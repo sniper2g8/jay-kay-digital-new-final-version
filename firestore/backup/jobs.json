@@ -1,0 +1,1922 @@
+[
+{
+  "title": "Canvas Printing A1",
+  "jobNo": "JKDP-JOB-0008",
+  "description": "Photo Frame Canvas printing",
+  "customerId": "PTSBxN8bmIJzLhi5dasJ",
+  "quantity": 1,
+  "lf": {
+    "category": "banner",
+    "variant": "canvas_banner"
+  },
+  "paper": null,
+  "finishIds": [],
+  "finishPrices": {},
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "status": "Completed",
+  "invoiced": true,
+  "invoiceId": "YYIPeI71bkoBprBIs3fE",
+  "submittedDate": "2025-08-13",
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "size": {
+    "sizeMode": "custom",
+    "unit": "mm",
+    "standardSize": "A1",
+    "width": 420,
+    "height": 593
+  },
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 150,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 150,
+    "total": 150,
+    "currency": "Le"
+  },
+  "files": [],
+  "customerName": "Dels Enterprise",
+  "updatedAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "serviceName": "Large Format Printing",
+  "serviceId": "large-format",
+  "firestore_id": "1x96O3687AFrUhqD8rE7"
+},
+{
+  "jobNo": "JKDP-JOB-0018",
+  "description": "pull-up banners coming",
+  "customerId": "iWSU1dPIcfecASZTRz73",
+  "lf": {
+    "category": "banner",
+    "variant": "normal_banner"
+  },
+  "paper": null,
+  "size": {
+    "sizeMode": "custom",
+    "standardSize": "A4",
+    "unit": "cm",
+    "width": 85,
+    "height": 200
+  },
+  "finishIds": [],
+  "finishPrices": {},
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "status": "Completed",
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "files": [],
+  "customerName": "Inkee Media",
+  "invoiced": true,
+  "serviceName": "Large Format Printing",
+  "serviceId": "large-format",
+  "quantity": 3,
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 200,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 200,
+    "total": 600,
+    "currency": "Le"
+  },
+  "submittedDate": "2025-07-22",
+  "title": "pull-up banners ",
+  "invoiceId": "5rFfFn9MJMoMMFLR6wuh",
+  "invoiceNo": "JKDP-INV-0002",
+  "updatedAt": {
+    "_seconds": 1756666327,
+    "_nanoseconds": 936000000
+  },
+  "firestore_id": "7G60k5jOMBWXKj6S3SNf"
+},
+{
+  "title": "A2 Envelopes",
+  "jobNo": "JKDP-JOB-0039",
+  "description": "A2 Envelopes",
+  "customerId": "iWSU1dPIcfecASZTRz73",
+  "serviceId": "digital-printing",
+  "serviceName": "Digital Printing",
+  "quantity": 4,
+  "lf": null,
+  "paper": {
+    "type": "Art Paper (Glossy)",
+    "weightGsm": 200
+  },
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A4",
+    "unit": "m"
+  },
+  "finishIds": [
+    "die-cutting"
+  ],
+  "finishPrices": {
+    "die-cutting": 25
+  },
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "status": "Completed",
+  "invoiced": true,
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 50,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 50,
+    "total": 200,
+    "currency": "Le"
+  },
+  "files": [],
+  "submittedDate": "2025-07-29",
+  "customerName": "Inkee Media",
+  "invoiceId": "5rFfFn9MJMoMMFLR6wuh",
+  "invoiceNo": "JKDP-INV-0002",
+  "updatedAt": {
+    "_seconds": 1756666327,
+    "_nanoseconds": 936000000
+  },
+  "firestore_id": "C756s9cGUAhqf80MmNFo"
+},
+{
+  "title": "4x6 banner outdoor",
+  "jobNo": "JKDP-JOB-0045",
+  "description": "4x6 banner outdoor",
+  "customerId": "qJBxG0VLNSN72HdCMOF1",
+  "serviceId": "large-format-printing",
+  "serviceName": "Large Format Printing",
+  "quantity": 30,
+  "lf": {
+    "category": "banner",
+    "variant": "normal_banner"
+  },
+  "paper": null,
+  "size": {
+    "sizeMode": "custom",
+    "standardSize": "A4",
+    "unit": "feet",
+    "width": 4,
+    "height": 6
+  },
+  "finishIds": [],
+  "finishPrices": {},
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "invoiced": false,
+  "estimate": {
+    "mode": "area",
+    "unitPrice": 240,
+    "unitPriceUsed": 240,
+    "unitPriceOverridden": false,
+    "total": 7200,
+    "currency": "Le"
+  },
+  "createdAt": {
+    "_seconds": 1755719650,
+    "_nanoseconds": 400000000
+  },
+  "status": "Completed",
+  "submittedDate": "2025-08-20",
+  "updatedAt": {
+    "_seconds": 1756247006,
+    "_nanoseconds": 618000000
+  },
+  "firestore_id": "EGXufaOEV9v0gt7sDgeN"
+},
+{
+  "customerId": "iWSU1dPIcfecASZTRz73",
+  "customerName": "Inkee Media",
+  "title": "Mpox Register",
+  "serviceId": "brochures",
+  "quantity": 100,
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A3"
+  },
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "finishPrices": {},
+  "__open": true,
+  "paper": {
+    "pageCount": 50,
+    "type": "bond",
+    "weightGsm": 80,
+    "coverType": "matte",
+    "coverWeightGsm": 250
+  },
+  "submittedDate": "2025-08-26",
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "files": [],
+  "status": "Completed",
+  "jobNo": "JKDP-JOB-0081",
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "serviceName": "Brochures",
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 100,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 100,
+    "total": 10000,
+    "currency": "Le"
+  },
+  "invoiced": true,
+  "invoiceId": "5rFfFn9MJMoMMFLR6wuh",
+  "invoiceNo": "JKDP-INV-0002",
+  "updatedAt": {
+    "_seconds": 1756666327,
+    "_nanoseconds": 936000000
+  },
+  "firestore_id": "JK-0077"
+},
+{
+  "jobNo": "JKDP-JOB-0091",
+  "customerId": "CiVGwfoDpk6mColkQguP",
+  "customerName": "Abdulaih Conteh",
+  "title": "2025 Sierra Leone Innovates-Digital Government Summit Newsletter",
+  "serviceId": "brochures",
+  "serviceName": "Brochures",
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A4"
+  },
+  "paper": {
+    "pageCount": 68,
+    "type": "glossy",
+    "weightGsm": 150,
+    "coverType": "glossy",
+    "coverWeightGsm": 300
+  },
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "files": [],
+  "submittedDate": "2025-08-27",
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "finishPrices": {
+    "fin-lam-soft-touch": 0
+  },
+  "quantity": 40,
+  "status": "Completed",
+  "createdBy": "B8c6nhXf4FYmpAo2CmovoviSWJ62",
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 240,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 240,
+    "total": 9600,
+    "currency": "Le"
+  },
+  "invoiced": true,
+  "invoiceId": "NKSVrimLk4H1edX5MXHH",
+  "invoiceNo": "JKDP-INV-0004",
+  "updatedAt": {
+    "_seconds": 1757003674,
+    "_nanoseconds": 342000000
+  },
+  "firestore_id": "JKDP-JOB-0091"
+},
+{
+  "jobNo": "JKDP-JOB-0092",
+  "customerId": "iWSU1dPIcfecASZTRz73",
+  "customerName": "Inkee Media",
+  "title": "Mpox Summary Sheet",
+  "serviceId": "digital-printing",
+  "serviceName": "Digital Printing",
+  "quantity": 2500,
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A4"
+  },
+  "paper": {
+    "type": "Bond",
+    "weightGsm": 80
+  },
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 1,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 1,
+    "total": 2500,
+    "currency": "Le"
+  },
+  "files": [],
+  "submittedDate": "2025-08-30",
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "status": "Completed",
+  "invoiced": true,
+  "invoiceId": "5rFfFn9MJMoMMFLR6wuh",
+  "invoiceNo": "JKDP-INV-0002",
+  "updatedAt": {
+    "_seconds": 1756666327,
+    "_nanoseconds": 936000000
+  },
+  "firestore_id": "JKDP-JOB-0092"
+},
+{
+  "jobNo": "JKDP-JOB-0094",
+  "customerId": "iWSU1dPIcfecASZTRz73",
+  "customerName": "Inkee Media",
+  "serviceId": "business-cards",
+  "serviceName": "Business Cards",
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A4"
+  },
+  "paper": {
+    "type": "Matte",
+    "weightGsm": 350
+  },
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "files": [],
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "submittedDate": "2025-07-03",
+  "title": "Emma Fofanah Business Card 700gsm",
+  "quantity": 50,
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 20,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 20,
+    "total": 1000,
+    "currency": "Le"
+  },
+  "status": "Completed",
+  "invoiced": true,
+  "invoiceId": "5rFfFn9MJMoMMFLR6wuh",
+  "invoiceNo": "JKDP-INV-0002",
+  "updatedAt": {
+    "_seconds": 1756666327,
+    "_nanoseconds": 936000000
+  },
+  "firestore_id": "JKDP-JOB-0094"
+},
+{
+  "jobNo": "JKDP-JOB-0095",
+  "customerId": "iWSU1dPIcfecASZTRz73",
+  "customerName": "Inkee Media",
+  "title": "CFAO Service Sticker Die Cut",
+  "serviceId": "digital-printing",
+  "serviceName": "Digital Printing",
+  "quantity": 500,
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A4"
+  },
+  "paper": {},
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "files": [],
+  "submittedDate": "2025-07-07",
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "finishPrices": {
+    "die-cutting": 2
+  },
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 6,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 6,
+    "total": 3000,
+    "currency": "Le"
+  },
+  "status": "Completed",
+  "invoiced": true,
+  "invoiceId": "5rFfFn9MJMoMMFLR6wuh",
+  "invoiceNo": "JKDP-INV-0002",
+  "updatedAt": {
+    "_seconds": 1756666327,
+    "_nanoseconds": 936000000
+  },
+  "firestore_id": "JKDP-JOB-0095"
+},
+{
+  "jobNo": "JKDP-JOB-0096",
+  "customerId": "iWSU1dPIcfecASZTRz73",
+  "customerName": "Inkee Media",
+  "title": "CFAO A3 Stickers FV01",
+  "serviceId": "large-format",
+  "serviceName": "Large Format Printing",
+  "quantity": 50,
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A3"
+  },
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "lf": {
+    "category": "sav",
+    "variant": "normal_sav"
+  },
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 12,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 12,
+    "total": 600,
+    "currency": "Le"
+  },
+  "files": [],
+  "submittedDate": "2025-07-07",
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "status": "Completed",
+  "invoiced": true,
+  "invoiceId": "5rFfFn9MJMoMMFLR6wuh",
+  "invoiceNo": "JKDP-INV-0002",
+  "updatedAt": {
+    "_seconds": 1756666327,
+    "_nanoseconds": 936000000
+  },
+  "firestore_id": "JKDP-JOB-0096"
+},
+{
+  "jobNo": "JKDP-JOB-0097",
+  "customerId": "iWSU1dPIcfecASZTRz73",
+  "customerName": "Inkee Media",
+  "title": "CFAO A3 Stickers FV02",
+  "serviceId": "large-format",
+  "serviceName": "Large Format Printing",
+  "quantity": 50,
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A3"
+  },
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "lf": {
+    "category": "sav",
+    "variant": "normal_sav"
+  },
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 12,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 12,
+    "total": 600,
+    "currency": "Le"
+  },
+  "files": [],
+  "submittedDate": "2025-07-07",
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "status": "Completed",
+  "invoiced": true,
+  "invoiceId": "5rFfFn9MJMoMMFLR6wuh",
+  "invoiceNo": "JKDP-INV-0002",
+  "updatedAt": {
+    "_seconds": 1756666327,
+    "_nanoseconds": 936000000
+  },
+  "firestore_id": "JKDP-JOB-0097"
+},
+{
+  "jobNo": "JKDP-JOB-0098",
+  "customerId": "iWSU1dPIcfecASZTRz73",
+  "customerName": "Inkee Media",
+  "title": "CFAO A3 Stickers FV01 and CFAO A3 Stickers FV01",
+  "serviceId": "large-format",
+  "serviceName": "Large Format Printing",
+  "quantity": 100,
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A5"
+  },
+  "lf": {
+    "category": "sav",
+    "variant": "normal_sav"
+  },
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 3,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 3,
+    "total": 300,
+    "currency": "Le"
+  },
+  "files": [],
+  "submittedDate": "2025-07-07",
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "status": "Completed",
+  "invoiced": true,
+  "invoiceId": "5rFfFn9MJMoMMFLR6wuh",
+  "invoiceNo": "JKDP-INV-0002",
+  "updatedAt": {
+    "_seconds": 1756666327,
+    "_nanoseconds": 936000000
+  },
+  "firestore_id": "JKDP-JOB-0098"
+},
+{
+  "jobNo": "JKDP-JOB-0100",
+  "customerId": "iWSU1dPIcfecASZTRz73",
+  "customerName": "Inkee Media",
+  "title": "Name: Child Friendly Guide on Handwashing and Positive Hygiene for Sunday School Final",
+  "serviceId": "brochures",
+  "serviceName": "Brochures",
+  "quantity": 60,
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A4"
+  },
+  "paper": {
+    "pageCount": 33,
+    "type": "glossy",
+    "weightGsm": 150,
+    "coverType": "glossy",
+    "coverWeightGsm": 300
+  },
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "files": [],
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "finishPrices": {
+    "fin-lam-soft-touch": 15
+  },
+  "submittedDate": "2025-07-09",
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 100,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 100,
+    "total": 6000,
+    "currency": "Le"
+  },
+  "status": "Completed",
+  "invoiced": true,
+  "invoiceId": "5rFfFn9MJMoMMFLR6wuh",
+  "invoiceNo": "JKDP-INV-0002",
+  "updatedAt": {
+    "_seconds": 1756666327,
+    "_nanoseconds": 936000000
+  },
+  "firestore_id": "JKDP-JOB-0100"
+},
+{
+  "jobNo": "JKDP-JOB-0101",
+  "customerId": "iWSU1dPIcfecASZTRz73",
+  "customerName": "Inkee Media",
+  "title": "Wold Vision Business Card Normal",
+  "serviceId": "business-cards",
+  "serviceName": "Business Cards",
+  "quantity": 50,
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A4"
+  },
+  "paper": {
+    "type": "Glossy",
+    "weightGsm": 350
+  },
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 4,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 4,
+    "total": 200,
+    "currency": "Le"
+  },
+  "files": [],
+  "submittedDate": "2025-07-14",
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "status": "Completed",
+  "invoiced": true,
+  "invoiceId": "5rFfFn9MJMoMMFLR6wuh",
+  "invoiceNo": "JKDP-INV-0002",
+  "updatedAt": {
+    "_seconds": 1756666327,
+    "_nanoseconds": 936000000
+  },
+  "firestore_id": "JKDP-JOB-0101"
+},
+{
+  "jobNo": "JKDP-JOB-0102",
+  "customerId": "iWSU1dPIcfecASZTRz73",
+  "customerName": "Inkee Media",
+  "title": "AAH Trifold",
+  "serviceId": "flyers",
+  "serviceName": "Flyers",
+  "quantity": 52,
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A3"
+  },
+  "paper": {
+    "type": "glossy",
+    "weightGsm": 250
+  },
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "files": [],
+  "submittedDate": "2025-07-18",
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "finishPrices": {
+    "fin-lam-soft-touch": 25
+  },
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 30,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 30,
+    "total": 1560,
+    "currency": "Le"
+  },
+  "status": "Completed",
+  "invoiced": true,
+  "invoiceId": "5rFfFn9MJMoMMFLR6wuh",
+  "invoiceNo": "JKDP-INV-0002",
+  "updatedAt": {
+    "_seconds": 1756666327,
+    "_nanoseconds": 936000000
+  },
+  "firestore_id": "JKDP-JOB-0102"
+},
+{
+  "jobNo": "JKDP-JOB-0103",
+  "customerId": "iWSU1dPIcfecASZTRz73",
+  "customerName": "Inkee Media",
+  "title": "Gender Responsive Land Governance",
+  "serviceId": "brochures",
+  "serviceName": "Brochures",
+  "quantity": 82,
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A4"
+  },
+  "paper": {
+    "pageCount": 36,
+    "type": "glossy",
+    "weightGsm": 150,
+    "coverType": "glossy",
+    "coverWeightGsm": 250
+  },
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 90,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 90,
+    "total": 7380,
+    "currency": "Le"
+  },
+  "files": [],
+  "submittedDate": "2025-08-31",
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "status": "Completed",
+  "invoiced": true,
+  "invoiceId": "5rFfFn9MJMoMMFLR6wuh",
+  "invoiceNo": "JKDP-INV-0002",
+  "updatedAt": {
+    "_seconds": 1756666327,
+    "_nanoseconds": 936000000
+  },
+  "firestore_id": "JKDP-JOB-0103"
+},
+{
+  "jobNo": "JKDP-JOB-0104",
+  "customerId": "iWSU1dPIcfecASZTRz73",
+  "customerName": "Inkee Media",
+  "title": "Brochure A4 trifold",
+  "serviceId": "flyers",
+  "serviceName": "Flyers",
+  "quantity": 250,
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A4"
+  },
+  "paper": {
+    "type": "glossy",
+    "weightGsm": 200
+  },
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 5,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 5,
+    "total": 1250,
+    "currency": "Le"
+  },
+  "files": [],
+  "submittedDate": "2025-07-22",
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "status": "Completed",
+  "invoiced": true,
+  "invoiceId": "5rFfFn9MJMoMMFLR6wuh",
+  "invoiceNo": "JKDP-INV-0002",
+  "updatedAt": {
+    "_seconds": 1756666327,
+    "_nanoseconds": 936000000
+  },
+  "firestore_id": "JKDP-JOB-0104"
+},
+{
+  "jobNo": "JKDP-JOB-0105",
+  "customerId": "iWSU1dPIcfecASZTRz73",
+  "customerName": "Inkee Media",
+  "title": "Grade 2 Workbooks Perfect bind Cover UV Coated",
+  "serviceId": "brochures",
+  "serviceName": "Brochures",
+  "quantity": 1,
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A4"
+  },
+  "paper": {
+    "pageCount": 132,
+    "type": "bond",
+    "weightGsm": 80,
+    "coverType": "glossy",
+    "coverWeightGsm": 250
+  },
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 430,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 430,
+    "total": 430,
+    "currency": "Le"
+  },
+  "files": [],
+  "submittedDate": "2025-07-25",
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "finishPrices": {
+    "fin-spot-3d": 0
+  },
+  "status": "Completed",
+  "invoiced": true,
+  "invoiceId": "5rFfFn9MJMoMMFLR6wuh",
+  "invoiceNo": "JKDP-INV-0002",
+  "updatedAt": {
+    "_seconds": 1756666327,
+    "_nanoseconds": 936000000
+  },
+  "firestore_id": "JKDP-JOB-0105"
+},
+{
+  "jobNo": "JKDP-JOB-0106",
+  "customerId": "iWSU1dPIcfecASZTRz73",
+  "customerName": "Inkee Media",
+  "title": "Irc-girl-shine part 4",
+  "serviceId": "brochures",
+  "serviceName": "Brochures",
+  "quantity": 1,
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A4"
+  },
+  "paper": {
+    "pageCount": 120,
+    "type": "bond",
+    "weightGsm": 80,
+    "coverType": "glossy",
+    "coverWeightGsm": 300
+  },
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 300,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 300,
+    "total": 300,
+    "currency": "Le"
+  },
+  "files": [],
+  "submittedDate": "2025-08-06",
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "status": "Completed",
+  "invoiced": true,
+  "invoiceId": "5rFfFn9MJMoMMFLR6wuh",
+  "invoiceNo": "JKDP-INV-0002",
+  "updatedAt": {
+    "_seconds": 1756666327,
+    "_nanoseconds": 936000000
+  },
+  "firestore_id": "JKDP-JOB-0106"
+},
+{
+  "jobNo": "JKDP-JOB-0107",
+  "customerId": "iWSU1dPIcfecASZTRz73",
+  "customerName": "Inkee Media",
+  "title": "Part 2 Assile_Final",
+  "serviceId": "brochures",
+  "serviceName": "Brochures",
+  "quantity": 1,
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A4"
+  },
+  "paper": {
+    "pageCount": 388,
+    "type": "bond",
+    "weightGsm": 80,
+    "coverType": "glossy",
+    "coverWeightGsm": 300
+  },
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 776,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 776,
+    "total": 776,
+    "currency": "Le"
+  },
+  "files": [],
+  "submittedDate": "2025-08-06",
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "status": "Completed",
+  "invoiced": true,
+  "invoiceId": "5rFfFn9MJMoMMFLR6wuh",
+  "invoiceNo": "JKDP-INV-0002",
+  "updatedAt": {
+    "_seconds": 1756666327,
+    "_nanoseconds": 936000000
+  },
+  "firestore_id": "JKDP-JOB-0107"
+},
+{
+  "jobNo": "JKDP-JOB-0108",
+  "customerId": "iWSU1dPIcfecASZTRz73",
+  "customerName": "Inkee Media",
+  "title": "SLEDP Mid-Year Update Magazin",
+  "serviceId": "brochures",
+  "serviceName": "Brochures",
+  "quantity": 1,
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A3"
+  },
+  "paper": {
+    "pageCount": 26,
+    "type": "glossy",
+    "weightGsm": 150,
+    "coverType": "glossy",
+    "coverWeightGsm": 300
+  },
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 65,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 65,
+    "total": 65,
+    "currency": "Le"
+  },
+  "files": [],
+  "submittedDate": "2025-08-13",
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "status": "Completed",
+  "invoiced": true,
+  "invoiceId": "5rFfFn9MJMoMMFLR6wuh",
+  "invoiceNo": "JKDP-INV-0002",
+  "updatedAt": {
+    "_seconds": 1756666327,
+    "_nanoseconds": 936000000
+  },
+  "firestore_id": "JKDP-JOB-0108"
+},
+{
+  "jobNo": "JKDP-JOB-0109",
+  "customerId": "CiVGwfoDpk6mColkQguP",
+  "customerName": "Abdulaih Conteh",
+  "title": "BO DISTRICT COUNCIL NEWSLETTER",
+  "serviceId": "brochures-booklets",
+  "serviceName": "Brochures & Booklets",
+  "quantity": 100,
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A4"
+  },
+  "paper": {
+    "pageCount": 14,
+    "type": "Matte",
+    "weightGsm": 150,
+    "coverType": "Glossy",
+    "coverWeightGsm": 300
+  },
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 150,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 150,
+    "total": 15000,
+    "currency": "Le"
+  },
+  "files": [],
+  "submittedDate": "2025-09-02",
+  "createdBy": "B8c6nhXf4FYmpAo2CmovoviSWJ62",
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "finishPrices": {
+    "fin-lam-matte": 0
+  },
+  "status": "Completed",
+  "invoiced": true,
+  "invoiceId": "NKSVrimLk4H1edX5MXHH",
+  "invoiceNo": "JKDP-INV-0004",
+  "updatedAt": {
+    "_seconds": 1757003674,
+    "_nanoseconds": 342000000
+  },
+  "firestore_id": "JKDP-JOB-0109"
+},
+{
+  "jobNo": "JKDP-JOB-0110",
+  "customerId": "CiVGwfoDpk6mColkQguP",
+  "customerName": "Abdulaih Conteh",
+  "title": "BO DISTRICT COUNCIL NEWSLETTER 2",
+  "serviceId": "brochures",
+  "serviceName": "Brochures",
+  "quantity": 10,
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A4"
+  },
+  "paper": {
+    "pageCount": 6,
+    "type": "glossy",
+    "weightGsm": 150,
+    "coverType": "glossy",
+    "coverWeightGsm": 300
+  },
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 80,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 80,
+    "total": 800,
+    "currency": "Le"
+  },
+  "files": [],
+  "submittedDate": "2025-09-02",
+  "createdBy": "B8c6nhXf4FYmpAo2CmovoviSWJ62",
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "finishPrices": {
+    "fin-lam-matte": 0
+  },
+  "status": "Completed",
+  "invoiced": true,
+  "invoiceId": "NKSVrimLk4H1edX5MXHH",
+  "invoiceNo": "JKDP-INV-0004",
+  "updatedAt": {
+    "_seconds": 1757003674,
+    "_nanoseconds": 342000000
+  },
+  "firestore_id": "JKDP-JOB-0110"
+},
+{
+  "jobNo": "JKDP-JOB-0111",
+  "customerId": "PTSBxN8bmIJzLhi5dasJ",
+  "customerName": "Dels Enterprise",
+  "title": "Print and Cut SAV A7",
+  "serviceId": "large-format",
+  "serviceName": "Large Format Printing",
+  "quantity": 50,
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A6"
+  },
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "lf": {
+    "category": "sav",
+    "variant": "normal_sav"
+  },
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 7,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 7,
+    "total": 350,
+    "currency": "Le"
+  },
+  "files": [],
+  "submittedDate": "2025-09-05",
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "status": "Completed",
+  "updatedAt": {
+    "_seconds": 1757158789,
+    "_nanoseconds": 28000000
+  },
+  "firestore_id": "JKDP-JOB-0111"
+},
+{
+  "jobNo": "JKDP-JOB-0112",
+  "customerId": "PTSBxN8bmIJzLhi5dasJ",
+  "customerName": "Dels Enterprise",
+  "title": "4x6 dells",
+  "serviceId": "large-format",
+  "serviceName": "Large Format Printing",
+  "quantity": 1,
+  "size": {
+    "sizeMode": "custom",
+    "standardSize": "A4",
+    "width": 4,
+    "height": 6,
+    "unit": "inches"
+  },
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "lf": {
+    "category": "banner",
+    "variant": "normal_banner"
+  },
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 240,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 240,
+    "total": 240,
+    "currency": "Le"
+  },
+  "files": [],
+  "submittedDate": "2025-09-06",
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "status": "Completed",
+  "updatedAt": {
+    "_seconds": 1757158784,
+    "_nanoseconds": 16000000
+  },
+  "firestore_id": "JKDP-JOB-0112"
+},
+{
+  "title": "Grade 2 Workbooks - 80 pages Saddle Stich FV",
+  "jobNo": "JKDP-JOB-0043",
+  "description": "Grade 2 Workbooks - 80 pages Saddle Stich FV.pdf\nSmaple\nCover UV Coated",
+  "customerId": "iWSU1dPIcfecASZTRz73",
+  "serviceId": "brochures-booklets",
+  "serviceName": "Brochures & Booklets",
+  "lf": null,
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A4",
+    "unit": "m"
+  },
+  "finishIds": [
+    "saddle_stitching"
+  ],
+  "finishPrices": {
+    "saddle_stitching": 0
+  },
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "status": "Completed",
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "quantity": 2,
+  "paper": {
+    "weightGsm": 80,
+    "type": "Bond",
+    "coverType": "Glossy",
+    "coverWeightGsm": 250,
+    "pageCount": null
+  },
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 170,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 170,
+    "total": 340,
+    "currency": "Le"
+  },
+  "files": [],
+  "customerName": "Inkee Media",
+  "invoiced": true,
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "submittedDate": "2025-07-19",
+  "invoiceId": "5rFfFn9MJMoMMFLR6wuh",
+  "invoiceNo": "JKDP-INV-0002",
+  "updatedAt": {
+    "_seconds": 1756666327,
+    "_nanoseconds": 936000000
+  },
+  "firestore_id": "OH08JCq7ZxKtAHrciLhk"
+},
+{
+  "title": "Car branding",
+  "description": "",
+  "customerId": "CiVGwfoDpk6mColkQguP",
+  "serviceId": "large-format",
+  "serviceName": "Large Format Printing",
+  "quantity": 1,
+  "lf": {
+    "category": "sav",
+    "variant": "normal_sav"
+  },
+  "size": {
+    "sizeMode": "custom",
+    "standardSize": "A4",
+    "width": 5,
+    "height": 16,
+    "unit": "feet"
+  },
+  "finishOptions": [],
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "estimate": {
+    "mode": "area",
+    "unitPrice": 1003.35,
+    "unitPriceUsed": 1003.35,
+    "unitPriceOverridden": false,
+    "total": 1003.35,
+    "currency": "Le"
+  },
+  "files": [],
+  "createdAt": {
+    "_seconds": 1755950143,
+    "_nanoseconds": 445000000
+  },
+  "status": "Completed",
+  "jobNo": "JKDP-JOB-0082",
+  "submittedDate": "2025-08-23",
+  "invoiced": true,
+  "invoiceId": "NKSVrimLk4H1edX5MXHH",
+  "invoiceNo": "JKDP-INV-0004",
+  "updatedAt": {
+    "_seconds": 1757003674,
+    "_nanoseconds": 342000000
+  },
+  "firestore_id": "PBwrE2KQREF255ozT7m7"
+},
+{
+  "title": "Folder",
+  "description": "Folder for UNDP",
+  "customerId": "CiVGwfoDpk6mColkQguP",
+  "serviceId": "digital-printing",
+  "serviceName": "Digital Printing",
+  "quantity": 50,
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A3",
+    "unit": "mm"
+  },
+  "finishOptions": [
+    {
+      "id": "lamination",
+      "active": true,
+      "name": "Lamination",
+      "pricing": {
+        "mode": "per_item",
+        "type": "surcharge",
+        "currency": "Le",
+        "amount": 500
+      },
+      "category": "General"
+    }
+  ],
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 40,
+    "unitPriceUsed": 40,
+    "unitPriceOverridden": false,
+    "total": 2000,
+    "currency": "Le"
+  },
+  "paper": {
+    "type": "Art Paper (Glossy)",
+    "weightGsm": 300
+  },
+  "files": [],
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "status": "Completed",
+  "jobNo": "JKDP-JOB-0083",
+  "submittedDate": "2025-08-26",
+  "invoiced": true,
+  "invoiceId": "NKSVrimLk4H1edX5MXHH",
+  "invoiceNo": "JKDP-INV-0004",
+  "updatedAt": {
+    "_seconds": 1757003674,
+    "_nanoseconds": 342000000
+  },
+  "firestore_id": "RURwFOzhptUVDHG97g88"
+},
+{
+  "title": "CFAO A3 lamition",
+  "jobNo": "JKDP-JOB-0040",
+  "description": "",
+  "customerId": "iWSU1dPIcfecASZTRz73",
+  "serviceId": "digital-printing",
+  "serviceName": "Digital Printing",
+  "lf": null,
+  "paper": {
+    "type": "Art Paper (Glossy)",
+    "weightGsm": 300
+  },
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A3",
+    "unit": "m"
+  },
+  "finishIds": [
+    "lamination"
+  ],
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "status": "Completed",
+  "invoiced": true,
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "files": [],
+  "submittedDate": "2025-07-07",
+  "customerName": "Inkee Media",
+  "finishPrices": {
+    "lamination": 10
+  },
+  "quantity": 32,
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 15,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 15,
+    "total": 480,
+    "currency": "Le"
+  },
+  "invoiceId": "5rFfFn9MJMoMMFLR6wuh",
+  "invoiceNo": "JKDP-INV-0002",
+  "updatedAt": {
+    "_seconds": 1756666327,
+    "_nanoseconds": 936000000
+  },
+  "firestore_id": "SxLVSTa81civf5egvHXT"
+},
+{
+  "title": "PSI Books",
+  "customerId": "iWSU1dPIcfecASZTRz73",
+  "serviceId": "digital-printing",
+  "serviceName": "Digital Printing",
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A3",
+    "unit": "mm"
+  },
+  "finishOptions": [],
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "paper": {
+    "type": "Bond"
+  },
+  "files": [],
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "description": "PSI Books 100 copies",
+  "status": "Completed",
+  "jobNo": "JKDP-JOB-0084",
+  "submittedDate": "2025-08-26",
+  "quantity": 200,
+  "createdBy": "B8c6nhXf4FYmpAo2CmovoviSWJ62",
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 260,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 260,
+    "total": 52000,
+    "currency": "Le"
+  },
+  "customerName": "Inkee Media",
+  "invoiced": true,
+  "invoiceId": "5rFfFn9MJMoMMFLR6wuh",
+  "invoiceNo": "JKDP-INV-0002",
+  "updatedAt": {
+    "_seconds": 1756666327,
+    "_nanoseconds": 936000000
+  },
+  "firestore_id": "UwGhjNIozP8kdyxtO9eG"
+},
+{
+  "title": "IFRC Brochure - 300 copies",
+  "jobNo": "JKDP-JOB-0042",
+  "description": "IFRC Brochure - 300 copies",
+  "customerId": "iWSU1dPIcfecASZTRz73",
+  "serviceId": "flyers",
+  "serviceName": "Flyers",
+  "quantity": 300,
+  "lf": null,
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A4",
+    "unit": "m"
+  },
+  "finishIds": [],
+  "finishPrices": {},
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "status": "Completed",
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "files": [
+    {
+      "id": "2025-08-27T04:09:45.239Z",
+      "storagePath": "jobs/JKDP-JOB-0042/1753094735510-IFRC Brochure - 300 copies.pdf",
+      "filename": "1753094735510-IFRC Brochure - 300 copies.pdf",
+      "mime": "application/pdf",
+      "sizeBytes": 2215348,
+      "uploadedBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+      "uploadedAt": {
+        "seconds": 1756267785,
+        "nanoseconds": 239000000
+      },
+      "url": "https://firebasestorage.googleapis.com/v0/b/jay-kay-digital-press-6q5na.firebasestorage.app/o/jobs%2FJKDP-JOB-0042%2F1753094735510-IFRC%20Brochure%20-%20300%20copies.pdf?alt=media&token=d739f9ba-49ff-47ff-a69e-861d14f512ef",
+      "title": "1753094735510-IFRC Brochure - 300 copies.pdf",
+      "quantity": 1,
+      "description": ""
+    }
+  ],
+  "customerName": "Inkee Media",
+  "invoiced": true,
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "submittedDate": "2025-07-21",
+  "paper": {
+    "type": "glossy",
+    "weightGsm": 150
+  },
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 5,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 5,
+    "total": 1500,
+    "currency": "Le"
+  },
+  "invoiceId": "5rFfFn9MJMoMMFLR6wuh",
+  "invoiceNo": "JKDP-INV-0002",
+  "updatedAt": {
+    "_seconds": 1756666327,
+    "_nanoseconds": 936000000
+  },
+  "firestore_id": "Vjc8mxQb2s7qJck4hdit"
+},
+{
+  "title": "Transaparent SAV",
+  "jobNo": "JKDP-JOB-0007",
+  "description": "",
+  "customerId": "PTSBxN8bmIJzLhi5dasJ",
+  "quantity": 15,
+  "lf": {
+    "category": "sav",
+    "variant": "transparent_sav"
+  },
+  "paper": null,
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A3",
+    "unit": "m"
+  },
+  "finishIds": [],
+  "finishPrices": {},
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "status": "Completed",
+  "invoiced": true,
+  "invoiceId": "YYIPeI71bkoBprBIs3fE",
+  "submittedDate": "2025-08-13",
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 25,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 25,
+    "total": 375,
+    "currency": "Le"
+  },
+  "files": [],
+  "customerName": "Dels Enterprise",
+  "updatedAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "serviceName": "Large Format Printing",
+  "serviceId": "large-format",
+  "firestore_id": "Y7h3FVBfliJvisE1PfR6"
+},
+{
+  "title": "Teachers Guide - 280 Pages - Perfect Bound FV",
+  "jobNo": "JKDP-JOB-0035",
+  "description": "Teachers Guide - 280 Pages - Perfect Bound FV",
+  "customerId": "iWSU1dPIcfecASZTRz73",
+  "serviceId": "brochures-booklets",
+  "serviceName": "Brochures & Booklets",
+  "lf": null,
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A4",
+    "unit": "m"
+  },
+  "finishIds": [
+    "perfect_binding"
+  ],
+  "finishPrices": {
+    "perfect_binding": 0
+  },
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "status": "Completed",
+  "submittedDate": "2025-08-13",
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "quantity": 2,
+  "paper": {
+    "coverType": "Glossy",
+    "weightGsm": 100,
+    "coverWeightGsm": 300,
+    "type": "Bond",
+    "pageCount": null
+  },
+  "createdBy": "B8c6nhXf4FYmpAo2CmovoviSWJ62",
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 440,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 440,
+    "total": 880,
+    "currency": "Le"
+  },
+  "files": [],
+  "customerName": "Inkee Media",
+  "invoiced": true,
+  "invoiceId": "5rFfFn9MJMoMMFLR6wuh",
+  "invoiceNo": "JKDP-INV-0002",
+  "updatedAt": {
+    "_seconds": 1756666327,
+    "_nanoseconds": 936000000
+  },
+  "firestore_id": "bqA5rBfnfpIfs5BOxCq0"
+},
+{
+  "title": "anzen cross - A2 laminated - 2 copies",
+  "jobNo": "JKDP-JOB-0034",
+  "description": "anzen cross - A2 laminated - 2 copies\nUV printed",
+  "customerId": "iWSU1dPIcfecASZTRz73",
+  "serviceId": "posters",
+  "serviceName": "Posters",
+  "quantity": 2,
+  "lf": null,
+  "paper": {
+    "type": "Glossy",
+    "weightGsm": 250
+  },
+  "finishIds": [
+    "lamination"
+  ],
+  "finishPrices": {
+    "lamination": 20
+  },
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "status": "Completed",
+  "submittedDate": "2025-08-13",
+  "invoiced": true,
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A2",
+    "unit": "m"
+  },
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 200,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 200,
+    "total": 400,
+    "currency": "Le"
+  },
+  "files": [],
+  "customerName": "Inkee Media",
+  "invoiceId": "5rFfFn9MJMoMMFLR6wuh",
+  "invoiceNo": "JKDP-INV-0002",
+  "updatedAt": {
+    "_seconds": 1756666327,
+    "_nanoseconds": 936000000
+  },
+  "firestore_id": "dpvmb1hP6at8FRJMcW2t"
+},
+{
+  "jobNo": "JKDP-JOB-0041",
+  "customerId": "iWSU1dPIcfecASZTRz73",
+  "serviceId": "large-format-printing",
+  "serviceName": "Large Format Printing",
+  "quantity": 1500,
+  "lf": {
+    "category": "sav",
+    "variant": "normal_sav"
+  },
+  "paper": null,
+  "finishIds": [],
+  "finishPrices": {},
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "createdAt": {
+    "_seconds": 1755102706,
+    "_nanoseconds": 586000000
+  },
+  "status": "Completed",
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A3",
+    "unit": "m"
+  },
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 12,
+    "unitPriceUsed": 12,
+    "unitPriceOverridden": false,
+    "total": 18000,
+    "currency": "Le"
+  },
+  "description": "IFRC A3 posters - 1,500 copies SAV",
+  "title": "IFRC A3 posters - 1,500 copies SAV",
+  "submittedDate": "2025-08-13",
+  "invoiced": true,
+  "invoiceId": "5rFfFn9MJMoMMFLR6wuh",
+  "invoiceNo": "JKDP-INV-0002",
+  "updatedAt": {
+    "_seconds": 1756666327,
+    "_nanoseconds": 936000000
+  },
+  "firestore_id": "jjO3pyZfRIJLPshD5yBW"
+},
+{
+  "jobNo": "JKDP-JOB-0009",
+  "customerId": "PTSBxN8bmIJzLhi5dasJ",
+  "quantity": 20,
+  "lf": {
+    "category": "banner",
+    "variant": "canvas_banner"
+  },
+  "paper": null,
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A2",
+    "unit": "m"
+  },
+  "finishIds": [],
+  "finishPrices": {},
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 35,
+    "unitPriceUsed": 35,
+    "unitPriceOverridden": false,
+    "total": 700,
+    "currency": "Le"
+  },
+  "status": "Completed",
+  "invoiced": true,
+  "invoiceId": "YYIPeI71bkoBprBIs3fE",
+  "description": "Canvas A2",
+  "title": "Canvas A2",
+  "submittedDate": "2025-08-13",
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "files": [],
+  "customerName": "Dels Enterprise",
+  "updatedAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "serviceName": "Large Format Printing",
+  "serviceId": "large-format",
+  "firestore_id": "jtwefT4KoOP3PeWKhXYL"
+},
+{
+  "title": "Amarachi wedding A4 folded split FV",
+  "jobNo": "JKDP-JOB-0037",
+  "description": "Amarachi wedding A4 folded split FV",
+  "customerId": "iWSU1dPIcfecASZTRz73",
+  "serviceId": "invitations",
+  "serviceName": "Invitations",
+  "quantity": 50,
+  "lf": null,
+  "paper": {
+    "type": "glossy",
+    "weightGsm": 350
+  },
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A4",
+    "unit": "m"
+  },
+  "finishIds": [
+    "fin-foil-gold",
+    "fin-lam-soft-touch"
+  ],
+  "finishPrices": {
+    "fin-foil-gold": 0,
+    "fin-lam-soft-touch": 0
+  },
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 50,
+    "unitPriceUsed": 50,
+    "unitPriceOverridden": false,
+    "total": 2500,
+    "currency": "Le"
+  },
+  "status": "Completed",
+  "invoiced": true,
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "files": [],
+  "submittedDate": "2025-07-29",
+  "customerName": "Inkee Media",
+  "invoiceId": "5rFfFn9MJMoMMFLR6wuh",
+  "invoiceNo": "JKDP-INV-0002",
+  "updatedAt": {
+    "_seconds": 1756666327,
+    "_nanoseconds": 936000000
+  },
+  "firestore_id": "kwur0QSrnfsCKfQD0ZO8"
+},
+{
+  "title": "4x6 banner",
+  "jobNo": "JKDP-JOB-0006",
+  "description": "",
+  "customerId": "qJBxG0VLNSN72HdCMOF1",
+  "serviceId": "large-format-printing",
+  "serviceName": "Large Format Printing",
+  "quantity": 10,
+  "lf": {
+    "category": "banner",
+    "variant": "normal_banner"
+  },
+  "paper": null,
+  "size": {
+    "sizeMode": "custom",
+    "standardSize": "A4",
+    "unit": "feet",
+    "width": 4,
+    "height": 6
+  },
+  "finishIds": [],
+  "finishPrices": {},
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "estimate": {
+    "mode": "area",
+    "unitPrice": 240,
+    "unitPriceUsed": 240,
+    "unitPriceOverridden": false,
+    "total": 2400,
+    "currency": "Le"
+  },
+  "createdAt": {
+    "_seconds": 1755079304,
+    "_nanoseconds": 578000000
+  },
+  "status": "Completed",
+  "invoiced": true,
+  "invoiceId": "CE6UZQL16n2fRiqLxcBe",
+  "submittedDate": "2025-08-13",
+  "updatedAt": {
+    "_seconds": 1756247006,
+    "_nanoseconds": 625000000
+  },
+  "firestore_id": "sUT78nD9goycZKaEqiJ1"
+},
+{
+  "title": "Land Sourvey",
+  "description": "",
+  "customerId": "CiVGwfoDpk6mColkQguP",
+  "serviceId": "brochures",
+  "serviceName": "Brochures",
+  "quantity": 100,
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A4",
+    "unit": "mm"
+  },
+  "finishOptions": [],
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "paper": {
+    "type": "glossy",
+    "weightGsm": 150,
+    "coverType": "glossy",
+    "coverWeightGsm": 250,
+    "pageCount": 35
+  },
+  "files": [],
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "status": "Completed",
+  "dueDate": {
+    "_seconds": 1755993600,
+    "_nanoseconds": 0
+  },
+  "jobNo": "JKDP-JOB-0085",
+  "submittedDate": "2025-08-26",
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 70,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 70,
+    "total": 7000,
+    "currency": "Le"
+  },
+  "customerName": "Abdulaih Conteh",
+  "invoiced": true,
+  "invoiceId": "NKSVrimLk4H1edX5MXHH",
+  "invoiceNo": "JKDP-INV-0004",
+  "updatedAt": {
+    "_seconds": 1757003674,
+    "_nanoseconds": 342000000
+  },
+  "firestore_id": "tO5iaBZsyFBw0qeraPME"
+},
+{
+  "title": "A1 posters",
+  "jobNo": "JKDP-JOB-0038",
+  "description": "A1 posters double side printing front and Back Lamintaion",
+  "customerId": "iWSU1dPIcfecASZTRz73",
+  "serviceId": "posters",
+  "serviceName": "Posters",
+  "quantity": 15,
+  "lf": null,
+  "paper": {
+    "type": "Glossy",
+    "weightGsm": 250
+  },
+  "size": {
+    "sizeMode": "standard",
+    "standardSize": "A1",
+    "unit": "m"
+  },
+  "finishIds": [
+    "lamination"
+  ],
+  "finishPrices": {
+    "lamination": 15
+  },
+  "delivery": {
+    "method": "front_desk_pickup"
+  },
+  "createdBy": "iGf2Hs1SugeLv0jnvg64vOiegIw1",
+  "status": "Completed",
+  "submittedDate": "2025-08-13",
+  "createdAt": {
+    "_methodName": "serverTimestamp"
+  },
+  "estimate": {
+    "mode": "fixed",
+    "unitPrice": 300,
+    "unitPriceOverridden": false,
+    "unitPriceUsed": 300,
+    "total": 4500,
+    "currency": "Le"
+  },
+  "files": [],
+  "customerName": "Inkee Media",
+  "invoiced": true,
+  "invoiceId": "5rFfFn9MJMoMMFLR6wuh",
+  "invoiceNo": "JKDP-INV-0002",
+  "updatedAt": {
+    "_seconds": 1756666327,
+    "_nanoseconds": 936000000
+  },
+  "firestore_id": "z5prZXZIyTpxzLQcXzcv"
+}
+]

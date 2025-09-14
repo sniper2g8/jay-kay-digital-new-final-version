@@ -1,0 +1,698 @@
+[
+{
+  "id": "die-cutting",
+  "name": "Die-cutting",
+  "category": "Finishing",
+  "active": true,
+  "pricing": {
+    "type": "surcharge",
+    "mode": "per_item",
+    "amount": 100,
+    "currency": "Le"
+  },
+  "firestore_id": "die-cutting"
+},
+{
+  "id": "die_cutting",
+  "name": "Die-cutting",
+  "category": "General",
+  "pricing": {
+    "type": "surcharge",
+    "mode": "per_item",
+    "amount": 1500,
+    "currency": "Le"
+  },
+  "active": true,
+  "firestore_id": "die_cutting"
+},
+{
+  "id": "eyelets",
+  "name": "Eyelets",
+  "category": "Finishing",
+  "active": true,
+  "pricing": {
+    "type": "surcharge",
+    "mode": "per_item",
+    "amount": 10,
+    "currency": "Le"
+  },
+  "firestore_id": "eyelets"
+},
+{
+  "createdAt": {
+    "_seconds": 1754970483,
+    "_nanoseconds": 870000000
+  },
+  "name": "Binding (Hard Cover Bind)",
+  "active": true,
+  "appliesTo": [
+    "books"
+  ],
+  "id": "fin-bind-hard-cover",
+  "category": "binding",
+  "parameters": {
+    "boardThickness": "2.5mm",
+    "pricing": {
+      "mode": "per_item",
+      "amount": 0,
+      "currency": "Le",
+      "type": "surcharge"
+    }
+  },
+  "updatedAt": {
+    "_seconds": 1754970483,
+    "_nanoseconds": 870000000
+  },
+  "firestore_id": "fin-bind-hard-cover"
+},
+{
+  "createdAt": {
+    "_seconds": 1754970483,
+    "_nanoseconds": 323000000
+  },
+  "name": "Binding (Perfect Bound)",
+  "active": true,
+  "appliesTo": [
+    "books"
+  ],
+  "id": "fin-bind-perfect",
+  "category": "binding",
+  "parameters": {
+    "minPages": 40,
+    "pricing": {
+      "mode": "per_item",
+      "amount": 0,
+      "currency": "Le",
+      "type": "surcharge"
+    }
+  },
+  "updatedAt": {
+    "_seconds": 1754970483,
+    "_nanoseconds": 323000000
+  },
+  "firestore_id": "fin-bind-perfect"
+},
+{
+  "createdAt": {
+    "_seconds": 1754970483,
+    "_nanoseconds": 161000000
+  },
+  "name": "Binding (Saddle Stitch)",
+  "active": true,
+  "appliesTo": [
+    "books"
+  ],
+  "id": "fin-bind-saddle-stitch",
+  "category": "binding",
+  "parameters": {
+    "maxPages": 64,
+    "pricing": {
+      "mode": "per_item",
+      "amount": 0,
+      "currency": "Le",
+      "type": "surcharge"
+    }
+  },
+  "updatedAt": {
+    "_seconds": 1754970483,
+    "_nanoseconds": 161000000
+  },
+  "firestore_id": "fin-bind-saddle-stitch"
+},
+{
+  "createdAt": {
+    "_seconds": 1754978580,
+    "_nanoseconds": 371000000
+  },
+  "name": "Rounded Corners",
+  "active": true,
+  "id": "fin-corners-rounded",
+  "category": "die_cut",
+  "pricing": {
+    "mode": "per_item",
+    "amount": 0,
+    "currency": "Le",
+    "type": "surcharge"
+  },
+  "updatedAt": {
+    "_seconds": 1754978580,
+    "_nanoseconds": 371000000
+  },
+  "firestore_id": "fin-corners-rounded"
+},
+{
+  "name": "Die Cutting",
+  "active": true,
+  "appliesTo": [
+    "invitations",
+    "flyers",
+    "3d-spot-uv"
+  ],
+  "id": "fin-diecut",
+  "category": "die_cut",
+  "parameters": {
+    "shape": "custom",
+    "bleedRequired": true,
+    "pricing": {
+      "mode": "per_item",
+      "amount": 0,
+      "currency": "Le",
+      "type": "surcharge"
+    }
+  },
+  "createdAt": {
+    "_seconds": 1754978580,
+    "_nanoseconds": 128000000
+  },
+  "pricing": {
+    "mode": "per_item",
+    "amount": 0,
+    "currency": "Le",
+    "type": "surcharge"
+  },
+  "updatedAt": {
+    "_seconds": 1754978580,
+    "_nanoseconds": 128000000
+  },
+  "firestore_id": "fin-diecut"
+},
+{
+  "active": true,
+  "appliesTo": [
+    "invitations",
+    "flyers",
+    "3d-spot-uv"
+  ],
+  "id": "fin-foil-broken-glass",
+  "category": "foil",
+  "parameters": {
+    "areaUnit": "cm2",
+    "foil": "broken_glass",
+    "pricing": {
+      "mode": "per_item",
+      "amount": 0,
+      "currency": "Le",
+      "type": "surcharge"
+    }
+  },
+  "createdAt": {
+    "_seconds": 1754978579,
+    "_nanoseconds": 877000000
+  },
+  "name": "Broken Glass Foil",
+  "pricing": {
+    "mode": "per_item",
+    "amount": 0,
+    "currency": "Le",
+    "type": "surcharge"
+  },
+  "updatedAt": {
+    "_seconds": 1754978579,
+    "_nanoseconds": 877000000
+  },
+  "firestore_id": "fin-foil-broken-glass"
+},
+{
+  "name": "Metallic Foil (Gold)",
+  "active": true,
+  "appliesTo": [
+    "invitations",
+    "flyers",
+    "3d-spot-uv"
+  ],
+  "id": "fin-foil-gold",
+  "category": "foil",
+  "parameters": {
+    "areaUnit": "cm2",
+    "foil": "gold",
+    "pricing": {
+      "mode": "per_item",
+      "amount": 0,
+      "currency": "Le",
+      "type": "surcharge"
+    }
+  },
+  "createdAt": {
+    "_seconds": 1754978578,
+    "_nanoseconds": 481000000
+  },
+  "pricing": {
+    "mode": "per_item",
+    "amount": 0,
+    "currency": "Le",
+    "type": "surcharge"
+  },
+  "updatedAt": {
+    "_seconds": 1754978578,
+    "_nanoseconds": 481000000
+  },
+  "firestore_id": "fin-foil-gold"
+},
+{
+  "active": true,
+  "appliesTo": [
+    "invitations",
+    "flyers",
+    "3d-spot-uv"
+  ],
+  "id": "fin-foil-invisible",
+  "category": "foil",
+  "parameters": {
+    "areaUnit": "cm2",
+    "foil": "invisible",
+    "pricing": {
+      "mode": "per_item",
+      "amount": 0,
+      "currency": "Le",
+      "type": "surcharge"
+    }
+  },
+  "createdAt": {
+    "_seconds": 1754978579,
+    "_nanoseconds": 663000000
+  },
+  "name": "Invisible Foil",
+  "pricing": {
+    "mode": "per_item",
+    "amount": 0,
+    "currency": "Le",
+    "type": "surcharge"
+  },
+  "updatedAt": {
+    "_seconds": 1754978579,
+    "_nanoseconds": 663000000
+  },
+  "firestore_id": "fin-foil-invisible"
+},
+{
+  "name": "Metallic Foil (Rainbow)",
+  "active": true,
+  "appliesTo": [
+    "invitations",
+    "flyers",
+    "3d-spot-uv"
+  ],
+  "id": "fin-foil-rainbow",
+  "category": "foil",
+  "parameters": {
+    "areaUnit": "cm2",
+    "foil": "rainbow",
+    "pricing": {
+      "mode": "per_item",
+      "amount": 0,
+      "currency": "Le",
+      "type": "surcharge"
+    }
+  },
+  "createdAt": {
+    "_seconds": 1754978579,
+    "_nanoseconds": 167000000
+  },
+  "pricing": {
+    "mode": "per_item",
+    "amount": 0,
+    "currency": "Le",
+    "type": "surcharge"
+  },
+  "updatedAt": {
+    "_seconds": 1754978579,
+    "_nanoseconds": 167000000
+  },
+  "firestore_id": "fin-foil-rainbow"
+},
+{
+  "name": "Metallic Foil (Silver)",
+  "active": true,
+  "appliesTo": [
+    "invitations",
+    "flyers",
+    "3d-spot-uv"
+  ],
+  "id": "fin-foil-silver",
+  "category": "foil",
+  "parameters": {
+    "areaUnit": "cm2",
+    "foil": "silver",
+    "pricing": {
+      "mode": "per_item",
+      "amount": 0,
+      "currency": "Le",
+      "type": "surcharge"
+    }
+  },
+  "createdAt": {
+    "_seconds": 1754978578,
+    "_nanoseconds": 983000000
+  },
+  "pricing": {
+    "mode": "per_item",
+    "amount": 0,
+    "currency": "Le",
+    "type": "surcharge"
+  },
+  "updatedAt": {
+    "_seconds": 1754978578,
+    "_nanoseconds": 983000000
+  },
+  "firestore_id": "fin-foil-silver"
+},
+{
+  "name": "Lamination (Glossy)",
+  "active": true,
+  "appliesTo": [
+    "large-format",
+    "flyers",
+    "books",
+    "invitations"
+  ],
+  "id": "fin-lam-glossy",
+  "category": "lamination",
+  "parameters": {
+    "side": "single",
+    "pricing": {
+      "mode": "per_m2",
+      "amount": 0,
+      "currency": "Le",
+      "type": "surcharge"
+    }
+  },
+  "createdAt": {
+    "_seconds": 1754978576,
+    "_nanoseconds": 903000000
+  },
+  "pricing": {
+    "mode": "per_item",
+    "amount": 0,
+    "currency": "Le",
+    "type": "surcharge"
+  },
+  "updatedAt": {
+    "_seconds": 1754978576,
+    "_nanoseconds": 903000000
+  },
+  "firestore_id": "fin-lam-glossy"
+},
+{
+  "name": "Lamination (Matte)",
+  "active": true,
+  "appliesTo": [
+    "large-format",
+    "flyers",
+    "books",
+    "invitations"
+  ],
+  "id": "fin-lam-matte",
+  "category": "lamination",
+  "parameters": {
+    "side": "single",
+    "pricing": {
+      "mode": "per_m2",
+      "amount": 0,
+      "currency": "Le",
+      "type": "surcharge"
+    }
+  },
+  "createdAt": {
+    "_seconds": 1754978577,
+    "_nanoseconds": 93000000
+  },
+  "pricing": {
+    "mode": "per_item",
+    "amount": 0,
+    "currency": "Le",
+    "type": "surcharge"
+  },
+  "updatedAt": {
+    "_seconds": 1754978577,
+    "_nanoseconds": 93000000
+  },
+  "firestore_id": "fin-lam-matte"
+},
+{
+  "name": "Lamination (Soft-touch)",
+  "active": true,
+  "appliesTo": [
+    "flyers",
+    "books",
+    "invitations"
+  ],
+  "id": "fin-lam-soft-touch",
+  "category": "lamination",
+  "parameters": {
+    "side": "single",
+    "texture": "soft-touch",
+    "pricing": {
+      "mode": "per_item",
+      "amount": 0,
+      "currency": "Le",
+      "type": "surcharge"
+    }
+  },
+  "createdAt": {
+    "_seconds": 1754978577,
+    "_nanoseconds": 608000000
+  },
+  "pricing": {
+    "mode": "per_item",
+    "amount": 0,
+    "currency": "Le",
+    "type": "surcharge"
+  },
+  "updatedAt": {
+    "_seconds": 1754978577,
+    "_nanoseconds": 608000000
+  },
+  "firestore_id": "fin-lam-soft-touch"
+},
+{
+  "name": "Varnish Coating",
+  "active": true,
+  "appliesTo": [
+    "flyers",
+    "invitations",
+    "books"
+  ],
+  "id": "fin-lam-varnish",
+  "parameters": {
+    "sheen": "gloss",
+    "type": "varnish",
+    "pricing": {
+      "mode": "per_item",
+      "amount": 0,
+      "currency": "Le",
+      "type": "surcharge"
+    }
+  },
+  "createdAt": {
+    "_seconds": 1754978577,
+    "_nanoseconds": 775000000
+  },
+  "category": "varnish",
+  "pricing": {
+    "mode": "per_item",
+    "amount": 0,
+    "currency": "Le",
+    "type": "surcharge"
+  },
+  "updatedAt": {
+    "_seconds": 1754978577,
+    "_nanoseconds": 775000000
+  },
+  "firestore_id": "fin-lam-varnish"
+},
+{
+  "name": "3D Spot Varnish",
+  "active": true,
+  "appliesTo": [
+    "invitations",
+    "flyers",
+    "3d-spot-uv"
+  ],
+  "id": "fin-spot-3d",
+  "category": "spot_varnish",
+  "parameters": {
+    "areaUnit": "cm2",
+    "thicknessMicron": 30,
+    "pricing": {
+      "mode": "per_item",
+      "amount": 0,
+      "currency": "Le",
+      "type": "surcharge"
+    }
+  },
+  "createdAt": {
+    "_seconds": 1754978578,
+    "_nanoseconds": 305000000
+  },
+  "pricing": {
+    "mode": "per_item",
+    "amount": 0,
+    "currency": "Le",
+    "type": "surcharge"
+  },
+  "updatedAt": {
+    "_seconds": 1754978578,
+    "_nanoseconds": 305000000
+  },
+  "firestore_id": "fin-spot-3d"
+},
+{
+  "id": "folding",
+  "name": "Folding",
+  "category": "General",
+  "pricing": {
+    "type": "surcharge",
+    "mode": "per_item",
+    "amount": 200,
+    "currency": "Le"
+  },
+  "active": true,
+  "firestore_id": "folding"
+},
+{
+  "id": "lamination",
+  "name": "Lamination",
+  "category": "General",
+  "pricing": {
+    "type": "surcharge",
+    "mode": "per_item",
+    "amount": 500,
+    "currency": "Le"
+  },
+  "active": true,
+  "firestore_id": "lamination"
+},
+{
+  "createdAt": {
+    "_seconds": 1754978580,
+    "_nanoseconds": 496000000
+  },
+  "name": "Eyelets",
+  "active": true,
+  "id": "lf-eyelets",
+  "category": "large_format",
+  "pricing": {
+    "mode": "per_item",
+    "amount": 0,
+    "currency": "Le",
+    "type": "surcharge"
+  },
+  "updatedAt": {
+    "_seconds": 1754978580,
+    "_nanoseconds": 496000000
+  },
+  "firestore_id": "lf-eyelets"
+},
+{
+  "createdAt": {
+    "_seconds": 1754978580,
+    "_nanoseconds": 630000000
+  },
+  "name": "Hemming",
+  "active": true,
+  "id": "lf-hemming",
+  "category": "large_format",
+  "pricing": {
+    "mode": "per_item",
+    "amount": 0,
+    "currency": "Le",
+    "type": "surcharge"
+  },
+  "updatedAt": {
+    "_seconds": 1754978580,
+    "_nanoseconds": 630000000
+  },
+  "firestore_id": "lf-hemming"
+},
+{
+  "id": "perfect-binding",
+  "name": "Perfect Binding",
+  "category": "Binding",
+  "active": true,
+  "pricing": {
+    "type": "surcharge",
+    "mode": "per_item",
+    "amount": 200,
+    "currency": "Le"
+  },
+  "firestore_id": "perfect-binding"
+},
+{
+  "id": "perfect_binding",
+  "name": "Perfect Binding",
+  "category": "Binding",
+  "pricing": {
+    "type": "surcharge",
+    "mode": "per_item",
+    "amount": 2000,
+    "currency": "Le"
+  },
+  "active": true,
+  "firestore_id": "perfect_binding"
+},
+{
+  "id": "saddle-stitching",
+  "name": "Saddle Stitching",
+  "category": "Binding",
+  "active": true,
+  "pricing": {
+    "type": "surcharge",
+    "mode": "per_item",
+    "amount": 75,
+    "currency": "Le"
+  },
+  "firestore_id": "saddle-stitching"
+},
+{
+  "id": "saddle_stitching",
+  "name": "Saddle Stitching",
+  "category": "Binding",
+  "pricing": {
+    "type": "surcharge",
+    "mode": "per_item",
+    "amount": 800,
+    "currency": "Le"
+  },
+  "active": true,
+  "firestore_id": "saddle_stitching"
+},
+{
+  "id": "spiral_binding",
+  "name": "Spiral Binding",
+  "category": "Binding",
+  "pricing": {
+    "type": "surcharge",
+    "mode": "per_item",
+    "amount": 1200,
+    "currency": "Le"
+  },
+  "active": true,
+  "firestore_id": "spiral_binding"
+},
+{
+  "id": "spot-uv",
+  "name": "Spot UV",
+  "category": "Finishing",
+  "active": true,
+  "pricing": {
+    "type": "surcharge",
+    "mode": "per_item",
+    "amount": 50,
+    "currency": "Le"
+  },
+  "firestore_id": "spot-uv"
+},
+{
+  "id": "spot_uv",
+  "name": "Spot UV",
+  "category": "General",
+  "pricing": {
+    "type": "surcharge",
+    "mode": "per_item",
+    "amount": 1000,
+    "currency": "Le"
+  },
+  "active": true,
+  "firestore_id": "spot_uv"
+}
+]

@@ -1,0 +1,76 @@
+[
+{
+  "createdAt": {
+    "_seconds": 1756598400,
+    "_nanoseconds": 42000000
+  },
+  "name": "Ivy Mensah",
+  "email": "efemaame335@gmail.com",
+  "humanID": "JKDP-ADM-002",
+  "role": "admin",
+  "firestore_id": "B8c6nhXf4FYmpAo2CmovoviSWJ62"
+},
+{
+  "name": "Abdulaih Conteh",
+  "email": "bakadieinvestments2020@gmail.com",
+  "phone": "+232 88 527230",
+  "address": "64 BaiBureh Road",
+  "role": "customer",
+  "createdAt": {
+    "_seconds": 1755719895,
+    "_nanoseconds": 393000000
+  },
+  "humanId": "JKDP-CUS-004",
+  "firestore_id": "CiVGwfoDpk6mColkQguP"
+},
+{
+  "name": "Dels Enterprise",
+  "email": "delsenterprise@gmail.com",
+  "address": "",
+  "role": "customer",
+  "createdAt": {
+    "_seconds": 1754884596,
+    "_nanoseconds": 635000000
+  },
+  "humanId": "JKDP-CUS-001",
+  "phone": "+23278606226",
+  "firestore_id": "PTSBxN8bmIJzLhi5dasJ"
+},
+{
+  "createdAt": {
+    "_seconds": 1754843608,
+    "_nanoseconds": 360000000
+  },
+  "role": "admin",
+  "email": "smailamensah@gmail.com",
+  "name": "Smaila Mensah",
+  "humanId": "JKDP-ADM-001",
+  "firestore_id": "iGf2Hs1SugeLv0jnvg64vOiegIw1"
+},
+{
+  "name": "Inkee Media",
+  "email": "hello@ishmaelbull.xyz",
+  "phone": "+232 78 412412",
+  "address": "White Street",
+  "role": "customer",
+  "createdAt": {
+    "_seconds": 1755084876,
+    "_nanoseconds": 365000000
+  },
+  "humanId": "JKDP-CUS-003",
+  "firestore_id": "iWSU1dPIcfecASZTRz73"
+},
+{
+  "name": "Mr. Timbu",
+  "email": "customer@jaykaydigitalpress.com",
+  "phone": "",
+  "address": "",
+  "role": "customer",
+  "createdAt": {
+    "_seconds": 1754937370,
+    "_nanoseconds": 668000000
+  },
+  "humanId": "JKDP-CUS-002",
+  "firestore_id": "qJBxG0VLNSN72HdCMOF1"
+}
+]

@@ -1,0 +1,5901 @@
+[
+{
+  "createdAt": {
+    "_seconds": 1754843605,
+    "_nanoseconds": 862000000
+  },
+  "unit": "item",
+  "meta": {},
+  "ruleType": "item",
+  "id": "books-item",
+  "serviceId": "books",
+  "basePrice": 0,
+  "updatedAt": {
+    "_seconds": 1754843605,
+    "_nanoseconds": 862000000
+  },
+  "firestore_id": "books-item"
+},
+{
+  "createdAt": {
+    "_seconds": 1754843605,
+    "_nanoseconds": 862000000
+  },
+  "unit": "item",
+  "meta": {},
+  "ruleType": "item",
+  "id": "dtf-item",
+  "serviceId": "dtf",
+  "basePrice": 0,
+  "updatedAt": {
+    "_seconds": 1754843605,
+    "_nanoseconds": 862000000
+  },
+  "firestore_id": "dtf-item"
+},
+{
+  "createdAt": {
+    "_seconds": 1754843605,
+    "_nanoseconds": 862000000
+  },
+  "unit": "item",
+  "meta": {},
+  "ruleType": "item",
+  "id": "flyers-item",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "updatedAt": {
+    "_seconds": 1754843605,
+    "_nanoseconds": 862000000
+  },
+  "firestore_id": "flyers-item"
+},
+{
+  "createdAt": {
+    "_seconds": 1754843605,
+    "_nanoseconds": 862000000
+  },
+  "unit": "item",
+  "meta": {},
+  "ruleType": "item",
+  "id": "invites-item",
+  "serviceId": "invitations",
+  "basePrice": 0,
+  "updatedAt": {
+    "_seconds": 1754843605,
+    "_nanoseconds": 862000000
+  },
+  "firestore_id": "invites-item"
+},
+{
+  "createdAt": {
+    "_seconds": 1754930076,
+    "_nanoseconds": 836000000
+  },
+  "unit": "m2",
+  "meta": {
+    "variant": "normal_banner",
+    "currency": "Le",
+    "category": "banner"
+  },
+  "ruleType": "area",
+  "id": "lf-ban-normal",
+  "serviceId": "large-format",
+  "basePrice": 90,
+  "updatedAt": {
+    "_seconds": 1754930076,
+    "_nanoseconds": 836000000
+  },
+  "firestore_id": "lf-ban-normal"
+},
+{
+  "createdAt": {
+    "_seconds": 1754930076,
+    "_nanoseconds": 387000000
+  },
+  "unit": "m2",
+  "meta": {
+    "variant": "pvc_banner",
+    "currency": "Le",
+    "category": "banner"
+  },
+  "ruleType": "area",
+  "id": "lf-ban-pvc",
+  "serviceId": "large-format",
+  "basePrice": 90,
+  "updatedAt": {
+    "_seconds": 1754930076,
+    "_nanoseconds": 387000000
+  },
+  "firestore_id": "lf-ban-pvc"
+},
+{
+  "createdAt": {
+    "_seconds": 1754930076,
+    "_nanoseconds": 179000000
+  },
+  "unit": "m2",
+  "meta": {
+    "variant": "reflective_banner",
+    "currency": "Le",
+    "category": "banner"
+  },
+  "ruleType": "area",
+  "id": "lf-ban-reflective",
+  "serviceId": "large-format",
+  "basePrice": 90,
+  "updatedAt": {
+    "_seconds": 1754930076,
+    "_nanoseconds": 179000000
+  },
+  "firestore_id": "lf-ban-reflective"
+},
+{
+  "createdAt": {
+    "_seconds": 1754843605,
+    "_nanoseconds": 862000000
+  },
+  "unit": "m2",
+  "meta": {
+    "product": "banner",
+    "currency": "Le"
+  },
+  "ruleType": "area",
+  "id": "lf-banner-le90",
+  "serviceId": "large-format",
+  "basePrice": 90,
+  "updatedAt": {
+    "_seconds": 1754843605,
+    "_nanoseconds": 862000000
+  },
+  "firestore_id": "lf-banner-le90"
+},
+{
+  "createdAt": {
+    "_seconds": 1754930077,
+    "_nanoseconds": 103000000
+  },
+  "unit": "m2",
+  "meta": {
+    "currency": "Le",
+    "category": "blue_back_paper"
+  },
+  "ruleType": "area",
+  "id": "lf-blueback-le90",
+  "serviceId": "large-format",
+  "basePrice": 90,
+  "updatedAt": {
+    "_seconds": 1754930077,
+    "_nanoseconds": 103000000
+  },
+  "firestore_id": "lf-blueback-le90"
+},
+{
+  "createdAt": {
+    "_seconds": 1754843605,
+    "_nanoseconds": 862000000
+  },
+  "unit": "m2",
+  "meta": {
+    "product": "sav",
+    "currency": "Le"
+  },
+  "ruleType": "area",
+  "id": "lf-sav-le90",
+  "serviceId": "large-format",
+  "basePrice": 90,
+  "updatedAt": {
+    "_seconds": 1754843605,
+    "_nanoseconds": 862000000
+  },
+  "firestore_id": "lf-sav-le90"
+},
+{
+  "createdAt": {
+    "_seconds": 1754930075,
+    "_nanoseconds": 498000000
+  },
+  "unit": "m2",
+  "meta": {
+    "variant": "normal_sav",
+    "currency": "Le",
+    "category": "sav"
+  },
+  "ruleType": "area",
+  "id": "lf-sav-normal",
+  "serviceId": "large-format",
+  "basePrice": 90,
+  "updatedAt": {
+    "_seconds": 1754930075,
+    "_nanoseconds": 498000000
+  },
+  "firestore_id": "lf-sav-normal"
+},
+{
+  "createdAt": {
+    "_seconds": 1754930074,
+    "_nanoseconds": 976000000
+  },
+  "unit": "m2",
+  "meta": {
+    "variant": "reflective_sav",
+    "currency": "Le",
+    "category": "sav"
+  },
+  "ruleType": "area",
+  "id": "lf-sav-reflective",
+  "serviceId": "large-format",
+  "basePrice": 90,
+  "updatedAt": {
+    "_seconds": 1754930074,
+    "_nanoseconds": 976000000
+  },
+  "firestore_id": "lf-sav-reflective"
+},
+{
+  "createdAt": {
+    "_seconds": 1754930075,
+    "_nanoseconds": 711000000
+  },
+  "unit": "m2",
+  "meta": {
+    "variant": "transparent_sav",
+    "currency": "Le",
+    "category": "sav"
+  },
+  "ruleType": "area",
+  "id": "lf-sav-trans",
+  "serviceId": "large-format",
+  "basePrice": 90,
+  "updatedAt": {
+    "_seconds": 1754930075,
+    "_nanoseconds": 711000000
+  },
+  "firestore_id": "lf-sav-trans"
+},
+{
+  "createdAt": {
+    "_seconds": 1754843605,
+    "_nanoseconds": 862000000
+  },
+  "unit": "item",
+  "meta": {},
+  "ruleType": "item",
+  "id": "photos-item",
+  "serviceId": "photos",
+  "basePrice": 0,
+  "updatedAt": {
+    "_seconds": 1754843605,
+    "_nanoseconds": 862000000
+  },
+  "firestore_id": "photos-item"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 250,
+    "size": "A0",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a0-glossy-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 300,
+    "size": "A0",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a0-glossy-300gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 350,
+    "size": "A0",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a0-glossy-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 250,
+    "size": "A0",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a0-matte-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 300,
+    "size": "A0",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a0-matte-300gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 350,
+    "size": "A0",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a0-matte-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 250,
+    "size": "A1",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a1-glossy-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 300,
+    "size": "A1",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a1-glossy-300gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 350,
+    "size": "A1",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a1-glossy-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 250,
+    "size": "A1",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a1-matte-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 300,
+    "size": "A1",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a1-matte-300gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 350,
+    "size": "A1",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a1-matte-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 250,
+    "size": "A2",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a2-glossy-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 300,
+    "size": "A2",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a2-glossy-300gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 350,
+    "size": "A2",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a2-glossy-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 250,
+    "size": "A2",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a2-matte-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 300,
+    "size": "A2",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a2-matte-300gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 350,
+    "size": "A2",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a2-matte-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 250,
+    "size": "A3",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a3-glossy-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 300,
+    "size": "A3",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a3-glossy-300gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 350,
+    "size": "A3",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a3-glossy-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 250,
+    "size": "A3",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a3-matte-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 300,
+    "size": "A3",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a3-matte-300gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 350,
+    "size": "A3",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a3-matte-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 250,
+    "size": "A4",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a4-glossy-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 300,
+    "size": "A4",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a4-glossy-300gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 350,
+    "size": "A4",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a4-glossy-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 250,
+    "size": "A4",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a4-matte-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 300,
+    "size": "A4",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a4-matte-300gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 350,
+    "size": "A4",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a4-matte-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 250,
+    "size": "A5",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a5-glossy-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 300,
+    "size": "A5",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a5-glossy-300gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 350,
+    "size": "A5",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a5-glossy-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 250,
+    "size": "A5",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a5-matte-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 300,
+    "size": "A5",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a5-matte-300gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 350,
+    "size": "A5",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 551000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a5-matte-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 250,
+    "size": "A6",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a6-glossy-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 300,
+    "size": "A6",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a6-glossy-300gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 350,
+    "size": "A6",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a6-glossy-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 250,
+    "size": "A6",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a6-matte-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 300,
+    "size": "A6",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a6-matte-300gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 350,
+    "size": "A6",
+    "currency": "Le",
+    "section": "cover"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "firestore_id": "pr-brochures-fixed-cover-a6-matte-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 115,
+    "size": "A0",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a0-bond-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 150,
+    "size": "A0",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a0-bond-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 200,
+    "size": "A0",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a0-bond-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 80,
+    "size": "A0",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a0-bond-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 115,
+    "size": "A0",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a0-glossy-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 150,
+    "size": "A0",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a0-glossy-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 200,
+    "size": "A0",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a0-glossy-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 80,
+    "size": "A0",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a0-glossy-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 115,
+    "size": "A0",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a0-matte-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 150,
+    "size": "A0",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a0-matte-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 200,
+    "size": "A0",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a0-matte-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 80,
+    "size": "A0",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a0-matte-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 115,
+    "size": "A1",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a1-bond-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 150,
+    "size": "A1",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a1-bond-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 200,
+    "size": "A1",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a1-bond-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 80,
+    "size": "A1",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a1-bond-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 115,
+    "size": "A1",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a1-glossy-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 150,
+    "size": "A1",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a1-glossy-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 200,
+    "size": "A1",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a1-glossy-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 80,
+    "size": "A1",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a1-glossy-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 115,
+    "size": "A1",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a1-matte-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 150,
+    "size": "A1",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a1-matte-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 200,
+    "size": "A1",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 549000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a1-matte-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 80,
+    "size": "A1",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a1-matte-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 115,
+    "size": "A2",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a2-bond-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 150,
+    "size": "A2",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a2-bond-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 200,
+    "size": "A2",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a2-bond-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 80,
+    "size": "A2",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a2-bond-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 115,
+    "size": "A2",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a2-glossy-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 150,
+    "size": "A2",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a2-glossy-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 200,
+    "size": "A2",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a2-glossy-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 80,
+    "size": "A2",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a2-glossy-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 115,
+    "size": "A2",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a2-matte-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 150,
+    "size": "A2",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a2-matte-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 200,
+    "size": "A2",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a2-matte-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 80,
+    "size": "A2",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a2-matte-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 115,
+    "size": "A3",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a3-bond-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 150,
+    "size": "A3",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a3-bond-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 200,
+    "size": "A3",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a3-bond-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 80,
+    "size": "A3",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a3-bond-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 115,
+    "size": "A3",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a3-glossy-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 150,
+    "size": "A3",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a3-glossy-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 200,
+    "size": "A3",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a3-glossy-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 80,
+    "size": "A3",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a3-glossy-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 115,
+    "size": "A3",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a3-matte-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 150,
+    "size": "A3",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a3-matte-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 200,
+    "size": "A3",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a3-matte-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 80,
+    "size": "A3",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a3-matte-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 115,
+    "size": "A4",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a4-bond-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 150,
+    "size": "A4",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a4-bond-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 200,
+    "size": "A4",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a4-bond-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 80,
+    "size": "A4",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a4-bond-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 115,
+    "size": "A4",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a4-glossy-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 150,
+    "size": "A4",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a4-glossy-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 200,
+    "size": "A4",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a4-glossy-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 80,
+    "size": "A4",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a4-glossy-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 115,
+    "size": "A4",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a4-matte-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 150,
+    "size": "A4",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a4-matte-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 200,
+    "size": "A4",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a4-matte-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 80,
+    "size": "A4",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a4-matte-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 115,
+    "size": "A5",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a5-bond-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 150,
+    "size": "A5",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a5-bond-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 200,
+    "size": "A5",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a5-bond-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 80,
+    "size": "A5",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a5-bond-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 115,
+    "size": "A5",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a5-glossy-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 150,
+    "size": "A5",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a5-glossy-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 200,
+    "size": "A5",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a5-glossy-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 80,
+    "size": "A5",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a5-glossy-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 115,
+    "size": "A5",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a5-matte-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 150,
+    "size": "A5",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a5-matte-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 200,
+    "size": "A5",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a5-matte-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 80,
+    "size": "A5",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a5-matte-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 115,
+    "size": "A6",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a6-bond-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 150,
+    "size": "A6",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a6-bond-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 200,
+    "size": "A6",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a6-bond-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 80,
+    "size": "A6",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a6-bond-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 115,
+    "size": "A6",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a6-glossy-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 150,
+    "size": "A6",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a6-glossy-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 200,
+    "size": "A6",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a6-glossy-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 80,
+    "size": "A6",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a6-glossy-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 115,
+    "size": "A6",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a6-matte-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 150,
+    "size": "A6",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a6-matte-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 200,
+    "size": "A6",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 530000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a6-matte-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 80,
+    "size": "A6",
+    "currency": "Le",
+    "section": "inner"
+  },
+  "ruleType": "fixed",
+  "serviceId": "brochures",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "firestore_id": "pr-brochures-fixed-inner-a6-matte-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 115,
+    "size": "A0",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a0-bond-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 150,
+    "size": "A0",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a0-bond-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 200,
+    "size": "A0",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a0-bond-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 250,
+    "size": "A0",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a0-bond-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 350,
+    "size": "A0",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a0-bond-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 80,
+    "size": "A0",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a0-bond-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 115,
+    "size": "A0",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a0-glossy-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 150,
+    "size": "A0",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a0-glossy-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 200,
+    "size": "A0",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "firestore_id": "pr-flyers-fixed-a0-glossy-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 250,
+    "size": "A0",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "firestore_id": "pr-flyers-fixed-a0-glossy-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 350,
+    "size": "A0",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "firestore_id": "pr-flyers-fixed-a0-glossy-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 80,
+    "size": "A0",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a0-glossy-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 115,
+    "size": "A0",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "firestore_id": "pr-flyers-fixed-a0-matte-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 150,
+    "size": "A0",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "firestore_id": "pr-flyers-fixed-a0-matte-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 200,
+    "size": "A0",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "firestore_id": "pr-flyers-fixed-a0-matte-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 250,
+    "size": "A0",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "firestore_id": "pr-flyers-fixed-a0-matte-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 350,
+    "size": "A0",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "firestore_id": "pr-flyers-fixed-a0-matte-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 80,
+    "size": "A0",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 543000000
+  },
+  "firestore_id": "pr-flyers-fixed-a0-matte-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 115,
+    "size": "A1",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-flyers-fixed-a1-bond-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 150,
+    "size": "A1",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-flyers-fixed-a1-bond-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 200,
+    "size": "A1",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-flyers-fixed-a1-bond-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 250,
+    "size": "A1",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-flyers-fixed-a1-bond-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 350,
+    "size": "A1",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-flyers-fixed-a1-bond-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 80,
+    "size": "A1",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-flyers-fixed-a1-bond-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 115,
+    "size": "A1",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a1-glossy-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 150,
+    "size": "A1",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a1-glossy-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 200,
+    "size": "A1",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a1-glossy-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 250,
+    "size": "A1",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a1-glossy-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 350,
+    "size": "A1",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a1-glossy-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 80,
+    "size": "A1",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-flyers-fixed-a1-glossy-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 115,
+    "size": "A1",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a1-matte-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 150,
+    "size": "A1",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a1-matte-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 200,
+    "size": "A1",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a1-matte-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 250,
+    "size": "A1",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a1-matte-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 350,
+    "size": "A1",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a1-matte-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 80,
+    "size": "A1",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a1-matte-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 115,
+    "size": "A2",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a2-bond-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 150,
+    "size": "A2",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a2-bond-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 200,
+    "size": "A2",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a2-bond-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 250,
+    "size": "A2",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a2-bond-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 350,
+    "size": "A2",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-flyers-fixed-a2-bond-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 80,
+    "size": "A2",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a2-bond-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 115,
+    "size": "A2",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-flyers-fixed-a2-glossy-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 150,
+    "size": "A2",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-flyers-fixed-a2-glossy-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 200,
+    "size": "A2",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-flyers-fixed-a2-glossy-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 250,
+    "size": "A2",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-flyers-fixed-a2-glossy-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 350,
+    "size": "A2",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-flyers-fixed-a2-glossy-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 80,
+    "size": "A2",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-flyers-fixed-a2-glossy-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 115,
+    "size": "A2",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-flyers-fixed-a2-matte-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 150,
+    "size": "A2",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-flyers-fixed-a2-matte-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 200,
+    "size": "A2",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-flyers-fixed-a2-matte-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 250,
+    "size": "A2",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-flyers-fixed-a2-matte-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 350,
+    "size": "A2",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-flyers-fixed-a2-matte-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 80,
+    "size": "A2",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 540000000
+  },
+  "firestore_id": "pr-flyers-fixed-a2-matte-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 115,
+    "size": "A3",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a3-bond-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 150,
+    "size": "A3",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a3-bond-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 200,
+    "size": "A3",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a3-bond-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 250,
+    "size": "A3",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a3-bond-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 350,
+    "size": "A3",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a3-bond-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 80,
+    "size": "A3",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a3-bond-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 115,
+    "size": "A3",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a3-glossy-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 150,
+    "size": "A3",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a3-glossy-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 200,
+    "size": "A3",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a3-glossy-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 250,
+    "size": "A3",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a3-glossy-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 350,
+    "size": "A3",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a3-glossy-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 80,
+    "size": "A3",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a3-glossy-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 115,
+    "size": "A3",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a3-matte-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 150,
+    "size": "A3",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a3-matte-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 200,
+    "size": "A3",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a3-matte-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 250,
+    "size": "A3",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a3-matte-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 350,
+    "size": "A3",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a3-matte-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 80,
+    "size": "A3",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a3-matte-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 115,
+    "size": "A4",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a4-bond-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 150,
+    "size": "A4",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a4-bond-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 200,
+    "size": "A4",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a4-bond-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 250,
+    "size": "A4",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a4-bond-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 350,
+    "size": "A4",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a4-bond-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 80,
+    "size": "A4",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a4-bond-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 115,
+    "size": "A4",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a4-glossy-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 150,
+    "size": "A4",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a4-glossy-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 200,
+    "size": "A4",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a4-glossy-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 250,
+    "size": "A4",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a4-glossy-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 350,
+    "size": "A4",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a4-glossy-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 80,
+    "size": "A4",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a4-glossy-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 115,
+    "size": "A4",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a4-matte-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 150,
+    "size": "A4",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a4-matte-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 200,
+    "size": "A4",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a4-matte-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 250,
+    "size": "A4",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a4-matte-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 350,
+    "size": "A4",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a4-matte-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 80,
+    "size": "A4",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a4-matte-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 115,
+    "size": "A5",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a5-bond-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 150,
+    "size": "A5",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a5-bond-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 200,
+    "size": "A5",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a5-bond-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 250,
+    "size": "A5",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a5-bond-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 350,
+    "size": "A5",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a5-bond-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 80,
+    "size": "A5",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a5-bond-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 115,
+    "size": "A5",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a5-glossy-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 150,
+    "size": "A5",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a5-glossy-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 200,
+    "size": "A5",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a5-glossy-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 250,
+    "size": "A5",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a5-glossy-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 350,
+    "size": "A5",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a5-glossy-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 80,
+    "size": "A5",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a5-glossy-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 115,
+    "size": "A5",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a5-matte-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 150,
+    "size": "A5",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a5-matte-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 200,
+    "size": "A5",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a5-matte-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 250,
+    "size": "A5",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a5-matte-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 350,
+    "size": "A5",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a5-matte-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 80,
+    "size": "A5",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a5-matte-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 115,
+    "size": "A6",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a6-bond-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 150,
+    "size": "A6",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a6-bond-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 200,
+    "size": "A6",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a6-bond-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 250,
+    "size": "A6",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a6-bond-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 350,
+    "size": "A6",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a6-bond-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "bond",
+    "paperWeightGsm": 80,
+    "size": "A6",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a6-bond-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 115,
+    "size": "A6",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a6-glossy-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 150,
+    "size": "A6",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a6-glossy-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 200,
+    "size": "A6",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a6-glossy-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 250,
+    "size": "A6",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a6-glossy-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 350,
+    "size": "A6",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a6-glossy-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "glossy",
+    "paperWeightGsm": 80,
+    "size": "A6",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a6-glossy-80gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 115,
+    "size": "A6",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a6-matte-115gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 150,
+    "size": "A6",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a6-matte-150gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 200,
+    "size": "A6",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a6-matte-200gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 250,
+    "size": "A6",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a6-matte-250gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 350,
+    "size": "A6",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a6-matte-350gsm"
+},
+{
+  "unit": "item",
+  "meta": {
+    "paperType": "matte",
+    "paperWeightGsm": 80,
+    "size": "A6",
+    "currency": "Le"
+  },
+  "ruleType": "fixed",
+  "serviceId": "flyers",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 539000000
+  },
+  "firestore_id": "pr-flyers-fixed-a6-matte-80gsm"
+},
+{
+  "unit": "m2",
+  "meta": {
+    "variant": "canvas_banner",
+    "currency": "Le",
+    "category": "banner"
+  },
+  "ruleType": "area",
+  "serviceId": "large-format",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971226,
+    "_nanoseconds": 273000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971226,
+    "_nanoseconds": 273000000
+  },
+  "firestore_id": "pr-large-format-area-banner-canvas-banner"
+},
+{
+  "unit": "m2",
+  "meta": {
+    "variant": "normal_banner",
+    "currency": "Le",
+    "category": "banner"
+  },
+  "ruleType": "area",
+  "serviceId": "large-format",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971226,
+    "_nanoseconds": 273000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971226,
+    "_nanoseconds": 273000000
+  },
+  "firestore_id": "pr-large-format-area-banner-normal-banner"
+},
+{
+  "unit": "m2",
+  "meta": {
+    "variant": "pvc_banner",
+    "currency": "Le",
+    "category": "banner"
+  },
+  "ruleType": "area",
+  "serviceId": "large-format",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "firestore_id": "pr-large-format-area-banner-pvc-banner"
+},
+{
+  "unit": "m2",
+  "meta": {
+    "variant": "reflective_banner",
+    "currency": "Le",
+    "category": "banner"
+  },
+  "ruleType": "area",
+  "serviceId": "large-format",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "firestore_id": "pr-large-format-area-banner-reflective-banner"
+},
+{
+  "unit": "m2",
+  "meta": {
+    "currency": "Le",
+    "category": "blue_back_paper"
+  },
+  "ruleType": "area",
+  "serviceId": "large-format",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971226,
+    "_nanoseconds": 273000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971226,
+    "_nanoseconds": 273000000
+  },
+  "firestore_id": "pr-large-format-area-blue-back-paper-any"
+},
+{
+  "unit": "m2",
+  "meta": {
+    "variant": "normal_sav",
+    "currency": "Le",
+    "category": "sav"
+  },
+  "ruleType": "area",
+  "serviceId": "large-format",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "firestore_id": "pr-large-format-area-sav-normal-sav"
+},
+{
+  "unit": "m2",
+  "meta": {
+    "variant": "reflective_sav",
+    "currency": "Le",
+    "category": "sav"
+  },
+  "ruleType": "area",
+  "serviceId": "large-format",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "firestore_id": "pr-large-format-area-sav-reflective-sav"
+},
+{
+  "unit": "m2",
+  "meta": {
+    "variant": "transparent_sav",
+    "currency": "Le",
+    "category": "sav"
+  },
+  "ruleType": "area",
+  "serviceId": "large-format",
+  "basePrice": 0,
+  "createdAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "updatedAt": {
+    "_seconds": 1754971225,
+    "_nanoseconds": 557000000
+  },
+  "firestore_id": "pr-large-format-area-sav-transparent-sav"
+},
+{
+  "createdAt": {
+    "_seconds": 1754843605,
+    "_nanoseconds": 862000000
+  },
+  "unit": "item",
+  "meta": {},
+  "ruleType": "item",
+  "id": "spotuv-item",
+  "serviceId": "3d-spot-uv",
+  "basePrice": 0,
+  "updatedAt": {
+    "_seconds": 1754843605,
+    "_nanoseconds": 862000000
+  },
+  "firestore_id": "spotuv-item"
+},
+{
+  "createdAt": {
+    "_seconds": 1754843605,
+    "_nanoseconds": 862000000
+  },
+  "unit": "item",
+  "meta": {},
+  "ruleType": "item",
+  "id": "tshirt-item",
+  "serviceId": "custom-tshirt",
+  "basePrice": 0,
+  "updatedAt": {
+    "_seconds": 1754843605,
+    "_nanoseconds": 862000000
+  },
+  "firestore_id": "tshirt-item"
+},
+{
+  "createdAt": {
+    "_seconds": 1754843605,
+    "_nanoseconds": 862000000
+  },
+  "unit": "item",
+  "meta": {},
+  "ruleType": "item",
+  "id": "uvdtf-item",
+  "serviceId": "uv-dtf",
+  "basePrice": 0,
+  "updatedAt": {
+    "_seconds": 1754843605,
+    "_nanoseconds": 862000000
+  },
+  "firestore_id": "uvdtf-item"
+}
+]

@@ -1,0 +1,18 @@
+[
+{
+  "last": 2,
+  "firestore_id": "admins"
+},
+{
+  "last": 4,
+  "firestore_id": "customers"
+},
+{
+  "last": 4,
+  "firestore_id": "invoices"
+},
+{
+  "last": 112,
+  "firestore_id": "jobs"
+}
+]

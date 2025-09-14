@@ -8,4 +8,5 @@ supabase-service.json
 __*
 fly.toml
 local.env.sh
+.env.local
 

@@ -1,0 +1,878 @@
+[
+{
+  "specSchema": {
+    "type": "object",
+    "required": [
+      "base",
+      "uv_area_cm2",
+      "quantity"
+    ],
+    "properties": {
+      "notes": {
+        "title": "Notes",
+        "type": "string"
+      },
+      "quantity": {
+        "default": 100,
+        "title": "Quantity",
+        "type": "integer",
+        "minimum": 1
+      },
+      "uv_area_cm2": {
+        "title": "UV Area (cm²)",
+        "type": "number",
+        "minimum": 1
+      },
+      "base": {
+        "title": "Base",
+        "type": "string",
+        "enum": [
+          "business-card",
+          "invitation"
+        ]
+      }
+    }
+  },
+  "active": true,
+  "slug": "3d-spot-uv",
+  "imageUrl": "https://firebasestorage.googleapis.com/v0/b/jay-kay-digital-press-6q5na.firebasestorage.app/o/services%2Fbusiness-cards.jpg-1754928373813?alt=media&token=11480ea3-e148-41e3-a3ce-07e275dc491b",
+  "createdAt": {
+    "_seconds": 1754978581,
+    "_nanoseconds": 727000000
+  },
+  "options": {
+    "sizing": {
+      "supportsStandard": true,
+      "standardSizes": [
+        "A6",
+        "A5",
+        "A4",
+        "A3",
+        "A2",
+        "A1",
+        "A0"
+      ],
+      "supportsCustom": true
+    },
+    "paper": {
+      "types": [
+        "glossy",
+        "matte",
+        "uncoated"
+      ],
+      "weightsGsm": [
+        200,
+        250,
+        300,
+        350
+      ]
+    },
+    "finishIds": [
+      "fin-spot-3d",
+      "fin-lam-matte",
+      "fin-foil-gold",
+      "fin-foil-silver",
+      "fin-diecut"
+    ]
+  },
+  "description": "Raised spot varnish embellishment",
+  "title": "3D Spot UV",
+  "updatedAt": {
+    "_seconds": 1754978581,
+    "_nanoseconds": 727000000
+  },
+  "sortOrder": 3,
+  "isPopular": true,
+  "firestore_id": "3d-spot-uv"
+},
+{
+  "active": true,
+  "description": "Bi-fold / Tri-fold with inner & cover stocks",
+  "title": "Brochures",
+  "slug": "brochures",
+  "createdAt": {
+    "_seconds": 1754978580,
+    "_nanoseconds": 765000000
+  },
+  "sortOrder": 0,
+  "options": {
+    "sizing": {
+      "supportsStandard": true,
+      "standardSizes": [
+        "A6",
+        "A5",
+        "A4",
+        "A3",
+        "A2",
+        "A1",
+        "A0"
+      ],
+      "supportsCustom": true
+    },
+    "binding": [
+      "fold-bifold",
+      "fold-trifold",
+      "saddle-stitch"
+    ],
+    "paper": {
+      "cover": {
+        "types": [
+          "glossy",
+          "matte"
+        ],
+        "weightsGsm": [
+          250,
+          300,
+          350
+        ]
+      },
+      "inner": {
+        "types": [
+          "bond",
+          "glossy",
+          "matte"
+        ],
+        "weightsGsm": [
+          80,
+          115,
+          150,
+          200
+        ]
+      },
+      "types": [
+        "bond",
+        "glossy",
+        "matte"
+      ],
+      "weightsGsm": [
+        80,
+        115,
+        150,
+        200,
+        250,
+        300,
+        350
+      ]
+    },
+    "finishIds": [
+      "fin-lam-glossy",
+      "fin-lam-matte",
+      "fin-lam-soft-touch",
+      "fin-lam-varnish",
+      "fin-spot-3d",
+      "fin-foil-gold",
+      "fin-foil-silver",
+      "fin-diecut",
+      "fin-corners-rounded"
+    ]
+  },
+  "updatedAt": {
+    "_seconds": 1754978580,
+    "_nanoseconds": 765000000
+  },
+  "imageUrl": "https://firebasestorage.googleapis.com/v0/b/jay-kay-digital-press-6q5na.firebasestorage.app/o/services%2Ffamily-services-brochure-template-screenshot-01-.jpg-1755012368482?alt=media&token=8c2aadd5-4897-4579-9042-03095dc53371",
+  "firestore_id": "brochures"
+},
+{
+  "slug": "brochures-booklets",
+  "title": "Brochures & Booklets",
+  "description": "Professionally bound brochures and booklets, perfect for catalogs, magazines, and corporate profiles.",
+  "active": true,
+  "imageUrl": "https://firebasestorage.googleapis.com/v0/b/jay-kay-digital-press-6q5na.appspot.com/o/site-assets%2Fbrochures.png?alt=media&token=c2a8b9e8-4b7b-4b1e-9b0a-9b9b9b9b9b9c",
+  "options": {
+    "sizing": {
+      "supportsStandard": true,
+      "supportsCustom": false
+    },
+    "paper": {
+      "inner": {
+        "types": [
+          "Bond",
+          "Matte"
+        ],
+        "weightsGsm": [
+          100,
+          130,
+          150
+        ]
+      },
+      "cover": {
+        "types": [
+          "Matte",
+          "Glossy"
+        ],
+        "weightsGsm": [
+          200,
+          250,
+          300
+        ]
+      }
+    },
+    "finishIds": [
+      "perfect_binding",
+      "saddle_stitching",
+      "spiral_binding",
+      "lamination"
+    ]
+  },
+  "sortOrder": 9,
+  "id": "brochures-booklets",
+  "firestore_id": "brochures-booklets"
+},
+{
+  "slug": "business-cards",
+  "title": "Business Cards",
+  "description": "High-quality business cards available in various finishes and paper types to make a lasting impression.",
+  "isPopular": true,
+  "imageUrl": "https://firebasestorage.googleapis.com/v0/b/jay-kay-digital-press-6q5na.appspot.com/o/site-assets%2Fbusiness-cards.png?alt=media&token=c2a8b9e8-4b7b-4b1e-9b0a-9b9b9b9b9b9a",
+  "options": {
+    "sizing": {
+      "supportsStandard": true,
+      "supportsCustom": true
+    },
+    "paper": {
+      "types": [
+        "Matte",
+        "Glossy",
+        "Linen"
+      ],
+      "weightsGsm": [
+        250,
+        300,
+        350
+      ]
+    },
+    "finishIds": [
+      "lamination",
+      "spot_uv",
+      "die_cutting"
+    ]
+  },
+  "id": "business-cards",
+  "sortOrder": 16,
+  "active": true,
+  "firestore_id": "business-cards"
+},
+{
+  "specSchema": {
+    "type": "object",
+    "required": [
+      "size",
+      "print_area",
+      "quantity"
+    ],
+    "properties": {
+      "print_area": {
+        "title": "Print Area",
+        "type": "string",
+        "enum": [
+          "front",
+          "back",
+          "front+back"
+        ]
+      },
+      "notes": {
+        "title": "Notes",
+        "type": "string"
+      },
+      "quantity": {
+        "default": 1,
+        "title": "Quantity",
+        "type": "integer",
+        "minimum": 1
+      },
+      "color": {
+        "title": "Color",
+        "type": "string"
+      },
+      "size": {
+        "title": "Size",
+        "type": "string",
+        "enum": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL"
+        ]
+      }
+    }
+  },
+  "active": true,
+  "title": "Custom T-Shirt",
+  "slug": "custom-tshirt",
+  "createdAt": {
+    "_seconds": 1754978582,
+    "_nanoseconds": 163000000
+  },
+  "sortOrder": 10,
+  "options": {
+    "sizing": {
+      "supportsStandard": true,
+      "standardSizes": [
+        "A6",
+        "A5",
+        "A4",
+        "A3",
+        "A2",
+        "A1",
+        "A0"
+      ],
+      "supportsCustom": true
+    },
+    "paper": {
+      "types": [
+        "standard"
+      ],
+      "weightsGsm": [
+        0
+      ]
+    },
+    "finishIds": [
+      "fin-spot-3d"
+    ]
+  },
+  "description": "Garment printing",
+  "updatedAt": {
+    "_seconds": 1754978582,
+    "_nanoseconds": 163000000
+  },
+  "firestore_id": "custom-tshirt"
+},
+{
+  "slug": "digital-printing",
+  "title": "Digital Printing",
+  "description": "High-quality digital printing for flyers, brochures, and business cards.",
+  "active": true,
+  "isPopular": true,
+  "options": {
+    "sizing": {
+      "supportsStandard": true,
+      "supportsCustom": true
+    },
+    "paper": {
+      "types": [
+        "Bond",
+        "Art Paper (Matte)",
+        "Art Paper (Glossy)"
+      ],
+      "weightsGsm": [
+        80,
+        100,
+        115,
+        130,
+        150,
+        170,
+        200,
+        250,
+        300
+      ]
+    },
+    "finishIds": [
+      "lamination",
+      "spot-uv",
+      "die-cutting"
+    ]
+  },
+  "imageUrl": "https://firebasestorage.googleapis.com/v0/b/jay-kay-digital-press-6q5na.firebasestorage.app/o/services%2Fposters-large-format.jpg-1754928220337?alt=media&token=2d81f685-fc29-4a18-b0c1-1236b9ec059c",
+  "sortOrder": 6,
+  "id": "digital-printing",
+  "firestore_id": "digital-printing"
+},
+{
+  "slug": "dtf",
+  "title": "DTF Printing",
+  "description": "High-quality Direct-to-Film printing for textiles and apparel.",
+  "active": true,
+  "sortOrder": 7,
+  "imageUrl": "https://firebasestorage.googleapis.com/v0/b/jay-kay-digital-press-6q5na.appspot.com/o/site-assets%2Fdtf-printing.png?alt=media&token=d5a2d1d1-6e3e-4b1e-9b0a-9b9b9b9b9b9f",
+  "options": {
+    "sizing": {
+      "supportsStandard": false,
+      "supportsCustom": true
+    },
+    "paper": {
+      "types": [
+        "Standard Film"
+      ],
+      "weightsGsm": [
+        100
+      ]
+    },
+    "finishIds": []
+  },
+  "firestore_id": "dtf"
+},
+{
+  "specSchema": {
+    "type": "object",
+    "required": [
+      "size",
+      "sides",
+      "finish",
+      "quantity"
+    ],
+    "properties": {
+      "notes": {
+        "title": "Notes",
+        "type": "string"
+      },
+      "quantity": {
+        "default": 100,
+        "title": "Quantity",
+        "type": "integer",
+        "minimum": 50
+      },
+      "size": {
+        "title": "Size",
+        "type": "string",
+        "enum": [
+          "A5",
+          "A4"
+        ]
+      },
+      "sides": {
+        "title": "Sides",
+        "type": "string",
+        "enum": [
+          "single",
+          "double"
+        ]
+      },
+      "finish": {
+        "title": "Finish",
+        "type": "string",
+        "enum": [
+          "glossy",
+          "matte"
+        ]
+      }
+    }
+  },
+  "title": "Flyers",
+  "slug": "flyers",
+  "imageUrl": "https://firebasestorage.googleapis.com/v0/b/jay-kay-digital-press-6q5na.firebasestorage.app/o/services%2Fflyers-brochures.jpg-1754928287431?alt=media&token=90cdbcb0-fd82-4933-aafa-7b3991192cc2",
+  "options": {
+    "sizing": {
+      "supportsStandard": true,
+      "standardSizes": [
+        "A6",
+        "A5",
+        "A4",
+        "A3",
+        "A2",
+        "A1",
+        "A0"
+      ],
+      "supportsCustom": true
+    },
+    "paper": {
+      "types": [
+        "bond",
+        "glossy",
+        "matte"
+      ],
+      "weightsGsm": [
+        80,
+        115,
+        150,
+        200,
+        250,
+        350
+      ]
+    },
+    "finishIds": [
+      "fin-lam-glossy",
+      "fin-lam-matte",
+      "fin-lam-soft-touch",
+      "fin-lam-varnish",
+      "fin-spot-3d",
+      "fin-foil-gold",
+      "fin-foil-silver",
+      "fin-diecut",
+      "fin-corners-rounded"
+    ]
+  },
+  "description": "Single-sheet flyers",
+  "createdAt": {
+    "_seconds": 1754978580,
+    "_nanoseconds": 916000000
+  },
+  "sortOrder": 1,
+  "updatedAt": {
+    "_seconds": 1754978580,
+    "_nanoseconds": 916000000
+  },
+  "active": false,
+  "id": "flyers",
+  "firestore_id": "flyers"
+},
+{
+  "slug": "flyers-leaflets",
+  "title": "Flyers & Leaflets",
+  "description": "Promote your business or event with vibrant flyers and leaflets, printed on premium paper stock.",
+  "active": true,
+  "isPopular": true,
+  "imageUrl": "https://firebasestorage.googleapis.com/v0/b/jay-kay-digital-press-6q5na.appspot.com/o/site-assets%2Fflyers.png?alt=media&token=c2a8b9e8-4b7b-4b1e-9b0a-9b9b9b9b9b9b",
+  "options": {
+    "sizing": {
+      "supportsStandard": true,
+      "supportsCustom": false
+    },
+    "paper": {
+      "types": [
+        "Bond",
+        "Glossy",
+        "Matte"
+      ],
+      "weightsGsm": [
+        130,
+        150,
+        170
+      ]
+    },
+    "finishIds": [
+      "folding",
+      "lamination"
+    ]
+  },
+  "sortOrder": 10,
+  "id": "flyers-leaflets",
+  "firestore_id": "flyers-leaflets"
+},
+{
+  "slug": "graphic-design",
+  "title": "Graphic Design",
+  "description": "Professional design services to bring your ideas to life.",
+  "sortOrder": 6,
+  "isPopular": false,
+  "imageUrl": "https://firebasestorage.googleapis.com/v0/b/jay-kay-digital-press-6q5na.appspot.com/o/site-assets%2Fgraphic-design.png?alt=media&token=3e4d9c7f-9d9e-4f1b-9d4a-c4e73f8a939e",
+  "options": {
+    "sizing": {
+      "supportsStandard": false,
+      "supportsCustom": false
+    },
+    "paper": {},
+    "finishIds": []
+  },
+  "active": false,
+  "firestore_id": "graphic-design"
+},
+{
+  "specSchema": {
+    "type": "object",
+    "required": [
+      "size",
+      "stock",
+      "finish",
+      "quantity"
+    ],
+    "properties": {
+      "notes": {
+        "title": "Notes",
+        "type": "string"
+      },
+      "quantity": {
+        "default": 50,
+        "title": "Quantity",
+        "type": "integer",
+        "minimum": 10
+      },
+      "size": {
+        "title": "Size",
+        "type": "string",
+        "enum": [
+          "A6",
+          "A5",
+          "DL"
+        ]
+      },
+      "finish": {
+        "title": "Finish",
+        "type": "string",
+        "enum": [
+          "matte",
+          "gloss",
+          "3d-spot-uv"
+        ]
+      },
+      "stock": {
+        "title": "Card Stock",
+        "type": "string",
+        "enum": [
+          "250gsm",
+          "300gsm",
+          "350gsm"
+        ]
+      }
+    }
+  },
+  "active": true,
+  "title": "Invitations",
+  "slug": "invitations",
+  "createdAt": {
+    "_seconds": 1754978581,
+    "_nanoseconds": 324000000
+  },
+  "sortOrder": 4,
+  "options": {
+    "sizing": {
+      "supportsStandard": true,
+      "standardSizes": [
+        "A6",
+        "A5",
+        "A4",
+        "A3",
+        "A2",
+        "A1",
+        "A0"
+      ],
+      "supportsCustom": true
+    },
+    "paper": {
+      "types": [
+        "matte",
+        "glossy",
+        "textured"
+      ],
+      "weightsGsm": [
+        250,
+        300,
+        350,
+        400
+      ]
+    },
+    "finishIds": [
+      "fin-spot-3d",
+      "fin-foil-gold",
+      "fin-foil-silver",
+      "fin-foil-rainbow",
+      "fin-foil-invisible",
+      "fin-foil-broken-glass",
+      "fin-diecut",
+      "fin-corners-rounded",
+      "fin-lam-soft-touch"
+    ]
+  },
+  "description": "Premium cardstock with foil / spot UV / die cutting",
+  "updatedAt": {
+    "_seconds": 1754978581,
+    "_nanoseconds": 324000000
+  },
+  "imageUrl": "https://firebasestorage.googleapis.com/v0/b/jay-kay-digital-press-6q5na.firebasestorage.app/o/services%2Finvitation.jpg-1755676239877?alt=media&token=91d6531f-f045-4b28-b340-919efbc9ee23",
+  "firestore_id": "invitations"
+},
+{
+  "slug": "large-format",
+  "title": "Large Format Printing",
+  "description": "Banners, billboards, and large-scale graphics for maximum impact.",
+  "active": true,
+  "imageUrl": "https://firebasestorage.googleapis.com/v0/b/jay-kay-digital-press-6q5na.appspot.com/o/site-assets%2Flarge-format.png?alt=media&token=c2a8b9e8-4b7b-4b1e-9b0a-9b9b9b9b9b9e",
+  "options": {
+    "media": {
+      "categories": [
+        "sav",
+        "banner",
+        "blue_back_paper"
+      ],
+      "variants": {
+        "sav": [
+          "reflective_sav",
+          "normal_sav",
+          "transparent_sav"
+        ],
+        "banner": [
+          "reflective_banner",
+          "pvc_banner",
+          "normal_banner",
+          "canvas_banner"
+        ],
+        "blue_back_paper": [
+          null
+        ]
+      }
+    },
+    "finishIds": [],
+    "sizing": {
+      "supportsCustom": true,
+      "supportsStandard": true
+    }
+  },
+  "sortOrder": 10,
+  "id": "large-format",
+  "firestore_id": "large-format"
+},
+{
+  "active": true,
+  "title": "Photos",
+  "slug": "photos",
+  "createdAt": {
+    "_seconds": 1754978581,
+    "_nanoseconds": 464000000
+  },
+  "sortOrder": 5,
+  "options": {
+    "sizing": {
+      "supportsStandard": true,
+      "standardSizes": [
+        "A6",
+        "A5",
+        "A4",
+        "A3",
+        "A2",
+        "A1",
+        "A0"
+      ],
+      "supportsCustom": true
+    },
+    "paper": {
+      "types": [
+        "glossy",
+        "matte",
+        "lustre"
+      ],
+      "weightsGsm": [
+        200,
+        230,
+        260,
+        300
+      ]
+    },
+    "finishIds": [
+      "fin-lam-glossy",
+      "fin-lam-matte"
+    ]
+  },
+  "description": "Photo papers",
+  "updatedAt": {
+    "_seconds": 1754978581,
+    "_nanoseconds": 464000000
+  },
+  "imageUrl": "https://firebasestorage.googleapis.com/v0/b/jay-kay-digital-press-6q5na.firebasestorage.app/o/services%2F650095a7b264b95f8972f791-6-pack-picture-frames-multi-photo.jpg-1755080924822?alt=media&token=571e89f9-1caa-400e-a71e-20c7cee395de",
+  "specSchema": {
+    "type": "object",
+    "required": [
+      "size",
+      "finish",
+      "quantity"
+    ],
+    "properties": {
+      "notes": {
+        "title": "Notes",
+        "type": "string"
+      },
+      "quantity": {
+        "default": 1,
+        "title": "Quantity",
+        "type": "integer",
+        "minimum": 1
+      },
+      "finish": {
+        "title": "Finish",
+        "type": "string",
+        "enum": [
+          "glossy",
+          "matte",
+          "Soft Touch",
+          "Varnish"
+        ]
+      },
+      "size": {
+        "title": "Size",
+        "type": "string",
+        "enum": [
+          "4x6",
+          "5x7",
+          "8x10",
+          "A4",
+          "16x24",
+          "24x36",
+          "20x30"
+        ]
+      }
+    }
+  },
+  "firestore_id": "photos"
+},
+{
+  "slug": "posters",
+  "title": "Posters",
+  "description": "Eye-catching posters in various sizes, printed with vivid colors to grab attention.",
+  "active": true,
+  "imageUrl": "https://firebasestorage.googleapis.com/v0/b/jay-kay-digital-press-6q5na.appspot.com/o/site-assets%2Fposters.png?alt=media&token=c2a8b9e8-4b7b-4b1e-9b0a-9b9b9b9b9b9d",
+  "options": {
+    "sizing": {
+      "supportsStandard": true,
+      "supportsCustom": true
+    },
+    "paper": {
+      "types": [
+        "Glossy",
+        "Matte",
+        "Satin"
+      ],
+      "weightsGsm": [
+        170,
+        200,
+        250
+      ]
+    },
+    "finishIds": [
+      "lamination"
+    ]
+  },
+  "sortOrder": 7,
+  "id": "posters",
+  "firestore_id": "posters"
+},
+{
+  "slug": "uv-dtf",
+  "title": "UV DTF Printing",
+  "description": "Durable and vibrant UV Direct-to-Film prints for various applications.",
+  "active": true,
+  "sortOrder": 6,
+  "isPopular": false,
+  "imageUrl": "https://firebasestorage.googleapis.com/v0/b/jay-kay-digital-press-6q5na.appspot.com/o/site-assets%2Fuv-dtf.png?alt=media&token=c2a8b9e8-4b7b-4b1e-9b0a-9b9b9b9b9b9f",
+  "options": {
+    "sizing": {
+      "supportsStandard": false,
+      "supportsCustom": true
+    },
+    "paper": {
+      "types": [
+        "Standard Film"
+      ],
+      "weightsGsm": [
+        100
+      ]
+    },
+    "finishIds": []
+  },
+  "firestore_id": "uv-dtf"
+},
+{
+  "slug": "uv-dtf-printing",
+  "active": true,
+  "sortOrder": 3,
+  "options": {
+    "sizing": {
+      "supportsStandard": false,
+      "supportsCustom": true
+    },
+    "paper": {
+      "types": [
+        "UV DTF Film"
+      ],
+      "weightsGsm": [
+        100
+      ]
+    },
+    "finishIds": []
+  },
+  "title": "UV Printing",
+  "imageUrl": "https://firebasestorage.googleapis.com/v0/b/jay-kay-digital-press-6q5na.firebasestorage.app/o/services%2Fmimaki-jfx-1615-plus-series-printing-machine-097.jpg-1755013302388?alt=media&token=beb2fb06-8f7e-41c0-bd45-5d24f7ae1f10",
+  "description": "Durable and vibrant prints on a variety of surfaces with UV technology.",
+  "isPopular": true,
+  "firestore_id": "uv-dtf-printing"
+}
+]
