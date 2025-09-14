@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,11 +16,15 @@ import {
   MapPin,
   Calendar,
   DollarSign,
-  Loader2
+  Loader2,
+  Edit,
+  Trash2
 } from "lucide-react";
 import Link from "next/link";
-import { useCustomersWithStats } from "@/lib/hooks/useCustomers";
-import DatabasePermissionError from "@/components/DatabasePermissionError";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import DashboardHeader from "@/components/DashboardHeader";
+import { supabase } from "@/lib/supabase";
+import { Customer } from "@/types/database";
 
 export default function CustomersPage() {
   const { data: customers, error, isLoading, mutate } = useCustomersWithStats();
