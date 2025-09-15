@@ -101,10 +101,12 @@ export default function CustomersPage() {
               <Link href="/dashboard">
                 <Button variant="outline">Back to Dashboard</Button>
               </Link>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Customer
-              </Button>
+              <Link href="/dashboard/customers/add">
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Customer
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -262,10 +264,12 @@ export default function CustomersPage() {
                       ? 'Try adjusting your search terms' 
                       : 'Get started by adding your first customer'}
                   </p>
-                  <Button>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Customer
-                  </Button>
+                  <Link href="/dashboard/customers/add">
+                    <Button>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Customer
+                    </Button>
+                  </Link>
                 </div>
               )}
             </CardContent>

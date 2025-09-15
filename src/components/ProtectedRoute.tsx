@@ -21,16 +21,21 @@ export default function ProtectedRoute({
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
+    console.log('ProtectedRoute - Auth state check:', { user: !!user, loading });
+    
     if (!loading) {
       if (!user) {
+        console.log('ProtectedRoute - No user, redirecting to login');
         // Not authenticated - redirect to login
         router.push(redirectTo);
       } else if (requiredRole) {
         // TODO: Check user role when we implement role system
         // For now, allow all authenticated users
+        console.log('ProtectedRoute - User authenticated, role check passed');
         setChecking(false);
       } else {
         // Authenticated and no role required
+        console.log('ProtectedRoute - User authenticated, no role required');
         setChecking(false);
       }
     }

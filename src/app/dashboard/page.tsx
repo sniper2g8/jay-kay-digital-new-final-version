@@ -11,18 +11,63 @@ import {
   DollarSign,
   Plus,
   Eye,
-  BarChart3
+  BarChart3,
+  Loader2
 } from "lucide-react";
 import Link from "next/link";
 import { useCustomers } from "@/lib/hooks/useCustomers";
 import { useJobStats } from "@/lib/hooks/useJobs";
 import { useFinancialStats } from "@/lib/hooks/useFinances";
 import DashboardLayout from "@/components/DashboardLayout";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function DashboardPage() {
+  const { user, session, loading: authLoading } = useAuth();
+  
+  // Only call hooks if we're sure the user is authenticated
+  const shouldFetchData = user && session && !authLoading;
+  
   const { data: customers, isLoading: customersLoading } = useCustomers();
   const { data: jobStats, isLoading: jobStatsLoading } = useJobStats();
   const { data: financialStats, isLoading: financialStatsLoading } = useFinancialStats();
+
+  console.log('Dashboard - Auth state:', { 
+    hasUser: !!user, 
+    hasSession: !!session, 
+    authLoading,
+    shouldFetchData 
+  });
+
+  // Show loading state while authentication is being determined
+  if (authLoading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="flex items-center space-x-2">
+            <Loader2 className="h-6 w-6 animate-spin" />
+            <span>Loading dashboard...</span>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  // Show message if not authenticated
+  if (!user || !session) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <h2 className="text-xl font-semibold mb-2">Authentication Required</h2>
+            <p className="text-gray-600 mb-4">Please log in to access the dashboard.</p>
+            <Button onClick={() => window.location.href = '/auth/login'}>
+              Go to Login
+            </Button>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
   return (
     <DashboardLayout>
       <div className="px-6 py-6">

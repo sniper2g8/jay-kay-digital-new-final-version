@@ -23,99 +23,6 @@ import Link from "next/link";
 import { useJobsWithCustomers, useJobStats } from "@/lib/hooks/useJobs";
 import DashboardLayout from "@/components/DashboardLayout";
 
-// Mock data for reference - will be replaced with real data
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const mockJobs = [
-  {
-    jobNo: "JKDP-JOB-2024-001",
-    customer_id: "JKDP-CUS-001",
-    customer_name: "ABC Marketing Solutions", 
-    job_title: "Business Cards - Premium",
-    description: "500 premium business cards with UV coating",
-    status: "in_progress",
-    priority: "high",
-    quantity: 500,
-    final_cost: 600.00,
-    submittedDate: "2024-01-10",
-    dueDate: "2024-01-15", 
-    assigned_to: "John Smith"
-  },
-  {
-    jobNo: "JKDP-JOB-2024-002", 
-    customer_id: "JKDP-CUS-002",
-    customer_name: "TechStart Inc",
-    job_title: "Company Brochures",
-    description: "200 tri-fold brochures for tech conference",
-    status: "pending",
-    priority: "medium",
-    quantity: 200,
-    final_cost: 700.00,
-    submittedDate: "2024-01-08",
-    dueDate: "2024-01-18",
-    assigned_to: "Sarah Johnson"
-  },
-  {
-    jobNo: "JKDP-JOB-2024-003",
-    customer_id: "JKDP-CUS-003", 
-    customer_name: "Local Restaurant Group",
-    job_title: "Menu Printing",
-    description: "100 laminated menus for 3 restaurant locations",
-    status: "completed",
-    priority: "low",
-    quantity: 100,
-    final_cost: 850.00,
-    submittedDate: "2024-01-05",
-    dueDate: "2024-01-12",
-    assigned_to: "Mike Chen"
-  },
-  {
-    jobNo: "JKDP-JOB-2024-004",
-    customer_id: "JKDP-CUS-001",
-    customer_name: "ABC Marketing Solutions",
-    job_title: "Flyer Campaign",
-    description: "1000 promotional flyers for new product launch",
-    status: "quote_sent",
-    priority: "medium", 
-    quantity: 1000,
-    final_cost: 450.00,
-    submittedDate: "2024-01-12",
-    dueDate: "2024-01-20",
-    assigned_to: "Emma Davis"
-  }
-];
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case "completed": return "bg-green-100 text-green-800";
-    case "in_progress": return "bg-blue-100 text-blue-800";
-    case "pending": return "bg-yellow-100 text-yellow-800";
-    case "quote_sent": return "bg-purple-100 text-purple-800";
-    default: return "bg-gray-100 text-gray-800";
-  }
-};
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const getPriorityColor = (priority: string) => {
-  switch (priority) {
-    case "high": return "bg-red-100 text-red-800";
-    case "medium": return "bg-yellow-100 text-yellow-800"; 
-    case "low": return "bg-green-100 text-green-800";
-    default: return "bg-gray-100 text-gray-800";
-  }
-};
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const getStatusIcon = (status: string) => {
-  switch (status) {
-    case "completed": return <CheckCircle className="h-4 w-4" />;
-    case "in_progress": return <Clock className="h-4 w-4" />;
-    case "pending": return <AlertCircle className="h-4 w-4" />;
-    case "quote_sent": return <FileText className="h-4 w-4" />;
-    default: return <FileText className="h-4 w-4" />;
-  }
-};
-
 export default function JobsPage() {
   const { data: jobs, error: jobsError, isLoading: jobsLoading } = useJobsWithCustomers();
   const { data: stats, isLoading: statsLoading } = useJobStats();
@@ -164,10 +71,12 @@ export default function JobsPage() {
               <Link href="/dashboard">
                 <Button variant="outline">Back to Dashboard</Button>
               </Link>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                New Job
-              </Button>
+              <Link href="/dashboard/submit-job">
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Job
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -263,10 +172,12 @@ export default function JobsPage() {
                   <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">No jobs found</h3>
                   <p className="text-gray-600 mb-4">Get started by creating your first printing job</p>
-                  <Button>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Create Job
-                  </Button>
+                  <Link href="/dashboard/submit-job">
+                    <Button>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create Job
+                    </Button>
+                  </Link>
                 </div>
               ) : (
                 <div className="space-y-4">

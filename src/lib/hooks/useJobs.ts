@@ -76,19 +76,19 @@ const fetchJobsWithCustomers = async (): Promise<JobWithCustomer[]> => {
 
   const { data: customers, error: customersError } = await supabase
     .from('customers')
-    .select('human_id, business_name');
+    .select('id, business_name');
   
   if (customersError) throw customersError;
 
   interface CustomerData {
-    human_id: string;
+    id: string;
     business_name: string;
   }
 
   // Create a lookup map for customer names
   const customerMap = new Map();
   (customers as CustomerData[])?.forEach((customer: CustomerData) => {
-    customerMap.set(customer.human_id, customer.business_name);
+    customerMap.set(customer.id, customer.business_name);
   });
 
   // Add customer names to jobs
@@ -114,7 +114,7 @@ const fetchJobByNumber = async (jobNumber: string): Promise<JobWithCustomer> => 
   const { data: customer, error: customerError } = await supabase
     .from('customers')
     .select('business_name')
-    .eq('customer_id', (job as Job).customer_id || '')
+    .eq('id', (job as Job).customer_id || '')
     .single();
   
   if (customerError) throw customerError;
@@ -130,11 +130,11 @@ const fetchJobByNumber = async (jobNumber: string): Promise<JobWithCustomer> => 
 };
 
 // Fetcher for jobs by customer
-const fetchJobsByCustomer = async (customerHumanId: string): Promise<JobWithCustomer[]> => {
+const fetchJobsByCustomer = async (customerId: string): Promise<JobWithCustomer[]> => {
   const { data: jobs, error: jobsError } = await supabase
     .from('jobs')
     .select('*')
-    .eq('customer_id', customerHumanId)
+    .eq('customer_id', customerId)
     .order('created_at', { ascending: false });
   
   if (jobsError) throw jobsError;
@@ -143,7 +143,7 @@ const fetchJobsByCustomer = async (customerHumanId: string): Promise<JobWithCust
   const { data: customer, error: customerError } = await supabase
     .from('customers')
     .select('business_name')
-    .eq('human_id', customerHumanId)
+    .eq('id', customerId)
     .single();
   
   if (customerError) throw customerError;
@@ -203,10 +203,10 @@ export const useJob = (jobNumber: string | null) => {
 };
 
 // Hook to get jobs for specific customer
-export const useJobsByCustomer = (customerHumanId: string | null) => {
+export const useJobsByCustomer = (customerId: string | null) => {
   return useSWR(
-    customerHumanId ? `jobs-customer-${customerHumanId}` : null,
-    () => customerHumanId ? fetchJobsByCustomer(customerHumanId) : null,
+    customerId ? `jobs-customer-${customerId}` : null,
+    () => customerId ? fetchJobsByCustomer(customerId) : null,
     {
       refreshInterval: 30000,
       revalidateOnFocus: true,
