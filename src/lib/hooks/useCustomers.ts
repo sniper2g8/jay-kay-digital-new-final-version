@@ -1,5 +1,6 @@
 import useSWR from 'swr';
 import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Updated customer type to match actual database schema
 export interface Customer {
@@ -135,11 +136,18 @@ const fetchCustomerWithStats = async (customerHumanId: string): Promise<Customer
 
 // Hook to get all customers
 export const useCustomers = () => {
-  return useSWR('customers', fetchCustomers, {
-    refreshInterval: 30000, // Refresh every 30 seconds
-    revalidateOnFocus: true,
-    errorRetryCount: 3
-  });
+  const { user, session } = useAuth();
+  
+  return useSWR(
+    // Only fetch if user is authenticated
+    user && session ? 'customers' : null, 
+    fetchCustomers, 
+    {
+      refreshInterval: 30000, // Refresh every 30 seconds
+      revalidateOnFocus: true,
+      errorRetryCount: 3
+    }
+  );
 };
 
 // Hook to get specific customer by human ID

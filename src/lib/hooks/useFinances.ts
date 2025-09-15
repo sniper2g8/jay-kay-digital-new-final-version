@@ -1,5 +1,6 @@
 import useSWR from 'swr';
 import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/AuthContext';
 import type { Database } from '@/lib/database-generated.types';
 
 type Json = Database['public']['Tables']['invoices']['Row']['items'];
@@ -227,44 +228,70 @@ const fetchInvoicesByCustomer = async (customerHumanId: string): Promise<Invoice
 
 // Hook to get all payments
 export const usePayments = () => {
-  return useSWR('payments', fetchPayments, {
-    refreshInterval: 30000, // Refresh every 30 seconds
-    revalidateOnFocus: true,
-    errorRetryCount: 3
-  });
+  const { user, session } = useAuth();
+  
+  return useSWR(
+    user && session ? 'payments' : null, 
+    fetchPayments, 
+    {
+      refreshInterval: 30000, // Refresh every 30 seconds
+      revalidateOnFocus: true,
+      errorRetryCount: 3
+    }
+  );
 };
 
 // Hook to get all invoices
 export const useInvoices = () => {
-  return useSWR('invoices', fetchInvoices, {
-    refreshInterval: 30000, // Refresh every 30 seconds
-    revalidateOnFocus: true,
-    errorRetryCount: 3
-  });
+  const { user, session } = useAuth();
+  
+  return useSWR(
+    user && session ? 'invoices' : null, 
+    fetchInvoices, 
+    {
+      refreshInterval: 30000, // Refresh every 30 seconds
+      revalidateOnFocus: true,
+      errorRetryCount: 3
+    }
+  );
 };
 
 // Hook to get payments with customer information
 export const usePaymentsWithCustomers = () => {
-  return useSWR('payments-with-customers', fetchPaymentsWithCustomers, {
-    refreshInterval: 30000, // Refresh every 30 seconds
-    revalidateOnFocus: true,
-    errorRetryCount: 3
-  });
+  const { user, session } = useAuth();
+  
+  return useSWR(
+    user && session ? 'payments-with-customers' : null, 
+    fetchPaymentsWithCustomers, 
+    {
+      refreshInterval: 30000, // Refresh every 30 seconds
+      revalidateOnFocus: true,
+      errorRetryCount: 3
+    }
+  );
 };
 
 // Hook to get invoices with customer information
 export const useInvoicesWithCustomers = () => {
-  return useSWR('invoices-with-customers', fetchInvoicesWithCustomers, {
-    refreshInterval: 30000, // Refresh every 30 seconds
-    revalidateOnFocus: true,
-    errorRetryCount: 3
-  });
+  const { user, session } = useAuth();
+  
+  return useSWR(
+    user && session ? 'invoices-with-customers' : null, 
+    fetchInvoicesWithCustomers, 
+    {
+      refreshInterval: 30000, // Refresh every 30 seconds
+      revalidateOnFocus: true,
+      errorRetryCount: 3
+    }
+  );
 };
 
 // Hook to get payments for specific customer
 export const usePaymentsByCustomer = (customerHumanId: string | null) => {
+  const { user, session } = useAuth();
+  
   return useSWR(
-    customerHumanId ? `payments-customer-${customerHumanId}` : null,
+    user && session && customerHumanId ? `payments-customer-${customerHumanId}` : null,
     () => customerHumanId ? fetchPaymentsByCustomer(customerHumanId) : null,
     {
       refreshInterval: 30000,
@@ -276,8 +303,10 @@ export const usePaymentsByCustomer = (customerHumanId: string | null) => {
 
 // Hook to get invoices for specific customer
 export const useInvoicesByCustomer = (customerHumanId: string | null) => {
+  const { user, session } = useAuth();
+  
   return useSWR(
-    customerHumanId ? `invoices-customer-${customerHumanId}` : null,
+    user && session && customerHumanId ? `invoices-customer-${customerHumanId}` : null,
     () => customerHumanId ? fetchInvoicesByCustomer(customerHumanId) : null,
     {
       refreshInterval: 30000,
@@ -289,34 +318,40 @@ export const useInvoicesByCustomer = (customerHumanId: string | null) => {
 
 // Hook to get financial statistics
 export const useFinancialStats = () => {
-  return useSWR('financial-stats', async () => {
-    const [invoices, payments] = await Promise.all([
-      fetchInvoices(),
-      fetchPayments()
-    ]);
-    
-    const totalRevenue = invoices.reduce((sum, invoice) => sum + (invoice.total || invoice.grandTotal || 0), 0);
-    const totalPaid = payments.reduce((sum, payment) => sum + (payment.amount || 0), 0);
-    const paidInvoices = invoices.filter(inv => inv.status === 'paid');
-    const pendingInvoices = invoices.filter(inv => inv.status === 'pending' || inv.payment_status === 'pending');
-    const totalPending = pendingInvoices.reduce((sum, invoice) => sum + (invoice.total || invoice.grandTotal || 0), 0);
-    const collectionRate = totalRevenue > 0 ? (totalPaid / totalRevenue) * 100 : 0;
+  const { user, session } = useAuth();
+  
+  return useSWR(
+    user && session ? 'financial-stats' : null, 
+    async () => {
+      const [invoices, payments] = await Promise.all([
+        fetchInvoices(),
+        fetchPayments()
+      ]);
+      
+      const totalRevenue = invoices.reduce((sum, invoice) => sum + (invoice.total || invoice.grandTotal || 0), 0);
+      const totalPaid = payments.reduce((sum, payment) => sum + (payment.amount || 0), 0);
+      const paidInvoices = invoices.filter(inv => inv.status === 'paid');
+      const pendingInvoices = invoices.filter(inv => inv.status === 'pending' || inv.payment_status === 'pending');
+      const totalPending = pendingInvoices.reduce((sum, invoice) => sum + (invoice.total || invoice.grandTotal || 0), 0);
+      const collectionRate = totalRevenue > 0 ? (totalPaid / totalRevenue) * 100 : 0;
 
-    return {
-      total_revenue: totalRevenue,
-      total_paid: totalPaid,
-      total_pending: totalPending,
-      paid_invoices_count: paidInvoices.length,
-      pending_invoices_count: pendingInvoices.length,
-      total_invoices: invoices.length,
-      total_payments: payments.length,
-      collection_rate: Math.round(collectionRate)
-    };
-  }, {
-    refreshInterval: 60000, // Refresh every minute
-    revalidateOnFocus: true,
-    errorRetryCount: 2
-  });
+      return {
+        total_revenue: totalRevenue,
+        total_paid: totalPaid,
+        total_pending: totalPending,
+        paid_invoices_count: paidInvoices.length,
+        pending_invoices_count: pendingInvoices.length,
+        total_invoices: invoices.length,
+        total_payments: payments.length,
+        collection_rate: Math.round(collectionRate)
+      };
+    }, 
+    {
+      refreshInterval: 60000, // Refresh every minute
+      revalidateOnFocus: true,
+      errorRetryCount: 2
+    }
+  );
 };
 
 // Basic mutation functions for financial operations

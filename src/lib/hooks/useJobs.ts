@@ -1,5 +1,6 @@
 import useSWR from 'swr';
 import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/AuthContext';
 import type { Database } from '@/lib/database-generated.types';
 
 type Json = Database['public']['Tables']['jobs']['Row']['delivery'];
@@ -161,20 +162,32 @@ const fetchJobsByCustomer = async (customerHumanId: string): Promise<JobWithCust
 
 // Hook to get all jobs
 export const useJobs = () => {
-  return useSWR('jobs', fetchJobs, {
-    refreshInterval: 30000, // Refresh every 30 seconds
-    revalidateOnFocus: true,
-    errorRetryCount: 3
-  });
+  const { user, session } = useAuth();
+  
+  return useSWR(
+    user && session ? 'jobs' : null, 
+    fetchJobs, 
+    {
+      refreshInterval: 30000, // Refresh every 30 seconds
+      revalidateOnFocus: true,
+      errorRetryCount: 3
+    }
+  );
 };
 
 // Hook to get jobs with customer information
 export const useJobsWithCustomers = () => {
-  return useSWR('jobs-with-customers', fetchJobsWithCustomers, {
-    refreshInterval: 30000, // Refresh every 30 seconds
-    revalidateOnFocus: true,
-    errorRetryCount: 3
-  });
+  const { user, session } = useAuth();
+  
+  return useSWR(
+    user && session ? 'jobs-with-customers' : null, 
+    fetchJobsWithCustomers, 
+    {
+      refreshInterval: 30000, // Refresh every 30 seconds
+      revalidateOnFocus: true,
+      errorRetryCount: 3
+    }
+  );
 };
 
 // Hook to get specific job by job number
@@ -204,29 +217,35 @@ export const useJobsByCustomer = (customerHumanId: string | null) => {
 
 // Hook to get job statistics
 export const useJobStats = () => {
-  return useSWR('job-stats', async () => {
-    const jobs = await fetchJobs();
-    
-    const totalJobs = jobs.length;
-    const inProgress = jobs.filter(job => job.status === 'in_progress').length;
-    const completed = jobs.filter(job => job.status === 'completed').length;
-    const pending = jobs.filter(job => job.status === 'pending').length;
-    const totalValue = jobs.reduce((sum, job) => sum + (job.final_cost || job.estimated_cost || 0), 0);
-    const avgJobValue = totalJobs > 0 ? totalValue / totalJobs : 0;
+  const { user, session } = useAuth();
+  
+  return useSWR(
+    user && session ? 'job-stats' : null, 
+    async () => {
+      const jobs = await fetchJobs();
+      
+      const totalJobs = jobs.length;
+      const inProgress = jobs.filter(job => job.status === 'in_progress').length;
+      const completed = jobs.filter(job => job.status === 'completed').length;
+      const pending = jobs.filter(job => job.status === 'pending').length;
+      const totalValue = jobs.reduce((sum, job) => sum + (job.final_cost || job.estimated_cost || 0), 0);
+      const avgJobValue = totalJobs > 0 ? totalValue / totalJobs : 0;
 
-    return {
-      total_jobs: totalJobs,
-      in_progress: inProgress,
-      completed: completed,
-      pending: pending,
-      total_value: totalValue,
-      avg_job_value: avgJobValue
-    };
-  }, {
-    refreshInterval: 60000, // Refresh every minute
-    revalidateOnFocus: true,
-    errorRetryCount: 2
-  });
+      return {
+        total_jobs: totalJobs,
+        in_progress: inProgress,
+        completed: completed,
+        pending: pending,
+        total_value: totalValue,
+        avg_job_value: avgJobValue
+      };
+    }, 
+    {
+      refreshInterval: 60000, // Refresh every minute
+      revalidateOnFocus: true,
+      errorRetryCount: 2
+    }
+  );
 };
 
 // Basic mutation functions for job operations
