@@ -138,8 +138,38 @@ export default function EditCustomerPage() {
       toast.success('Customer updated successfully!');
       router.push('/dashboard/customers');
     } catch (error) {
-      console.error('Update error:', error);
-      toast.error('Failed to update customer. Please try again.');
+      console.error('Customer update error:', error);
+      console.error('Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : 'No stack trace',
+        name: error instanceof Error ? error.name : 'Unknown error type',
+        code: error && typeof error === 'object' && 'code' in error ? (error as { code: unknown }).code : undefined,
+        details: error && typeof error === 'object' && 'details' in error ? (error as { details: unknown }).details : undefined,
+        hint: error && typeof error === 'object' && 'hint' in error ? (error as { hint: unknown }).hint : undefined,
+        customerId: customerId,
+        formData: 'Form data submitted'
+      });
+      
+      // Enhanced error handling with specific messages
+      let errorMessage = 'Failed to update customer. Please try again.';
+      
+      if (error instanceof Error) {
+        if (error.message.includes('permission denied')) {
+          errorMessage = 'Permission denied. Please check your access rights.';
+        } else if (error.message.includes('unique constraint')) {
+          errorMessage = 'A customer with this email already exists.';
+        } else if (error.message.includes('foreign key')) {
+          errorMessage = 'Invalid data reference. Please check your selections.';
+        } else if (error.message.includes('not found')) {
+          errorMessage = 'Customer not found. They may have been deleted.';
+        } else if (error.message.includes('invalid email')) {
+          errorMessage = 'Please enter a valid email address.';
+        } else {
+          errorMessage = `Update failed: ${error.message}`;
+        }
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

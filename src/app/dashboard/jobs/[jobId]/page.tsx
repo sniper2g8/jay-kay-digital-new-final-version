@@ -38,6 +38,9 @@ interface JobFile {
   file_size: number | null;
   file_type: string | null;
   created_at: string | null;
+  entity_id: string;
+  entity_type: string;
+  uploaded_by: string | null;
 }
 
 export default function JobDetailPage() {
@@ -53,13 +56,16 @@ export default function JobDetailPage() {
   // Fetch job files on component mount
   React.useEffect(() => {
     const fetchJobFiles = async () => {
-      if (!jobId) return;
+      if (!jobId || !job) return;
       
       try {
+        console.log('Fetching files for job:', { jobId, jobUUID: job.id, jobNumber: job.jobNo });
+        
+        // Try fetching by job UUID first (more likely to be correct)
         const { data, error } = await supabase
           .from('file_attachments')
           .select('*')
-          .eq('entity_id', jobId)
+          .eq('entity_id', job.id) // Use actual job UUID
           .eq('entity_type', 'job')
           .order('created_at', { ascending: false });
 
@@ -67,27 +73,40 @@ export default function JobDetailPage() {
           console.error('Error fetching job files:', error);
           toast.error('Failed to load job files');
         } else {
+          console.log('Fetched files data:', data); // Debug log
           setFiles(data || []);
         }
       } catch (err) {
         console.error('Unexpected error fetching files:', err);
+        toast.error('Error loading job files');
       } finally {
         setFilesLoading(false);
       }
     };
 
     fetchJobFiles();
-  }, [jobId]);
+  }, [jobId, job]);
 
   const downloadFile = async (file: JobFile) => {
     setDownloadingFiles(prev => new Set(prev).add(file.id));
     
     try {
+      console.log('Attempting to download file:', file);
+      
+      // Extract the storage path from the file_url
+      // file_url format is usually: https://[project].supabase.co/storage/v1/object/public/job-files/[path]
+      const urlParts = file.file_url.split('/');
+      const bucketIndex = urlParts.indexOf('job-files');
+      const storagePath = bucketIndex >= 0 ? urlParts.slice(bucketIndex + 1).join('/') : file.file_url;
+      
+      console.log('Using storage path:', storagePath);
+      
       const { data, error } = await supabase.storage
         .from('job-files')
-        .download(file.file_url);
+        .download(storagePath);
 
       if (error) {
+        console.error('Storage download error:', error);
         throw error;
       }
 
