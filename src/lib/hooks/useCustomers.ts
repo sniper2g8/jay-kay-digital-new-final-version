@@ -37,6 +37,11 @@ export interface CustomerWithStats extends Customer {
 
 // Fetcher function for customers
 const fetchCustomers = async (): Promise<Customer[]> => {
+  // Don't execute during build/SSG
+  if (typeof window === 'undefined') {
+    return [];
+  }
+  
   try {
     console.log('🚨 fetchCustomers called - This should NOT happen if user is not authenticated!');
     
@@ -147,15 +152,23 @@ const fetchCustomerWithStats = async (customerHumanId: string): Promise<Customer
 export const useCustomers = () => {
   const { user, session, loading } = useAuth();
   
-  console.log('useCustomers hook - Auth state:', { 
-    hasUser: !!user, 
-    hasSession: !!session, 
-    loading,
-    userEmail: user?.email || 'no user'
-  });
+  // Build-time check - still call hooks but don't log or execute side effects
+  const isBuildTime = typeof window === 'undefined';
   
-  const shouldFetch = user && session && !loading;
-  console.log('useCustomers - shouldFetch:', shouldFetch);
+  if (!isBuildTime) {
+    console.log('useCustomers hook - Auth state:', { 
+      hasUser: !!user, 
+      hasSession: !!session, 
+      loading,
+      userEmail: user?.email || 'no user'
+    });
+  }
+  
+  const shouldFetch = user && session && !loading && !isBuildTime;
+  
+  if (!isBuildTime) {
+    console.log('useCustomers - shouldFetch:', shouldFetch);
+  }
   
   return useSWR(
     // Only fetch if user is authenticated

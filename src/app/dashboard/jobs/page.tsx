@@ -276,45 +276,6 @@ export default function JobsPage() {
             </div>)}
                 </CardContent>
         </Card>
-
-        {/* Human-Readable Query Examples */}
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>Database Query Examples</CardTitle>
-            <CardDescription>How to query job data using human-readable IDs</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-gray-100 p-4 rounded-lg">
-              <h4 className="font-medium mb-2">Example Queries:</h4>
-              <div className="space-y-2 text-sm font-mono">
-                <div className="text-blue-600">
-                  {/* Get jobs for specific customer */}
-                </div>
-                <div>
-                  supabase.from(&apos;jobs&apos;).select(&apos;*&apos;).eq(&apos;customer_human_id&apos;, &apos;JKDP-CUS-001&apos;)
-                </div>
-                <div className="text-blue-600 mt-3">
-                  {/* Get specific job by job number */}
-                </div>
-                <div>
-                  supabase.from(&apos;jobs&apos;).select(&apos;*&apos;).eq(&apos;jobNo&apos;, &apos;JKDP-JOB-2024-001&apos;)
-                </div>
-                <div className="text-blue-600 mt-3">
-                  {/* Get jobs by status */}
-                </div>
-                <div>
-                  supabase.from(&apos;jobs&apos;).select(&apos;*&apos;).eq(&apos;status&apos;, &apos;in_progress&apos;)
-                </div>
-                <div className="text-blue-600 mt-3">
-                  {/* Join with customer data */}
-                </div>
-                <div>
-                  supabase.from(&apos;jobs&apos;).select(&apos;*, customers(business_name, contact_person)&apos;)
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
         </div>
       </div>
     </DashboardLayout>

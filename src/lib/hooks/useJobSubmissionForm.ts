@@ -206,7 +206,7 @@ export const useJobSubmissionForm = () => {
     if (!selectedService) {
       // Use all available options from database
       setAvailablePaperTypes(paperTypes.data.map(p => p.name));
-      setAvailablePaperWeights(paperWeights.data.map(p => p.gsm));
+      setAvailablePaperWeights(paperWeights.data.map(p => p.weight_gsm));
       setAvailableFinishingOptions(finishOptions.data);
       return;
     }
@@ -222,14 +222,14 @@ export const useJobSubmissionForm = () => {
         .map(type => type.name);
       
       const filteredPaperWeights = paperWeights.data
-        .filter(weight => serviceSpec.paper_weights.includes(weight.gsm))
-        .map(weight => weight.gsm);
+        .filter(weight => serviceSpec.paper_weights.includes(weight.weight_gsm))
+        .map(weight => weight.weight_gsm);
       
       const filteredFinishing = finishOptions.data
         .filter(option => serviceSpec.finishing_options.includes(option.id));
       
       setAvailablePaperTypes(filteredPaperTypes.length > 0 ? filteredPaperTypes : paperTypes.data.map(p => p.name));
-      setAvailablePaperWeights(filteredPaperWeights.length > 0 ? filteredPaperWeights : paperWeights.data.map(p => p.gsm));
+      setAvailablePaperWeights(filteredPaperWeights.length > 0 ? filteredPaperWeights : paperWeights.data.map(p => p.weight_gsm));
       setAvailableFinishingOptions(filteredFinishing.length > 0 ? filteredFinishing : finishOptions.data);
       
       // Reset selections if they're no longer valid
@@ -243,7 +243,7 @@ export const useJobSubmissionForm = () => {
     } else {
       // Use all available options if service not found in specifications
       setAvailablePaperTypes(paperTypes.data.map(p => p.name));
-      setAvailablePaperWeights(paperWeights.data.map(p => p.gsm));
+      setAvailablePaperWeights(paperWeights.data.map(p => p.weight_gsm));
       setAvailableFinishingOptions(finishOptions.data);
     }
   }, [services, formData.service_id, formData.paper_type, formData.paper_weight, paperTypes.data, paperWeights.data, finishOptions.data, serviceSpecifications]);
@@ -372,8 +372,12 @@ export const useJobSubmissionForm = () => {
     showNewCustomerDialog,
     setShowNewCustomerDialog,
     
-    // Paper specifications from database
-    paperSizesData: paperSizes.data,
+    // Paper specifications from database (transformed for compatibility)
+    paperSizesData: paperSizes.data?.map(size => ({
+      name: size.name,
+      width_mm: Math.round(size.width_inches * 25.4 * 100) / 100, // Convert inches to mm
+      height_mm: Math.round(size.height_inches * 25.4 * 100) / 100
+    })) || [],
     paperWeightsData: paperWeights.data,
     paperTypesData: paperTypes.data,
     finishOptionsData: finishOptions.data,

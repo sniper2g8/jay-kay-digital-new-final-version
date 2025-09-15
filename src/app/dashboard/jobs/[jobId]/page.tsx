@@ -71,7 +71,7 @@ export default function JobDetailPage() {
         // Use job UUID for consistent and fast lookup
         const { data, error } = await supabase
           .from('file_attachments')
-          .select('id, file_name, file_url, file_size, created_at, entity_id, entity_type, uploaded_by')
+          .select('id, file_name, file_url, file_size, file_type, created_at, entity_id, entity_type, uploaded_by')
           .eq('entity_id', job.id)
           .eq('entity_type', 'job')
           .order('created_at', { ascending: false });
@@ -79,10 +79,21 @@ export default function JobDetailPage() {
         if (error) {
           console.error('Error fetching job files:', error);
           if (!isCancelled) {
-            toast.error('Failed to load job files');
+            toast.error('Failed to load job files: ' + error.message);
           }
         } else {
           console.log('Fetched files data:', data);
+          console.log('Number of files found:', data?.length || 0);
+          
+          // Also try to query all file_attachments to see if there are any at all
+          const { data: allFiles, error: allFilesError } = await supabase
+            .from('file_attachments')
+            .select('id, entity_id, entity_type, file_name')
+            .limit(5);
+          
+          console.log('All files in database (sample):', allFiles);
+          console.log('All files error:', allFilesError);
+          
           if (!isCancelled) {
             setFiles(data || []);
           }
@@ -404,6 +415,19 @@ export default function JobDetailPage() {
                                   <p className="text-sm text-gray-700">
                                     {specs.paper.type} - {specs.paper.weight}
                                   </p>
+                                </div>
+                              )}
+                              
+                              {specs.finishing_options && specs.finishing_options.length > 0 && (
+                                <div>
+                                  <h4 className="font-medium text-gray-900 mb-1">Finishing Options</h4>
+                                  <div className="text-sm text-gray-700">
+                                    {specs.finishing_options.map((option: string | { id?: string; name?: string }, index: number) => (
+                                      <span key={index} className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs mr-2 mb-1">
+                                        {typeof option === 'string' ? option : option.name || option.id}
+                                      </span>
+                                    ))}
+                                  </div>
                                 </div>
                               )}
                               

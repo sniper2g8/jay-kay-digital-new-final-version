@@ -16,6 +16,11 @@ export interface UserWithRole {
 // Fetcher function to get current user's role information
 const fetchUserRole = async (userId: string): Promise<UserWithRole | null> => {
   if (!userId) return null;
+  
+  // Don't execute during build/SSG
+  if (typeof window === 'undefined') {
+    return null;
+  }
 
   console.log('🚨 fetchUserRole called - This should NOT happen if user is not authenticated!');
   
@@ -50,15 +55,23 @@ const fetchUserRole = async (userId: string): Promise<UserWithRole | null> => {
 export const useUserRole = () => {
   const { user, session, loading } = useAuth();
 
-  console.log('useUserRole hook - Auth state:', { 
-    hasUser: !!user, 
-    hasSession: !!session, 
-    loading,
-    userEmail: user?.email || 'no user'
-  });
+  // Build-time check - still call hooks but don't log or execute side effects
+  const isBuildTime = typeof window === 'undefined';
+  
+  if (!isBuildTime) {
+    console.log('useUserRole hook - Auth state:', { 
+      hasUser: !!user, 
+      hasSession: !!session, 
+      loading,
+      userEmail: user?.email || 'no user'
+    });
+  }
 
-  const shouldFetch = user && session && !loading;
-  console.log('useUserRole - shouldFetch:', shouldFetch);
+  const shouldFetch = user && session && !loading && !isBuildTime;
+  
+  if (!isBuildTime) {
+    console.log('useUserRole - shouldFetch:', shouldFetch);
+  }
 
   return useSWR(
     shouldFetch ? `user-role-${user.id}` : null,

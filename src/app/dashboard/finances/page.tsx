@@ -1,3 +1,5 @@
+'use client';
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,75 +14,14 @@ import {
   CreditCard,
   AlertCircle,
   CheckCircle,
-  Calendar,
   TrendingUp,
-  Download
+  Download,
+  Eye
 } from "lucide-react";
 import Link from "next/link";
+import { useInvoicesWithCustomers, usePaymentsWithCustomers, useFinancialStats } from '@/lib/hooks/useFinances';
 
-// Mock data showcasing human-readable IDs and relationships
-const mockInvoices = [
-  {
-    invoice_no: "JKDP-INV-2024-001",
-    customer_human_id: "JKDP-CUS-001",
-    customer_name: "ABC Marketing Solutions",
-    jobNo: "JKDP-JOB-2024-001",
-    amount: 600.00,
-    status: "paid",
-    issue_date: "2024-01-10",
-    due_date: "2024-01-25",
-    paid_date: "2024-01-20"
-  },
-  {
-    invoice_no: "JKDP-INV-2024-002",
-    customer_human_id: "JKDP-CUS-002", 
-    customer_name: "TechStart Inc",
-    jobNo: "JKDP-JOB-2024-002",
-    amount: 700.00,
-    status: "pending",
-    issue_date: "2024-01-08",
-    due_date: "2024-01-23",
-    paid_date: null
-  },
-  {
-    invoice_no: "JKDP-INV-2024-003",
-    customer_human_id: "JKDP-CUS-003",
-    customer_name: "Local Restaurant Group", 
-    jobNo: "JKDP-JOB-2024-003",
-    amount: 850.00,
-    status: "paid",
-    issue_date: "2024-01-05",
-    due_date: "2024-01-20",
-    paid_date: "2024-01-15"
-  }
-];
-
-const mockPayments = [
-  {
-    payment_number: "JKDP-PAY-2024-001",
-    customer_human_id: "JKDP-CUS-001",
-    customer_name: "ABC Marketing Solutions",
-    invoice_no: "JKDP-INV-2024-001",
-    amount: 600.00,
-    payment_method: "credit_card",
-    payment_date: "2024-01-20",
-    status: "completed",
-    reference: "CC-ending-4532"
-  },
-  {
-    payment_number: "JKDP-PAY-2024-002",
-    customer_human_id: "JKDP-CUS-003",
-    customer_name: "Local Restaurant Group",
-    invoice_no: "JKDP-INV-2024-003", 
-    amount: 850.00,
-    payment_method: "bank_transfer",
-    payment_date: "2024-01-15",
-    status: "completed",
-    reference: "BT-REF-789456"
-  }
-];
-
-const getInvoiceStatusColor = (status: string) => {
+const getInvoiceStatusColor = (status: string | null) => {
   switch (status) {
     case "paid": return "bg-green-100 text-green-800";
     case "pending": return "bg-yellow-100 text-yellow-800";
@@ -99,11 +40,15 @@ const getPaymentMethodIcon = (method: string) => {
 };
 
 export default function FinancesPage() {
-  const totalRevenue = mockInvoices.reduce((sum, inv) => sum + inv.amount, 0);
-  const paidInvoices = mockInvoices.filter(inv => inv.status === "paid");
-  const pendingInvoices = mockInvoices.filter(inv => inv.status === "pending");
-  const totalPaid = paidInvoices.reduce((sum, inv) => sum + inv.amount, 0);
-  const totalPending = pendingInvoices.reduce((sum, inv) => sum + inv.amount, 0);
+  const { data: invoices = [] } = useInvoicesWithCustomers();
+  const { data: payments = [] } = usePaymentsWithCustomers();
+  const { data: stats } = useFinancialStats();
+
+  // Calculate totals from live data
+  const totalRevenue = stats?.total_revenue || 0;
+  const totalPaid = stats?.total_paid || 0;
+  const totalPending = stats?.total_pending || 0;
+  const collectionRate = stats?.collection_rate || 0;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -156,7 +101,7 @@ export default function FinancesPage() {
             <CardContent>
               <div className="text-2xl font-bold">${totalRevenue.toLocaleString()}</div>
               <p className="text-xs text-muted-foreground">
-                All invoices this year
+                {stats?.total_invoices || 0} invoices total
               </p>
             </CardContent>
           </Card>
@@ -169,7 +114,7 @@ export default function FinancesPage() {
             <CardContent>
               <div className="text-2xl font-bold">${totalPaid.toLocaleString()}</div>
               <p className="text-xs text-muted-foreground">
-                {paidInvoices.length} paid invoices
+                {stats?.paid_invoices_count || 0} paid invoices
               </p>
             </CardContent>
           </Card>
@@ -182,7 +127,7 @@ export default function FinancesPage() {
             <CardContent>
               <div className="text-2xl font-bold">${totalPending.toLocaleString()}</div>
               <p className="text-xs text-muted-foreground">
-                {pendingInvoices.length} pending invoices
+                {stats?.pending_invoices_count || 0} pending invoices
               </p>
             </CardContent>
           </Card>
@@ -193,7 +138,7 @@ export default function FinancesPage() {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{Math.round((totalPaid / totalRevenue) * 100)}%</div>
+              <div className="text-2xl font-bold">{collectionRate}%</div>
               <p className="text-xs text-muted-foreground">
                 Payment efficiency
               </p>
@@ -201,166 +146,109 @@ export default function FinancesPage() {
           </Card>
         </div>
 
-        {/* Invoices Section */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>Recent Invoices</CardTitle>
-            <CardDescription>Track invoice status and payment progress</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {mockInvoices.map((invoice) => (
-                <div key={invoice.invoice_no} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center space-x-4">
-                    <div className="bg-blue-100 p-3 rounded-lg">
-                      <FileText className="h-6 w-6 text-blue-600" />
-                    </div>
-                    <div>
-                      <div className="flex items-center space-x-2 mb-1">
-                        <h3 className="font-semibold text-gray-900">{invoice.invoice_no}</h3>
-                        <Badge className={getInvoiceStatusColor(invoice.status)}>
-                          <div className="flex items-center space-x-1">
-                            {invoice.status === "paid" ? (
-                              <CheckCircle className="h-3 w-3" />
-                            ) : (
-                              <AlertCircle className="h-3 w-3" />
-                            )}
-                            <span>{invoice.status}</span>
-                          </div>
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-gray-600 mb-2">
-                        {invoice.customer_name} • Job: {invoice.jobNo}
-                      </p>
-                      <div className="flex items-center space-x-4 text-xs text-gray-500">
-                        <div className="flex items-center">
-                          <Calendar className="h-3 w-3 mr-1" />
-                          Issued: {new Date(invoice.issue_date).toLocaleDateString()}
-                        </div>
-                        <div className="flex items-center">
-                          <Calendar className="h-3 w-3 mr-1" />
-                          Due: {new Date(invoice.due_date).toLocaleDateString()}
-                        </div>
-                        {invoice.paid_date && (
-                          <div className="flex items-center">
-                            <CheckCircle className="h-3 w-3 mr-1" />
-                            Paid: {new Date(invoice.paid_date).toLocaleDateString()}
-                          </div>
-                        )}
-                      </div>
-                    </div>
+        {/* Main Content Tabs */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Invoices Table */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Invoices</CardTitle>
+              <CardDescription>Manage and track your invoices</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {invoices.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                    <FileText className="h-6 w-6 text-gray-400" />
                   </div>
-                  
-                  <div className="flex items-center space-x-6">
-                    <div className="text-right">
-                      <p className="text-lg font-semibold text-gray-900">${invoice.amount.toLocaleString()}</p>
-                      <p className="text-xs text-gray-500">
-                        {invoice.status === "pending" ? "Amount Due" : "Amount Paid"}
-                      </p>
-                    </div>
-                    <Button variant="outline" size="sm">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  <p className="text-sm text-gray-500 mb-1">No invoices found</p>
+                  <p className="text-xs text-gray-400 mb-4">Create your first invoice to get started</p>
+                  <Button>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Create Invoice
+                  </Button>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Payments Section */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>Recent Payments</CardTitle>
-            <CardDescription>Track payment transactions and methods</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {mockPayments.map((payment) => (
-                <div key={payment.payment_number} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center space-x-4">
-                    <div className="bg-green-100 p-3 rounded-lg">
-                      {getPaymentMethodIcon(payment.payment_method)}
+              ) : (
+                <div className="space-y-4">
+                  {invoices.map((invoice) => (
+                    <div key={invoice.invoiceNo} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-3">
+                          <div>
+                            <p className="font-medium">{invoice.invoiceNo}</p>
+                            <p className="text-sm text-gray-500">{invoice.customerName}</p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center space-x-4">
+                        <div className="text-right">
+                          <p className="font-medium">${invoice.grandTotal?.toLocaleString() || '0'}</p>
+                          <p className="text-sm text-gray-500">{invoice.dueDate ? new Date(invoice.dueDate as string).toLocaleDateString() : 'N/A'}</p>
+                        </div>
+                        
+                        <Badge className={getInvoiceStatusColor(invoice.status)}>
+                          {invoice.status}
+                        </Badge>
+                        
+                        <Button variant="ghost" size="sm">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
-                    <div>
-                      <div className="flex items-center space-x-2 mb-1">
-                        <h3 className="font-semibold text-gray-900">{payment.payment_number}</h3>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Payments Table */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Payments</CardTitle>
+              <CardDescription>Track incoming payments</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {payments.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                    <DollarSign className="h-6 w-6 text-gray-400" />
+                  </div>
+                  <p className="text-sm text-gray-500 mb-1">No payments recorded</p>
+                  <p className="text-xs text-gray-400">Payments will appear here when received</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {payments.map((payment) => (
+                    <div key={payment.payment_number} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        {getPaymentMethodIcon(payment.payment_method)}
+                        <div>
+                          <p className="font-medium">{payment.payment_number}</p>
+                          <p className="text-sm text-gray-500">{payment.customer_name}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center space-x-4">
+                        <div className="text-right">
+                          <p className="font-medium">${payment.amount?.toLocaleString() || '0'}</p>
+                          <p className="text-sm text-gray-500">{payment.payment_date ? new Date(payment.payment_date as string).toLocaleDateString() : 'N/A'}</p>
+                        </div>
+                        
                         <Badge className="bg-green-100 text-green-800">
                           {payment.status}
                         </Badge>
-                      </div>
-                      <p className="text-sm text-gray-600 mb-2">
-                        {payment.customer_name} • Invoice: {payment.invoice_no}
-                      </p>
-                      <div className="flex items-center space-x-4 text-xs text-gray-500">
-                        <div className="flex items-center">
-                          {getPaymentMethodIcon(payment.payment_method)}
-                          <span className="ml-1">{payment.payment_method.replace('_', ' ')}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <Calendar className="h-3 w-3 mr-1" />
-                          {new Date(payment.payment_date).toLocaleDateString()}
-                        </div>
-                        <div>
-                          Ref: {payment.reference}
-                        </div>
+                        
+                        <Button variant="ghost" size="sm">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
-                  </div>
-                  
-                  <div className="flex items-center space-x-6">
-                    <div className="text-right">
-                      <p className="text-lg font-semibold text-green-600">+${payment.amount.toLocaleString()}</p>
-                      <p className="text-xs text-gray-500">Payment Received</p>
-                    </div>
-                    <Button variant="outline" size="sm">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Human-Readable Query Examples */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Database Query Examples</CardTitle>
-            <CardDescription>How to query financial data using human-readable IDs</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-gray-100 p-4 rounded-lg">
-              <h4 className="font-medium mb-2">Example Queries:</h4>
-              <div className="space-y-2 text-sm font-mono">
-                <div className="text-blue-600">
-                  {/* Get all invoices for a customer */}
-                </div>
-                <div>
-                  supabase.from(&apos;invoices&apos;).select(&apos;*&apos;).eq(&apos;customer_human_id&apos;, &apos;JKDP-CUS-001&apos;)
-                </div>
-                <div className="text-blue-600 mt-3">
-                  {/* Get payments for specific invoice */}
-                </div>
-                <div>
-                  supabase.from(&apos;payments&apos;).select(&apos;*&apos;).eq(&apos;invoice_no&apos;, &apos;JKDP-INV-2024-001&apos;)
-                </div>
-                <div className="text-blue-600 mt-3">
-                  {/* Get customer payment history */}
-                </div>
-                <div>
-                  supabase.from(&apos;payments&apos;).select(&apos;*&apos;).eq(&apos;customer_human_id&apos;, &apos;JKDP-CUS-001&apos;)
-                </div>
-                <div className="text-blue-600 mt-3">
-                  {/* Join invoice with customer data */}
-                </div>
-                <div>
-                  supabase.from(&apos;invoices&apos;).select(&apos;*, customers(business_name)&apos;).eq(&apos;status&apos;, &apos;pending&apos;)
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

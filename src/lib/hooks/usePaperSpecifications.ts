@@ -3,40 +3,31 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 
 export interface PaperSize {
-  id: string;
+  id: number;
   name: string;
-  series: string;
-  width_mm: number;
-  height_mm: number;
   width_inches: number;
   height_inches: number;
-  category: string;
-  description: string | null;
-  common_uses: string[] | null;
-  active: boolean;
+  category: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface PaperWeight {
-  id: string;
-  gsm: number;
+  id: number;
   name: string;
-  category: string;
-  description: string | null;
-  common_uses: string[] | null;
-  thickness_mm: number | null;
-  opacity_percent: number | null;
-  active: boolean;
+  weight_gsm: number;
+  weight_lbs: number | null;
+  finish: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface PaperType {
-  id: string;
+  id: number;
   name: string;
-  category: string;
   description: string | null;
-  finish: string | null;
-  compatible_weights: number[] | null;
-  common_uses: string[] | null;
-  active: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface FinishOption {
@@ -51,33 +42,33 @@ export interface FinishOption {
 
 // Fallback data for when tables don't exist yet
 const fallbackPaperSizes: PaperSize[] = [
-  { id: 'a0', name: 'A0', series: 'A', width_mm: 841, height_mm: 1189, width_inches: 33.11, height_inches: 46.81, category: 'standard', description: 'Largest standard A-series format', common_uses: ['Posters', 'Large format printing'], active: true },
-  { id: 'a1', name: 'A1', series: 'A', width_mm: 594, height_mm: 841, width_inches: 23.39, height_inches: 33.11, category: 'standard', description: 'Large format poster size', common_uses: ['Posters', 'Flip charts'], active: true },
-  { id: 'a2', name: 'A2', series: 'A', width_mm: 420, height_mm: 594, width_inches: 16.54, height_inches: 23.39, category: 'standard', description: 'Medium poster size', common_uses: ['Small posters', 'Drawings'], active: true },
-  { id: 'a3', name: 'A3', series: 'A', width_mm: 297, height_mm: 420, width_inches: 11.69, height_inches: 16.54, category: 'standard', description: 'Tabloid size', common_uses: ['Drawings', 'Diagrams'], active: true },
-  { id: 'a4', name: 'A4', series: 'A', width_mm: 210, height_mm: 297, width_inches: 8.27, height_inches: 11.69, category: 'standard', description: 'Standard letter size', common_uses: ['Letters', 'Documents', 'Flyers'], active: true },
-  { id: 'a5', name: 'A5', series: 'A', width_mm: 148, height_mm: 210, width_inches: 5.83, height_inches: 8.27, category: 'standard', description: 'Half letter size', common_uses: ['Greeting cards', 'Small flyers'], active: true },
-  { id: 'a6', name: 'A6', series: 'A', width_mm: 105, height_mm: 148, width_inches: 4.13, height_inches: 5.83, category: 'standard', description: 'Postcard size', common_uses: ['Postcards', 'Business cards'], active: true },
-  { id: 'custom', name: 'Custom', series: 'CUSTOM', width_mm: 0, height_mm: 0, width_inches: 0, height_inches: 0, category: 'custom', description: 'Custom dimensions', common_uses: ['Special projects'], active: true }
+  { id: 1, name: 'A0', width_inches: 33.11, height_inches: 46.81, category: 'standard', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 2, name: 'A1', width_inches: 23.39, height_inches: 33.11, category: 'standard', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 3, name: 'A2', width_inches: 16.54, height_inches: 23.39, category: 'standard', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 4, name: 'A3', width_inches: 11.69, height_inches: 16.54, category: 'standard', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 5, name: 'A4', width_inches: 8.27, height_inches: 11.69, category: 'standard', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 6, name: 'A5', width_inches: 5.83, height_inches: 8.27, category: 'standard', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 7, name: 'A6', width_inches: 4.13, height_inches: 5.83, category: 'standard', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 8, name: 'Custom', width_inches: 0, height_inches: 0, category: 'custom', created_at: new Date().toISOString(), updated_at: new Date().toISOString() }
 ];
 
 const fallbackPaperWeights: PaperWeight[] = [
-  { id: '80gsm', gsm: 80, name: '80 GSM', category: 'standard', description: 'Standard copy paper', common_uses: ['Office documents'], thickness_mm: 0.10, opacity_percent: 90, active: true },
-  { id: '100gsm', gsm: 100, name: '100 GSM', category: 'standard', description: 'Premium copy paper', common_uses: ['Letterheads'], thickness_mm: 0.12, opacity_percent: 94, active: true },
-  { id: '120gsm', gsm: 120, name: '120 GSM', category: 'standard', description: 'Light cardstock', common_uses: ['Brochures', 'Flyers'], thickness_mm: 0.15, opacity_percent: 96, active: true },
-  { id: '150gsm', gsm: 150, name: '150 GSM', category: 'heavyweight', description: 'Medium cardstock', common_uses: ['Business cards'], thickness_mm: 0.18, opacity_percent: 98, active: true },
-  { id: '200gsm', gsm: 200, name: '200 GSM', category: 'heavyweight', description: 'Heavy cardstock', common_uses: ['Business cards', 'Covers'], thickness_mm: 0.24, opacity_percent: 99, active: true },
-  { id: '250gsm', gsm: 250, name: '250 GSM', category: 'cardstock', description: 'Premium cardstock', common_uses: ['Luxury invitations'], thickness_mm: 0.30, opacity_percent: 99, active: true },
-  { id: '300gsm', gsm: 300, name: '300 GSM', category: 'cardstock', description: 'Extra heavy cardstock', common_uses: ['Premium business cards'], thickness_mm: 0.36, opacity_percent: 99, active: true },
-  { id: '350gsm', gsm: 350, name: '350 GSM', category: 'cardstock', description: 'Ultra heavy cardstock', common_uses: ['Luxury cards'], thickness_mm: 0.42, opacity_percent: 99, active: true }
+  { id: 1, name: '80 GSM', weight_gsm: 80, weight_lbs: null, finish: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 2, name: '100 GSM', weight_gsm: 100, weight_lbs: null, finish: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 3, name: '120 GSM', weight_gsm: 120, weight_lbs: null, finish: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 4, name: '150 GSM', weight_gsm: 150, weight_lbs: null, finish: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 5, name: '200 GSM', weight_gsm: 200, weight_lbs: null, finish: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 6, name: '250 GSM', weight_gsm: 250, weight_lbs: null, finish: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 7, name: '300 GSM', weight_gsm: 300, weight_lbs: null, finish: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 8, name: '350 GSM', weight_gsm: 350, weight_lbs: null, finish: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }
 ];
 
 const fallbackPaperTypes: PaperType[] = [
-  { id: 'copy', name: 'Copy Paper', category: 'standard', description: 'Standard office copy paper', finish: 'matte', compatible_weights: [70, 80, 90], common_uses: ['Documents', 'Letters'], active: true },
-  { id: 'premium', name: 'Premium Paper', category: 'standard', description: 'High-quality white paper', finish: 'matte', compatible_weights: [80, 90, 100, 120], common_uses: ['Presentations'], active: true },
-  { id: 'glossy', name: 'Glossy Paper', category: 'coated', description: 'Glossy coated paper for photos', finish: 'glossy', compatible_weights: [120, 150, 200, 250], common_uses: ['Photos', 'Brochures'], active: true },
-  { id: 'matte', name: 'Matte Paper', category: 'coated', description: 'Matte coated paper', finish: 'matte', compatible_weights: [120, 150, 200, 250], common_uses: ['Brochures', 'Art prints'], active: true },
-  { id: 'cardstock', name: 'Cardstock', category: 'heavyweight', description: 'Thick paper for cards', finish: 'various', compatible_weights: [200, 250, 300, 350], common_uses: ['Business cards', 'Invitations'], active: true }
+  { id: 1, name: 'Copy Paper', description: 'Standard office copy paper', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 2, name: 'Premium Paper', description: 'High-quality white paper', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 3, name: 'Glossy Paper', description: 'Glossy coated paper for photos', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 4, name: 'Matte Paper', description: 'Matte coated paper', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 5, name: 'Cardstock', description: 'Thick paper for cards', created_at: new Date().toISOString(), updated_at: new Date().toISOString() }
 ];
 
 const fallbackFinishOptions: FinishOption[] = [
@@ -99,10 +90,10 @@ const fallbackFinishOptions: FinishOption[] = [
 const fetchPaperSizes = async (): Promise<PaperSize[]> => {
   try {
     console.log('🔍 Attempting to fetch paper sizes from database...');
+    // Fetch paper sizes with proper typing
     const { data, error } = await supabase
       .from('paper_sizes')
       .select('*')
-      .eq('active', true)
       .order('name');
     
     if (error) {
@@ -112,7 +103,7 @@ const fetchPaperSizes = async (): Promise<PaperSize[]> => {
     
     if (data && data.length > 0) {
       console.log('✅ Successfully fetched paper sizes from database');
-      return data as PaperSize[];
+      return data;
     } else {
       console.log('📋 No data in database, using fallback');
       return fallbackPaperSizes;
@@ -126,11 +117,11 @@ const fetchPaperSizes = async (): Promise<PaperSize[]> => {
 const fetchPaperWeights = async (): Promise<PaperWeight[]> => {
   try {
     console.log('🔍 Attempting to fetch paper weights from database...');
+    // Fetch paper weights with proper typing
     const { data, error } = await supabase
       .from('paper_weights')
       .select('*')
-      .eq('active', true)
-      .order('gsm');
+      .order('weight_gsm');
     
     if (error) {
       console.log('⚠️ Database fetch failed, using fallback data:', error.message);
@@ -139,7 +130,7 @@ const fetchPaperWeights = async (): Promise<PaperWeight[]> => {
     
     if (data && data.length > 0) {
       console.log('✅ Successfully fetched paper weights from database');
-      return data as PaperWeight[];
+      return data;
     } else {
       console.log('📋 No data in database, using fallback');
       return fallbackPaperWeights;
@@ -153,10 +144,10 @@ const fetchPaperWeights = async (): Promise<PaperWeight[]> => {
 const fetchPaperTypes = async (): Promise<PaperType[]> => {
   try {
     console.log('🔍 Attempting to fetch paper types from database...');
+    // Fetch paper types with proper typing
     const { data, error } = await supabase
       .from('paper_types')
       .select('*')
-      .eq('active', true)
       .order('name');
     
     if (error) {
@@ -166,7 +157,7 @@ const fetchPaperTypes = async (): Promise<PaperType[]> => {
     
     if (data && data.length > 0) {
       console.log('✅ Successfully fetched paper types from database');
-      return data as PaperType[];
+      return data;
     } else {
       console.log('📋 No data in database, using fallback');
       return fallbackPaperTypes;

@@ -211,38 +211,12 @@ export default function DashboardPage() {
                 <CardDescription>Latest system updates</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Job JKDP-JOB-1045 completed</p>
-                      <p className="text-xs text-gray-500">2 minutes ago</p>
-                    </div>
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                    <Calendar className="h-6 w-6 text-gray-400" />
                   </div>
-                  
-                  <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">New customer registered</p>
-                      <p className="text-xs text-gray-500">15 minutes ago</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Payment received</p>
-                      <p className="text-xs text-gray-500">1 hour ago</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Inventory updated</p>
-                      <p className="text-xs text-gray-500">3 hours ago</p>
-                    </div>
-                  </div>
+                  <p className="text-sm text-gray-500 mb-1">No recent activity</p>
+                  <p className="text-xs text-gray-400">Activity will appear here as you use the system</p>
                 </div>
               </CardContent>
             </Card>

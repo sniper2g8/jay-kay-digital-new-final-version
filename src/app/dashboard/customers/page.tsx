@@ -301,39 +301,6 @@ export default function CustomersPage() {
               )}
             </CardContent>
           </Card>
-
-          {/* Human-Readable Query Examples */}
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle>Database Query Examples</CardTitle>
-              <CardDescription>How to query customer data using human-readable IDs</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="bg-gray-100 p-4 rounded-lg">
-                <h4 className="font-medium mb-2">Example Queries:</h4>
-                <div className="space-y-2 text-sm font-mono">
-                  <div className="text-blue-600">
-                    {/* Get specific customer by human ID */}
-                  </div>
-                  <div>
-                    supabase.from(&apos;customers&apos;).select(&apos;*&apos;).eq(&apos;customer_human_id&apos;, &apos;JKDP-CUS-001&apos;)
-                  </div>
-                  <div className="text-blue-600 mt-3">
-                    {/* Get all jobs for a customer */}
-                  </div>
-                  <div>
-                    supabase.from(&apos;jobs&apos;).select(&apos;*&apos;).eq(&apos;customer_human_id&apos;, &apos;JKDP-CUS-001&apos;)
-                  </div>
-                  <div className="text-blue-600 mt-3">
-                    {/* Get payments for a customer */}
-                  </div>
-                  <div>
-                    supabase.from(&apos;payments&apos;).select(&apos;*&apos;).eq(&apos;customer_human_id&apos;, &apos;JKDP-CUS-001&apos;)
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </DashboardLayout>
