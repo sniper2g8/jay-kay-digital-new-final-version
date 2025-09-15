@@ -264,8 +264,10 @@ export default function JobsPage() {
                               ${((job.final_cost || 0) / (job.quantity || 1)).toFixed(2)}/unit
                             </p>
                           </div>
-                          <Button variant="outline" size="sm">
-                            <MoreHorizontal className="h-4 w-4" />
+                          <Button variant="outline" size="sm" asChild>
+                            <Link href={`/dashboard/jobs/${job.jobNo || job.id}`}>
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Link>
                           </Button>
                         </div>
                       </div>

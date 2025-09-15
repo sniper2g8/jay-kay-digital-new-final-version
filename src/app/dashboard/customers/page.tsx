@@ -20,6 +20,7 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { supabase } from "@/lib/supabase";
 import { useCustomers } from "@/lib/hooks/useCustomers";
 import { mutate } from 'swr';
+import { toast } from 'sonner';
 
 export default function CustomersPage() {
   const { data: customers, error, isLoading } = useCustomers();
@@ -33,24 +34,48 @@ export default function CustomersPage() {
     customer.human_id?.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
-  const handleDeleteCustomer = async (customerId: string) => {
-    if (!confirm('Are you sure you want to delete this customer?')) {
-      return;
-    }
-
+  const handleDeleteCustomer = async (customerId: string, customerName: string) => {
+    // Check if customer has any jobs first
     try {
+      const { data: jobs, error: jobsError } = await supabase
+        .from('jobs')
+        .select('id')
+        .eq('customer_id', customerId)
+        .limit(1);
+
+      if (jobsError) {
+        console.error('Error checking customer jobs:', jobsError);
+        toast.error('Failed to check customer dependencies');
+        return;
+      }
+
+      if (jobs && jobs.length > 0) {
+        toast.error(`Cannot delete ${customerName}. Customer has existing jobs.`);
+        return;
+      }
+
+      // Confirm deletion
+      if (!confirm(`Are you sure you want to delete "${customerName}"? This action cannot be undone.`)) {
+        return;
+      }
+
       const { error } = await supabase
         .from('customers')
         .delete()
         .eq('id', customerId);
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
 
       // Refresh the data using SWR's mutate
       mutate('customers');
+      mutate('jobs-with-customers');
+      toast.success(`Customer "${customerName}" deleted successfully`);
+      
     } catch (error) {
       console.error('Error deleting customer:', error);
-      alert('Failed to delete customer. Please try again.');
+      toast.error('Failed to delete customer. Please try again.');
     }
   };
 
@@ -235,14 +260,16 @@ export default function CustomersPage() {
                           </p>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <Button variant="outline" size="sm">
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit
+                          <Button variant="outline" size="sm" asChild>
+                            <Link href={`/dashboard/customers/${customer.id}/edit`}>
+                              <Edit className="h-4 w-4 mr-2" />
+                              Edit
+                            </Link>
                           </Button>
                           <Button 
                             variant="outline" 
                             size="sm"
-                            onClick={() => handleDeleteCustomer(customer.id)}
+                            onClick={() => handleDeleteCustomer(customer.id, customer.business_name || 'Unknown Customer')}
                             className="text-red-600 hover:text-red-700 hover:bg-red-50"
                           >
                             <Trash2 className="h-4 w-4 mr-2" />

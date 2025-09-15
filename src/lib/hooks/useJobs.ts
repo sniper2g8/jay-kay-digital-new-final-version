@@ -1,4 +1,5 @@
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
+import { useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import type { Database } from '@/lib/database-generated.types';
@@ -160,34 +161,91 @@ const fetchJobsByCustomer = async (customerId: string): Promise<JobWithCustomer[
   return jobsWithCustomer as JobWithCustomer[];
 };
 
-// Hook to get all jobs
+// Hook to get all jobs with real-time updates
 export const useJobs = () => {
   const { user, session } = useAuth();
   
-  return useSWR(
+  const swrResult = useSWR(
     user && session ? 'jobs' : null, 
     fetchJobs, 
     {
-      refreshInterval: 30000, // Refresh every 30 seconds
+      refreshInterval: 30000, // Refresh every 30 seconds as fallback
       revalidateOnFocus: true,
       errorRetryCount: 3
     }
   );
+
+  // Set up real-time subscription
+  useEffect(() => {
+    if (!user || !session) return;
+
+    const subscription = supabase
+      .channel('jobs-changes')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'jobs' },
+        (payload) => {
+          console.log('Real-time job update:', payload);
+          // Revalidate SWR cache when jobs table changes
+          mutate('jobs');
+          // Also revalidate related caches
+          mutate('jobs-with-customers');
+          mutate('job-stats');
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [user, session]);
+
+  return swrResult;
 };
 
-// Hook to get jobs with customer information
+// Hook to get jobs with customer information and real-time updates
 export const useJobsWithCustomers = () => {
   const { user, session } = useAuth();
   
-  return useSWR(
+  const swrResult = useSWR(
     user && session ? 'jobs-with-customers' : null, 
     fetchJobsWithCustomers, 
     {
-      refreshInterval: 30000, // Refresh every 30 seconds
+      refreshInterval: 30000, // Refresh every 30 seconds as fallback
       revalidateOnFocus: true,
       errorRetryCount: 3
     }
   );
+
+  // Set up real-time subscription for both jobs and customers
+  useEffect(() => {
+    if (!user || !session) return;
+
+    const subscription = supabase
+      .channel('jobs-customers-changes')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'jobs' },
+        (payload) => {
+          console.log('Real-time job update for jobs-with-customers:', payload);
+          mutate('jobs-with-customers');
+          mutate('jobs');
+          mutate('job-stats');
+        }
+      )
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'customers' },
+        (payload) => {
+          console.log('Real-time customer update:', payload);
+          mutate('jobs-with-customers');
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [user, session]);
+
+  return swrResult;
 };
 
 // Hook to get specific job by job number
@@ -215,11 +273,11 @@ export const useJobsByCustomer = (customerId: string | null) => {
   );
 };
 
-// Hook to get job statistics
+// Hook to get job statistics with real-time updates
 export const useJobStats = () => {
   const { user, session } = useAuth();
   
-  return useSWR(
+  const swrResult = useSWR(
     user && session ? 'job-stats' : null, 
     async () => {
       const jobs = await fetchJobs();
@@ -241,11 +299,35 @@ export const useJobStats = () => {
       };
     }, 
     {
-      refreshInterval: 60000, // Refresh every minute
+      refreshInterval: 60000, // Refresh every minute as fallback
       revalidateOnFocus: true,
       errorRetryCount: 2
     }
   );
+
+  // Set up real-time subscription for job statistics
+  useEffect(() => {
+    if (!user || !session) return;
+
+    const subscription = supabase
+      .channel('job-stats-changes')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'jobs' },
+        (payload) => {
+          console.log('Real-time job update for job-stats:', payload);
+          mutate('job-stats');
+          mutate('jobs');
+          mutate('jobs-with-customers');
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [user, session]);
+
+  return swrResult;
 };
 
 // Basic mutation functions for job operations
