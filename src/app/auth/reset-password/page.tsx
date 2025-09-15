@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -18,11 +18,10 @@ function ResetPasswordForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
+  const [success, setSuccess] = useState('');
   
   const router = useRouter();
   const searchParams = useSearchParams();
-  const supabase = createClientComponentClient();
 
   const validatePassword = (pass: string) => {
     return pass.length >= 6;
@@ -65,7 +64,7 @@ function ResetPasswordForm() {
       if (error) {
         setError(error.message);
       } else {
-        setSuccess(true);
+        setSuccess('Your password has been successfully updated.');
         // Redirect to login after 3 seconds
         setTimeout(() => {
           router.push('/auth/login');
