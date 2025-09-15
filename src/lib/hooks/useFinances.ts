@@ -1,5 +1,8 @@
 import useSWR from 'swr';
 import { supabase } from '@/lib/supabase';
+import type { Database } from '@/lib/database-generated.types';
+
+type Json = Database['public']['Tables']['invoices']['Row']['items'];
 
 // Payment interface
 export interface Payment {
@@ -18,27 +21,35 @@ export interface Payment {
   updated_at: string;
 }
 
-// Invoice interface
+// Invoice interface - updated to match database schema
 export interface Invoice {
   id: string;
-  invoice_no: string;
-  customer_human_id: string;
-  job_number?: string;
-  amount: number;
-  subtotal?: number;
-  tax?: number;
-  taxRate?: number;
-  discount?: number;
-  currency: string;
-  status: string;
-  payment_status: string;
-  issue_date: string;
-  due_date: string;
-  paid_date?: string;
-  notes?: string;
-  items?: unknown;
-  created_at: string;
-  updated_at: string;
+  invoiceNo: string | null;
+  customer_id: string | null;
+  customerName: string | null;
+  amountDue: number | null;
+  amountPaid: number | null;
+  subtotal: number | null;
+  tax: number | null;
+  taxRate: number | null;
+  taxable: number | null;
+  discount: number | null;
+  grandTotal: number | null;
+  total: number | null;
+  currency: string | null;
+  status: string | null;
+  payment_status: Database["public"]["Enums"]["payment_status"] | null;
+  issueDate: Json | null;
+  due_date: string | null;
+  dueDate: Json | null;
+  payment_link: string | null;
+  invoice_qr: string | null;
+  notes: string | null;
+  items: Json | null;
+  created_at: string | null;
+  updated_at: string | null;
+  createdAt: Json | null;
+  updatedAt: Json | null;
 }
 
 // Extended types with customer info
@@ -83,19 +94,24 @@ const fetchPaymentsWithCustomers = async (): Promise<PaymentWithCustomer[]> => {
 
   const { data: customers, error: customersError } = await supabase
     .from('customers')
-    .select('customer_human_id, business_name');
+    .select('id, human_id, business_name');
   
   if (customersError) throw customersError;
 
   interface CustomerData {
-    customer_human_id: string;
+    id: string;
+    human_id: string | null;
     business_name: string;
   }
 
-  // Create a lookup map for customer names
+  // Create a lookup map for customer names using customer.id as key
   const customerMap = new Map();
   (customers as CustomerData[])?.forEach((customer: CustomerData) => {
-    customerMap.set(customer.customer_human_id, customer.business_name);
+    customerMap.set(customer.id, customer.business_name);
+    // Also map by human_id if it exists for backward compatibility
+    if (customer.human_id) {
+      customerMap.set(customer.human_id, customer.business_name);
+    }
   });
 
   // Add customer names to payments
@@ -118,25 +134,30 @@ const fetchInvoicesWithCustomers = async (): Promise<InvoiceWithCustomer[]> => {
 
   const { data: customers, error: customersError } = await supabase
     .from('customers')
-    .select('customer_human_id, business_name');
+    .select('id, human_id, business_name');
   
   if (customersError) throw customersError;
 
   interface CustomerData {
-    customer_human_id: string;
+    id: string;
+    human_id: string | null;
     business_name: string;
   }
 
-  // Create a lookup map for customer names
+  // Create a lookup map for customer names using customer.id as key
   const customerMap = new Map();
   (customers as CustomerData[])?.forEach((customer: CustomerData) => {
-    customerMap.set(customer.customer_human_id, customer.business_name);
+    customerMap.set(customer.id, customer.business_name);
+    // Also map by human_id if it exists for backward compatibility
+    if (customer.human_id) {
+      customerMap.set(customer.human_id, customer.business_name);
+    }
   });
 
   // Add customer names to invoices
   const invoicesWithCustomers = (invoices as Invoice[])?.map((invoice: Invoice) => ({
     ...invoice,
-    customer_name: customerMap.get(invoice.customer_human_id) || 'Unknown Customer'
+    customer_name: customerMap.get(invoice.customer_id || '') || 'Unknown Customer'
   })) || [];
 
   return invoicesWithCustomers as InvoiceWithCustomer[];
@@ -274,11 +295,11 @@ export const useFinancialStats = () => {
       fetchPayments()
     ]);
     
-    const totalRevenue = invoices.reduce((sum, invoice) => sum + (invoice.amount || 0), 0);
+    const totalRevenue = invoices.reduce((sum, invoice) => sum + (invoice.total || invoice.grandTotal || 0), 0);
     const totalPaid = payments.reduce((sum, payment) => sum + (payment.amount || 0), 0);
     const paidInvoices = invoices.filter(inv => inv.status === 'paid');
     const pendingInvoices = invoices.filter(inv => inv.status === 'pending' || inv.payment_status === 'pending');
-    const totalPending = pendingInvoices.reduce((sum, invoice) => sum + (invoice.amount || 0), 0);
+    const totalPending = pendingInvoices.reduce((sum, invoice) => sum + (invoice.total || invoice.grandTotal || 0), 0);
     const collectionRate = totalRevenue > 0 ? (totalPaid / totalRevenue) * 100 : 0;
 
     return {

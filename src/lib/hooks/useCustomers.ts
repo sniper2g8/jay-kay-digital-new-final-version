@@ -1,22 +1,28 @@
 import useSWR from 'swr';
 import { supabase } from '@/lib/supabase';
 
-// Simplified customer type for now
+// Updated customer type to match actual database schema
 export interface Customer {
   id: string;
-  customer_human_id: string;
+  human_id: string | null;
   business_name: string;
-  contact_person?: string;
-  email?: string;
-  phone?: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  zip_code?: string;
-  status: string;
-  created_at: string;
-  updated_at: string;
-  notes?: string;
+  contact_person?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  address?: string | null;
+  city?: string | null;
+  state?: string | null;
+  zip_code?: string | null;
+  customer_status: string | null;
+  customer_type?: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  notes?: string | null;
+  credit_limit?: number | null;
+  payment_terms?: string | null;
+  tax_id?: string | null;
+  name?: string | null;
+  app_user_id?: string | null;
 }
 
 // Extended customer type with stats
@@ -97,7 +103,7 @@ const fetchCustomerWithStats = async (customerHumanId: string): Promise<Customer
   // Get job count and total spent
   const { data: jobs, error: jobsError } = await supabase
     .from('jobs')
-    .select('total_amount')
+    .select('final_cost')
     .eq('customer_human_id', customerHumanId);
   
   if (jobsError) throw jobsError;
@@ -113,8 +119,8 @@ const fetchCustomerWithStats = async (customerHumanId: string): Promise<Customer
   if (paymentsError) throw paymentsError;
 
   const totalJobs = jobs?.length || 0;
-  const totalSpent = jobs?.reduce((sum: number, job: { total_amount?: number }) => 
-    sum + (job.total_amount || 0), 0) || 0;
+  const totalSpent = jobs?.reduce((sum: number, job: { final_cost?: number | null }) => 
+    sum + (job.final_cost || 0), 0) || 0;
   const lastPayment = (payments as { payment_date?: string }[])?.[0]?.payment_date || null;
 
   return {
@@ -170,10 +176,10 @@ export const useCustomersWithStats = () => {
     const customersWithStats = await Promise.all(
       customers.map(async (customer) => {
         try {
-          const stats = await fetchCustomerWithStats(customer.customer_human_id);
+          const stats = await fetchCustomerWithStats(customer.human_id || customer.id);
           return stats;
         } catch (error) {
-          console.error(`Error fetching stats for ${customer.customer_human_id}:`, error);
+          console.error(`Error fetching stats for ${customer.human_id || customer.id}:`, error);
           return {
             ...customer,
             stats: {

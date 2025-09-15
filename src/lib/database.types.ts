@@ -20,7 +20,7 @@ export interface Database {
       customers: {
         Row: {
           id: string;
-          customer_human_id: string; // JKDP-CUS-001 format 
+          human_id: string; // JKDP-CUS-001 format 
           business_name: string;
           contact_person?: string;
           email?: string;
@@ -39,7 +39,7 @@ export interface Database {
         Row: {
           id: string;
           payment_number: string; // PAY-2025-0001 format
-          customer_human_id: string; // FK to customers.customer_human_id (JKDP-CUS-001)
+          human_id: string; // FK to customers.human_id (JKDP-CUS-001)
           invoice_no: string; // FK to invoices.invoice_no (JKDP-INV-0001)
           amount: number;
           payment_method: "cash" | "credit_card" | "bank_transfer" | "check" | "mobile_money";
@@ -56,7 +56,7 @@ export interface Database {
         Row: {
           id: string;
           invoice_no: string; // JKDP-INV-0001 format
-          customer_human_id: string; // FK to customers.customer_human_id
+          human_id: string; // FK to customers.human_id
           job_number?: string; // FK to jobs.job_number
           amount: number;
           subtotal?: number;
@@ -79,7 +79,7 @@ export interface Database {
         Row: {
           id: string;
           job_number: string; // JKDP-JOB-2024-001 format
-          customer_human_id: string; // FK to customers.customer_human_id
+          human_id: string; // FK to customers.human_id
           title: string;
           description?: string;
           status: "pending" | "in_progress" | "review" | "completed" | "cancelled" | "on_hold" | "quote_sent";

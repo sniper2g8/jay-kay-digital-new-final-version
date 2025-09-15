@@ -1,27 +1,51 @@
 import useSWR from 'swr';
 import { supabase } from '@/lib/supabase';
+import type { Database } from '@/lib/database-generated.types';
 
-// Job interface
+type Json = Database['public']['Tables']['jobs']['Row']['delivery'];
+
+// Job interface - updated to match database schema
 export interface Job {
   id: string;
-  job_number: string;
-  customer_human_id: string;
-  title: string;
-  description?: string;
-  status: string;
-  priority: string;
-  quantity?: number;
-  unit_price?: number;
-  total_amount?: number;
-  order_date?: string;
-  due_date?: string;
-  assigned_to?: string;
-  print_method?: string;
-  paper_type?: string;
-  finishing?: string;
-  requirements?: string;
-  created_at: string;
-  updated_at: string;
+  jobNo: string | null;
+  customer_id: string | null;
+  customerName: string | null;
+  title: string | null;
+  description: string | null;
+  status: string | null;
+  priority: Database["public"]["Enums"]["priority_level"] | null;
+  quantity: number | null;
+  estimated_cost: number | null;
+  final_cost: number | null;
+  estimated_delivery: string | null;
+  actual_delivery: string | null;
+  assigned_to: string | null;
+  job_type: Database["public"]["Enums"]["job_type_enum"] | null;
+  service_id: string | null;
+  serviceName: string | null;
+  invoice_id: string | null;
+  invoiced: boolean | null;
+  invoiceNo: string | null;
+  qr_code: string | null;
+  tracking_url: string | null;
+  submittedDate: string | null;
+  dueDate: Json | null;
+  delivery: Json | null;
+  estimate: Json | null;
+  files: Json | null;
+  finishIds: Json | null;
+  finishOptions: Json | null;
+  finishPrices: Json | null;
+  lf: Json | null;
+  paper: Json | null;
+  size: Json | null;
+  specifications: Json | null;
+  __open: boolean | null;
+  created_at: string | null;
+  updated_at: string | null;
+  createdAt: Json | null;
+  createdBy: string | null;
+  updatedAt: Json | null;
 }
 
 // Job with customer information
@@ -51,25 +75,25 @@ const fetchJobsWithCustomers = async (): Promise<JobWithCustomer[]> => {
 
   const { data: customers, error: customersError } = await supabase
     .from('customers')
-    .select('customer_human_id, business_name');
+    .select('human_id, business_name');
   
   if (customersError) throw customersError;
 
   interface CustomerData {
-    customer_human_id: string;
+    human_id: string;
     business_name: string;
   }
 
   // Create a lookup map for customer names
   const customerMap = new Map();
   (customers as CustomerData[])?.forEach((customer: CustomerData) => {
-    customerMap.set(customer.customer_human_id, customer.business_name);
+    customerMap.set(customer.human_id, customer.business_name);
   });
 
   // Add customer names to jobs
   const jobsWithCustomers = (jobs as Job[])?.map((job: Job) => ({
     ...job,
-    customer_name: customerMap.get(job.customer_human_id) || 'Unknown Customer'
+    customer_name: customerMap.get(job.customer_id || '') || 'Unknown Customer'
   })) || [];
 
   return jobsWithCustomers as JobWithCustomer[];
@@ -89,7 +113,7 @@ const fetchJobByNumber = async (jobNumber: string): Promise<JobWithCustomer> => 
   const { data: customer, error: customerError } = await supabase
     .from('customers')
     .select('business_name')
-    .eq('customer_human_id', (job as Job).customer_human_id)
+    .eq('customer_id', (job as Job).customer_id || '')
     .single();
   
   if (customerError) throw customerError;
@@ -109,7 +133,7 @@ const fetchJobsByCustomer = async (customerHumanId: string): Promise<JobWithCust
   const { data: jobs, error: jobsError } = await supabase
     .from('jobs')
     .select('*')
-    .eq('customer_human_id', customerHumanId)
+    .eq('customer_id', customerHumanId)
     .order('created_at', { ascending: false });
   
   if (jobsError) throw jobsError;
@@ -118,7 +142,7 @@ const fetchJobsByCustomer = async (customerHumanId: string): Promise<JobWithCust
   const { data: customer, error: customerError } = await supabase
     .from('customers')
     .select('business_name')
-    .eq('customer_human_id', customerHumanId)
+    .eq('human_id', customerHumanId)
     .single();
   
   if (customerError) throw customerError;
@@ -187,7 +211,7 @@ export const useJobStats = () => {
     const inProgress = jobs.filter(job => job.status === 'in_progress').length;
     const completed = jobs.filter(job => job.status === 'completed').length;
     const pending = jobs.filter(job => job.status === 'pending').length;
-    const totalValue = jobs.reduce((sum, job) => sum + (job.total_amount || 0), 0);
+    const totalValue = jobs.reduce((sum, job) => sum + (job.final_cost || job.estimated_cost || 0), 0);
     const avgJobValue = totalJobs > 0 ? totalValue / totalJobs : 0;
 
     return {

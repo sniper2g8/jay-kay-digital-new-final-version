@@ -3,8 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import DashboardHeader from "@/components/DashboardHeader";
 import { 
   Users, 
   FileText, 
@@ -16,36 +14,40 @@ import {
   BarChart3
 } from "lucide-react";
 import Link from "next/link";
+import { useCustomers } from "@/lib/hooks/useCustomers";
+import { useJobStats } from "@/lib/hooks/useJobs";
+import { useFinancialStats } from "@/lib/hooks/useFinances";
+import DashboardLayout from "@/components/DashboardLayout";
 
 export default function DashboardPage() {
+  const { data: customers, isLoading: customersLoading } = useCustomers();
+  const { data: jobStats, isLoading: jobStatsLoading } = useJobStats();
+  const { data: financialStats, isLoading: financialStatsLoading } = useFinancialStats();
   return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50">
-        <DashboardHeader />
-        
-        <div className="px-6 py-6">
-          {/* Welcome Section */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Dashboard Overview
-                </h2>
-                <p className="text-gray-600">
-                  Here&apos;s what&apos;s happening with your printing operations today.
-                </p>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Badge className="bg-green-100 text-green-800">
-                  System Operational
-                </Badge>
-                <Button size="sm">
-                  <Plus className="h-4 w-4 mr-2" />
-                  New Job
-                </Button>
-              </div>
+    <DashboardLayout>
+      <div className="px-6 py-6">
+        {/* Welcome Section */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">
+                Dashboard Overview
+              </h2>
+              <p className="text-gray-600">
+                Here&apos;s what&apos;s happening with your printing operations today.
+              </p>
+            </div>
+            <div className="flex items-center space-x-3">
+              <Badge className="bg-green-100 text-green-800">
+                System Operational
+              </Badge>
+              <Button size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                New Job
+              </Button>
             </div>
           </div>
+        </div>
 
           {/* Quick Stats */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -55,9 +57,11 @@ export default function DashboardPage() {
                 <FileText className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">142</div>
+                <div className="text-2xl font-bold">
+                  {jobStatsLoading ? '...' : (jobStats?.total_jobs || 0)}
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  +12% from last month
+                  {jobStats?.completed || 0} completed, {jobStats?.in_progress || 0} active
                 </p>
               </CardContent>
             </Card>
@@ -68,33 +72,39 @@ export default function DashboardPage() {
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">48</div>
+                <div className="text-2xl font-bold">
+                  {customersLoading ? '...' : (customers?.length || 0)}
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  +5 new this month
+                  Registered customers
                 </p>
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Monthly Revenue</CardTitle>
+                <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">$24,580</div>
+                <div className="text-2xl font-bold">
+                  {financialStatsLoading ? '...' : `$${(financialStats?.total_revenue || 0).toLocaleString()}`}
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  +18% from last month
+                  {financialStats?.collection_rate || 0}% collection rate
                 </p>
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Completion Rate</CardTitle>
+                <CardTitle className="text-sm font-medium">Job Completion</CardTitle>
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">94.2%</div>
+                <div className="text-2xl font-bold">
+                  {jobStatsLoading ? '...' : `${Math.round((jobStats?.completed || 0) / Math.max(jobStats?.total_jobs || 1, 1) * 100)}%`}
+                </div>
                 <p className="text-xs text-muted-foreground">
                   +2.1% from last month
                 </p>
@@ -208,7 +218,9 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center justify-between">
-                    <div className="text-2xl font-bold text-blue-600">48</div>
+                    <div className="text-2xl font-bold text-blue-600">
+                      {customersLoading ? '...' : (customers?.length || 0)}
+                    </div>
                     <Button variant="ghost" size="sm">
                       <Eye className="h-4 w-4 mr-2" />
                       View All
@@ -231,7 +243,9 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center justify-between">
-                    <div className="text-2xl font-bold text-green-600">142</div>
+                    <div className="text-2xl font-bold text-green-600">
+                      {jobStatsLoading ? '...' : (jobStats?.total_jobs || 0)}
+                    </div>
                     <Button variant="ghost" size="sm">
                       <Eye className="h-4 w-4 mr-2" />
                       View All
@@ -254,7 +268,9 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center justify-between">
-                    <div className="text-2xl font-bold text-purple-600">$24.5K</div>
+                    <div className="text-2xl font-bold text-purple-600">
+                      {financialStatsLoading ? '...' : `$${(financialStats?.total_revenue || 0).toLocaleString()}`}
+                    </div>
                     <Button variant="ghost" size="sm">
                       <Eye className="h-4 w-4 mr-2" />
                       View Details
@@ -264,8 +280,7 @@ export default function DashboardPage() {
               </Card>
             </Link>
           </div>
-        </div>
       </div>
-    </ProtectedRoute>
+    </DashboardLayout>
   );
 }

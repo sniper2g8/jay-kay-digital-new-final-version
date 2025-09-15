@@ -18,6 +18,9 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "next-env.d.ts",
+      "migrations/**",
+      "src/lib/database-generated.types.ts",
+      "src/lib/database-generated.types.backup.ts",
     ],
   },
 ];

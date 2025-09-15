@@ -9,7 +9,7 @@ interface TestResults {
   connection: string;
   customers: {
     count: number;
-    sample: Array<{ customer_human_id: string; business_name: string }>;
+    sample: Array<{ human_id: string | null; business_name: string }>;
     error: string | null;
   };
   jobs: {
@@ -57,7 +57,7 @@ export default function SupabaseConnectionTest() {
       console.log('Attempting to query customers table...');
       const { data: customers, error: customersError } = await supabase
         .from('customers')
-        .select('customer_human_id, business_name')
+        .select('human_id, business_name')
         .limit(5);
 
       if (customersError) {

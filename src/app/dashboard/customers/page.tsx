@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,53 +10,28 @@ import {
   Plus, 
   Filter,
   Building2,
-  Phone,
-  Mail,
-  MapPin,
   Calendar,
   Loader2,
   Edit,
   Trash2
 } from "lucide-react";
 import Link from "next/link";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import DashboardHeader from "@/components/DashboardHeader";
+import DashboardLayout from "@/components/DashboardLayout";
 import { supabase } from "@/lib/supabase";
+import { useCustomers } from "@/lib/hooks/useCustomers";
+import { mutate } from 'swr';
 
 export default function CustomersPage() {
-  const [customers, setCustomers] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: customers, error, isLoading } = useCustomers();
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredCustomers, setFilteredCustomers] = useState<any[]>([]);
 
-  useEffect(() => {
-    fetchCustomers();
-  }, []);
-
-  useEffect(() => {
-    const filtered = customers.filter(customer =>
-      customer.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.human_id?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredCustomers(filtered);
-  }, [customers, searchTerm]);
-
-  const fetchCustomers = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('customers')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      
-      setCustomers(data || []);
-    } catch (error) {
-      console.error('Error fetching customers:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Filter customers based on search term
+  const filteredCustomers = customers?.filter(customer => 
+    customer.business_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    customer.contact_person?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    customer.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    customer.human_id?.toLowerCase().includes(searchTerm.toLowerCase())
+  ) || [];
 
   const handleDeleteCustomer = async (customerId: string) => {
     if (!confirm('Are you sure you want to delete this customer?')) {
@@ -71,18 +46,18 @@ export default function CustomersPage() {
 
       if (error) throw error;
 
-      setCustomers(customers.filter(c => c.id !== customerId));
+      // Refresh the data using SWR's mutate
+      mutate('customers');
     } catch (error) {
       console.error('Error deleting customer:', error);
       alert('Failed to delete customer. Please try again.');
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <ProtectedRoute>
+      <DashboardLayout>
         <div className="min-h-screen bg-gray-50">
-          <DashboardHeader />
           <div className="px-6 py-6 flex items-center justify-center">
             <div className="flex items-center space-x-2">
               <Loader2 className="h-6 w-6 animate-spin" />
@@ -90,18 +65,31 @@ export default function CustomersPage() {
             </div>
           </div>
         </div>
-      </ProtectedRoute>
+      </DashboardLayout>
     );
   }
 
-  const activeCustomers = filteredCustomers.filter(c => c.status === 'active');
-  const inactiveCustomers = filteredCustomers.filter(c => c.status === 'inactive');
+  if (error) {
+    return (
+      <DashboardLayout>
+        <div className="min-h-screen bg-gray-50">
+          <div className="px-6 py-6">
+            <div className="bg-red-50 border border-red-200 rounded-md p-4">
+              <h3 className="text-lg font-medium text-red-800">Error Loading Customers</h3>
+              <p className="text-sm text-red-600 mt-1">{error.message}</p>
+            </div>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  const activeCustomers = filteredCustomers.filter(c => c.customer_status === 'active');
+  const inactiveCustomers = filteredCustomers.filter(c => c.customer_status === 'inactive');
 
   return (
-    <ProtectedRoute>
+    <DashboardLayout>
       <div className="min-h-screen bg-gray-50">
-        <DashboardHeader />
-        
         {/* Header */}
         <div className="bg-white border-b p-6">
           <div className="flex items-center justify-between">
@@ -147,7 +135,7 @@ export default function CustomersPage() {
                 <Building2 className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{customers.length}</div>
+                <div className="text-2xl font-bold">{customers?.length || 0}</div>
                 <p className="text-xs text-muted-foreground">
                   {activeCustomers.length} active, {inactiveCustomers.length} inactive
                 </p>
@@ -174,7 +162,8 @@ export default function CustomersPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {customers.filter(c => {
+                  {customers?.filter(c => {
+                    if (!c.created_at) return false;
                     const created = new Date(c.created_at);
                     const now = new Date();
                     return created.getMonth() === now.getMonth() && created.getFullYear() === now.getFullYear();
@@ -210,7 +199,7 @@ export default function CustomersPage() {
               {filteredCustomers && filteredCustomers.length > 0 ? (
                 <div className="space-y-4">
                   {filteredCustomers.map((customer) => (
-                    <div key={customer.human_id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                    <div key={customer.human_id || customer.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
                       <div className="flex items-center space-x-4">
                         <div className="bg-blue-100 p-3 rounded-lg">
                           <Building2 className="h-6 w-6 text-blue-600" />
@@ -218,10 +207,10 @@ export default function CustomersPage() {
                         <div>
                           <div className="flex items-center space-x-2 mb-1">
                             <h3 className="font-semibold text-gray-900">
-                              {customer.name || 'No Name'}
+                              {customer.business_name || 'No Business Name'}
                             </h3>
                             <Badge className="bg-green-100 text-green-800">
-                              Active
+                              {customer.customer_status || 'Active'}
                             </Badge>
                           </div>
                           <p className="text-sm text-gray-600 mb-2">
@@ -240,7 +229,7 @@ export default function CustomersPage() {
                         <div className="text-right">
                           <p className="text-sm text-gray-900">Created</p>
                           <p className="text-xs text-gray-500">
-                            {new Date(customer.created_at).toLocaleDateString()}
+                            {customer.created_at ? new Date(customer.created_at).toLocaleDateString() : 'N/A'}
                           </p>
                         </div>
                         <div className="flex items-center space-x-2">
@@ -316,6 +305,6 @@ export default function CustomersPage() {
           </Card>
         </div>
       </div>
-    </ProtectedRoute>
+    </DashboardLayout>
   );
 }

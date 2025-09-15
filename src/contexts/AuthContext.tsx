@@ -74,9 +74,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
+      // Clear local state immediately
+      setUser(null);
+      setSession(null);
+      
+      // Then call Supabase signOut
       const { error } = await supabase.auth.signOut();
+      
       return { error };
     } catch (error) {
+      // Even if there's an error, clear local state
+      setUser(null);
+      setSession(null);
       return { error: error as AuthError };
     }
   };

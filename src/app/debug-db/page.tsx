@@ -4,15 +4,21 @@ import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+
+interface DiagnosticResult {
+  test: string;
+  status: 'success' | 'error' | 'warning';
+  result: string;
+  details: string;
+}
 
 export default function DatabaseDiagnosticPage() {
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<DiagnosticResult[]>([]);
   const [loading, setLoading] = useState(false);
 
   const runDiagnostics = async () => {
     setLoading(true);
-    const diagnosticResults = [];
+    const diagnosticResults: DiagnosticResult[] = [];
 
     // Test 1: Basic connection
     try {
@@ -23,11 +29,12 @@ export default function DatabaseDiagnosticPage() {
         result: error ? error.message : `Count: ${data?.length || 0}`,
         details: error ? JSON.stringify(error, null, 2) : 'Connection successful'
       });
-    } catch (err: any) {
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
       diagnosticResults.push({
         test: 'Customer Table Count',
         status: 'error',
-        result: err.message,
+        result: errorMessage,
         details: JSON.stringify(err, null, 2)
       });
     }
@@ -51,31 +58,33 @@ export default function DatabaseDiagnosticPage() {
           details: data && data.length > 0 ? JSON.stringify(data[0], null, 2) : 'No data in table'
         });
       }
-    } catch (err: any) {
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
       diagnosticResults.push({
         test: 'Table Schema',
         status: 'error',
-        result: err.message,
+        result: errorMessage,
         details: JSON.stringify(err, null, 2)
       });
     }
 
     // Test 3: Test other tables
-    const tables = ['jobs', 'invoices', 'payments', 'appUsers', 'roles'];
-    for (const table of tables) {
+    const tableNames = ['jobs', 'invoices', 'payments', 'appUsers', 'roles'] as const;
+    for (const tableName of tableNames) {
       try {
-        const { data, error } = await supabase.from(table).select('count', { count: 'exact', head: true });
+        const { error } = await supabase.from(tableName).select('count', { count: 'exact', head: true });
         diagnosticResults.push({
-          test: `${table} Table`,
+          test: `${tableName} Table`,
           status: error ? 'error' : 'success',
           result: error ? error.message : 'Accessible',
           details: error ? JSON.stringify(error, null, 2) : 'Table exists and is accessible'
         });
-      } catch (err: any) {
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
         diagnosticResults.push({
-          test: `${table} Table`,
+          test: `${tableName} Table`,
           status: 'error',
-          result: err.message,
+          result: errorMessage,
           details: JSON.stringify(err, null, 2)
         });
       }
@@ -90,11 +99,12 @@ export default function DatabaseDiagnosticPage() {
         result: user ? `Logged in as: ${user.email}` : 'Not authenticated',
         details: user ? JSON.stringify(user, null, 2) : 'No active session'
       });
-    } catch (err: any) {
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
       diagnosticResults.push({
         test: 'Authentication Status',
         status: 'error',
-        result: err.message,
+        result: errorMessage,
         details: JSON.stringify(err, null, 2)
       });
     }
