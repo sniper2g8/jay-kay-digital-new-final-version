@@ -6,7 +6,11 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "fix:auth-tokens": "node scripts/fix-null-token-issue-corrected.js",
+    "test:auth-fix": "node scripts/test-auth-fix.js",
+    "check:auth-tokens": "node scripts/check-auth-tokens.js",
+    "verify:auth-fix": "node scripts/verify-auth-fix.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

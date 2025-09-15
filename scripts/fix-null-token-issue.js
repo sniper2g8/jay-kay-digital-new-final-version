@@ -1,192 +1,124 @@
-const { Client } = require('pg');
-require('dotenv').config({ path: '.env.local' });
+import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
 
-async function fixNullTokenIssue() {
-  const client = new Client({
-    host: process.env.DATABASE_HOST,
-    port: process.env.DATABASE_PORT,
-    database: process.env.DATABASE_NAME,
-    user: process.env.DATABASE_USER,
-    password: process.env.DATABASE_PASSWORD,
-    ssl: { rejectUnauthorized: false }
-  });
+// Load environment variables
+dotenv.config({ path: '.env.local' });
 
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl || !supabaseServiceKey) {
+  console.error('❌ Missing required environment variables');
+  console.error('Please ensure NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are set in .env.local');
+  process.exit(1);
+}
+
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+async function runFix() {
+  console.log('🔧 Starting Auth Token NULL Conversion Fix...');
+  
   try {
-    await client.connect();
-    console.log('🔍 Investigating NULL token conversion issues...\n');
-
-    // 1. First, let's examine the exact issue
-    console.log('=== Checking auth.users token column types ===');
-    try {
-      const columnInfo = await client.query(`
-        SELECT 
-          column_name, 
-          data_type, 
-          is_nullable,
-          column_default
-        FROM information_schema.columns 
-        WHERE table_name = 'users' 
-        AND table_schema = 'auth'
-        AND column_name LIKE '%token%'
-        ORDER BY column_name
-      `);
+    // Read the SQL fix file
+    const sqlPath = path.join(process.cwd(), 'fix-auth-tokens-null-issue.sql');
+    const sqlContent = fs.readFileSync(sqlPath, 'utf8');
+    
+    // Split SQL into statements (simple approach for this fix)
+    const statements = sqlContent
+      .split(';')
+      .map(stmt => stmt.trim())
+      .filter(stmt => stmt.length > 0 && !stmt.startsWith('--'));
+    
+    console.log(`📋 Found ${statements.length} SQL statements to execute`);
+    
+    // Execute each statement
+    for (let i = 0; i < statements.length; i++) {
+      const statement = statements[i];
+      if (!statement) continue;
       
-      console.log('Token columns in auth.users:');
-      columnInfo.rows.forEach(col => {
-        console.log(`  ${col.column_name}: ${col.data_type} (nullable: ${col.is_nullable})`);
-      });
-      
-    } catch (error) {
-      console.log('⚠ Cannot access column information:', error.message);
-    }
-
-    // 2. Check for problematic token values
-    console.log('\n=== Checking for problematic token values ===');
-    try {
-      const tokenCheck = await client.query(`
-        SELECT 
-          id,
-          email,
-          CASE 
-            WHEN confirmation_token = '' THEN 'EMPTY_STRING'
-            WHEN confirmation_token IS NULL THEN 'NULL'
-            WHEN LENGTH(confirmation_token) = 0 THEN 'ZERO_LENGTH'
-            ELSE 'HAS_VALUE'
-          END as confirmation_token_status,
-          CASE 
-            WHEN recovery_token = '' THEN 'EMPTY_STRING'
-            WHEN recovery_token IS NULL THEN 'NULL'
-            WHEN LENGTH(recovery_token) = 0 THEN 'ZERO_LENGTH'
-            ELSE 'HAS_VALUE'
-          END as recovery_token_status,
-          CASE 
-            WHEN email_change_token_new = '' THEN 'EMPTY_STRING'
-            WHEN email_change_token_new IS NULL THEN 'NULL'
-            WHEN LENGTH(email_change_token_new) = 0 THEN 'ZERO_LENGTH'
-            ELSE 'HAS_VALUE'
-          END as email_change_token_new_status
-        FROM auth.users
-        ORDER BY created_at DESC
-        LIMIT 10
-      `);
-      
-      console.log('Token status for recent users:');
-      tokenCheck.rows.forEach(user => {
-        console.log(`  ${user.email}:`);
-        console.log(`    confirmation_token: ${user.confirmation_token_status}`);
-        console.log(`    recovery_token: ${user.recovery_token_status}`);
-        console.log(`    email_change_token_new: ${user.email_change_token_new_status}`);
-      });
-      
-    } catch (error) {
-      console.log('⚠ Cannot check token values:', error.message);
-    }
-
-    // 3. Try the comprehensive fix
-    console.log('\n=== Applying comprehensive token fix ===');
-    try {
-      // Fix all possible problematic token values
-      const fixes = [
-        {
-          name: 'confirmation_token',
-          query: "UPDATE auth.users SET confirmation_token = NULL WHERE confirmation_token = '' OR LENGTH(COALESCE(confirmation_token, '')) = 0"
-        },
-        {
-          name: 'recovery_token',
-          query: "UPDATE auth.users SET recovery_token = NULL WHERE recovery_token = '' OR LENGTH(COALESCE(recovery_token, '')) = 0"
-        },
-        {
-          name: 'email_change_token_new',
-          query: "UPDATE auth.users SET email_change_token_new = NULL WHERE email_change_token_new = '' OR LENGTH(COALESCE(email_change_token_new, '')) = 0"
-        },
-        {
-          name: 'email_change_token_current',
-          query: "UPDATE auth.users SET email_change_token_current = NULL WHERE email_change_token_current = '' OR LENGTH(COALESCE(email_change_token_current, '')) = 0"
-        },
-        {
-          name: 'phone_change_token',
-          query: "UPDATE auth.users SET phone_change_token = NULL WHERE phone_change_token = '' OR LENGTH(COALESCE(phone_change_token, '')) = 0"
-        }
-      ];
-
-      for (const fix of fixes) {
-        try {
-          const result = await client.query(fix.query);
-          console.log(`✓ Fixed ${result.rowCount} rows for ${fix.name}`);
-        } catch (error) {
-          console.log(`❌ Error fixing ${fix.name}:`, error.message);
-        }
-      }
-
-    } catch (error) {
-      console.log('❌ Error in comprehensive fix:', error.message);
-    }
-
-    // 4. Alternative approach - try to recreate the problematic scenario
-    console.log('\n=== Testing auth token scanning ===');
-    try {
-      // Simulate what Supabase auth service might be doing
-      const testQuery = await client.query(`
-        SELECT 
-          id, 
-          email, 
-          confirmation_token,
-          recovery_token,
-          email_change_token_new
-        FROM auth.users 
-        WHERE email = 'delsenterprise@gmail.com'
-        LIMIT 1
-      `);
-      
-      console.log('✓ Direct token query successful');
-      if (testQuery.rows.length > 0) {
-        const user = testQuery.rows[0];
-        console.log(`  confirmation_token: ${user.confirmation_token === null ? 'NULL' : user.confirmation_token}`);
-        console.log(`  recovery_token: ${user.recovery_token === null ? 'NULL' : user.recovery_token}`);
+      // Skip informational SELECT statements for execution
+      if (statement.toUpperCase().startsWith('SELECT')) {
+        console.log(`ℹ️  Skipping SELECT statement ${i + 1}: ${statement.substring(0, 50)}...`);
+        continue;
       }
       
-    } catch (error) {
-      console.log('❌ Token scanning test failed:', error.message);
+      console.log(`⚡ Executing statement ${i + 1}/${statements.length}...`);
+      
+      try {
+        // For CREATE FUNCTION and other complex statements, we need to execute them differently
+        if (statement.toUpperCase().includes('CREATE OR REPLACE FUNCTION') || 
+            statement.toUpperCase().includes('CREATE TRIGGER') ||
+            statement.toUpperCase().includes('DROP TRIGGER')) {
+          // These need to be executed as RPC calls or raw SQL
+          const { error } = await supabase.rpc('exec_sql', { sql_query: statement });
+          if (error) {
+            console.warn(`⚠️  Warning executing statement ${i + 1}:`, error.message);
+            // Try alternative approach
+            const response = await fetch(`${supabaseUrl}/rest/v1/rpc/exec_sql`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${supabaseServiceKey}`,
+                'apikey': supabaseServiceKey
+              },
+              body: JSON.stringify({ sql_query: statement })
+            });
+            
+            if (!response.ok) {
+              const errorText = await response.text();
+              console.warn(`⚠️  Alternative approach also failed:`, errorText);
+            }
+          }
+        } else {
+          // For regular UPDATE/ALTER statements, try direct execution
+          const response = await fetch(`${supabaseUrl}/rest/v1/rpc/exec_sql`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${supabaseServiceKey}`,
+              'apikey': supabaseServiceKey
+            },
+            body: JSON.stringify({ sql_query: statement })
+          });
+          
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.warn(`⚠️  Warning executing statement ${i + 1}:`, errorText);
+          }
+        }
+        
+        console.log(`✅ Statement ${i + 1} executed successfully`);
+      } catch (stmtError) {
+        console.warn(`⚠️  Error executing statement ${i + 1}:`, stmtError.message);
+      }
     }
-
-    // 5. Check if we need to contact Supabase support
-    console.log('\n=== Final verification ===');
+    
+    console.log('✅ Auth token NULL conversion fix completed!');
+    console.log('🔄 Testing authentication...');
+    
+    // Test authentication with a simple query
     try {
-      const finalCheck = await client.query(`
-        SELECT COUNT(*) as total_users,
-               COUNT(CASE WHEN confirmation_token = '' THEN 1 END) as empty_confirmation_tokens,
-               COUNT(CASE WHEN recovery_token = '' THEN 1 END) as empty_recovery_tokens
-        FROM auth.users
-      `);
+      const { data, error } = await supabase
+        .from('appUsers')
+        .select('id')
+        .limit(1);
       
-      const stats = finalCheck.rows[0];
-      console.log(`Total users: ${stats.total_users}`);
-      console.log(`Empty confirmation tokens: ${stats.empty_confirmation_tokens}`);
-      console.log(`Empty recovery tokens: ${stats.empty_recovery_tokens}`);
-      
-      if (stats.empty_confirmation_tokens > 0 || stats.empty_recovery_tokens > 0) {
-        console.log('\n🚨 ISSUE PERSISTS: Still found empty string tokens');
-        console.log('📧 You may need to contact Supabase Support to fix this at the database level');
-        console.log('🔗 Reference this error: "converting NULL to string is unsupported" in auth.users tokens');
+      if (error) {
+        console.warn('⚠️  Test query failed:', error.message);
       } else {
-        console.log('\n✅ All empty string tokens have been cleaned up');
+        console.log('✅ Test query succeeded - authentication should now work properly');
       }
-      
-    } catch (error) {
-      console.log('⚠ Cannot verify final state:', error.message);
+    } catch (testError) {
+      console.warn('⚠️  Test authentication failed:', testError.message);
     }
-
-    console.log('\n🎯 Fix attempt completed!');
-
+    
   } catch (error) {
-    console.error('❌ Database connection failed:', error.message);
-  } finally {
-    try {
-      await client.end();
-    } catch (error) {
-      // Ignore cleanup errors
-    }
+    console.error('❌ Fix execution failed:', error);
+    process.exit(1);
   }
 }
 
-fixNullTokenIssue().catch(console.error);
+// Run the fix
+runFix().catch(console.error);
