@@ -12,13 +12,32 @@ import {
   ArrowLeft,
   Save,
   Loader2,
-  AlertTriangle
+  AlertTriangle,
+  Upload,
+  X,
+  File,
+  FileImage,
+  FileText,
+  Download,
+  Trash2
 } from "lucide-react";
 import { useJob } from "@/lib/hooks/useJobs";
+import { useFileUpload } from "@/lib/hooks/useFileUpload";
 import DashboardLayout from "@/components/DashboardLayout";
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { mutate } from 'swr';
+
+interface JobFile {
+  id: string;
+  file_name: string;
+  file_url: string;
+  file_size: number | null;
+  created_at: string | null;
+  entity_id: string;
+  entity_type: string;
+  uploaded_by: string | null;
+}
 
 export default function EditJobPage() {
   const params = useParams();
@@ -26,7 +45,10 @@ export default function EditJobPage() {
   const jobId = params.jobId as string;
   
   const { data: job, error: jobError, isLoading: jobLoading } = useJob(jobId);
+  const { fileUploads, handleFileSelect, removeFile, uploadFiles } = useFileUpload();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [existingFiles, setExistingFiles] = useState<JobFile[]>([]);
+  const [filesLoading, setFilesLoading] = useState(true);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -61,6 +83,114 @@ export default function EditJobPage() {
       });
     }
   }, [job]);
+
+  // Load existing files
+  useEffect(() => {
+    const loadFiles = async () => {
+      if (!job?.id) return;
+      
+      setFilesLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('file_attachments')
+          .select('*')
+          .eq('entity_id', job.id)
+          .eq('entity_type', 'job')
+          .order('created_at', { ascending: false });
+        
+        if (error) {
+          console.error('Error loading files:', error);
+          toast.error('Failed to load job files');
+        } else {
+          setExistingFiles(data || []);
+        }
+      } catch (err) {
+        console.error('Error loading files:', err);
+        toast.error('Error loading job files');
+      } finally {
+        setFilesLoading(false);
+      }
+    };
+
+    loadFiles();
+  }, [job?.id]);
+
+  const removeExistingFile = async (fileId: string) => {
+    try {
+      const { error } = await supabase
+        .from('file_attachments')
+        .delete()
+        .eq('id', fileId);
+      
+      if (error) {
+        console.error('Error deleting file:', error);
+        toast.error('Failed to delete file');
+      } else {
+        setExistingFiles(prev => prev.filter(f => f.id !== fileId));
+        toast.success('File deleted successfully');
+      }
+    } catch (err) {
+      console.error('Error deleting file:', err);
+      toast.error('Error deleting file');
+    }
+  };
+
+  const downloadFile = async (file: JobFile) => {
+    try {
+      // Extract storage path from the public URL
+      const urlParts = file.file_url.split('/storage/v1/object/public/job-files/');
+      if (urlParts.length !== 2) {
+        throw new Error('Invalid file URL format');
+      }
+      
+      const filePath = urlParts[1];
+      const { data, error } = await supabase.storage
+        .from('job-files')
+        .download(filePath);
+
+      if (error) {
+        throw error;
+      }
+
+      // Create download link
+      const url = URL.createObjectURL(data);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = file.file_name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      toast.success('File downloaded successfully');
+    } catch (error) {
+      console.error('Download error:', error);
+      toast.error('Failed to download file');
+    }
+  };
+
+  const getFileIcon = (fileName: string) => {
+    const extension = fileName.split('.').pop()?.toLowerCase();
+    switch (extension) {
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+      case 'gif':
+      case 'webp':
+        return <FileImage className="h-5 w-5 text-blue-500" />;
+      case 'pdf':
+        return <FileText className="h-5 w-5 text-red-500" />;
+      default:
+        return <File className="h-5 w-5 text-gray-500" />;
+    }
+  };
+
+  const formatFileSize = (bytes: number | null) => {
+    if (!bytes) return 'Unknown size';
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
 
   const handleInputChange = (field: string, value: string | number) => {
     setFormData(prev => ({
@@ -105,6 +235,25 @@ export default function EditJobPage() {
 
       if (error) {
         throw error;
+      }
+
+      // Upload new files if any
+      if (fileUploads.length > 0) {
+        try {
+          await uploadFiles(job.id);
+          // Reload existing files to show the new uploads
+          const { data: updatedFiles } = await supabase
+            .from('file_attachments')
+            .select('*')
+            .eq('entity_id', job.id)
+            .eq('entity_type', 'job')
+            .order('created_at', { ascending: false });
+          
+          setExistingFiles(updatedFiles || []);
+        } catch (fileError) {
+          console.error('File upload error:', fileError);
+          toast.error('Job updated but some files failed to upload');
+        }
       }
 
       // Invalidate caches for real-time updates
@@ -389,6 +538,126 @@ export default function EditJobPage() {
                       rows={4}
                     />
                   </div>
+                </CardContent>
+              </Card>
+
+              {/* File Management */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Upload className="h-5 w-5 mr-2" />
+                    Job Files
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Existing Files */}
+                  <div>
+                    <Label>Existing Files</Label>
+                    {filesLoading ? (
+                      <div className="flex items-center justify-center py-4">
+                        <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                        Loading files...
+                      </div>
+                    ) : existingFiles.length === 0 ? (
+                      <div className="text-center py-4 text-gray-500">
+                        No files attached to this job
+                      </div>
+                    ) : (
+                      <div className="space-y-2 mt-2">
+                        {existingFiles.map((file) => (
+                          <div key={file.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
+                            <div className="flex items-center space-x-3">
+                              {getFileIcon(file.file_name)}
+                              <div>
+                                <p className="font-medium text-gray-900">{file.file_name}</p>
+                                <p className="text-sm text-gray-500">
+                                  {formatFileSize(file.file_size)} • {file.created_at ? new Date(file.created_at).toLocaleDateString() : 'Unknown date'}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => downloadFile(file)}
+                              >
+                                <Download className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  if (confirm('Are you sure you want to delete this file?')) {
+                                    removeExistingFile(file.id);
+                                  }
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4 text-red-500" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Add New Files */}
+                  <div>
+                    <Label htmlFor="new-files">Add New Files</Label>
+                    <div className="mt-2">
+                      <Input
+                        id="new-files"
+                        type="file"
+                        multiple
+                        onChange={handleFileSelect}
+                        className="cursor-pointer"
+                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.webp"
+                      />
+                      <p className="text-sm text-gray-500 mt-1">
+                        Supported formats: PDF, DOC, DOCX, JPG, PNG, GIF, WEBP
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* New File Uploads Preview */}
+                  {fileUploads.length > 0 && (
+                    <div>
+                      <Label>New Files to Upload</Label>
+                      <div className="space-y-2 mt-2">
+                        {fileUploads.map((upload) => (
+                          <div key={upload.id} className="flex items-center justify-between p-3 border rounded-lg bg-blue-50">
+                            <div className="flex items-center space-x-3">
+                              {getFileIcon(upload.file.name)}
+                              <div>
+                                <p className="font-medium text-gray-900">{upload.file.name}</p>
+                                <p className="text-sm text-gray-500">
+                                  {formatFileSize(upload.file.size)} • {upload.status}
+                                </p>
+                                {upload.status === 'uploading' && (
+                                  <div className="w-32 bg-gray-200 rounded-full h-2 mt-1">
+                                    <div 
+                                      className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                                      style={{ width: `${upload.progress}%` }}
+                                    ></div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => removeFile(upload.id)}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 

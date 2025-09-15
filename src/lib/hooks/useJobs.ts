@@ -106,7 +106,7 @@ const fetchJobByNumber = async (jobNumber: string): Promise<JobWithCustomer> => 
   const { data: job, error: jobError } = await supabase
     .from('jobs')
     .select('*')
-    .eq('job_number', jobNumber)
+    .eq('jobNo', jobNumber)
     .single();
   
   if (jobError) throw jobError;

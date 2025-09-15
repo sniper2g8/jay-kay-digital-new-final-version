@@ -87,7 +87,7 @@ export default function DatabaseConnectionTest() {
     try {
       const { data, error } = await supabase
         .from('jobs')
-        .select('job_number, title')
+        .select('jobNo, title')
         .limit(1);
       
       if (error) {

@@ -24,7 +24,7 @@ const mockInvoices = [
     invoice_no: "JKDP-INV-2024-001",
     customer_human_id: "JKDP-CUS-001",
     customer_name: "ABC Marketing Solutions",
-    job_number: "JKDP-JOB-2024-001",
+    jobNo: "JKDP-JOB-2024-001",
     amount: 600.00,
     status: "paid",
     issue_date: "2024-01-10",
@@ -35,7 +35,7 @@ const mockInvoices = [
     invoice_no: "JKDP-INV-2024-002",
     customer_human_id: "JKDP-CUS-002", 
     customer_name: "TechStart Inc",
-    job_number: "JKDP-JOB-2024-002",
+    jobNo: "JKDP-JOB-2024-002",
     amount: 700.00,
     status: "pending",
     issue_date: "2024-01-08",
@@ -46,7 +46,7 @@ const mockInvoices = [
     invoice_no: "JKDP-INV-2024-003",
     customer_human_id: "JKDP-CUS-003",
     customer_name: "Local Restaurant Group", 
-    job_number: "JKDP-JOB-2024-003",
+    jobNo: "JKDP-JOB-2024-003",
     amount: 850.00,
     status: "paid",
     issue_date: "2024-01-05",
@@ -230,7 +230,7 @@ export default function FinancesPage() {
                         </Badge>
                       </div>
                       <p className="text-sm text-gray-600 mb-2">
-                        {invoice.customer_name} • Job: {invoice.job_number}
+                        {invoice.customer_name} • Job: {invoice.jobNo}
                       </p>
                       <div className="flex items-center space-x-4 text-xs text-gray-500">
                         <div className="flex items-center">

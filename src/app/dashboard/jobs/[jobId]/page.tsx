@@ -6,12 +6,14 @@ import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   ArrowLeft,
   FileText,
   Download,
   Edit,
   Share,
+  Trash2,
   Clock,
   CheckCircle,
   AlertCircle,
@@ -30,6 +32,7 @@ import { useJob } from "@/lib/hooks/useJobs";
 import DashboardLayout from "@/components/DashboardLayout";
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
+import { mutate } from 'swr';
 
 interface JobFile {
   id: string;
@@ -53,39 +56,56 @@ export default function JobDetailPage() {
   const [filesLoading, setFilesLoading] = useState(true);
   const [downloadingFiles, setDownloadingFiles] = useState<Set<string>>(new Set());
 
-  // Fetch job files on component mount
+  // Fetch job files on component mount - optimized to avoid multiple calls
   React.useEffect(() => {
+    let isCancelled = false;
+    
     const fetchJobFiles = async () => {
-      if (!jobId || !job) return;
+      if (!job?.id) return;
+      
+      setFilesLoading(true);
       
       try {
         console.log('Fetching files for job:', { jobId, jobUUID: job.id, jobNumber: job.jobNo });
         
-        // Try fetching by job UUID first (more likely to be correct)
+        // Use job UUID for consistent and fast lookup
         const { data, error } = await supabase
           .from('file_attachments')
-          .select('*')
-          .eq('entity_id', job.id) // Use actual job UUID
+          .select('id, file_name, file_url, file_size, created_at, entity_id, entity_type, uploaded_by')
+          .eq('entity_id', job.id)
           .eq('entity_type', 'job')
           .order('created_at', { ascending: false });
 
         if (error) {
           console.error('Error fetching job files:', error);
-          toast.error('Failed to load job files');
+          if (!isCancelled) {
+            toast.error('Failed to load job files');
+          }
         } else {
-          console.log('Fetched files data:', data); // Debug log
-          setFiles(data || []);
+          console.log('Fetched files data:', data);
+          if (!isCancelled) {
+            setFiles(data || []);
+          }
         }
       } catch (err) {
         console.error('Unexpected error fetching files:', err);
-        toast.error('Error loading job files');
+        if (!isCancelled) {
+          toast.error('Error loading job files');
+        }
       } finally {
-        setFilesLoading(false);
+        if (!isCancelled) {
+          setFilesLoading(false);
+        }
       }
     };
 
     fetchJobFiles();
-  }, [jobId, job]);
+
+    // Cleanup function to prevent setting state on unmounted component
+    return () => {
+      isCancelled = true;
+    };
+  }, [job?.id, job?.jobNo, jobId]); // Only re-run when job ID changes
 
   const downloadFile = async (file: JobFile) => {
     setDownloadingFiles(prev => new Set(prev).add(file.id));
@@ -232,9 +252,72 @@ export default function JobDetailPage() {
                 </div>
               </div>
               <div className="flex items-center space-x-3">
+                {/* Status Update Dropdown */}
+                <Select 
+                  value={job.status || 'pending'} 
+                  onValueChange={async (newStatus) => {
+                    try {
+                      const { error } = await supabase
+                        .from('jobs')
+                        .update({ 
+                          status: newStatus,
+                          updated_at: new Date().toISOString()
+                        })
+                        .eq('id', job.id);
+
+                      if (error) {
+                        console.error('Status update error:', error);
+                        toast.error('Failed to update status');
+                      } else {
+                        toast.success('Status updated successfully');
+                        // Refresh the job data
+                        mutate(`job-${jobId}`);
+                      }
+                    } catch (error) {
+                      console.error('Status update error:', error);
+                      toast.error('Failed to update status');
+                    }
+                  }}
+                >
+                  <SelectTrigger className="w-40">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="in_progress">In Progress</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                    <SelectItem value="on_hold">On Hold</SelectItem>
+                  </SelectContent>
+                </Select>
+                
                 <Button variant="outline">
                   <Share className="h-4 w-4 mr-2" />
                   Share
+                </Button>
+                <Button variant="destructive" onClick={async () => {
+                  if (confirm('Are you sure you want to delete this job? This action cannot be undone.')) {
+                    try {
+                      const { error } = await supabase
+                        .from('jobs')
+                        .delete()
+                        .eq('id', job.id);
+
+                      if (error) {
+                        console.error('Delete error:', error);
+                        toast.error('Failed to delete job');
+                      } else {
+                        toast.success('Job deleted successfully');
+                        router.push('/dashboard/jobs');
+                      }
+                    } catch (error) {
+                      console.error('Delete error:', error);
+                      toast.error('Failed to delete job');
+                    }
+                  }
+                }}>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete
                 </Button>
                 <Button asChild>
                   <Link href={`/dashboard/jobs/${jobId}/edit`}>
@@ -281,13 +364,58 @@ export default function JobDetailPage() {
                   {job.specifications && (
                     <div>
                       <label className="text-sm font-medium text-gray-700">Specifications</label>
-                      <div className="bg-gray-50 rounded-md p-3 mt-1">
-                        <pre className="text-sm text-gray-900 whitespace-pre-wrap">
-                          {typeof job.specifications === 'string' 
-                            ? job.specifications 
-                            : JSON.stringify(job.specifications, null, 2)
-                          }
-                        </pre>
+                      <div className="bg-gray-50 rounded-md p-4 mt-1 space-y-3">
+                        {(() => {
+                          const specs = typeof job.specifications === 'string' 
+                            ? JSON.parse(job.specifications) 
+                            : job.specifications;
+                          
+                          return (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              {specs.requirements && (
+                                <div>
+                                  <h4 className="font-medium text-gray-900 mb-1">Requirements</h4>
+                                  <p className="text-sm text-gray-700">{specs.requirements}</p>
+                                </div>
+                              )}
+                              
+                              {specs.special_instructions && (
+                                <div>
+                                  <h4 className="font-medium text-gray-900 mb-1">Special Instructions</h4>
+                                  <p className="text-sm text-gray-700">{specs.special_instructions}</p>
+                                </div>
+                              )}
+                              
+                              {specs.size && (
+                                <div>
+                                  <h4 className="font-medium text-gray-900 mb-1">Size</h4>
+                                  <p className="text-sm text-gray-700">
+                                    {specs.size.type === 'standard' 
+                                      ? `Standard: ${specs.size.preset}` 
+                                      : `Custom: ${specs.size.width} × ${specs.size.height} ${specs.size.unit}`
+                                    }
+                                  </p>
+                                </div>
+                              )}
+                              
+                              {specs.paper && (
+                                <div>
+                                  <h4 className="font-medium text-gray-900 mb-1">Paper</h4>
+                                  <p className="text-sm text-gray-700">
+                                    {specs.paper.type} - {specs.paper.weight}
+                                  </p>
+                                </div>
+                              )}
+                              
+                              {specs.unit_price && (
+                                <div>
+                                  <h4 className="font-medium text-gray-900 mb-1">Unit Price</h4>
+                                  <p className="text-sm text-gray-700">${specs.unit_price}</p>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
                       </div>
                     </div>
                   )}
