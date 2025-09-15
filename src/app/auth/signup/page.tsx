@@ -155,12 +155,13 @@ export default function SignupPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
+                suppressHydrationWarning={true}
               />
             </div>
             
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <div className="relative">
+              <div className="relative" suppressHydrationWarning={true}>
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
@@ -169,6 +170,7 @@ export default function SignupPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   disabled={loading}
+                  suppressHydrationWarning={true}
                 />
                 <Button
                   type="button"
@@ -189,7 +191,7 @@ export default function SignupPage() {
 
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <div className="relative">
+              <div className="relative" suppressHydrationWarning={true}>
                 <Input
                   id="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
@@ -198,6 +200,7 @@ export default function SignupPage() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   disabled={loading}
+                  suppressHydrationWarning={true}
                 />
                 <Button
                   type="button"

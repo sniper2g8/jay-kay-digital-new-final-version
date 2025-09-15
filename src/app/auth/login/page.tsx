@@ -71,12 +71,13 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
+                suppressHydrationWarning={true}
               />
             </div>
             
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <div className="relative">
+              <div className="relative" suppressHydrationWarning={true}>
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
@@ -85,6 +86,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   disabled={loading}
+                  suppressHydrationWarning={true}
                 />
                 <Button
                   type="button"
