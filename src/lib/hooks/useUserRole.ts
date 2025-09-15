@@ -17,6 +17,15 @@ export interface UserWithRole {
 const fetchUserRole = async (userId: string): Promise<UserWithRole | null> => {
   if (!userId) return null;
 
+  console.log('🚨 fetchUserRole called - This should NOT happen if user is not authenticated!');
+  
+  // Check current session status
+  const { data: { session } } = await supabase.auth.getSession();
+  console.log('Current session in fetchUserRole:', {
+    hasSession: !!session,
+    userEmail: session?.user?.email || 'no user'
+  });
+
   try {
     // Get user data from appUsers table
     const { data, error } = await supabase
@@ -39,10 +48,20 @@ const fetchUserRole = async (userId: string): Promise<UserWithRole | null> => {
 
 // Hook to get current user's role
 export const useUserRole = () => {
-  const { user } = useAuth();
+  const { user, session, loading } = useAuth();
+
+  console.log('useUserRole hook - Auth state:', { 
+    hasUser: !!user, 
+    hasSession: !!session, 
+    loading,
+    userEmail: user?.email || 'no user'
+  });
+
+  const shouldFetch = user && session && !loading;
+  console.log('useUserRole - shouldFetch:', shouldFetch);
 
   return useSWR(
-    user ? `user-role-${user.id}` : null,
+    shouldFetch ? `user-role-${user.id}` : null,
     () => user ? fetchUserRole(user.id) : null,
     {
       revalidateOnFocus: false,

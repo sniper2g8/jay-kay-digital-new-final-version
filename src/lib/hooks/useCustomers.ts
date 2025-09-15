@@ -38,6 +38,15 @@ export interface CustomerWithStats extends Customer {
 // Fetcher function for customers
 const fetchCustomers = async (): Promise<Customer[]> => {
   try {
+    console.log('🚨 fetchCustomers called - This should NOT happen if user is not authenticated!');
+    
+    // Check current session status
+    const { data: { session } } = await supabase.auth.getSession();
+    console.log('Current session in fetchCustomers:', {
+      hasSession: !!session,
+      userEmail: session?.user?.email || 'no user'
+    });
+    
     console.log('Fetching customers from Supabase...');
     const { data, error } = await supabase
       .from('customers')
@@ -136,11 +145,21 @@ const fetchCustomerWithStats = async (customerHumanId: string): Promise<Customer
 
 // Hook to get all customers
 export const useCustomers = () => {
-  const { user, session } = useAuth();
+  const { user, session, loading } = useAuth();
+  
+  console.log('useCustomers hook - Auth state:', { 
+    hasUser: !!user, 
+    hasSession: !!session, 
+    loading,
+    userEmail: user?.email || 'no user'
+  });
+  
+  const shouldFetch = user && session && !loading;
+  console.log('useCustomers - shouldFetch:', shouldFetch);
   
   return useSWR(
     // Only fetch if user is authenticated
-    user && session ? 'customers' : null, 
+    shouldFetch ? 'customers' : null, 
     fetchCustomers, 
     {
       refreshInterval: 30000, // Refresh every 30 seconds
