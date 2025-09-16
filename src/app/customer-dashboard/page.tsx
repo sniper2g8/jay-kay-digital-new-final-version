@@ -3,16 +3,17 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/lib/hooks/useUserRole';
 import { useCustomerData } from '@/lib/hooks/useCustomerData';
+import { formatCurrency } from '@/lib/constants';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { FileText, Upload, Clock, CheckCircle, AlertCircle, User, Mail, DollarSign, Package, Loader2 } from 'lucide-react';
+import { FileText, Upload, Clock, CheckCircle, AlertCircle, User, Mail, DollarSign, Package, Loader2, LogOut } from 'lucide-react';
 import Link from 'next/link';
 
 export default function CustomerDashboard() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, signOut } = useAuth();
   const { data: userData, isLoading: roleLoading, error: roleError } = useUserRole();
   const { jobs, invoices, stats, loading: dataLoading, error: dataError, refreshData } = useCustomerData();
   const router = useRouter();
@@ -76,18 +77,24 @@ export default function CustomerDashboard() {
   const userRole = userData?.primary_role || 'customer';
   const userName = userData?.name || user.email?.split('@')[0] || 'User';
 
-  // Format currency
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
+  // Format currency using the shared formatCurrency function
+  const formatCurrencyLocal = (amount: number) => {
+    return formatCurrency(amount);
   };
 
   // Format date
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return 'N/A';
     return new Date(dateStr).toLocaleDateString();
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      router.push('/auth/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   return (
@@ -104,6 +111,10 @@ export default function CustomerDashboard() {
           </Badge>
           <Button onClick={refreshData} variant="outline" size="sm">
             Refresh Data
+          </Button>
+          <Button onClick={handleLogout} variant="outline" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50">
+            <LogOut className="h-4 w-4 mr-2" />
+            Logout
           </Button>
         </div>
       </div>
@@ -215,11 +226,9 @@ export default function CustomerDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link href="/test-file-upload">
-              <Button className="w-full">
-                Start New Order
-              </Button>
-            </Link>
+            <Button className="w-full">
+              Start New Order
+            </Button>
           </CardContent>
         </Card>
 
@@ -338,12 +347,10 @@ export default function CustomerDashboard() {
               <FileText className="h-12 w-12 mx-auto mb-4 text-gray-300" />
               <p>No jobs yet</p>
               <p className="text-sm">Your printing orders will appear here</p>
-              <Link href="/test-file-upload">
-                <Button className="mt-4">
-                  <Upload className="h-4 w-4 mr-2" />
-                  Create Your First Order
-                </Button>
-              </Link>
+              <Button className="mt-4">
+                <Upload className="h-4 w-4 mr-2" />
+                Create Your First Order
+              </Button>
             </div>
           )}
         </CardContent>
@@ -406,27 +413,6 @@ export default function CustomerDashboard() {
               <p className="text-sm">Your invoices will appear here once jobs are completed</p>
             </div>
           )}
-        </CardContent>
-      </Card>
-
-      {/* Test File Upload Section (for testing) */}
-      <Card className="border-blue-200 bg-blue-50">
-        <CardHeader>
-          <CardTitle className="text-blue-800">🧪 Test File Upload System</CardTitle>
-          <CardDescription className="text-blue-600">
-            Test the file upload functionality for your orders
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-blue-700 mb-4">
-            Click below to test the file upload system. This will help ensure your files can be properly uploaded for printing orders.
-          </p>
-          <Link href="/test-file-upload">
-            <Button variant="outline" className="border-blue-300 text-blue-700 hover:bg-blue-100">
-              <Upload className="h-4 w-4 mr-2" />
-              Test File Upload
-            </Button>
-          </Link>
         </CardContent>
       </Card>
     </div>

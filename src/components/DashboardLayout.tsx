@@ -23,10 +23,10 @@ export default function DashboardLayout({
   if (isLoading) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="flex items-center space-x-2">
-            <Loader2 className="h-6 w-6 animate-spin" />
-            <span>Loading user information...</span>
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <div className="flex flex-col items-center space-y-4">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <span className="text-muted-foreground">Loading user information...</span>
           </div>
         </div>
       </ProtectedRoute>
@@ -37,10 +37,10 @@ export default function DashboardLayout({
   if (error) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="bg-red-50 border border-red-200 rounded-md p-6 max-w-md">
-            <h3 className="text-lg font-medium text-red-800 mb-2">Access Error</h3>
-            <p className="text-sm text-red-600">
+        <div className="min-h-screen bg-background flex items-center justify-center p-4">
+          <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-6 max-w-md w-full animate-in fade-in slide-in-from-top-2">
+            <h3 className="text-lg font-semibold text-destructive mb-2">Access Error</h3>
+            <p className="text-sm text-destructive/80">
               Unable to verify your permissions. Please try refreshing the page or contact support.
             </p>
           </div>
@@ -80,10 +80,10 @@ export default function DashboardLayout({
   if (!hasRequiredRole()) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="bg-yellow-50 border border-yellow-200 rounded-md p-6 max-w-md">
-            <h3 className="text-lg font-medium text-yellow-800 mb-2">Access Restricted</h3>
-            <p className="text-sm text-yellow-700">
+        <div className="min-h-screen bg-background flex items-center justify-center p-4">
+          <div className="bg-warning/5 border border-warning/20 rounded-lg p-6 max-w-md w-full animate-in fade-in slide-in-from-top-2">
+            <h3 className="text-lg font-semibold text-warning mb-2">Access Restricted</h3>
+            <p className="text-sm text-warning/80">
               You don&apos;t have permission to access this section. Your current role is: {' '}
               <span className="font-medium capitalize">
                 {userData?.primary_role?.replace('_', ' ')}
@@ -97,7 +97,7 @@ export default function DashboardLayout({
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 flex">
+      <div className="min-h-screen bg-background flex animate-in fade-in duration-300">
         {/* Role-based Navigation Sidebar */}
         <RoleBasedNav />
         

@@ -28,9 +28,11 @@ export const useJobFiles = (jobId: string | null) => {
     return 'Unknown error occurred';
   };
 
-  const isValidUUID = (uuid: string): boolean => {
+  const isValidJobId = (jobId: string): boolean => {
+    // Accept both UUID format and human-readable job numbers (JKDP-JOB-XXXX)
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-    return uuidRegex.test(uuid);
+    const jobNoRegex = /^JKDP-JOB-\d+$/i;
+    return uuidRegex.test(jobId) || jobNoRegex.test(jobId);
   };
 
   const fetchFiles = useCallback(async (forceRefresh = false) => {
@@ -39,9 +41,9 @@ export const useJobFiles = (jobId: string | null) => {
       return;
     }
 
-    // Validate UUID format
-    if (!isValidUUID(jobId)) {
-      const errorMessage = `Invalid job ID format: ${jobId}. Expected UUID format (e.g., 550e8400-e29b-41d4-a716-446655440000)`;
+    // Validate job ID format (UUID or human-readable)
+    if (!isValidJobId(jobId)) {
+      const errorMessage = `Invalid job ID format: ${jobId}. Expected UUID format or job number format (JKDP-JOB-XXXX)`;
       console.error('❌', errorMessage);
       setError(errorMessage);
       setFiles([]);
@@ -66,10 +68,39 @@ export const useJobFiles = (jobId: string | null) => {
     try {
       console.log('🔍 Fetching files for job:', jobId);
       
+      let entityId = jobId;
+      
+      // If jobId is human-readable (JKDP-JOB-XXXX), resolve to UUID
+      if (jobId.startsWith('JKDP-JOB-')) {
+        console.log('🔄 Resolving human-readable job ID to UUID:', jobId);
+        const { data: jobData, error: jobError } = await supabase
+          .from('jobs')
+          .select('id')
+          .eq('jobNo', jobId)
+          .single();
+
+        if (jobError || !jobData) {
+          console.warn('⚠️  Job not found in jobs table:', jobId);
+          // Set empty files and return instead of throwing error
+          setFiles([]);
+          setError(null); // Clear any previous errors
+          fileCache[jobId] = {
+            files: [],
+            timestamp: Date.now(),
+            hasFiles: false
+          };
+          return;
+        }
+
+        entityId = jobData.id;
+        console.log('✅ Resolved to UUID:', entityId);
+      }
+      
+      // Query files using the resolved UUID (or direct UUID if passed)
       const { data, error: fetchError } = await supabase
         .from('file_attachments')
         .select('*')
-        .eq('entity_id', jobId)
+        .eq('entity_id', entityId)
         .eq('entity_type', 'job')
         .order('created_at', { ascending: false });
 
@@ -79,7 +110,7 @@ export const useJobFiles = (jobId: string | null) => {
       }
 
       const fetchedFiles = data || [];
-      console.log('✅ Files fetched:', fetchedFiles.length);
+      console.log(`✅ Files fetched for ${jobId} (${entityId}):`, fetchedFiles.length);
       
       // Update cache
       fileCache[jobId] = {

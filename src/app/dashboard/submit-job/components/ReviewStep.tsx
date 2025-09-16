@@ -248,8 +248,8 @@ export default function ReviewStep({
           <CardContent>
             <div className="space-y-3">
               <div className="flex justify-between">
-                <span>Base Price ({formData.quantity} × ${formData.unit_price.toFixed(2)})</span>
-                <span>${basePrice.toFixed(2)}</span>
+                <span>Base Price ({formData.quantity} × SLL {formData.unit_price.toFixed(2)})</span>
+                <span>SLL {basePrice.toFixed(2)}</span>
               </div>
               
               {formData.finishing_options.length > 0 && (
@@ -261,21 +261,21 @@ export default function ReviewStep({
                     const total = price * formData.quantity;
                     return (
                       <div key={optionId} className="flex justify-between text-sm ml-4">
-                        <span>{option?.name} ({formData.quantity} × ${price.toFixed(2)})</span>
-                        <span>${total.toFixed(2)}</span>
+                        <span>{option?.name} ({formData.quantity} × SLL {price.toFixed(2)})</span>
+                        <span>SLL {total.toFixed(2)}</span>
                       </div>
                     );
                   })}
                   <div className="flex justify-between text-sm">
                     <span>Finishing Subtotal:</span>
-                    <span>${finishingCost.toFixed(2)}</span>
+                    <span>SLL {finishingCost.toFixed(2)}</span>
                   </div>
                 </>
               )}
               
               <div className="border-t pt-3 flex justify-between text-lg font-bold">
                 <span>Total Estimated Cost:</span>
-                <span>${estimatedPrice.toFixed(2)}</span>
+                <span>SLL {estimatedPrice.toFixed(2)}</span>
               </div>
               
               <p className="text-xs text-gray-500 mt-2">

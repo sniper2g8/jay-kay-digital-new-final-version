@@ -185,8 +185,8 @@ export default function JobDetailsStep({
             <div className="text-sm text-blue-700 space-y-1">
               <p><strong>Title:</strong> {formData.title}</p>
               <p><strong>Quantity:</strong> {formData.quantity.toLocaleString()} units</p>
-              <p><strong>Unit Price:</strong> ${formData.unit_price.toFixed(2)}</p>
-              <p><strong>Estimated Total:</strong> ${(formData.quantity * formData.unit_price).toFixed(2)}</p>
+              <p><strong>Unit Price:</strong> SLL {formData.unit_price.toFixed(2)}</p>
+              <p><strong>Estimated Total:</strong> SLL {(formData.quantity * formData.unit_price).toFixed(2)}</p>
               <p><strong>Priority:</strong> {formData.priority}</p>
               {formData.due_date && <p><strong>Due Date:</strong> {new Date(formData.due_date).toLocaleDateString()}</p>}
             </div>

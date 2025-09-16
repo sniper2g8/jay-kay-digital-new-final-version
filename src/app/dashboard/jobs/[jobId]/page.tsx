@@ -1,16 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   ArrowLeft,
   FileText,
-  Download,
   Edit,
   Share,
   Trash2,
@@ -20,9 +19,6 @@ import {
   DollarSign,
   User,
   Calendar,
-  File,
-  FileImage,
-  Package,
   MapPin,
   Building,
   Loader2,
@@ -30,21 +26,10 @@ import {
 } from "lucide-react";
 import { useJob } from "@/lib/hooks/useJobs";
 import DashboardLayout from "@/components/DashboardLayout";
+import { JobFilesViewer } from "@/components/JobFilesViewer";
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { mutate } from 'swr';
-
-interface JobFile {
-  id: string;
-  file_name: string;
-  file_url: string;
-  file_size: number | null;
-  file_type: string | null;
-  created_at: string | null;
-  entity_id: string;
-  entity_type: string;
-  uploaded_by: string | null;
-}
 
 export default function JobDetailPage() {
   const params = useParams();
@@ -52,134 +37,6 @@ export default function JobDetailPage() {
   const jobId = params.jobId as string;
   
   const { data: job, error: jobError, isLoading: jobLoading } = useJob(jobId);
-  const [files, setFiles] = useState<JobFile[]>([]);
-  const [filesLoading, setFilesLoading] = useState(true);
-  const [downloadingFiles, setDownloadingFiles] = useState<Set<string>>(new Set());
-
-  // Fetch job files on component mount - optimized to avoid multiple calls
-  React.useEffect(() => {
-    let isCancelled = false;
-    
-    const fetchJobFiles = async () => {
-      if (!job?.id) return;
-      
-      setFilesLoading(true);
-      
-      try {
-        console.log('Fetching files for job:', { jobId, jobUUID: job.id, jobNumber: job.jobNo });
-        
-        // Use job UUID for consistent and fast lookup
-        const { data, error } = await supabase
-          .from('file_attachments')
-          .select('id, file_name, file_url, file_size, file_type, created_at, entity_id, entity_type, uploaded_by')
-          .eq('entity_id', job.id)
-          .eq('entity_type', 'job')
-          .order('created_at', { ascending: false });
-
-        if (error) {
-          console.error('Error fetching job files:', error);
-          if (!isCancelled) {
-            toast.error('Failed to load job files: ' + error.message);
-          }
-        } else {
-          console.log('Fetched files data:', data);
-          console.log('Number of files found:', data?.length || 0);
-          
-          // Also try to query all file_attachments to see if there are any at all
-          const { data: allFiles, error: allFilesError } = await supabase
-            .from('file_attachments')
-            .select('id, entity_id, entity_type, file_name')
-            .limit(5);
-          
-          console.log('All files in database (sample):', allFiles);
-          console.log('All files error:', allFilesError);
-          
-          if (!isCancelled) {
-            setFiles(data || []);
-          }
-        }
-      } catch (err) {
-        console.error('Unexpected error fetching files:', err);
-        if (!isCancelled) {
-          toast.error('Error loading job files');
-        }
-      } finally {
-        if (!isCancelled) {
-          setFilesLoading(false);
-        }
-      }
-    };
-
-    fetchJobFiles();
-
-    // Cleanup function to prevent setting state on unmounted component
-    return () => {
-      isCancelled = true;
-    };
-  }, [job?.id, job?.jobNo, jobId]); // Only re-run when job ID changes
-
-  const downloadFile = async (file: JobFile) => {
-    setDownloadingFiles(prev => new Set(prev).add(file.id));
-    
-    try {
-      console.log('Attempting to download file:', file);
-      
-      // Extract the storage path from the file_url
-      // file_url format is usually: https://[project].supabase.co/storage/v1/object/public/job-files/[path]
-      const urlParts = file.file_url.split('/');
-      const bucketIndex = urlParts.indexOf('job-files');
-      const storagePath = bucketIndex >= 0 ? urlParts.slice(bucketIndex + 1).join('/') : file.file_url;
-      
-      console.log('Using storage path:', storagePath);
-      
-      const { data, error } = await supabase.storage
-        .from('job-files')
-        .download(storagePath);
-
-      if (error) {
-        console.error('Storage download error:', error);
-        throw error;
-      }
-
-      // Create blob URL and trigger download
-      const blob = new Blob([data]);
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = file.file_name;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      
-      toast.success(`Downloaded ${file.file_name}`);
-    } catch (error) {
-      console.error('Download error:', error);
-      toast.error(`Failed to download ${file.file_name}`);
-    } finally {
-      setDownloadingFiles(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(file.id);
-        return newSet;
-      });
-    }
-  };
-
-  const getFileIcon = (filename: string) => {
-    const ext = filename.split('.').pop()?.toLowerCase();
-    if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext || '')) {
-      return <FileImage className="h-4 w-4" />;
-    }
-    return <File className="h-4 w-4" />;
-  };
-
-  const formatFileSize = (bytes: number | null) => {
-    if (!bytes || bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -447,65 +304,7 @@ export default function JobDetailPage() {
               </Card>
 
               {/* Files */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <Package className="h-5 w-5 mr-2" />
-                      Job Files ({files.length})
-                    </div>
-                    <Button variant="outline" size="sm">
-                      <Download className="h-4 w-4 mr-2" />
-                      Download All
-                    </Button>
-                  </CardTitle>
-                  <CardDescription>
-                    Files attached to this job
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {filesLoading ? (
-                    <div className="flex items-center justify-center py-8">
-                      <Loader2 className="h-6 w-6 animate-spin mr-2" />
-                      Loading files...
-                    </div>
-                  ) : files.length === 0 ? (
-                    <div className="text-center py-8">
-                      <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">No files attached</h3>
-                      <p className="text-gray-600">This job doesn&apos;t have any files attached yet.</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {files.map((file) => (
-                        <div key={file.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors">
-                          <div className="flex items-center space-x-3">
-                            {getFileIcon(file.file_name)}
-                            <div>
-                              <p className="font-medium text-gray-900">{file.file_name}</p>
-                              <p className="text-sm text-gray-500">
-                                {formatFileSize(file.file_size)} • Uploaded {file.created_at ? new Date(file.created_at).toLocaleDateString() : 'Unknown date'}
-                              </p>
-                            </div>
-                          </div>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => downloadFile(file)}
-                            disabled={downloadingFiles.has(file.id)}
-                          >
-                            {downloadingFiles.has(file.id) ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <Download className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+              <JobFilesViewer jobId={jobId} canDelete={true} />
             </div>
 
             {/* Sidebar */}
@@ -549,16 +348,16 @@ export default function JobDetailPage() {
                 <CardContent className="space-y-3">
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">Estimated Cost</span>
-                    <span className="font-medium">${(job.estimated_cost || 0).toLocaleString()}</span>
+                    <span className="font-medium">SLL {(job.estimated_cost || 0).toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">Final Cost</span>
-                    <span className="font-medium">${(job.final_cost || 0).toLocaleString()}</span>
+                    <span className="font-medium">SLL {(job.final_cost || 0).toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between pt-2 border-t">
                     <span className="text-sm text-gray-600">Per Unit</span>
                     <span className="font-medium">
-                      ${((job.final_cost || 0) / (job.quantity || 1)).toFixed(2)}
+                      SLL {((job.final_cost || 0) / (job.quantity || 1)).toFixed(2)}
                     </span>
                   </div>
                   

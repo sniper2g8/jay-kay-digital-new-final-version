@@ -273,7 +273,7 @@ export const useJobsByCustomer = (customerId: string | null) => {
   );
 };
 
-// Hook to get job statistics with real-time updates
+// Hook to get job statistics with real-time updates and improved pricing calculation
 export const useJobStats = () => {
   const { user, session } = useAuth();
   
@@ -286,8 +286,45 @@ export const useJobStats = () => {
       const inProgress = jobs.filter(job => job.status === 'in_progress').length;
       const completed = jobs.filter(job => job.status === 'completed').length;
       const pending = jobs.filter(job => job.status === 'pending').length;
-      const totalValue = jobs.reduce((sum, job) => sum + (job.final_cost || job.estimated_cost || 0), 0);
-      const avgJobValue = totalJobs > 0 ? totalValue / totalJobs : 0;
+      
+      // Improved value calculation that consolidates estimate fields
+      let totalValue = 0;
+      let jobsWithPricing = 0;
+      
+      jobs.forEach(job => {
+        let jobValue = 0;
+        
+        // Priority order: final_cost -> estimated_cost -> estimate JSON
+        if (job.final_cost && job.final_cost > 0) {
+          jobValue = job.final_cost;
+        } else if (job.estimated_cost && job.estimated_cost > 0) {
+          jobValue = job.estimated_cost;
+        } else if (job.estimate && typeof job.estimate === 'object') {
+          // Extract pricing from JSON estimate field - based on database analysis
+          const estimate = job.estimate as any;
+          // Database analysis shows all jobs use estimate.total field
+          if (estimate.total && estimate.total > 0) {
+            jobValue = parseFloat(estimate.total);
+          } else if (estimate.total_price && estimate.total_price > 0) {
+            jobValue = parseFloat(estimate.total_price);
+          } else if (estimate.totalPrice && estimate.totalPrice > 0) {
+            jobValue = parseFloat(estimate.totalPrice);
+          } else if (estimate.price && estimate.price > 0) {
+            jobValue = parseFloat(estimate.price);
+          } else if (estimate.cost && estimate.cost > 0) {
+            jobValue = parseFloat(estimate.cost);
+          } else if (estimate.amount && estimate.amount > 0) {
+            jobValue = parseFloat(estimate.amount);
+          }
+        }
+        
+        if (jobValue > 0) {
+          totalValue += jobValue;
+          jobsWithPricing++;
+        }
+      });
+      
+      const avgJobValue = jobsWithPricing > 0 ? totalValue / jobsWithPricing : 0;
 
       return {
         total_jobs: totalJobs,
@@ -295,7 +332,9 @@ export const useJobStats = () => {
         completed: completed,
         pending: pending,
         total_value: totalValue,
-        avg_job_value: avgJobValue
+        avg_job_value: avgJobValue,
+        jobs_with_pricing: jobsWithPricing,
+        pricing_coverage: jobsWithPricing / totalJobs * 100
       };
     }, 
     {

@@ -137,7 +137,7 @@ function JobsContent() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {statsLoading ? '...' : `$${(stats?.total_value || 0).toLocaleString()}`}
+                  {statsLoading ? '...' : `SLL ${(stats?.total_value || 0).toLocaleString()}`}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   All active jobs
@@ -152,7 +152,7 @@ function JobsContent() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {statsLoading ? '...' : `$${Math.round(stats?.avg_job_value || 0)}`}
+                  {statsLoading ? '...' : `SLL ${Math.round(stats?.avg_job_value || 0).toLocaleString()}`}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Per job average
@@ -259,10 +259,10 @@ function JobsContent() {
                         <div className="flex items-center space-x-6">
                           <div className="text-right">
                             <p className="text-sm font-medium text-gray-900">
-                              ${(job.final_cost || 0).toLocaleString()}
+                              SLL {(job.final_cost || 0).toLocaleString()}
                             </p>
                             <p className="text-xs text-gray-500">
-                              ${((job.final_cost || 0) / (job.quantity || 1)).toFixed(2)}/unit
+                              SLL {((job.final_cost || 0) / (job.quantity || 1)).toFixed(2)}/unit
                             </p>
                           </div>
                           <Button variant="outline" size="sm" asChild>

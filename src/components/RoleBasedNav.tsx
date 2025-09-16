@@ -214,16 +214,16 @@ export default function RoleBasedNav({ className }: RoleBasedNavProps) {
                 variant={isActive ? "default" : "ghost"}
                 className={`w-full justify-start ${mobile ? 'h-12' : 'h-10'} ${
                   isActive 
-                    ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
-                }`}
+                    ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm' 
+                    : 'text-foreground hover:text-primary hover:bg-accent'
+                } transition-all duration-200`}
                 onClick={() => mobile && setIsMobileMenuOpen(false)}
               >
                 <Icon className={`${mobile ? 'h-5 w-5' : 'h-4 w-4'} mr-3`} />
                 <div className="flex flex-col items-start">
                   <span className="font-medium">{item.label}</span>
                   {mobile && item.description && (
-                    <span className="text-xs text-gray-500 font-normal">
+                    <span className="text-xs text-muted-foreground font-normal mt-0.5">
                       {item.description}
                     </span>
                   )}
@@ -235,17 +235,17 @@ export default function RoleBasedNav({ className }: RoleBasedNavProps) {
       </div>
       
       {/* User Profile and Logout Section */}
-      <div className="border-t border-gray-200 pt-4 mt-4 space-y-2">
+      <div className="border-t border-border pt-4 mt-4 space-y-2">
         {/* User Profile Button */}
         <Button
           variant="ghost"
-          className={`w-full justify-start ${mobile ? 'h-12' : 'h-10'} text-gray-700 hover:text-gray-900 hover:bg-gray-100`}
+          className={`w-full justify-start ${mobile ? 'h-12' : 'h-10'} text-foreground hover:text-primary hover:bg-accent transition-all duration-200`}
         >
           <User className={`${mobile ? 'h-5 w-5' : 'h-4 w-4'} mr-3`} />
           <div className="flex flex-col items-start">
             <span className="font-medium">Profile</span>
             {mobile && (
-              <span className="text-xs text-gray-500 font-normal">
+              <span className="text-xs text-muted-foreground font-normal mt-0.5">
                 Account settings and preferences
               </span>
             )}
@@ -255,14 +255,14 @@ export default function RoleBasedNav({ className }: RoleBasedNavProps) {
         {/* Logout Button */}
         <Button
           variant="ghost"
-          className={`w-full justify-start ${mobile ? 'h-12' : 'h-10'} text-red-600 hover:text-red-700 hover:bg-red-50`}
+          className={`w-full justify-start ${mobile ? 'h-12' : 'h-10'} text-destructive hover:text-destructive hover:bg-destructive/10 transition-all duration-200`}
           onClick={handleLogout}
         >
           <LogOut className={`${mobile ? 'h-5 w-5' : 'h-4 w-4'} mr-3`} />
           <div className="flex flex-col items-start">
             <span className="font-medium">Sign Out</span>
             {mobile && (
-              <span className="text-xs text-red-500 font-normal">
+              <span className="text-xs text-destructive font-normal mt-0.5">
                 Logout from your account
               </span>
             )}
@@ -274,10 +274,11 @@ export default function RoleBasedNav({ className }: RoleBasedNavProps) {
 
   if (isLoading) {
     return (
-      <div className="w-64 bg-white border-r border-gray-200 p-4">
-        <div className="animate-pulse space-y-2">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-10 bg-gray-200 rounded"></div>
+      <div className="hidden lg:block w-64 bg-background border-r border-border p-4">
+        <div className="animate-pulse space-y-4">
+          <div className="h-6 bg-muted rounded w-3/4 mb-6"></div>
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="h-10 bg-muted rounded"></div>
           ))}
         </div>
       </div>
@@ -287,14 +288,14 @@ export default function RoleBasedNav({ className }: RoleBasedNavProps) {
   return (
     <>
       {/* Desktop Sidebar */}
-      <div className={`hidden lg:block w-64 bg-white border-r border-gray-200 ${className}`}>
+      <div className={`hidden lg:block w-64 bg-background border-r border-border ${className}`}>
         <div className="p-4">
           <div className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-900">Jay Kay Digital Press</h2>
+            <h2 className="text-lg font-bold text-foreground">Jay Kay Digital Press</h2>
             {userData && (
-              <div className="mt-2">
-                <p className="text-sm text-gray-600">{userData.name || userData.email}</p>
-                <p className="text-xs text-gray-500 capitalize">
+              <div className="mt-3">
+                <p className="text-sm font-medium text-foreground truncate">{userData.name || userData.email}</p>
+                <p className="text-xs text-muted-foreground capitalize mt-1">
                   {userData.primary_role?.replace('_', ' ')}
                 </p>
               </div>
@@ -308,19 +309,19 @@ export default function RoleBasedNav({ className }: RoleBasedNavProps) {
       <div className="lg:hidden">
         <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="fixed top-4 left-4 z-50">
-              <Menu className="h-6 w-6" />
+            <Button variant="outline" size="icon" className="fixed top-4 left-4 z-50 shadow-md border-black">
+              <Menu className="h-5 w-5" />
               <span className="sr-only">Open navigation menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-80 p-0">
+          <SheetContent side="left" className="w-80 p-0 bg-background">
             <div className="p-6">
               <div className="mb-6">
-                <h2 className="text-lg font-semibold text-gray-900">Jay Kay Digital Press</h2>
+                <h2 className="text-xl font-bold text-foreground">Jay Kay Digital Press</h2>
                 {userData && (
-                  <div className="mt-2">
-                    <p className="text-sm text-gray-600">{userData.name || userData.email}</p>
-                    <p className="text-xs text-gray-500 capitalize">
+                  <div className="mt-3">
+                    <p className="text-sm font-medium text-foreground truncate">{userData.name || userData.email}</p>
+                    <p className="text-xs text-muted-foreground capitalize mt-1">
                       {userData.primary_role?.replace('_', ' ')}
                     </p>
                   </div>
@@ -338,11 +339,11 @@ export default function RoleBasedNav({ className }: RoleBasedNavProps) {
 // Role Badge Component for showing user role
 export function RoleBadge({ role }: { role: UserRole }) {
   const roleColors: Record<UserRole, string> = {
-    'super_admin': 'bg-red-100 text-red-800',
-    'admin': 'bg-purple-100 text-purple-800',
-    'manager': 'bg-blue-100 text-blue-800',
-    'staff': 'bg-green-100 text-green-800',
-    'customer': 'bg-gray-100 text-gray-800'
+    'super_admin': 'bg-destructive/10 text-destructive',
+    'admin': 'bg-black text-white',
+    'manager': 'bg-red-500/10 text-red-600 dark:text-red-300',
+    'staff': 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-300',
+    'customer': 'bg-gray-500/10 text-gray-600 dark:text-gray-300'
   };
 
   return (

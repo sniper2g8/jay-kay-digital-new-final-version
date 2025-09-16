@@ -26,13 +26,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="motion-safe:scroll-smooth">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background text-foreground`}
       >
         <ErrorBoundary>
           <AuthProvider>
-            {children}
+            <div className="animate-in fade-in duration-500">
+              {children}
+            </div>
           </AuthProvider>
         </ErrorBoundary>
         <Toaster position="top-right" richColors />

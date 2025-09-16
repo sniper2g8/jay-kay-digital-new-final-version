@@ -22,6 +22,8 @@ import Link from "next/link";
 import { useInvoicesWithCustomers, usePaymentsWithCustomers, useFinancialStats } from '@/lib/hooks/useFinances';
 import DashboardLayout from "@/components/DashboardLayout";
 import ProtectedDashboard from "@/components/ProtectedDashboard";
+import { usePaymentsByCustomer, useInvoicesByCustomer } from '@/lib/hooks/useFinances';
+import { formatCurrency } from '@/lib/constants';
 
 const getInvoiceStatusColor = (status: string | null) => {
   switch (status) {
@@ -110,7 +112,7 @@ function FinancesContent() {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${totalRevenue.toLocaleString()}</div>
+              <div className="text-2xl font-bold">{formatCurrency(totalRevenue)}</div>
               <p className="text-xs text-muted-foreground">
                 {stats?.total_invoices || 0} invoices total
               </p>
@@ -123,7 +125,7 @@ function FinancesContent() {
               <CheckCircle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${totalPaid.toLocaleString()}</div>
+              <div className="text-2xl font-bold">{formatCurrency(totalPaid)}</div>
               <p className="text-xs text-muted-foreground">
                 {stats?.paid_invoices_count || 0} paid invoices
               </p>
@@ -136,7 +138,7 @@ function FinancesContent() {
               <AlertCircle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${totalPending.toLocaleString()}</div>
+              <div className="text-2xl font-bold">{formatCurrency(totalPending)}</div>
               <p className="text-xs text-muted-foreground">
                 {stats?.pending_invoices_count || 0} pending invoices
               </p>
@@ -193,7 +195,7 @@ function FinancesContent() {
                       
                       <div className="flex items-center space-x-4">
                         <div className="text-right">
-                          <p className="font-medium">${invoice.grandTotal?.toLocaleString() || '0'}</p>
+                          <p className="font-medium">SLL {invoice.grandTotal?.toLocaleString() || '0'}</p>
                           <p className="text-sm text-gray-500">{invoice.dueDate ? new Date(invoice.dueDate as string).toLocaleDateString() : 'N/A'}</p>
                         </div>
                         
@@ -241,7 +243,7 @@ function FinancesContent() {
                       
                       <div className="flex items-center space-x-4">
                         <div className="text-right">
-                          <p className="font-medium">${payment.amount?.toLocaleString() || '0'}</p>
+                          <p className="font-medium">SLL {payment.amount?.toLocaleString() || '0'}</p>
                           <p className="text-sm text-gray-500">{payment.payment_date ? new Date(payment.payment_date as string).toLocaleDateString() : 'N/A'}</p>
                         </div>
                         

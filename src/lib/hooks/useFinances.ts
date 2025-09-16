@@ -343,7 +343,8 @@ export const useFinancialStats = () => {
         pending_invoices_count: pendingInvoices.length,
         total_invoices: invoices.length,
         total_payments: payments.length,
-        collection_rate: Math.round(collectionRate)
+        collection_rate: Math.round(collectionRate),
+        currency: 'SLL' // Sierra Leonean Leone
       };
     }, 
     {
