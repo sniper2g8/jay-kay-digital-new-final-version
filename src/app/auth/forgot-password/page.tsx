@@ -24,18 +24,35 @@ export default function ForgotPasswordPage() {
     setMessage('');
 
     try {
+      // Use dynamic origin for better compatibility
+      const redirectUrl = `${window.location.origin}/auth/reset-password`;
+      
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/reset-password`,
+        redirectTo: redirectUrl,
       });
 
       if (error) {
-        setError(error.message);
+        console.error('Password reset error:', error);
+        
+        // More specific error messages
+        if (error.message.includes('Unable to process request')) {
+          setError('Service temporarily unavailable. Please check your Supabase configuration or try again later.');
+        } else if (error.message.includes('Invalid email')) {
+          setError('Please enter a valid email address.');
+        } else if (error.message.includes('User not found')) {
+          // Don't reveal if user exists or not for security
+          setEmailSent(true);
+          setMessage('If an account with this email exists, you will receive a password reset link.');
+        } else {
+          setError(error.message);
+        }
       } else {
         setEmailSent(true);
         setMessage('Check your email for a password reset link.');
       }
-    } catch {
-      setError('An unexpected error occurred. Please try again.');
+    } catch (err) {
+      console.error('Unexpected error:', err);
+      setError('An unexpected error occurred. Please check your internet connection and try again.');
     } finally {
       setIsLoading(false);
     }
