@@ -212,7 +212,7 @@ function CreateStatementContent() {
                           {selectedCustomer ? (
                             <div className="flex items-center">
                               <Users className="h-4 w-4 mr-2 text-muted-foreground" />
-                              <span>{selectedCustomer.company_name}</span>
+                              <span>{selectedCustomer.business_name}</span>
                             </div>
                           ) : (
                             "Select a customer"
@@ -223,9 +223,9 @@ function CreateStatementContent() {
                         {customers?.map((customer) => (
                           <SelectItem key={customer.id} value={customer.id}>
                             <div className="flex flex-col">
-                              <span className="font-medium">{customer.company_name}</span>
+                              <span className="font-medium">{customer.business_name}</span>
                               <span className="text-sm text-muted-foreground">
-                                {customer.contact_name} • {customer.email}
+                                {customer.contact_person && `${customer.contact_person} • `}{customer.email}
                               </span>
                             </div>
                           </SelectItem>
@@ -360,8 +360,8 @@ function CreateStatementContent() {
                   <div className="space-y-4">
                     <div>
                       <Label className="text-sm font-medium text-muted-foreground">Customer</Label>
-                      <p className="font-medium">{selectedCustomer?.company_name}</p>
-                      <p className="text-sm text-muted-foreground">{selectedCustomer?.contact_name}</p>
+                      <p className="font-medium">{selectedCustomer?.business_name}</p>
+                      <p className="text-sm text-muted-foreground">{selectedCustomer?.contact_person}</p>
                     </div>
                     
                     <div>
