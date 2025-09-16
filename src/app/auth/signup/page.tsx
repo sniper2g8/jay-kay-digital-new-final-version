@@ -70,34 +70,34 @@ export default function SignupPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-yellow-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <div className="mx-auto bg-red-600 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-4">
+            <Link href="/">
               <img 
                 src="/JK_Logo.jpg" 
                 alt="Jay Kay Digital Press Logo" 
-                className="w-10 h-10 object-contain"
+                className="h-16 w-16 object-contain mx-auto mb-4"
               />
-            </div>
+            </Link>
             <h1 className="text-3xl font-bold text-gray-900">Jay Kay Digital Press</h1>
             <p className="text-gray-600 mt-2">Professional Printing Services</p>
           </div>
           
           <Card className="shadow-xl border-0 rounded-2xl overflow-hidden">
-            <CardHeader className="space-y-1 text-center bg-green-600 text-white py-6">
-              <CheckCircle className="h-16 w-16 text-white mx-auto mb-4" />
+            <CardHeader className="space-y-1 text-center bg-white text-red-600 py-6">
+              <CheckCircle className="h-16 w-16 text-red-600 mx-auto mb-4" />
               <CardTitle className="text-2xl font-bold">
                 Account Created!
               </CardTitle>
-              <CardDescription className="text-green-100">
+              <CardDescription className="text-red-500">
                 Please verify your email
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-6">
               <div className="text-center">
                 <p className="text-gray-700 mb-4">
-                  We&apos;ve sent a verification link to <strong className="text-red-600">{email}</strong>
+                  We&apos;ve sent a verification link to <strong className="text-gray-800">{email}</strong>
                 </p>
                 <p className="text-gray-600 mb-6">
                   Please check your email and click the verification link to activate your account.
@@ -109,6 +109,14 @@ export default function SignupPage() {
                 </Link>
               </div>
             </CardContent>
+            <CardFooter className="text-center pt-4">
+              <Link 
+                href="/" 
+                className="text-sm text-gray-600 hover:text-gray-800 font-medium transition-colors flex items-center justify-center"
+              >
+                ← Back to Home
+              </Link>
+            </CardFooter>
           </Card>
         </div>
       </div>
@@ -116,26 +124,26 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-yellow-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="mx-auto bg-red-600 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-4">
+          <Link href="/">
             <img 
               src="/JK_Logo.jpg" 
               alt="Jay Kay Digital Press Logo" 
-              className="w-10 h-10 object-contain"
+              className="h-16 w-16 object-contain mx-auto mb-4"
             />
-          </div>
+          </Link>
           <h1 className="text-3xl font-bold text-gray-900">Jay Kay Digital Press</h1>
           <p className="text-gray-600 mt-2">Professional Printing Services</p>
         </div>
         
         <Card className="shadow-xl border-0 rounded-2xl overflow-hidden">
-          <CardHeader className="space-y-1 text-center bg-red-600 text-white py-6">
+          <CardHeader className="space-y-1 text-center bg-white text-red-600 py-6">
             <CardTitle className="text-2xl font-bold">
               Create Account
             </CardTitle>
-            <CardDescription className="text-red-100">
+            <CardDescription className="text-red-500">
               Join our printing service platform
             </CardDescription>
           </CardHeader>
@@ -292,6 +300,15 @@ export default function SignupPage() {
                 className="text-red-600 hover:text-red-800 font-medium transition-colors"
               >
                 Sign in
+              </Link>
+            </div>
+            
+            <div className="text-center pt-4">
+              <Link 
+                href="/" 
+                className="text-sm text-red-600 hover:text-red-800 font-medium transition-colors flex items-center justify-center"
+              >
+                ← Back to Home
               </Link>
             </div>
           </CardFooter>

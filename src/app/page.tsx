@@ -35,24 +35,24 @@ export default function Home() {
 
   const services = [
     {
-      title: "Offset Printing",
-      description: "High-quality bulk printing for brochures, flyers, and marketing materials with vibrant colors and sharp details.",
-      icon: <PrinterIcon className="h-6 w-6" />
+      title: "Business Cards",
+      description: "Professional business cards with various paper stocks and finishes to make a lasting impression.",
+      image: "/services/Business-card.jpg"
     },
     {
       title: "Digital Printing",
       description: "Fast turnaround for small to medium runs with exceptional quality and customization options.",
-      icon: <FileText className="h-6 w-6" />
+      image: "/services/Digital-Printing.jpg"
     },
     {
-      title: "Large Format Printing",
-      description: "Banners, posters, and signage up to 60 inches wide with professional finishing options.",
-      icon: <Zap className="h-6 w-6" />
+      title: "Brochures & Booklets",
+      description: "Eye-catching brochures and booklets for marketing campaigns and product information.",
+      image: "/services/brochures and booklets.png"
     },
     {
-      title: "Binding Services",
-      description: "Professional binding solutions including perfect binding, saddle stitching, and spiral binding.",
-      icon: <CheckCircle className="h-6 w-6" />
+      title: "Signage & Banners",
+      description: "Large format printing for indoor and outdoor signage, roll-up banners, and promotional displays.",
+      image: "/services/signage-roll-up-banner-3.jpg"
     }
   ];
 
@@ -92,10 +92,10 @@ export default function Home() {
             
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
-              <a href="#services" className="text-gray-300 hover:text-white transition-colors">Services</a>
-              <a href="#about" className="text-gray-300 hover:text-white transition-colors">About</a>
-              <a href="#testimonials" className="text-gray-300 hover:text-white transition-colors">Testimonials</a>
-              <a href="#contact" className="text-gray-300 hover:text-white transition-colors">Contact</a>
+              <a href="#services" className="text-gray-300 hover:text-red-400 transition-colors">Services</a>
+              <a href="#about" className="text-gray-300 hover:text-red-400 transition-colors">About</a>
+              <a href="#testimonials" className="text-gray-300 hover:text-red-400 transition-colors">Testimonials</a>
+              <a href="#contact" className="text-gray-300 hover:text-red-400 transition-colors">Contact</a>
             </nav>
             
             <div className="flex items-center space-x-4">
@@ -127,10 +127,10 @@ export default function Home() {
           {isMenuOpen && (
             <div className="md:hidden mt-4 pb-4">
               <div className="flex flex-col space-y-3">
-                <a href="#services" className="text-gray-300 hover:text-white transition-colors py-2" onClick={() => setIsMenuOpen(false)}>Services</a>
-                <a href="#about" className="text-gray-300 hover:text-white transition-colors py-2" onClick={() => setIsMenuOpen(false)}>About</a>
-                <a href="#testimonials" className="text-gray-300 hover:text-white transition-colors py-2" onClick={() => setIsMenuOpen(false)}>Testimonials</a>
-                <a href="#contact" className="text-gray-300 hover:text-white transition-colors py-2" onClick={() => setIsMenuOpen(false)}>Contact</a>
+                <a href="#services" className="text-gray-300 hover:text-red-400 transition-colors py-2" onClick={() => setIsMenuOpen(false)}>Services</a>
+                <a href="#about" className="text-gray-300 hover:text-red-400 transition-colors py-2" onClick={() => setIsMenuOpen(false)}>About</a>
+                <a href="#testimonials" className="text-gray-300 hover:text-red-400 transition-colors py-2" onClick={() => setIsMenuOpen(false)}>Testimonials</a>
+                <a href="#contact" className="text-gray-300 hover:text-red-400 transition-colors py-2" onClick={() => setIsMenuOpen(false)}>Contact</a>
               </div>
             </div>
           )}
@@ -168,7 +168,7 @@ export default function Home() {
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" asChild className="border-white text-white hover:bg-white/10 text-lg py-6 px-8">
+              <Button size="lg" variant="outline" asChild className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white text-lg py-6 px-8">
                 <Link href="/track">
                   Track Order
                 </Link>
@@ -192,14 +192,16 @@ export default function Home() {
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {services.map((service, index) => (
-              <Card key={index} className="hover:shadow-xl transition-all duration-300 border-red-200 hover:border-red-300">
+              <Card key={index} className="hover:shadow-xl transition-all duration-300 border-red-200 hover:border-red-300 overflow-hidden">
+                <div className="h-48 overflow-hidden">
+                  <img 
+                    src={service.image} 
+                    alt={service.title}
+                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                  />
+                </div>
                 <CardHeader>
-                  <div className="h-12 w-12 bg-red-100 rounded-lg flex items-center justify-center mb-4">
-                    <div className="text-red-600">
-                      {service.icon}
-                    </div>
-                  </div>
-                  <CardTitle>{service.title}</CardTitle>
+                  <CardTitle className="text-lg">{service.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <CardDescription>
@@ -413,29 +415,29 @@ export default function Home() {
             <div>
               <h4 className="font-semibold mb-4">Services</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Offset Printing</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Digital Printing</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Large Format</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Binding Services</a></li>
+                <li><a href="#" className="text-red-400 hover:text-red-300 transition-colors">Offset Printing</a></li>
+                <li><a href="#" className="text-red-400 hover:text-red-300 transition-colors">Digital Printing</a></li>
+                <li><a href="#" className="text-red-400 hover:text-red-300 transition-colors">Large Format</a></li>
+                <li><a href="#" className="text-red-400 hover:text-red-300 transition-colors">Binding Services</a></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold mb-4">Company</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Testimonials</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
+                <li><a href="#" className="text-red-400 hover:text-red-300 transition-colors">About Us</a></li>
+                <li><a href="#" className="text-red-400 hover:text-red-300 transition-colors">Testimonials</a></li>
+                <li><a href="#" className="text-red-400 hover:text-red-300 transition-colors">Careers</a></li>
+                <li><a href="#" className="text-red-400 hover:text-red-300 transition-colors">Contact</a></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold mb-4">Legal</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Cookie Policy</a></li>
+                <li><a href="#" className="text-red-400 hover:text-red-300 transition-colors">Privacy Policy</a></li>
+                <li><a href="#" className="text-red-400 hover:text-red-300 transition-colors">Terms of Service</a></li>
+                <li><a href="#" className="text-red-400 hover:text-red-300 transition-colors">Cookie Policy</a></li>
               </ul>
             </div>
           </div>

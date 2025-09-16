@@ -173,7 +173,7 @@ function DashboardContent() {
               <CardDescription>Common tasks and shortcuts</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <Link href="/dashboard/customers">
                   <Button variant="outline" className="h-20 flex-col space-y-2 w-full hover-lift border-black text-black hover:bg-gray-100">
                     <Users className="h-6 w-6" />
@@ -185,6 +185,13 @@ function DashboardContent() {
                   <Button variant="outline" className="h-20 flex-col space-y-2 w-full hover-lift border-black text-black hover:bg-gray-100">
                     <FileText className="h-6 w-6" />
                     <span className="text-sm">View Jobs</span>
+                  </Button>
+                </Link>
+                
+                <Link href="/dashboard/statements">
+                  <Button variant="outline" className="h-20 flex-col space-y-2 w-full hover-lift border-blue-500 text-blue-600 hover:bg-blue-50">
+                    <FileText className="h-6 w-6" />
+                    <span className="text-sm">Statements</span>
                   </Button>
                 </Link>
                 

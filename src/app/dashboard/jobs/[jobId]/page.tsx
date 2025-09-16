@@ -277,13 +277,41 @@ export default function JobDetailPage() {
                               
                               {specs.finishing_options && specs.finishing_options.length > 0 && (
                                 <div>
-                                  <h4 className="font-medium text-gray-900 mb-1">Finishing Options</h4>
-                                  <div className="text-sm text-gray-700">
-                                    {specs.finishing_options.map((option: string | { id?: string; name?: string }, index: number) => (
-                                      <span key={index} className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs mr-2 mb-1">
-                                        {typeof option === 'string' ? option : option.name || option.id}
-                                      </span>
-                                    ))}
+                                  <h4 className="font-medium text-gray-900 mb-2">Finishing Options</h4>
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    {specs.finishing_options.map((option: string | { id?: string; name?: string; category?: string; description?: string }, index: number) => {
+                                      const optionName = typeof option === 'string' ? option : option.name || option.id;
+                                      const optionCategory = typeof option === 'object' ? option.category : null;
+                                      const optionDescription = typeof option === 'object' ? option.description : null;
+                                      
+                                      return (
+                                        <div key={index} className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-3 hover:shadow-md transition-all duration-200">
+                                          <div className="flex items-start justify-between">
+                                            <div className="flex-1">
+                                              <span className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium mb-1">
+                                                {optionName}
+                                              </span>
+                                              {optionCategory && (
+                                                <p className="text-xs text-gray-600 capitalize mb-1">
+                                                  Category: {optionCategory.replace('_', ' ')}
+                                                </p>
+                                              )}
+                                              {optionDescription && (
+                                                <p className="text-xs text-gray-700">
+                                                  {optionDescription}
+                                                </p>
+                                              )}
+                                            </div>
+                                            <div className="flex-shrink-0 ml-2">
+                                              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                  <div className="mt-2 text-xs text-gray-500">
+                                    {specs.finishing_options.length} finishing option{specs.finishing_options.length !== 1 ? 's' : ''} selected
                                   </div>
                                 </div>
                               )}

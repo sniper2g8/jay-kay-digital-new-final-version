@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Eye, EyeOff, Mail, Lock, Printer } from 'lucide-react';
+import { Loader2, Eye, EyeOff, Mail, Lock } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -43,26 +43,26 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-yellow-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="mx-auto bg-red-600 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-4">
+          <Link href="/">
             <img 
               src="/JK_Logo.jpg" 
               alt="Jay Kay Digital Press Logo" 
-              className="w-10 h-10 object-contain"
+              className="h-16 w-16 object-contain mx-auto mb-4"
             />
-          </div>
+          </Link>
           <h1 className="text-3xl font-bold text-gray-900">Jay Kay Digital Press</h1>
           <p className="text-gray-600 mt-2">Professional Printing Services</p>
         </div>
         
         <Card className="shadow-xl border-0 rounded-2xl overflow-hidden">
-          <CardHeader className="space-y-1 text-center bg-red-600 text-white py-6">
+          <CardHeader className="space-y-1 text-center bg-white text-red-600 py-6">
             <CardTitle className="text-2xl font-bold">
               Welcome Back
             </CardTitle>
-            <CardDescription className="text-red-100">
+            <CardDescription className="text-red-500">
               Sign in to your account
             </CardDescription>
           </CardHeader>
@@ -159,6 +159,15 @@ export default function LoginPage() {
                 className="text-red-600 hover:text-red-800 font-medium transition-colors"
               >
                 Sign up
+              </Link>
+            </div>
+            
+            <div className="text-center pt-4">
+              <Link 
+                href="/" 
+                className="text-sm text-red-600 hover:text-red-800 font-medium transition-colors flex items-center justify-center"
+              >
+                ← Back to Home
               </Link>
             </div>
           </CardFooter>

@@ -574,6 +574,78 @@ export default function EditJobPage() {
                 </CardContent>
               </Card>
 
+              {/* Finishing Options Display */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <FileText className="h-5 w-5 mr-2" />
+                    Finishing Options
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {(() => {
+                      try {
+                        const specs = typeof job?.specifications === 'string' 
+                          ? JSON.parse(job.specifications) 
+                          : job?.specifications || {};
+                        
+                        if (specs.finishing_options && specs.finishing_options.length > 0) {
+                          return (
+                            <>
+                              <Label>Selected Finishing Options</Label>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                {specs.finishing_options.map((option: string | { id?: string; name?: string; category?: string }, index: number) => {
+                                  const optionName = typeof option === 'string' ? option : option.name || option.id;
+                                  const optionCategory = typeof option === 'object' ? option.category : null;
+                                  
+                                  return (
+                                    <div key={index} className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-3">
+                                      <div className="flex items-center justify-between">
+                                        <div>
+                                          <span className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
+                                            {optionName}
+                                          </span>
+                                          {optionCategory && (
+                                            <p className="text-xs text-gray-600 capitalize mt-1">
+                                              Category: {optionCategory.replace('_', ' ')}
+                                            </p>
+                                          )}
+                                        </div>
+                                        <div className="w-2 h-2 bg-green-400 rounded-full flex-shrink-0"></div>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                              <p className="text-xs text-gray-500">
+                                {specs.finishing_options.length} finishing option{specs.finishing_options.length !== 1 ? 's' : ''} applied
+                              </p>
+                            </>
+                          );
+                        } else {
+                          return (
+                            <div className="text-center py-4 text-gray-500">
+                              <FileText className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                              <p>No finishing options specified for this job</p>
+                              <p className="text-xs mt-1">Finishing options are set during job submission</p>
+                            </div>
+                          );
+                        }
+                      } catch {
+                        return (
+                          <div className="text-center py-4 text-gray-500">
+                            <AlertTriangle className="h-8 w-8 mx-auto mb-2 text-yellow-500" />
+                            <p>Unable to load finishing options</p>
+                            <p className="text-xs mt-1">Specifications data may be corrupted</p>
+                          </div>
+                        );
+                      }
+                    })()}
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* File Management */}
               <Card>
                 <CardHeader>

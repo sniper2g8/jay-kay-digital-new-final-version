@@ -68,6 +68,15 @@ const navigationItems: NavigationItem[] = [
     description: 'Track and manage printing jobs'
   },
 
+  // Customer Statements - Staff and above
+  {
+    label: 'Statements',
+    href: '/dashboard/statements',
+    icon: FileText,
+    roles: ['staff', 'manager', 'admin', 'super_admin'],
+    description: 'Customer account statements and balances'
+  },
+
   // Customer's own jobs
   {
     label: 'My Jobs',
