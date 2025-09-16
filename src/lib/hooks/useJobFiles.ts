@@ -180,23 +180,123 @@ export const useJobFiles = (jobId: string | null) => {
 
   const downloadFile = async (fileUrl: string, fileName: string) => {
     try {
-      console.log('⬇️  Downloading file:', fileName);
+      console.log('⬇️  Downloading file:', fileName, 'from:', fileUrl);
       
-      // Create a temporary link and trigger download
+      // Handle blob URLs (temporary URLs from browser)
+      if (fileUrl.startsWith('blob:')) {
+        console.log('🔄 Detected blob URL, attempting direct download...');
+        const link = document.createElement('a');
+        link.href = fileUrl;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        console.log('✅ Blob download initiated');
+        return true;
+      }
+      
+      // Handle Supabase storage URLs - now that bucket is public, use direct download
+      if (fileUrl.includes('/storage/v1/object/')) {
+        console.log('🔄 Detected Supabase storage URL, using direct download...');
+        
+        try {
+          // First try direct URL download since bucket is public
+          const response = await fetch(fileUrl, {
+            method: 'GET',
+            headers: {
+              'Accept': '*/*',
+            },
+          });
+          
+          if (response.ok) {
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Clean up
+            URL.revokeObjectURL(url);
+            
+            console.log('✅ Download completed via direct URL');
+            return true;
+          } else {
+            console.log('⚠️  Direct URL failed with status:', response.status);
+          }
+        } catch (fetchError) {
+          console.log('⚠️  Direct URL fetch failed:', fetchError);
+        }
+        
+        // Fallback: Extract file path and use storage API
+        const urlParts = fileUrl.split('/storage/v1/object/public/job-files/');
+        if (urlParts.length > 1) {
+          const filePath = urlParts[1];
+          console.log('� Falling back to storage API for path:', filePath);
+          
+          const { data, error } = await supabase.storage
+            .from('job-files')
+            .download(filePath);
+          
+          if (error) {
+            console.error('❌ Error downloading from storage:', error);
+            throw error;
+          }
+          
+          if (data) {
+            // Create blob URL and trigger download
+            const url = URL.createObjectURL(data);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Clean up the blob URL
+            URL.revokeObjectURL(url);
+            
+            console.log('✅ Download completed via storage API');
+            return true;
+          }
+        }
+      }
+      
+      // Final fallback: try direct download with fetch
+      console.log('🔄 Attempting final fallback direct fetch download...');
+      const response = await fetch(fileUrl, {
+        method: 'GET',
+        headers: {
+          'Accept': '*/*',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+      }
+      
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      
       const link = document.createElement('a');
-      link.href = fileUrl;
+      link.href = url;
       link.download = fileName;
-      link.target = '_blank';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       
-      console.log('✅ Download initiated');
+      // Clean up
+      URL.revokeObjectURL(url);
+      
+      console.log('✅ Download completed via fallback fetch');
       return true;
       
     } catch (err) {
       console.error('❌ Error downloading file:', serializeError(err));
-      setError('Failed to download file');
+      setError('Failed to download file: ' + serializeError(err));
       return false;
     }
   };
