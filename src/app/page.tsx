@@ -84,9 +84,7 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="bg-red-600 p-2 rounded-lg">
-                <img src="/JK_Logo.jpg" alt="Jay Kay Digital Press Logo" className="h-8 w-8 object-contain" />
-              </div>
+              <img src="/JK_Logo.jpg" alt="Jay Kay Digital Press Logo" className="h-10 w-10 object-contain" />
               <div>
                 <h1 className="text-xl font-bold text-white">Jay Kay Digital Press</h1>
               </div>
@@ -402,9 +400,7 @@ export default function Home() {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-3 mb-4">
-                <div className="bg-red-600 p-2 rounded-lg">
-                  <PrinterIcon className="h-5 w-5 text-white" />
-                </div>
+                <img src="/JK_Logo.jpg" alt="Jay Kay Digital Press Logo" className="h-8 w-8 object-contain" />
                 <div>
                   <p className="font-semibold">Jay Kay Digital Press</p>
                 </div>

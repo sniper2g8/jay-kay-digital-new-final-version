@@ -227,6 +227,8 @@ export default function EditJobPage() {
           status: formData.status,
           priority: formData.priority as 'low' | 'normal' | 'high' | 'urgent',
           quantity: formData.quantity,
+          unit_price: formData.unit_price,
+          estimate_price: formData.estimate_price,
           estimated_cost: formData.estimated_cost,
           final_cost: formData.final_cost,
           estimated_delivery: formData.estimated_delivery || null,
@@ -395,6 +397,33 @@ export default function EditJobPage() {
                         placeholder="0"
                         min="0"
                         required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="unit_price">Unit Price (SLL)</Label>
+                      <Input
+                        id="unit_price"
+                        type="number"
+                        step="0.01"
+                        value={formData.unit_price}
+                        onChange={(e) => handleInputChange('unit_price', parseFloat(e.target.value) || 0)}
+                        placeholder="0.00"
+                        min="0"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="estimate_price">Total Estimate (SLL)</Label>
+                      <Input
+                        id="estimate_price"
+                        type="number"
+                        step="0.01"
+                        value={formData.estimate_price}
+                        onChange={(e) => handleInputChange('estimate_price', parseFloat(e.target.value) || 0)}
+                        placeholder="0.00"
+                        min="0"
                       />
                     </div>
                   </div>
