@@ -115,7 +115,7 @@ export default function ReviewStep({
               {formData.due_date && (
                 <div>
                   <p className="text-sm font-medium text-gray-500">Due Date</p>
-                  <p className="text-lg">{new Date(formData.due_date).toLocaleDateString()}</p>
+                  <p className="text-lg">{new Date(formData.due_date).toLocaleDateString('en-SL')}</p>
                 </div>
               )}
             </div>

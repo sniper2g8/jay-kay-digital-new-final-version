@@ -196,7 +196,7 @@ function FinancesContent() {
                       <div className="flex items-center space-x-4">
                         <div className="text-right">
                           <p className="font-medium">SLL {invoice.grandTotal?.toLocaleString() || '0'}</p>
-                          <p className="text-sm text-gray-500">{invoice.dueDate ? new Date(invoice.dueDate as string).toLocaleDateString() : 'N/A'}</p>
+                          <p className="text-sm text-gray-500">{invoice.dueDate ? new Date(invoice.dueDate as string).toLocaleDateString('en-SL') : 'N/A'}</p>
                         </div>
                         
                         <Badge className={getInvoiceStatusColor(invoice.status)}>
@@ -244,7 +244,7 @@ function FinancesContent() {
                       <div className="flex items-center space-x-4">
                         <div className="text-right">
                           <p className="font-medium">SLL {payment.amount?.toLocaleString() || '0'}</p>
-                          <p className="text-sm text-gray-500">{payment.payment_date ? new Date(payment.payment_date as string).toLocaleDateString() : 'N/A'}</p>
+                          <p className="text-sm text-gray-500">{payment.payment_date ? new Date(payment.payment_date as string).toLocaleDateString('en-SL') : 'N/A'}</p>
                         </div>
                         
                         <Badge className="bg-green-100 text-green-800">

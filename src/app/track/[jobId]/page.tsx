@@ -216,7 +216,7 @@ export default function JobTrackingPage() {
                       <div>
                         <p className="text-sm font-medium">Order Date</p>
                         <p className="text-sm text-gray-600">
-                          {job.created_at ? new Date(job.created_at).toLocaleDateString() : 'N/A'}
+                          {job.created_at ? new Date(job.created_at).toLocaleDateString('en-SL') : 'N/A'}
                         </p>
                       </div>
                     </div>
@@ -227,7 +227,7 @@ export default function JobTrackingPage() {
                         <div>
                           <p className="text-sm font-medium">Estimated Completion</p>
                           <p className="text-sm text-gray-600">
-                            {new Date(job.estimated_delivery).toLocaleDateString()}
+                            {new Date(job.estimated_delivery).toLocaleDateString('en-SL')}
                           </p>
                         </div>
                       </div>

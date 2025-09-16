@@ -188,7 +188,7 @@ export default function JobDetailsStep({
               <p><strong>Unit Price:</strong> SLL {formData.unit_price.toFixed(2)}</p>
               <p><strong>Estimated Total:</strong> SLL {(formData.quantity * formData.unit_price).toFixed(2)}</p>
               <p><strong>Priority:</strong> {formData.priority}</p>
-              {formData.due_date && <p><strong>Due Date:</strong> {new Date(formData.due_date).toLocaleDateString()}</p>}
+              {formData.due_date && <p><strong>Due Date:</strong> {new Date(formData.due_date).toLocaleDateString('en-SL')}</p>}
             </div>
           </div>
         )}

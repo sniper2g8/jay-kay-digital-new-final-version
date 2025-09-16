@@ -243,7 +243,7 @@ function JobsContent() {
                               {job.dueDate && (
                                 <div className="flex items-center">
                                   <Calendar className="h-3 w-3 mr-1" />
-                                  Due: {typeof job.dueDate === 'string' ? new Date(job.dueDate).toLocaleDateString() : 'TBD'}
+                                  Due: {typeof job.dueDate === 'string' ? new Date(job.dueDate).toLocaleDateString('en-SL') : 'TBD'}
                                 </div>
                               )}
                               <div>

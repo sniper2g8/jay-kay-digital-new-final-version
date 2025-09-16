@@ -571,7 +571,7 @@ export default function EditJobPage() {
                               <div>
                                 <p className="font-medium text-gray-900">{file.file_name}</p>
                                 <p className="text-sm text-gray-500">
-                                  {formatFileSize(file.file_size)} • {file.created_at ? new Date(file.created_at).toLocaleDateString() : 'Unknown date'}
+                                  {formatFileSize(file.file_size)} • {file.created_at ? new Date(file.created_at).toLocaleDateString('en-SL') : 'Unknown date'}
                                 </p>
                               </div>
                             </div>

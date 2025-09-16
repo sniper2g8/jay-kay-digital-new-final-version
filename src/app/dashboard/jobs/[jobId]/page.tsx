@@ -382,7 +382,7 @@ export default function JobDetailPage() {
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Submitted</span>
                       <span className="text-sm font-medium">
-                        {new Date(job.submittedDate).toLocaleDateString()}
+                        {new Date(job.submittedDate).toLocaleDateString('en-SL')}
                       </span>
                     </div>
                   )}
@@ -391,7 +391,7 @@ export default function JobDetailPage() {
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Est. Delivery</span>
                       <span className="text-sm font-medium">
-                        {new Date(job.estimated_delivery).toLocaleDateString()}
+                        {new Date(job.estimated_delivery).toLocaleDateString('en-SL')}
                       </span>
                     </div>
                   )}
@@ -400,7 +400,7 @@ export default function JobDetailPage() {
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Delivered</span>
                       <span className="text-sm font-medium">
-                        {new Date(job.actual_delivery).toLocaleDateString()}
+                        {new Date(job.actual_delivery).toLocaleDateString('en-SL')}
                       </span>
                     </div>
                   )}

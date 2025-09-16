@@ -162,7 +162,7 @@ export const JobFilesViewer: React.FC<JobFilesViewerProps> = ({
                         <>
                           <span>•</span>
                           <span>
-                            {new Date(file.created_at).toLocaleDateString()}
+                            {new Date(file.created_at).toLocaleDateString('en-SL')}
                           </span>
                         </>
                       )}

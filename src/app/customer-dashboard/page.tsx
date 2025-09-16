@@ -82,10 +82,10 @@ export default function CustomerDashboard() {
     return formatCurrency(amount);
   };
 
-  // Format date
+  // Format date using Sierra Leone locale
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return 'N/A';
-    return new Date(dateStr).toLocaleDateString();
+    return new Date(dateStr).toLocaleDateString('en-SL');
   };
 
   const handleLogout = async () => {

@@ -247,7 +247,7 @@ function CustomersContent() {
                           <div className="flex items-center space-x-4 text-xs text-gray-500">
                             <div className="flex items-center">
                               <Calendar className="h-3 w-3 mr-1" />
-                              Created: {customer.created_at ? new Date(customer.created_at).toLocaleDateString() : 'Unknown'}
+                              Created: {customer.created_at ? new Date(customer.created_at).toLocaleDateString('en-SL') : 'Unknown'}
                             </div>
                           </div>
                         </div>
@@ -257,7 +257,7 @@ function CustomersContent() {
                         <div className="text-right">
                           <p className="text-sm text-gray-900">Created</p>
                           <p className="text-xs text-gray-500">
-                            {customer.created_at ? new Date(customer.created_at).toLocaleDateString() : 'N/A'}
+                            {customer.created_at ? new Date(customer.created_at).toLocaleDateString('en-SL') : 'N/A'}
                           </p>
                         </div>
                         <div className="flex items-center space-x-2">
