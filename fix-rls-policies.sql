@@ -1,58 +1,150 @@
--- RLS Policy Fix for appUsers table (case-sensitive)
--- The table exists as "appUsers" (camelCase) but PostgreSQL queries look for "appusers" (lowercase)
+-- SQL script to fix RLS policies for all tables
+-- This enables proper access for authenticated users and admins
 
--- Enable RLS on the correct table name (quoted for case sensitivity)
-ALTER TABLE public."appUsers" ENABLE ROW LEVEL SECURITY;
+-- Enable RLS on all tables
+ALTER TABLE public.customers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.jobs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.invoices ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.payments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.appUsers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.roles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.permissions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.services ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.inventory ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.paper_sizes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.paper_weights ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.paper_types ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.finish_options ENABLE ROW LEVEL SECURITY;
 
--- Drop any existing policies
-DROP POLICY IF EXISTS "Users can read own profile" ON public."appUsers";
-DROP POLICY IF EXISTS "Users can update own profile" ON public."appUsers";
-DROP POLICY IF EXISTS "Allow insert for authenticated users" ON public."appUsers";
-DROP POLICY IF EXISTS "Allow authenticated read access" ON public."appUsers";
+-- Create policies for authenticated users to read data
+CREATE POLICY "auth_users_select_customers" ON public.customers
+    FOR SELECT TO authenticated USING (true);
 
--- Create comprehensive policies for the appUsers table
-CREATE POLICY "Allow authenticated read access" ON public."appUsers"
-    FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "auth_users_select_jobs" ON public.jobs
+    FOR SELECT TO authenticated USING (true);
 
-CREATE POLICY "Users can read own profile" ON public."appUsers"
-    FOR SELECT USING (
-        auth.uid() = id::uuid OR 
-        auth.email() = email
+CREATE POLICY "auth_users_select_invoices" ON public.invoices
+    FOR SELECT TO authenticated USING (true);
+
+CREATE POLICY "auth_users_select_payments" ON public.payments
+    FOR SELECT TO authenticated USING (true);
+
+CREATE POLICY "auth_users_select_appUsers" ON public."appUsers"
+    FOR SELECT TO authenticated USING (true);
+
+CREATE POLICY "auth_users_select_roles" ON public.roles
+    FOR SELECT TO authenticated USING (true);
+
+CREATE POLICY "auth_users_select_permissions" ON public.permissions
+    FOR SELECT TO authenticated USING (true);
+
+CREATE POLICY "auth_users_select_user_roles" ON public.user_roles
+    FOR SELECT TO authenticated USING (true);
+
+CREATE POLICY "auth_users_select_services" ON public.services
+    FOR SELECT TO authenticated USING (true);
+
+CREATE POLICY "auth_users_select_inventory" ON public.inventory
+    FOR SELECT TO authenticated USING (true);
+
+CREATE POLICY "auth_users_select_paper_sizes" ON public.paper_sizes
+    FOR SELECT TO authenticated USING (true);
+
+CREATE POLICY "auth_users_select_paper_weights" ON public.paper_weights
+    FOR SELECT TO authenticated USING (true);
+
+CREATE POLICY "auth_users_select_paper_types" ON public.paper_types
+    FOR SELECT TO authenticated USING (true);
+
+CREATE POLICY "auth_users_select_finish_options" ON public.finish_options
+    FOR SELECT TO authenticated USING (true);
+
+-- Admin policies for full access
+CREATE POLICY "admin_full_access_customers" ON public.customers
+    FOR ALL TO authenticated USING (
+        EXISTS (
+            SELECT 1 FROM public."appUsers"
+            WHERE id = auth.uid() AND primary_role IN ('admin', 'super_admin')
+        )
     );
 
-CREATE POLICY "Users can update own profile" ON public."appUsers"
-    FOR UPDATE USING (
-        auth.uid() = id::uuid OR 
-        auth.email() = email
+CREATE POLICY "admin_full_access_jobs" ON public.jobs
+    FOR ALL TO authenticated USING (
+        EXISTS (
+            SELECT 1 FROM public."appUsers"
+            WHERE id = auth.uid() AND primary_role IN ('admin', 'super_admin')
+        )
     );
 
-CREATE POLICY "Allow insert for new users" ON public."appUsers"
-    FOR INSERT WITH CHECK (
-        auth.uid() = id::uuid OR
-        auth.role() = 'authenticated'
+CREATE POLICY "admin_full_access_invoices" ON public.invoices
+    FOR ALL TO authenticated USING (
+        EXISTS (
+            SELECT 1 FROM public."appUsers"
+            WHERE id = auth.uid() AND primary_role IN ('admin', 'super_admin')
+        )
     );
 
--- Create a view or alias to handle the case sensitivity issue
--- This creates a lowercase view that points to the camelCase table
-CREATE OR REPLACE VIEW public.appusers AS SELECT * FROM public."appUsers";
+CREATE POLICY "admin_full_access_payments" ON public.payments
+    FOR ALL TO authenticated USING (
+        EXISTS (
+            SELECT 1 FROM public."appUsers"
+            WHERE id = auth.uid() AND primary_role IN ('admin', 'super_admin')
+        )
+    );
 
--- Enable RLS on the view as well
-ALTER VIEW public.appusers SET (security_invoker = true);
+CREATE POLICY "admin_full_access_appUsers" ON public."appUsers"
+    FOR ALL TO authenticated USING (
+        EXISTS (
+            SELECT 1 FROM public."appUsers"
+            WHERE id = auth.uid() AND primary_role IN ('admin', 'super_admin')
+        )
+    );
 
--- Alternative approach: Create policies on both possible table references
--- In case the auth system uses the view
-DO $$
-BEGIN
-    -- Try to create policies on the lowercase view if it was successfully created
-    IF EXISTS (SELECT FROM information_schema.views WHERE table_schema = 'public' AND table_name = 'appusers') THEN
-        CREATE POLICY "Allow authenticated read access view" ON public.appusers
-            FOR SELECT USING (auth.role() = 'authenticated');
-    END IF;
-EXCEPTION WHEN OTHERS THEN
-    -- Ignore errors if view policies can't be created
-    NULL;
-END
-$$;
+CREATE POLICY "admin_full_access_services" ON public.services
+    FOR ALL TO authenticated USING (
+        EXISTS (
+            SELECT 1 FROM public."appUsers"
+            WHERE id = auth.uid() AND primary_role IN ('admin', 'super_admin')
+        )
+    );
 
--- Show what we've created
-SELECT 'RLS policies created for appUsers table' as status;
+CREATE POLICY "admin_full_access_inventory" ON public.inventory
+    FOR ALL TO authenticated USING (
+        EXISTS (
+            SELECT 1 FROM public."appUsers"
+            WHERE id = auth.uid() AND primary_role IN ('admin', 'super_admin')
+        )
+    );
+
+CREATE POLICY "admin_full_access_paper_specs" ON public.paper_sizes
+    FOR ALL TO authenticated USING (
+        EXISTS (
+            SELECT 1 FROM public."appUsers"
+            WHERE id = auth.uid() AND primary_role IN ('admin', 'super_admin')
+        )
+    );
+
+CREATE POLICY "admin_full_access_paper_weights" ON public.paper_weights
+    FOR ALL TO authenticated USING (
+        EXISTS (
+            SELECT 1 FROM public."appUsers"
+            WHERE id = auth.uid() AND primary_role IN ('admin', 'super_admin')
+        )
+    );
+
+CREATE POLICY "admin_full_access_paper_types" ON public.paper_types
+    FOR ALL TO authenticated USING (
+        EXISTS (
+            SELECT 1 FROM public."appUsers"
+            WHERE id = auth.uid() AND primary_role IN ('admin', 'super_admin')
+        )
+    );
+
+CREATE POLICY "admin_full_access_finish_options" ON public.finish_options
+    FOR ALL TO authenticated USING (
+        EXISTS (
+            SELECT 1 FROM public."appUsers"
+            WHERE id = auth.uid() AND primary_role IN ('admin', 'super_admin')
+        )
+    );
