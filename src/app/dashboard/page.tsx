@@ -19,9 +19,10 @@ import { useCustomers } from "@/lib/hooks/useCustomers";
 import { useJobStats } from "@/lib/hooks/useJobs";
 import { useFinancialStats } from "@/lib/hooks/useFinances";
 import DashboardLayout from "@/components/DashboardLayout";
+import ProtectedDashboard from "@/components/ProtectedDashboard";
 import { useAuth } from "@/contexts/AuthContext";
 
-export default function DashboardPage() {
+function DashboardContent() {
   const { user, session, loading: authLoading } = useAuth();
   
   // Only call hooks if we're sure the user is authenticated
@@ -35,7 +36,7 @@ export default function DashboardPage() {
     hasUser: !!user, 
     hasSession: !!session, 
     authLoading,
-    shouldFetchData 
+    shouldFetchData
   });
 
   // Show loading state while authentication is being determined
@@ -46,6 +47,25 @@ export default function DashboardPage() {
           <div className="flex items-center space-x-2">
             <Loader2 className="h-6 w-6 animate-spin" />
             <span>Loading dashboard...</span>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  // Show message if not authenticated
+  if (!user || !session) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <h2 className="text-xl font-semibold text-gray-700 mb-4">Authentication Required</h2>
+            <p className="text-gray-600 mb-6">Please log in to access the dashboard.</p>
+            <Button asChild>
+              <Link href="/auth/login">
+                Go to Login
+              </Link>
+            </Button>
           </div>
         </div>
       </DashboardLayout>
@@ -301,5 +321,14 @@ export default function DashboardPage() {
           </div>
       </div>
     </DashboardLayout>
+  );
+}
+
+// Main component with role-based protection
+export default function DashboardPage() {
+  return (
+    <ProtectedDashboard allowedRoles={['super_admin', 'admin', 'manager', 'staff']}>
+      <DashboardContent />
+    </ProtectedDashboard>
   );
 }

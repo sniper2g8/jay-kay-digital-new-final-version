@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { mutate } from 'swr';
 import { JobFormData } from './useJobSubmissionForm';
-import { FileRecord } from './useFileUpload';
+import { FileRecord } from './useFileUploadFixed';
 
 export const useJobSubmission = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);

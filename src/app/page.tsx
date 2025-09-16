@@ -1,12 +1,59 @@
+'use client';
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PrinterIcon, Users, FileText, TrendingUp, Shield, Zap } from "lucide-react";
 import Link from "next/link";
+import { useAuth } from '@/contexts/AuthContext';
+import { useUserRole } from '@/lib/hooks/useUserRole';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+
+function RoleBasedRedirect() {
+  const { user, loading: authLoading } = useAuth();
+  const { data: userData, isLoading: roleLoading } = useUserRole();
+  const router = useRouter();
+
+  useEffect(() => {
+    // Don't redirect if still loading or if user is not authenticated
+    if (authLoading || roleLoading || !user) return;
+
+    // If user is authenticated, redirect based on role
+    if (userData?.primary_role) {
+      const role = userData.primary_role;
+      console.log('Auto-redirecting user with role:', role);
+
+      switch (role) {
+        case 'super_admin':
+        case 'admin':
+        case 'manager':
+        case 'staff':
+          router.push('/dashboard');
+          break;
+        case 'customer':
+        default:
+          router.push('/customer-dashboard');
+          break;
+      }
+    } else if (user) {
+      // If authenticated but no role data, default to customer dashboard
+      console.log('No role data found, defaulting to customer dashboard');
+      router.push('/customer-dashboard');
+    }
+  }, [user, userData, authLoading, roleLoading, router]);
+
+  return null;
+}
 
 export default function Home() {
+  const { user } = useAuth();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
+      {/* Auto-redirect component */}
+      <RoleBasedRedirect />
+      
       {/* Header */}
       <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -25,11 +72,19 @@ export default function Home() {
               <Shield className="h-3 w-3 mr-1" />
               Enterprise Ready
             </Badge>
-            <Button asChild>
-              <Link href="/dashboard">
-                Access Dashboard
-              </Link>
-            </Button>
+            {user ? (
+              <Button asChild>
+                <Link href="/dashboard">
+                  My Dashboard
+                </Link>
+              </Button>
+            ) : (
+              <Button asChild>
+                <Link href="/auth/login">
+                  Login
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
       </header>

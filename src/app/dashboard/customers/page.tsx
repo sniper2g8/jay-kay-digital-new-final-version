@@ -17,12 +17,13 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import DashboardLayout from "@/components/DashboardLayout";
+import ProtectedDashboard from "@/components/ProtectedDashboard";
 import { supabase } from "@/lib/supabase";
 import { useCustomers } from "@/lib/hooks/useCustomers";
 import { mutate } from 'swr';
 import { toast } from 'sonner';
 
-export default function CustomersPage() {
+function CustomersContent() {
   const { data: customers, error, isLoading } = useCustomers();
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -304,5 +305,14 @@ export default function CustomersPage() {
         </div>
       </div>
     </DashboardLayout>
+  );
+}
+
+// Main component with role-based protection
+export default function CustomersPage() {
+  return (
+    <ProtectedDashboard allowedRoles={['super_admin', 'admin', 'manager', 'staff']}>
+      <CustomersContent />
+    </ProtectedDashboard>
   );
 }

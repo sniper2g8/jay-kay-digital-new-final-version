@@ -22,8 +22,9 @@ import {
 import Link from "next/link";
 import { useJobsWithCustomers, useJobStats } from "@/lib/hooks/useJobs";
 import DashboardLayout from "@/components/DashboardLayout";
+import ProtectedDashboard from "@/components/ProtectedDashboard";
 
-export default function JobsPage() {
+function JobsContent() {
   const { data: jobs, error: jobsError, isLoading: jobsLoading } = useJobsWithCustomers();
   const { data: stats, isLoading: statsLoading } = useJobStats();
 
@@ -279,5 +280,14 @@ export default function JobsPage() {
         </div>
       </div>
     </DashboardLayout>
+  );
+}
+
+// Main component with role-based protection
+export default function JobsPage() {
+  return (
+    <ProtectedDashboard allowedRoles={['super_admin', 'admin', 'manager', 'staff']}>
+      <JobsContent />
+    </ProtectedDashboard>
   );
 }

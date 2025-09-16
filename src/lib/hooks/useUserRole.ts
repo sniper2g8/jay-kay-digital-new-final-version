@@ -22,14 +22,18 @@ const fetchUserRole = async (userId: string): Promise<UserWithRole | null> => {
     return null;
   }
 
-  console.log('🚨 fetchUserRole called - This should NOT happen if user is not authenticated!');
+  // Check current session status first
+  const { data: { session }, error: sessionError } = await supabase.auth.getSession();
   
-  // Check current session status
-  const { data: { session } } = await supabase.auth.getSession();
-  console.log('Current session in fetchUserRole:', {
-    hasSession: !!session,
-    userEmail: session?.user?.email || 'no user'
-  });
+  if (sessionError) {
+    console.error('Session error in fetchUserRole:', sessionError);
+    return null;
+  }
+  
+  if (!session) {
+    console.log('No session in fetchUserRole - user not authenticated');
+    return null;
+  }
 
   try {
     // Get user data from appUsers table
@@ -40,6 +44,11 @@ const fetchUserRole = async (userId: string): Promise<UserWithRole | null> => {
       .single();
 
     if (error) {
+      // Don't log error if user simply doesn't exist in appUsers table yet
+      if (error.code === 'PGRST116') {
+        console.log('User not found in appUsers table:', userId);
+        return null;
+      }
       console.error('Error fetching user role:', error);
       return null;
     }
@@ -58,28 +67,22 @@ export const useUserRole = () => {
   // Build-time check - still call hooks but don't log or execute side effects
   const isBuildTime = typeof window === 'undefined';
   
-  if (!isBuildTime) {
-    console.log('useUserRole hook - Auth state:', { 
-      hasUser: !!user, 
-      hasSession: !!session, 
-      loading,
-      userEmail: user?.email || 'no user'
-    });
-  }
-
-  const shouldFetch = user && session && !loading && !isBuildTime;
-  
-  if (!isBuildTime) {
-    console.log('useUserRole - shouldFetch:', shouldFetch);
-  }
+  // Only fetch if user is authenticated and session is valid
+  const shouldFetch = !loading && !isBuildTime && user && session && session.user?.id === user.id;
 
   return useSWR(
     shouldFetch ? `user-role-${user.id}` : null,
-    () => user ? fetchUserRole(user.id) : null,
+    () => shouldFetch && user ? fetchUserRole(user.id) : null,
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: true,
-      errorRetryCount: 3
+      errorRetryCount: 2,
+      onError: (error) => {
+        // Only log errors if we actually expected to fetch data
+        if (shouldFetch) {
+          console.error('Error in useUserRole:', error);
+        }
+      }
     }
   );
 };

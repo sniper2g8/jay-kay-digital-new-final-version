@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useInvoicesWithCustomers, usePaymentsWithCustomers, useFinancialStats } from '@/lib/hooks/useFinances';
+import DashboardLayout from "@/components/DashboardLayout";
+import ProtectedDashboard from "@/components/ProtectedDashboard";
 
 const getInvoiceStatusColor = (status: string | null) => {
   switch (status) {
@@ -40,6 +42,14 @@ const getPaymentMethodIcon = (method: string) => {
 };
 
 export default function FinancesPage() {
+  return (
+    <ProtectedDashboard allowedRoles={['super_admin', 'admin', 'manager', 'staff']}>
+      <FinancesContent />
+    </ProtectedDashboard>
+  );
+}
+
+function FinancesContent() {
   const { data: invoices = [] } = useInvoicesWithCustomers();
   const { data: payments = [] } = usePaymentsWithCustomers();
   const { data: stats } = useFinancialStats();
@@ -51,7 +61,8 @@ export default function FinancesPage() {
   const collectionRate = stats?.collection_rate || 0;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <DashboardLayout>
+      <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b p-6">
         <div className="flex items-center justify-between">
@@ -251,5 +262,6 @@ export default function FinancesPage() {
         </div>
       </div>
     </div>
+    </DashboardLayout>
   );
 }
