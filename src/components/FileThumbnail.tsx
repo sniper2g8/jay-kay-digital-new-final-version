@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { FileText, ImageIcon, File, Download, AlertCircle } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import React, { useState } from 'react';
+import { FileText, ImageIcon, File } from 'lucide-react';
 
 interface FileThumbnailProps {
   fileUrl: string;
@@ -19,87 +18,14 @@ export const FileThumbnail: React.FC<FileThumbnailProps> = ({
   className = '',
   showFileName = true
 }) => {
-  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [imageError, setImageError] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
 
   const isImage = fileType?.startsWith('image/');
   const isPDF = fileType === 'application/pdf';
-  const isSupported = isImage || isPDF;
-
-  useEffect(() => {
-    if (!isSupported || !fileUrl) return;
-
-    const generateThumbnail = async () => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        if (isImage) {
-          // For images, use the original image but with loading optimization
-          setThumbnailUrl(fileUrl);
-        } else if (isPDF) {
-          // For PDFs, we'll try to generate a thumbnail using PDF.js
-          await generatePDFThumbnail(fileUrl);
-        }
-      } catch (err) {
-        console.error('Error generating thumbnail:', err);
-        setError('Failed to generate thumbnail');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    generateThumbnail();
-  }, [fileUrl, fileType, isImage, isPDF, isSupported]);
-
-  const generatePDFThumbnail = async (pdfUrl: string) => {
-    try {
-      // Import PDF.js dynamically to avoid SSR issues
-      const pdfjsLib = await import('pdfjs-dist');
-      
-      // Set worker source
-      pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
-
-      // Load the PDF
-      const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
-      const page = await pdf.getPage(1); // Get first page
-
-      // Set up canvas
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-      
-      if (!context) {
-        throw new Error('Could not get canvas context');
-      }
-
-      // Calculate scale for thumbnail (max 200px width)
-      const viewport = page.getViewport({ scale: 1 });
-      const scale = Math.min(200 / viewport.width, 200 / viewport.height);
-      const scaledViewport = page.getViewport({ scale });
-
-      canvas.width = scaledViewport.width;
-      canvas.height = scaledViewport.height;
-
-      // Render PDF page to canvas
-      await page.render({
-        canvasContext: context,
-        viewport: scaledViewport,
-      }).promise;
-
-      // Convert canvas to blob URL
-      canvas.toBlob((blob) => {
-        if (blob) {
-          const url = URL.createObjectURL(blob);
-          setThumbnailUrl(url);
-        }
-      }, 'image/jpeg', 0.8);
-
-    } catch (err) {
-      console.error('PDF thumbnail generation failed:', err);
-      setError('PDF preview unavailable');
-    }
-  };
+  const isDocument = fileType?.includes('word') || fileType?.includes('document');
+  const isSpreadsheet = fileType?.includes('sheet') || fileType?.includes('excel');
+  const isText = fileType?.startsWith('text/');
 
   const formatFileSize = (bytes: number | undefined): string => {
     if (!bytes) return '';
@@ -111,57 +37,82 @@ export const FileThumbnail: React.FC<FileThumbnailProps> = ({
   };
 
   const getFileIcon = () => {
-    if (isImage) return <ImageIcon className="h-8 w-8 text-blue-500" />;
     if (isPDF) return <FileText className="h-8 w-8 text-red-500" />;
+    if (isDocument) return <FileText className="h-8 w-8 text-blue-600" />;
+    if (isSpreadsheet) return <FileText className="h-8 w-8 text-green-600" />;
+    if (isText) return <FileText className="h-8 w-8 text-gray-600" />;
+    if (isImage) return <ImageIcon className="h-8 w-8 text-blue-500" />;
     return <File className="h-8 w-8 text-gray-500" />;
   };
 
-  // Cleanup blob URLs on unmount
-  useEffect(() => {
-    return () => {
-      if (thumbnailUrl && thumbnailUrl.startsWith('blob:')) {
-        URL.revokeObjectURL(thumbnailUrl);
-      }
-    };
-  }, [thumbnailUrl]);
+  const getFileTypeColor = () => {
+    if (isPDF) return 'bg-red-500';
+    if (isDocument) return 'bg-blue-600';
+    if (isSpreadsheet) return 'bg-green-600';
+    if (isText) return 'bg-gray-600';
+    if (isImage) return 'bg-blue-500';
+    return 'bg-gray-500';
+  };
+
+  const getFileExtension = () => {
+    if (!fileType) return fileName.split('.').pop()?.toUpperCase().slice(0, 3) || 'FILE';
+    
+    const ext = fileType.split('/')[1];
+    switch (ext) {
+      case 'pdf': return 'PDF';
+      case 'jpeg': case 'jpg': return 'JPG';
+      case 'png': return 'PNG';
+      case 'gif': return 'GIF';
+      case 'webp': return 'WEBP';
+      case 'msword': return 'DOC';
+      case 'vnd.openxmlformats-officedocument.wordprocessingml.document': return 'DOCX';
+      case 'vnd.ms-excel': return 'XLS';
+      case 'vnd.openxmlformats-officedocument.spreadsheetml.sheet': return 'XLSX';
+      case 'plain': return 'TXT';
+      case 'csv': return 'CSV';
+      default: return ext?.toUpperCase().slice(0, 3) || 'FILE';
+    }
+  };
 
   return (
     <div className={`relative group ${className}`}>
       {/* Thumbnail Container */}
       <div className="relative w-16 h-16 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 flex items-center justify-center">
-        {isLoading ? (
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-        ) : error ? (
-          <div className="flex flex-col items-center text-gray-400">
-            <AlertCircle className="h-4 w-4 mb-1" />
-            <span className="text-xs">Error</span>
+        {isImage && !imageError ? (
+          <div className="relative w-full h-full">
+            {imageLoading && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="animate-pulse bg-gray-200 w-full h-full"></div>
+              </div>
+            )}
+            <img
+              src={fileUrl}
+              alt={`Thumbnail of ${fileName}`}
+              className="w-full h-full object-cover"
+              loading="lazy"
+              onLoad={() => setImageLoading(false)}
+              onError={() => {
+                setImageError(true);
+                setImageLoading(false);
+              }}
+              style={{ display: imageLoading ? 'none' : 'block' }}
+            />
           </div>
-        ) : thumbnailUrl ? (
-          <img
-            src={thumbnailUrl}
-            alt={`Thumbnail of ${fileName}`}
-            className="w-full h-full object-cover"
-            loading="lazy"
-            onError={() => {
-              setError('Failed to load thumbnail');
-              setThumbnailUrl(null);
-            }}
-          />
         ) : (
-          getFileIcon()
+          <div className="flex flex-col items-center justify-center w-full h-full">
+            {getFileIcon()}
+          </div>
         )}
         
         {/* File Type Badge */}
-        {fileType && (
-          <div className="absolute top-1 right-1 bg-black bg-opacity-60 text-white text-xs px-1 rounded">
-            {fileType.split('/')[1]?.toUpperCase().slice(0, 3) || 'FILE'}
-          </div>
-        )}
+        <div className={`absolute top-1 right-1 ${getFileTypeColor()} text-white text-xs px-1 py-0.5 rounded text-center min-w-[24px]`}>
+          {getFileExtension()}
+        </div>
       </div>
 
       {/* File Info */}
       {showFileName && (
-        <div className="mt-2">
+        <div className="mt-2 w-16">
           <p className="text-xs font-medium text-gray-900 truncate" title={fileName}>
             {fileName}
           </p>
@@ -173,18 +124,55 @@ export const FileThumbnail: React.FC<FileThumbnailProps> = ({
         </div>
       )}
 
-      {/* Hover Preview (larger thumbnail) */}
-      {thumbnailUrl && !isLoading && !error && (
-        <div className="absolute z-10 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity duration-200 top-0 left-full ml-2 bg-white border border-gray-200 rounded-lg shadow-lg p-2">
-          <img
-            src={thumbnailUrl}
-            alt={`Preview of ${fileName}`}
-            className="w-48 h-48 object-contain"
-            loading="lazy"
-          />
-          <p className="text-xs text-center text-gray-600 mt-1 truncate">
-            {fileName}
-          </p>
+      {/* Hover Preview (larger preview for images) */}
+      {isImage && !imageError && (
+        <div className="absolute z-20 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 top-0 left-full ml-2 bg-white border border-gray-200 rounded-lg shadow-xl p-2 max-w-sm">
+          <div className="relative">
+            <img
+              src={fileUrl}
+              alt={`Preview of ${fileName}`}
+              className="max-w-64 max-h-64 object-contain rounded"
+              loading="lazy"
+            />
+          </div>
+          <div className="mt-2 p-2 bg-gray-50 rounded">
+            <p className="text-sm font-medium text-gray-900 truncate" title={fileName}>
+              {fileName}
+            </p>
+            <div className="flex justify-between text-xs text-gray-500 mt-1">
+              <span>{getFileExtension()}</span>
+              {fileSize && <span>{formatFileSize(fileSize)}</span>}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PDF and other file types hover info */}
+      {!isImage && (
+        <div className="absolute z-20 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 top-0 left-full ml-2 bg-white border border-gray-200 rounded-lg shadow-xl p-3 min-w-48">
+          <div className="flex items-center space-x-3">
+            <div className={`p-2 rounded-lg ${getFileTypeColor()}`}>
+              {getFileIcon()}
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-gray-900 truncate" title={fileName}>
+                {fileName}
+              </p>
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <span>{getFileExtension()} File</span>
+                {fileSize && <span>{formatFileSize(fileSize)}</span>}
+              </div>
+              {isPDF && (
+                <p className="text-xs text-gray-400 mt-1">PDF Document</p>
+              )}
+              {isDocument && (
+                <p className="text-xs text-gray-400 mt-1">Word Document</p>
+              )}
+              {isSpreadsheet && (
+                <p className="text-xs text-gray-400 mt-1">Spreadsheet</p>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>

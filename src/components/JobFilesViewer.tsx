@@ -6,13 +6,12 @@ import {
   FileText, 
   Download, 
   Trash2, 
-  ImageIcon, 
-  File, 
   AlertCircle,
   Loader2,
   RefreshCw
 } from 'lucide-react';
 import { useJobFiles } from '@/lib/hooks/useJobFiles';
+import { FileThumbnail } from '@/components/FileThumbnail';
 import { toast } from 'sonner';
 
 interface JobFilesViewerProps {
@@ -27,24 +26,6 @@ export const JobFilesViewer: React.FC<JobFilesViewerProps> = ({
   className
 }) => {
   const { files, loading, error, deleteFile, downloadFile, refreshFiles, hasFiles } = useJobFiles(jobId);
-
-  const getFileIcon = (fileType: string | null | undefined) => {
-    if (!fileType) return <File className="h-5 w-5 text-gray-500" />;
-    
-    if (fileType.startsWith('image/')) {
-      return <ImageIcon className="h-5 w-5 text-blue-500" />;
-    }
-    
-    if (fileType === 'application/pdf') {
-      return <FileText className="h-5 w-5 text-red-500" />;
-    }
-    
-    if (fileType.includes('word') || fileType.includes('document')) {
-      return <FileText className="h-5 w-5 text-blue-600" />;
-    }
-    
-    return <File className="h-5 w-5 text-gray-500" />;
-  };
 
   const formatFileSize = (bytes: number | null | undefined): string => {
     if (!bytes) return 'Unknown size';
@@ -151,13 +132,23 @@ export const JobFilesViewer: React.FC<JobFilesViewerProps> = ({
                 key={file.id}
                 className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
               >
-                <div className="flex items-center space-x-3 flex-1 min-w-0">
-                  {getFileIcon(file.file_type)}
+                <div className="flex items-center space-x-4 flex-1 min-w-0">
+                  {/* File Thumbnail */}
+                  <FileThumbnail
+                    fileUrl={file.file_url}
+                    fileName={file.file_name}
+                    fileType={file.file_type || null}
+                    fileSize={file.file_size || undefined}
+                    showFileName={false}
+                    className="flex-shrink-0"
+                  />
+                  
+                  {/* File Details */}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 truncate">
                       {file.file_name}
                     </p>
-                    <div className="flex items-center space-x-2 text-xs text-gray-500">
+                    <div className="flex items-center space-x-2 text-xs text-gray-500 mt-1">
                       <span>{formatFileSize(file.file_size)}</span>
                       {file.file_type && (
                         <>
