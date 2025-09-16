@@ -14,6 +14,7 @@ export interface JobFormData {
   requirements: string;
   special_instructions: string;
   unit_price: number;
+  estimate_price: number;
   size_type: 'standard' | 'custom';
   size_preset: string;
   custom_width: number;
@@ -66,6 +67,7 @@ const initialFormData: JobFormData = {
   requirements: '',
   special_instructions: '',
   unit_price: 0,
+  estimate_price: 0,
   size_type: 'standard',
   size_preset: '',
   custom_width: 0,

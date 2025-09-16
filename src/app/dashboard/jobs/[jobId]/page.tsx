@@ -346,6 +346,18 @@ export default function JobDetailPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
+                  {job.unit_price && (
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Unit Price</span>
+                      <span className="font-medium">SLL {job.unit_price.toLocaleString()}</span>
+                    </div>
+                  )}
+                  {job.estimate_price && (
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Total Estimate</span>
+                      <span className="font-medium">SLL {job.estimate_price.toLocaleString()}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">Estimated Cost</span>
                     <span className="font-medium">SLL {(job.estimated_cost || 0).toLocaleString()}</span>
@@ -357,7 +369,7 @@ export default function JobDetailPage() {
                   <div className="flex justify-between pt-2 border-t">
                     <span className="text-sm text-gray-600">Per Unit</span>
                     <span className="font-medium">
-                      SLL {((job.final_cost || 0) / (job.quantity || 1)).toFixed(2)}
+                      SLL {(job.unit_price || (job.final_cost || 0) / (job.quantity || 1)).toFixed(2)}
                     </span>
                   </div>
                   

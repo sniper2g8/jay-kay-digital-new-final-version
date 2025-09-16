@@ -259,11 +259,16 @@ function JobsContent() {
                         <div className="flex items-center space-x-6">
                           <div className="text-right">
                             <p className="text-sm font-medium text-gray-900">
-                              SLL {(job.final_cost || 0).toLocaleString()}
+                              SLL {(job.estimate_price || job.final_cost || 0).toLocaleString()}
                             </p>
                             <p className="text-xs text-gray-500">
-                              SLL {((job.final_cost || 0) / (job.quantity || 1)).toFixed(2)}/unit
+                              SLL {((job.unit_price || (job.final_cost || 0) / (job.quantity || 1))).toFixed(2)}/unit
                             </p>
+                            {job.estimate_price && job.final_cost && job.estimate_price !== job.final_cost && (
+                              <p className="text-xs text-blue-600">
+                                Final: SLL {job.final_cost.toLocaleString()}
+                              </p>
+                            )}
                           </div>
                           <Button variant="outline" size="sm" asChild>
                             <Link href={`/dashboard/jobs/${job.jobNo || job.id}`}>

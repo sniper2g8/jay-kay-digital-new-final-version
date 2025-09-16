@@ -142,6 +142,23 @@ export default function JobDetailsStep({
             />
           </div>
           <div>
+            <Label htmlFor="estimate_price">Total Estimate ($)</Label>
+            <Input
+              id="estimate_price"
+              type="number"
+              step="0.01"
+              min="0"
+              value={formData.estimate_price}
+              onChange={(e) => updateFormData('estimate_price', parseFloat(e.target.value) || 0)}
+              className="mt-2"
+              placeholder="Total project estimate"
+            />
+          </div>
+        </div>
+
+        {/* Due Date row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
             <Label htmlFor="due_date">Due Date</Label>
             <Input
               id="due_date"

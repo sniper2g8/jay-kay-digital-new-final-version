@@ -3,298 +3,449 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { PrinterIcon, Users, FileText, TrendingUp, Shield, Zap } from "lucide-react";
+import { 
+  PrinterIcon, 
+  Users, 
+  FileText, 
+  TrendingUp, 
+  Shield, 
+  Zap,
+  CheckCircle,
+  Star,
+  ArrowRight,
+  Menu,
+  X
+} from "lucide-react";
 import Link from "next/link";
 import { useAuth } from '@/contexts/AuthContext';
-import { useUserRole } from '@/lib/hooks/useUserRole';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-
-function RoleBasedRedirect() {
-  const { user, loading: authLoading } = useAuth();
-  const { data: userData, isLoading: roleLoading } = useUserRole();
-  const router = useRouter();
-
-  useEffect(() => {
-    // Don't redirect if still loading or if user is not authenticated
-    if (authLoading || roleLoading || !user) return;
-
-    // If user is authenticated, redirect based on role
-    if (userData?.primary_role) {
-      const role = userData.primary_role;
-      console.log('Auto-redirecting user with role:', role);
-
-      switch (role) {
-        case 'super_admin':
-        case 'admin':
-        case 'manager':
-        case 'staff':
-          router.push('/dashboard');
-          break;
-        case 'customer':
-        default:
-          router.push('/customer-dashboard');
-          break;
-      }
-    } else if (user) {
-      // If authenticated but no role data, default to customer dashboard
-      console.log('No role data found, defaulting to customer dashboard');
-      router.push('/customer-dashboard');
-    }
-  }, [user, userData, authLoading, roleLoading, router]);
-
-  return null;
-}
+import { useState, useEffect } from 'react';
 
 export default function Home() {
   const { user } = useAuth();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const services = [
+    {
+      title: "Offset Printing",
+      description: "High-quality bulk printing for brochures, flyers, and marketing materials with vibrant colors and sharp details.",
+      icon: <PrinterIcon className="h-6 w-6" />
+    },
+    {
+      title: "Digital Printing",
+      description: "Fast turnaround for small to medium runs with exceptional quality and customization options.",
+      icon: <FileText className="h-6 w-6" />
+    },
+    {
+      title: "Large Format Printing",
+      description: "Banners, posters, and signage up to 60 inches wide with professional finishing options.",
+      icon: <Zap className="h-6 w-6" />
+    },
+    {
+      title: "Binding Services",
+      description: "Professional binding solutions including perfect binding, saddle stitching, and spiral binding.",
+      icon: <CheckCircle className="h-6 w-6" />
+    }
+  ];
+
+  const testimonials = [
+    {
+      name: "Sarah Johnson",
+      company: "Freetown Marketing Co.",
+      content: "Jay Kay Digital Press transformed our marketing materials. The quality is exceptional and delivery is always on time.",
+      rating: 5
+    },
+    {
+      name: "Michael Thompson",
+      company: "SL Business Solutions",
+      content: "Professional service from start to finish. Their attention to detail makes all the difference in our client presentations.",
+      rating: 5
+    },
+    {
+      name: "Amina Kamara",
+      company: "Kamara & Associates",
+      content: "Reliable, high-quality printing services at competitive prices. They've become our go-to printing partner.",
+      rating: 5
+    }
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-yellow-50">
-      {/* Auto-redirect component */}
-      <RoleBasedRedirect />
-      
+    <div className="min-h-screen bg-gradient-to-br from-white via-red-50 to-yellow-50">
       {/* Header */}
-      <header className="border-b bg-black backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="bg-red-600 p-2 rounded-lg">
-              <img src="/JK_Logo.jpg" alt="Jay Kay Digital Press Logo" className="h-8 w-8 object-contain" />
+      <header className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-black/90 backdrop-blur-md py-2' : 'bg-transparent py-4'}`}>
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="bg-red-600 p-2 rounded-lg">
+                <img src="/JK_Logo.jpg" alt="Jay Kay Digital Press Logo" className="h-8 w-8 object-contain" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-white">Jay Kay Digital Press</h1>
+              </div>
             </div>
-            <div>
-              <h1 className="text-xl font-bold text-white">Jay Kay Digital Press</h1>
-              <p className="text-sm text-gray-300">Professional Printing Services</p>
+            
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center space-x-8">
+              <a href="#services" className="text-gray-300 hover:text-white transition-colors">Services</a>
+              <a href="#about" className="text-gray-300 hover:text-white transition-colors">About</a>
+              <a href="#testimonials" className="text-gray-300 hover:text-white transition-colors">Testimonials</a>
+              <a href="#contact" className="text-gray-300 hover:text-white transition-colors">Contact</a>
+            </nav>
+            
+            <div className="flex items-center space-x-4">
+              {user ? (
+                <Button asChild className="bg-red-600 hover:bg-red-700">
+                  <Link href="/dashboard">
+                    My Dashboard
+                  </Link>
+                </Button>
+              ) : (
+                <Button asChild className="bg-red-600 hover:bg-red-700">
+                  <Link href="/auth/login">
+                    Login
+                  </Link>
+                </Button>
+              )}
+              
+              {/* Mobile menu button */}
+              <button 
+                className="md:hidden text-white"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+              >
+                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </button>
             </div>
           </div>
           
-          <div className="flex items-center space-x-4">
-            <Badge variant="secondary" className="hidden sm:inline-flex bg-yellow-500 text-black">
-              <Shield className="h-3 w-3 mr-1" />
-              Enterprise Ready
-            </Badge>
-            {user ? (
-              <Button asChild className="bg-red-600 hover:bg-red-700">
-                <Link href="/dashboard">
-                  My Dashboard
-                </Link>
-              </Button>
-            ) : (
-              <Button asChild className="bg-red-600 hover:bg-red-700">
-                <Link href="/auth/login">
-                  Login
-                </Link>
-              </Button>
-            )}
-          </div>
+          {/* Mobile Navigation */}
+          {isMenuOpen && (
+            <div className="md:hidden mt-4 pb-4">
+              <div className="flex flex-col space-y-3">
+                <a href="#services" className="text-gray-300 hover:text-white transition-colors py-2" onClick={() => setIsMenuOpen(false)}>Services</a>
+                <a href="#about" className="text-gray-300 hover:text-white transition-colors py-2" onClick={() => setIsMenuOpen(false)}>About</a>
+                <a href="#testimonials" className="text-gray-300 hover:text-white transition-colors py-2" onClick={() => setIsMenuOpen(false)}>Testimonials</a>
+                <a href="#contact" className="text-gray-300 hover:text-white transition-colors py-2" onClick={() => setIsMenuOpen(false)}>Contact</a>
+              </div>
+            </div>
+          )}
         </div>
       </header>
 
       {/* Hero Section */}
-      <main className="container mx-auto px-4 py-12">
-        <div className="text-center mb-16 relative">
-          <div className="absolute inset-0 z-0">
-            <img 
-              src="/hero.jpg" 
-              alt="Jay Kay Digital Press" 
-              className="w-full h-96 object-cover rounded-xl opacity-20"
-            />
-          </div>
-          <div className="relative z-10">
-            <Badge className="mb-4 bg-yellow-500 text-black" variant="secondary">
-              🚀 Now Live - Complete System Migration
+      <section className="pt-32 pb-20 md:pt-40 md:pb-28 relative overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="/hero.jpg" 
+            alt="Jay Kay Digital Press" 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/50"></div>
+        </div>
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-3xl">
+            <Badge className="mb-4 bg-yellow-500 text-black">
+              <Shield className="h-3 w-3 mr-1" />
+              Professional Printing Services
             </Badge>
-            <h2 className="text-4xl sm:text-5xl font-bold text-black mb-6">
-              Complete Printing Press<br />
-              <span className="text-red-600">Management System</span>
-            </h2>
-            <p className="text-xl text-gray-800 mb-8 max-w-2xl mx-auto">
-              Streamline your printing operations with our comprehensive solution featuring 
-              job tracking, customer management, invoicing, and real-time analytics.
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+              Quality Printing Solutions for <span className="text-yellow-400">Your Business</span>
+            </h1>
+            <p className="text-xl text-gray-200 mb-8">
+              From concept to delivery, we provide exceptional printing services with fast turnaround times and competitive pricing for businesses across Sierra Leone.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" asChild className="bg-red-600 hover:bg-red-700">
-                <Link href="/dashboard">
-                  <Users className="mr-2 h-5 w-5" />
-                  Access Dashboard
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button size="lg" asChild className="bg-red-600 hover:bg-red-700 text-lg py-6 px-8">
+                <Link href="#services">
+                  Explore Services
+                  <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" asChild className="border-black text-black hover:bg-gray-100">
+              <Button size="lg" variant="outline" asChild className="border-white text-white hover:bg-white/10 text-lg py-6 px-8">
                 <Link href="/track">
-                  <FileText className="mr-2 h-5 w-5" />
                   Track Order
                 </Link>
               </Button>
             </div>
           </div>
         </div>
+      </section>
 
-        {/* System Status */}
-        <div className="mb-16">
-          <Card className="border-red-200 bg-red-50/50">
-            <CardHeader className="text-center">
-              <CardTitle className="text-red-800 flex items-center justify-center gap-2">
-                <Zap className="h-5 w-5" />
-                System Status: Fully Operational
-              </CardTitle>
-              <CardDescription className="text-red-700">
-                Database migrated successfully with 33,900+ records and optimized performance
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                <div>
-                  <div className="text-2xl font-bold text-red-800">29</div>
-                  <div className="text-sm text-red-600">Tables Active</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-red-800">33K+</div>
-                  <div className="text-sm text-red-600">Records Migrated</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-red-800">5</div>
-                  <div className="text-sm text-red-600">User Roles</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-red-800">100%</div>
-                  <div className="text-sm text-red-600">Human-Readable</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+      {/* Services Section */}
+      <section id="services" className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-black mb-4">
+              Our Printing Services
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Professional printing solutions tailored to meet your business needs with exceptional quality and fast delivery.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {services.map((service, index) => (
+              <Card key={index} className="hover:shadow-xl transition-all duration-300 border-red-200 hover:border-red-300">
+                <CardHeader>
+                  <div className="h-12 w-12 bg-red-100 rounded-lg flex items-center justify-center mb-4">
+                    <div className="text-red-600">
+                      {service.icon}
+                    </div>
+                  </div>
+                  <CardTitle>{service.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>
+                    {service.description}
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
+      </section>
 
-        {/* Features Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          <Card className="hover:shadow-lg transition-shadow border-red-200">
-            <CardHeader>
-              <div className="h-12 w-12 bg-red-100 rounded-lg flex items-center justify-center mb-4">
-                <FileText className="h-6 w-6 text-red-600" />
+      {/* About Section */}
+      <section id="about" className="py-20 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col lg:flex-row items-center gap-12">
+            <div className="lg:w-1/2">
+              <div className="bg-gray-200 border-2 border-dashed rounded-xl w-full h-96 flex items-center justify-center">
+                <span className="text-gray-500">Company Image</span>
               </div>
-              <CardTitle>Job Management</CardTitle>
-              <CardDescription>
-                Complete job lifecycle tracking from quote to delivery with real-time status updates.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Job status tracking</li>
-                <li>• Priority management</li>
-                <li>• Resource allocation</li>
-                <li>• Deadline monitoring</li>
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow border-yellow-200">
-            <CardHeader>
-              <div className="h-12 w-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">
-                <Users className="h-6 w-6 text-yellow-600" />
-              </div>
-              <CardTitle>Customer Portal</CardTitle>
-              <CardDescription>
-                Comprehensive customer management with human-readable IDs and service history.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Customer profiles (JKDP-CUS-###)</li>
-                <li>• Service history</li>
-                <li>• Payment tracking</li>
-                <li>• Communication logs</li>
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow border-black">
-            <CardHeader>
-              <div className="h-12 w-12 bg-black rounded-lg flex items-center justify-center mb-4">
-                <TrendingUp className="h-6 w-6 text-white" />
-              </div>
-              <CardTitle>Financial Management</CardTitle>
-              <CardDescription>
-                Integrated invoicing and payment system with human-readable references.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Invoice generation (JKDP-INV-###)</li>
-                <li>• Payment tracking (PAY-2025-###)</li>
-                <li>• Financial reporting</li>
-                <li>• Revenue analytics</li>
-              </ul>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Role-Based Access */}
-        <Card className="mb-16 border-red-200 bg-red-50/50">
-          <CardHeader className="text-center">
-            <CardTitle>Role-Based Dashboard Access</CardTitle>
-            <CardDescription>
-              Secure, personalized experiences for every user type
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-              {[
-                { role: "Super Admin", color: "bg-red-100 text-red-800", desc: "Full system control" },
-                { role: "Admin", color: "bg-black text-white", desc: "Operations management" },
-                { role: "Manager", color: "bg-yellow-100 text-yellow-800", desc: "Team oversight" },
-                { role: "Staff", color: "bg-red-100 text-red-800", desc: "Task execution" },
-                { role: "Customer", color: "bg-gray-100 text-gray-800", desc: "Order tracking" },
-              ].map((item) => (
-                <div key={item.role} className="text-center">
-                  <Badge className={`${item.color} mb-2`}>{item.role}</Badge>
-                  <p className="text-xs text-gray-600">{item.desc}</p>
-                </div>
-              ))}
             </div>
-          </CardContent>
-        </Card>
-
-        {/* CTA Section */}
-        <div className="text-center">
-          <Card className="border-red-200 bg-red-50/50">
-            <CardContent className="pt-6">
-              <h3 className="text-2xl font-bold text-red-900 mb-4">
-                Ready to Streamline Your Operations?
-              </h3>
-              <p className="text-red-700 mb-6">
-                Access your personalized dashboard and start managing your printing business more efficiently.
+            <div className="lg:w-1/2">
+              <h2 className="text-3xl md:text-4xl font-bold text-black mb-6">
+                Why Choose Jay Kay Digital Press?
+              </h2>
+              <p className="text-gray-600 mb-6 text-lg">
+                With years of experience in the printing industry, we combine traditional craftsmanship with modern technology to deliver exceptional results.
               </p>
-              <Button size="lg" asChild className="bg-red-600 hover:bg-red-700">
-                <Link href="/dashboard">
-                  Get Started
+              
+              <div className="space-y-4">
+                {[
+                  "State-of-the-art printing equipment for superior quality",
+                  "Fast turnaround times without compromising quality",
+                  "Competitive pricing for businesses of all sizes",
+                  "Eco-friendly printing options available",
+                  "Personalized customer service and support"
+                ].map((item, index) => (
+                  <div key={index} className="flex items-start">
+                    <CheckCircle className="h-6 w-6 text-red-600 mt-1 mr-3 flex-shrink-0" />
+                    <p className="text-gray-700">{item}</p>
+                  </div>
+                ))}
+              </div>
+              
+              <Button size="lg" asChild className="mt-8 bg-red-600 hover:bg-red-700">
+                <Link href="/auth/login">
+                  Get Started Today
                 </Link>
               </Button>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
-      </main>
+      </section>
 
-      {/* Footer */}
-      <footer className="border-t bg-black mt-16">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center space-x-3 mb-4 md:mb-0">
-              <div className="bg-red-600 p-2 rounded-lg">
-                <PrinterIcon className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <p className="font-semibold text-white">Jay Kay Digital Press</p>
-                <p className="text-sm text-gray-300">Professional Printing Services</p>
-              </div>
+      {/* Testimonials Section */}
+      <section id="testimonials" className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-black mb-4">
+              What Our Clients Say
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Don&apos;t just take our word for it - hear from businesses we&apos;ve helped grow through quality printing services.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <Card key={index} className="border-red-200">
+                <CardContent className="pt-6">
+                  <div className="flex mb-4">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                    ))}
+                  </div>
+                  <p className="text-gray-700 mb-6 italic">&quot;{testimonial.content}&quot;</p>
+                  <div>
+                    <p className="font-semibold text-black">{testimonial.name}</p>
+                    <p className="text-sm text-gray-600">{testimonial.company}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-r from-red-700 to-red-900 text-white">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+            Ready to Elevate Your Brand?
+          </h2>
+          <p className="text-xl mb-8 max-w-2xl mx-auto text-red-100">
+            Get started with Jay Kay Digital Press today and experience the difference that professional printing can make for your business.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" asChild className="bg-white text-red-700 hover:bg-gray-100">
+              <Link href="/auth/login">
+                Create Account
+              </Link>
+            </Button>
+            <Button size="lg" variant="outline" asChild className="border-white text-white hover:bg-white/10">
+              <Link href="#contact">
+                Contact Sales
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="py-20 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold text-black mb-4">
+                Get In Touch
+              </h2>
+              <p className="text-xl text-gray-600">
+                Have questions or ready to start your project? Reach out to our team.
+              </p>
             </div>
             
-            <div className="text-center md:text-right">
-              <p className="text-sm text-gray-300">
-                © 2025 Jay Kay Digital Press. All rights reserved.
-              </p>
-              <p className="text-xs text-gray-500 mt-1">
-                Enterprise Management System v1.0
+            <div className="grid md:grid-cols-2 gap-12">
+              <div>
+                <h3 className="text-2xl font-semibold mb-6">Contact Information</h3>
+                <div className="space-y-6">
+                  <div className="flex items-start">
+                    <div className="bg-red-100 p-3 rounded-lg mr-4">
+                      <FileText className="h-6 w-6 text-red-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-lg">Address</h4>
+                      <p className="text-gray-600">Freetown, Sierra Leone</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start">
+                    <div className="bg-red-100 p-3 rounded-lg mr-4">
+                      <Users className="h-6 w-6 text-red-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-lg">Phone</h4>
+                      <p className="text-gray-600">+232 XXX XXX XXX</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start">
+                    <div className="bg-red-100 p-3 rounded-lg mr-4">
+                      <TrendingUp className="h-6 w-6 text-red-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-lg">Email</h4>
+                      <p className="text-gray-600">info@jaykaydigitalpress.com</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="text-2xl font-semibold mb-6">Send us a Message</h3>
+                <form className="space-y-4">
+                  <div>
+                    <input 
+                      type="text" 
+                      placeholder="Your Name" 
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <input 
+                      type="email" 
+                      placeholder="Your Email" 
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <textarea 
+                      placeholder="Your Message" 
+                      rows={4}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    ></textarea>
+                  </div>
+                  <Button type="submit" className="w-full bg-red-600 hover:bg-red-700">
+                    Send Message
+                  </Button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t bg-black text-white">
+        <div className="container mx-auto px-4 py-12">
+          <div className="grid md:grid-cols-4 gap-8">
+            <div>
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="bg-red-600 p-2 rounded-lg">
+                  <PrinterIcon className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <p className="font-semibold">Jay Kay Digital Press</p>
+                </div>
+              </div>
+              <p className="text-gray-400 mb-4">
+                Professional printing services for businesses across Sierra Leone.
               </p>
             </div>
+            
+            <div>
+              <h4 className="font-semibold mb-4">Services</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li><a href="#" className="hover:text-white transition-colors">Offset Printing</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Digital Printing</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Large Format</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Binding Services</a></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="font-semibold mb-4">Company</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Testimonials</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="font-semibold mb-4">Legal</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Cookie Policy</a></li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+            <p>© 2025 Jay Kay Digital Press. All rights reserved.</p>
           </div>
         </div>
       </footer>

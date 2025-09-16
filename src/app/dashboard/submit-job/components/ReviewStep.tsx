@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, DollarSign, FileText, User, Settings, Upload } from 'lucide-react';
 import { JobFormData, Customer, Service } from '@/lib/hooks/useJobSubmissionForm';
-import { FileUpload } from '@/lib/hooks/useFileUpload';
+import { FileUpload } from '@/lib/hooks/useFileUploadFixed';
 import { FinishOption } from '@/lib/hooks/usePaperSpecifications';
 
 interface ReviewStepProps {

@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Upload, FileText, X, CheckCircle, AlertCircle } from 'lucide-react';
-import { FileUpload } from '@/lib/hooks/useFileUpload';
+import { FileUpload } from '@/lib/hooks/useFileUploadFixed';
 
 // Helper functions for formatting
 const formatBytes = (bytes: number): string => {

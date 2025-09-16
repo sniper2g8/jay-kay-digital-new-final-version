@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useJobSubmissionForm } from '@/lib/hooks/useJobSubmissionForm';
-import { useFileUpload } from '@/lib/hooks/useFileUpload';
+import { useFileUploadFixed } from '@/lib/hooks/useFileUploadFixed';
 import { useJobSubmission } from '@/lib/hooks/useJobSubmission';
 import DashboardHeader from '@/components/DashboardHeader';
 import { Button } from '@/components/ui/button';
@@ -36,7 +36,7 @@ const formSteps = [
 
 export default function SubmitJobPage() {
   const formHook = useJobSubmissionForm();
-  const fileHook = useFileUpload();
+  const fileHook = useFileUploadFixed();
   const submissionHook = useJobSubmission();
 
   const {
@@ -83,7 +83,10 @@ export default function SubmitJobPage() {
       case 2:
         return <SpecificationsStep {...formHook} />;
       case 3:
-        return <FilesStep {...fileHook} />;
+        return <FilesStep 
+          {...fileHook} 
+          isUploading={() => fileHook.isUploading}
+        />;
       case 4:
         return <ReviewStep {...formHook} {...fileHook} estimatedPrice={estimatedPrice} />;
       default:

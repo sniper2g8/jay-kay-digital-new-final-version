@@ -17,6 +17,8 @@ export interface Job {
   status: string | null;
   priority: Database["public"]["Enums"]["priority_level"] | null;
   quantity: number | null;
+  unit_price: number | null;
+  estimate_price: number | null;
   estimated_cost: number | null;
   final_cost: number | null;
   estimated_delivery: string | null;
@@ -294,27 +296,29 @@ export const useJobStats = () => {
       jobs.forEach(job => {
         let jobValue = 0;
         
-        // Priority order: final_cost -> estimated_cost -> estimate JSON
+        // Priority order: final_cost -> estimate_price -> estimated_cost -> estimate JSON
         if (job.final_cost && job.final_cost > 0) {
           jobValue = job.final_cost;
+        } else if (job.estimate_price && job.estimate_price > 0) {
+          jobValue = job.estimate_price;
         } else if (job.estimated_cost && job.estimated_cost > 0) {
           jobValue = job.estimated_cost;
         } else if (job.estimate && typeof job.estimate === 'object') {
           // Extract pricing from JSON estimate field - based on database analysis
-          const estimate = job.estimate as any;
+          const estimate = job.estimate as Record<string, unknown>;
           // Database analysis shows all jobs use estimate.total field
-          if (estimate.total && estimate.total > 0) {
-            jobValue = parseFloat(estimate.total);
-          } else if (estimate.total_price && estimate.total_price > 0) {
-            jobValue = parseFloat(estimate.total_price);
-          } else if (estimate.totalPrice && estimate.totalPrice > 0) {
-            jobValue = parseFloat(estimate.totalPrice);
-          } else if (estimate.price && estimate.price > 0) {
-            jobValue = parseFloat(estimate.price);
-          } else if (estimate.cost && estimate.cost > 0) {
-            jobValue = parseFloat(estimate.cost);
-          } else if (estimate.amount && estimate.amount > 0) {
-            jobValue = parseFloat(estimate.amount);
+          if (estimate.total && typeof estimate.total === 'number' && estimate.total > 0) {
+            jobValue = estimate.total;
+          } else if (estimate.total_price && typeof estimate.total_price === 'number' && estimate.total_price > 0) {
+            jobValue = estimate.total_price;
+          } else if (estimate.totalPrice && typeof estimate.totalPrice === 'number' && estimate.totalPrice > 0) {
+            jobValue = estimate.totalPrice;
+          } else if (estimate.price && typeof estimate.price === 'number' && estimate.price > 0) {
+            jobValue = estimate.price;
+          } else if (estimate.cost && typeof estimate.cost === 'number' && estimate.cost > 0) {
+            jobValue = estimate.cost;
+          } else if (estimate.amount && typeof estimate.amount === 'number' && estimate.amount > 0) {
+            jobValue = estimate.amount;
           }
         }
         

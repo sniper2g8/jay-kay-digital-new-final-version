@@ -22,7 +22,7 @@ import {
   Trash2
 } from "lucide-react";
 import { useJob } from "@/lib/hooks/useJobs";
-import { useFileUpload } from "@/lib/hooks/useFileUpload";
+import { useFileUploadFixed } from "@/lib/hooks/useFileUploadFixed";
 import DashboardLayout from "@/components/DashboardLayout";
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
@@ -45,7 +45,7 @@ export default function EditJobPage() {
   const jobId = params.jobId as string;
   
   const { data: job, error: jobError, isLoading: jobLoading } = useJob(jobId);
-  const { fileUploads, handleFileSelect, removeFile, uploadFiles } = useFileUpload();
+  const { fileUploads, handleFileSelect, removeFile, uploadFiles } = useFileUploadFixed();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [existingFiles, setExistingFiles] = useState<JobFile[]>([]);
   const [filesLoading, setFilesLoading] = useState(true);
@@ -55,6 +55,8 @@ export default function EditJobPage() {
     status: 'pending',
     priority: 'medium',
     quantity: 0,
+    unit_price: 0,
+    estimate_price: 0,
     estimated_cost: 0,
     final_cost: 0,
     estimated_delivery: '',
@@ -72,6 +74,8 @@ export default function EditJobPage() {
         status: job.status || 'pending',
         priority: job.priority || 'medium',
         quantity: job.quantity || 0,
+        unit_price: job.unit_price || 0,
+        estimate_price: job.estimate_price || 0,
         estimated_cost: job.estimated_cost || 0,
         final_cost: job.final_cost || 0,
         estimated_delivery: job.estimated_delivery ? job.estimated_delivery.split('T')[0] : '',
