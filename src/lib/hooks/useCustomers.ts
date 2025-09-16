@@ -59,11 +59,15 @@ const fetchCustomers = async (): Promise<Customer[]> => {
       .order('created_at', { ascending: false });
     
     if (error) {
-      console.error('Supabase error details:', {
+      console.error('Supabase error details:', error);
+      console.error('Full error object:', JSON.stringify(error, null, 2));
+      console.error('Error properties:', {
         message: error.message,
         details: error.details,
         hint: error.hint,
-        code: error.code
+        code: error.code,
+        name: error.name,
+        stack: error.stack
       });
       
       // Check for permission/RLS errors
