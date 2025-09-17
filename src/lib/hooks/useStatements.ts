@@ -313,7 +313,15 @@ export function useStatementActions() {
         .insert([{
           ...statementData,
           statement_number: statementNumber,
-          statement_date: statementData.statement_date || new Date().toISOString().split('T')[0]
+          statement_date: statementData.statement_date || new Date().toISOString().split('T')[0],
+          opening_balance: 0,
+          closing_balance: 0,
+          current_balance: 0,
+          total_charges: 0,
+          total_payments: 0,
+          total_adjustments: 0,
+          status: 'draft',
+          is_current_period: true
         }])
         .select()
         .single();
@@ -323,8 +331,13 @@ export function useStatementActions() {
       toast.success('Statement period created successfully');
       return data;
     } catch (error) {
-      console.error('Error creating statement period:', error);
-      toast.error('Failed to create statement period');
+      console.error('Error creating statement period:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        details: error,
+        stack: error instanceof Error ? error.stack : undefined
+      });
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create statement period';
+      toast.error(errorMessage);
       throw error;
     } finally {
       setIsLoading(false);
@@ -484,7 +497,7 @@ async function generateStatementNumber(customerId: string): Promise<string> {
     // Get customer info
     const { data: customer } = await supabase
       .from('customers')
-      .select('company_name')
+      .select('business_name')
       .eq('id', customerId)
       .single();
 
@@ -494,7 +507,7 @@ async function generateStatementNumber(customerId: string): Promise<string> {
     const month = (now.getMonth() + 1).toString().padStart(2, '0');
 
     // Create statement number: STMT-COMPANY-YYYY-MM
-    const companyCode = customer?.company_name?.substring(0, 4).toUpperCase().replace(/[^A-Z]/g, '') || 'CUST';
+    const companyCode = customer?.business_name?.substring(0, 4).toUpperCase().replace(/[^A-Z]/g, '') || 'CUST';
     const baseNumber = `STMT-${companyCode}-${year}-${month}`;
 
     // Check for existing statements with this base

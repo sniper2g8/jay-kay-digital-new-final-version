@@ -70,7 +70,22 @@ export interface Database {
           due_date: string;
           paid_date?: string;
           notes?: string;
-          items?: unknown; // JSON array of line items
+          items?: unknown; // JSON array of line items (deprecated - use invoice_items table)
+          created_at: string;
+          updated_at: string;
+        };
+      };
+      invoice_items: {
+        Row: {
+          id: number;
+          invoice_id: string; // FK to invoices.id
+          description: string;
+          quantity: number;
+          unit_price: number;
+          total_price: number;
+          job_id?: string; // FK to jobs.id
+          job_no?: string; // FK to jobs.job_number
+          notes?: string;
           created_at: string;
           updated_at: string;
         };
@@ -178,6 +193,7 @@ export interface Database {
 export type Customer = Database['public']['Tables']['customers']['Row'];
 export type Payment = Database['public']['Tables']['payments']['Row'];
 export type Invoice = Database['public']['Tables']['invoices']['Row'];
+export type InvoiceItem = Database['public']['Tables']['invoice_items']['Row'];
 export type Job = Database['public']['Tables']['jobs']['Row'];
 export type AppUser = Database['public']['Tables']['appUsers']['Row'];
 export type Role = Database['public']['Tables']['roles']['Row'];

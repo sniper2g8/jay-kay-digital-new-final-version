@@ -27,11 +27,14 @@ export default function Home() {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    // Only run on client side
+    if (typeof window !== 'undefined') {
+      const handleScroll = () => {
+        setIsScrolled(window.scrollY > 10);
+      };
+      window.addEventListener('scroll', handleScroll);
+      return () => window.removeEventListener('scroll', handleScroll);
+    }
   }, []);
 
   const services = [
@@ -79,13 +82,13 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-red-50 to-yellow-50">
+    <div className="min-h-screen bg-gradient-to-br from-white via-red-50 to-yellow-50" suppressHydrationWarning={true}>
       {/* Header */}
-      <header className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-black/90 backdrop-blur-md py-2' : 'bg-transparent py-4'}`}>
+      <header className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-black/90 backdrop-blur-md py-2' : 'bg-transparent py-4'}`} suppressHydrationWarning={true}>
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <img src="/JK_Logo.jpg" alt="Jay Kay Digital Press Logo" className="h-10 w-10 object-contain" />
+              <Image src="/JK_Logo.jpg" alt="Jay Kay Digital Press Logo" width={40} height={40} className="h-10 w-10 object-contain" />
               <div>
                 <h1 className="text-xl font-bold text-white">Jay Kay Digital Press</h1>
               </div>
@@ -118,6 +121,7 @@ export default function Home() {
               <button 
                 className="md:hidden text-white"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
+                suppressHydrationWarning={true}
               >
                 {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </button>
@@ -141,9 +145,10 @@ export default function Home() {
       {/* Hero Section */}
       <section className="pt-32 pb-20 md:pt-40 md:pb-28 relative overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img 
+          <Image 
             src="/hero.jpg" 
             alt="Jay Kay Digital Press" 
+            fill
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-black/50"></div>
@@ -195,9 +200,11 @@ export default function Home() {
             {services.map((service, index) => (
               <Card key={index} className="hover:shadow-xl transition-all duration-300 border-red-200 hover:border-red-300 overflow-hidden">
                 <div className="h-48 overflow-hidden">
-                  <img 
+                  <Image 
                     src={service.image} 
                     alt={service.title}
+                    width={400}
+                    height={300}
                     className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                   />
                 </div>
@@ -411,7 +418,7 @@ export default function Home() {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-3 mb-4">
-                <img src="/JK_Logo.jpg" alt="Jay Kay Digital Press Logo" className="h-8 w-8 object-contain" />
+                <Image src="/JK_Logo.jpg" alt="Jay Kay Digital Press Logo" width={32} height={32} className="h-8 w-8 object-contain" />
                 <div>
                   <p className="font-semibold">Jay Kay Digital Press</p>
                 </div>

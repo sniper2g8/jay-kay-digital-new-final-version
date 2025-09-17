@@ -68,6 +68,38 @@ const fetchJobs = async (): Promise<Job[]> => {
   return (data as Job[]) || [];
 };
 
+// Fetcher for uninvoiced jobs by customer
+const fetchUninvoicedJobsByCustomer = async (customerId: string): Promise<JobWithCustomer[]> => {
+  if (!customerId) return [];
+
+  const { data: jobs, error: jobsError } = await supabase
+    .from('jobs')
+    .select('*')
+    .eq('customer_id', customerId)
+    .or('invoiced.is.null,invoiced.eq.false')
+    .in('status', ['completed', 'delivered', 'ready_for_delivery'])
+    .order('created_at', { ascending: false });
+  
+  if (jobsError) throw jobsError;
+
+  const { data: customers, error: customersError } = await supabase
+    .from('customers')
+    .select('id, business_name')
+    .eq('id', customerId);
+  
+  if (customersError) throw customersError;
+
+  const customerName = customers?.[0]?.business_name || 'Unknown Customer';
+
+  // Add customer names to jobs
+  const jobsWithCustomers = (jobs as Job[])?.map((job: Job) => ({
+    ...job,
+    customer_name: customerName
+  })) || [];
+
+  return jobsWithCustomers;
+};
+
 // Fetcher for jobs with customer names
 const fetchJobsWithCustomers = async (): Promise<JobWithCustomer[]> => {
   const { data: jobs, error: jobsError } = await supabase
@@ -369,6 +401,21 @@ export const useJobStats = () => {
       subscription.unsubscribe();
     };
   }, [user, session]);
+
+  return swrResult;
+};
+
+// Hook for uninvoiced jobs by customer
+export const useUninvoicedJobsByCustomer = (customerId: string | null) => {
+  const swrResult = useSWR(
+    customerId ? `uninvoiced-jobs-${customerId}` : null,
+    () => customerId ? fetchUninvoicedJobsByCustomer(customerId) : Promise.resolve([]),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+      dedupingInterval: 5000,
+    }
+  );
 
   return swrResult;
 };

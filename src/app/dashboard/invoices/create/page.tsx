@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useCustomers } from '@/lib/hooks/useCustomers';
+import { useUninvoicedJobsByCustomer } from '@/lib/hooks/useJobs';
 import { useInvoiceTemplates, useInvoiceActions, type InvoiceFormData, type InvoiceLineItem } from '@/lib/hooks/useInvoiceManagement';
 import { formatCurrency, formatDate } from '@/lib/constants';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -47,6 +48,7 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
   const { createInvoice, createInvoiceFromJob } = useInvoiceActions();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedJobIds, setSelectedJobIds] = useState<Set<string>>(new Set());
   const [formData, setFormData] = useState<InvoiceFormData>({
     customer_id: '',
     invoice_date: new Date().toISOString().split('T')[0],
@@ -55,6 +57,11 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
     template_id: '',
     line_items: []
   });
+
+  // Get uninvoiced jobs for selected customer
+  const { data: uninvoicedJobs, isLoading: jobsLoading } = useUninvoicedJobsByCustomer(
+    formData.customer_id || null
+  );
 
   const [lineItems, setLineItems] = useState<InvoiceLineItemForm[]>([
     {
@@ -138,6 +145,49 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
     if (lineItems.length > 1) {
       setLineItems(prev => prev.filter(item => item.tempId !== tempId));
     }
+  };
+
+  // Job selection handlers
+  const handleJobSelection = (jobId: string, selected: boolean) => {
+    setSelectedJobIds(prev => {
+      const newSet = new Set(prev);
+      if (selected) {
+        newSet.add(jobId);
+      } else {
+        newSet.delete(jobId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleSelectAllJobs = () => {
+    if (uninvoicedJobs) {
+      setSelectedJobIds(new Set(uninvoicedJobs.map(job => job.id)));
+    }
+  };
+
+  const handleClearJobSelection = () => {
+    setSelectedJobIds(new Set());
+  };
+
+  const addJobsToLineItems = () => {
+    if (!uninvoicedJobs || selectedJobIds.size === 0) return;
+
+    const selectedJobs = uninvoicedJobs.filter(job => selectedJobIds.has(job.id));
+    const newLineItems: InvoiceLineItemForm[] = selectedJobs.map((job, index) => ({
+      tempId: `job-${job.id}`,
+      description: job.description || `Job: ${job.jobNo || job.id}`,
+      quantity: job.quantity || 1,
+      unit_price: job.final_cost || job.estimate_price || 0,
+      total_price: (job.final_cost || job.estimate_price || 0) * (job.quantity || 1),
+      line_order: lineItems.length + index + 1,
+      discount_amount: 0,
+      tax_rate: 0,
+      tax_amount: 0
+    }));
+
+    setLineItems(prev => [...prev, ...newLineItems]);
+    setSelectedJobIds(new Set()); // Clear selection after adding
   };
 
   const calculateTotals = () => {
@@ -298,6 +348,103 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
                     <p className="text-sm text-red-600">{errors.customer_id}</p>
                   )}
                 </div>
+
+                {/* Uninvoiced Jobs Section */}
+                {formData.customer_id && uninvoicedJobs && uninvoicedJobs.length > 0 && (
+                  <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium">Uninvoiced Jobs</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Select jobs to add as line items
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleSelectAllJobs}
+                        >
+                          Select All
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleClearJobSelection}
+                        >
+                          Clear
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          onClick={addJobsToLineItems}
+                          disabled={selectedJobIds.size === 0}
+                        >
+                          Add Selected ({selectedJobIds.size})
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div className="grid gap-2 max-h-64 overflow-y-auto">
+                      {uninvoicedJobs.map((job) => (
+                        <div
+                          key={job.id}
+                          className="flex items-center space-x-3 p-3 border rounded-md bg-background hover:bg-muted/50 cursor-pointer"
+                          onClick={() => handleJobSelection(job.id, !selectedJobIds.has(job.id))}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedJobIds.has(job.id)}
+                            onChange={(e) => handleJobSelection(job.id, e.target.checked)}
+                            className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between">
+                              <p className="text-sm font-medium truncate">
+                                {job.jobNo || `Job ${job.id}`}
+                              </p>
+                              <span className="text-sm font-medium text-right">
+                                {formatCurrency(job.final_cost || job.estimate_price || 0)}
+                              </span>
+                            </div>
+                            <p className="text-sm text-muted-foreground truncate">
+                              {job.description || 'No description'}
+                            </p>
+                            <div className="flex justify-between items-center mt-1">
+                              <span className="text-xs text-muted-foreground">
+                                Status: {job.status}
+                              </span>
+                              {job.quantity && job.quantity > 1 && (
+                                <span className="text-xs text-muted-foreground">
+                                  Qty: {job.quantity}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {formData.customer_id && uninvoicedJobs && uninvoicedJobs.length === 0 && !jobsLoading && (
+                  <div className="p-4 border rounded-lg bg-muted/50">
+                    <p className="text-sm text-muted-foreground text-center">
+                      No uninvoiced jobs found for this customer
+                    </p>
+                  </div>
+                )}
+
+                {formData.customer_id && jobsLoading && (
+                  <div className="p-4 border rounded-lg bg-muted/50">
+                    <div className="flex items-center justify-center">
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      <span className="text-sm text-muted-foreground">Loading jobs...</span>
+                    </div>
+                  </div>
+                )}
 
                 {/* Date and Terms */}
                 <div className="grid md:grid-cols-2 gap-4">
