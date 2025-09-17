@@ -1,24 +1,25 @@
-const { createClient } = require('@supabase/supabase-js');
+const { createClient } = require("@supabase/supabase-js");
 
-const supabaseUrl = 'https://pnoxqzlxfuvjvufdjuqh.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBub3hxemx4ZnV2anZ1ZmRqdXFoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczOTMxMzMsImV4cCI6MjA3Mjk2OTEzM30.QG0B60xV9TO2PaUeEOkzgqXcVuSkHVq3yYfXWKaaDzc';
+const supabaseUrl = "https://pnoxqzlxfuvjvufdjuqh.supabase.co";
+const supabaseKey =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBub3hxemx4ZnV2anZ1ZmRqdXFoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczOTMxMzMsImV4cCI6MjA3Mjk2OTEzM30.QG0B60xV9TO2PaUeEOkzgqXcVuSkHVq3yYfXWKaaDzc";
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function createEstimatesTable() {
-  console.log('🏗️  Creating Customer Estimates Table');
-  console.log('====================================\n');
-  
+  console.log("🏗️  Creating Customer Estimates Table");
+  console.log("====================================\n");
+
   try {
-    console.log('📋 Step 1: Creating customer_estimates table...');
-    
+    console.log("📋 Step 1: Creating customer_estimates table...");
+
     // Note: Since we're using the client library with anon key, we can't execute DDL
     // This would need to be done via SQL editor in Supabase dashboard or with service role key
-    
-    console.log('⚠️  Table creation needs to be done via Supabase SQL Editor');
-    console.log('\n📝 SQL to execute in Supabase Dashboard:');
-    console.log('=====================================');
-    
+
+    console.log("⚠️  Table creation needs to be done via Supabase SQL Editor");
+    console.log("\n📝 SQL to execute in Supabase Dashboard:");
+    console.log("=====================================");
+
     const createTableSQL = `
 -- Create customer_estimates table
 CREATE TABLE IF NOT EXISTS customer_estimates (
@@ -138,19 +139,20 @@ INSERT INTO customer_estimates (
   'high'
 );
     `;
-    
-    console.log(createTableSQL);
-    console.log('\n✅ Copy and paste the above SQL into Supabase SQL Editor');
-    console.log('📍 Instructions:');
-    console.log('   1. Go to Supabase Dashboard → SQL Editor');
-    console.log('   2. Paste the SQL above');
-    console.log('   3. Click "Run" to execute');
-    console.log('   4. Verify table creation was successful');
-    
-    console.log('\n🎯 After table creation, the estimates system will be fully functional!');
 
+    console.log(createTableSQL);
+    console.log("\n✅ Copy and paste the above SQL into Supabase SQL Editor");
+    console.log("📍 Instructions:");
+    console.log("   1. Go to Supabase Dashboard → SQL Editor");
+    console.log("   2. Paste the SQL above");
+    console.log('   3. Click "Run" to execute');
+    console.log("   4. Verify table creation was successful");
+
+    console.log(
+      "\n🎯 After table creation, the estimates system will be fully functional!",
+    );
   } catch (error) {
-    console.error('❌ Migration preparation failed:', error);
+    console.error("❌ Migration preparation failed:", error);
   }
 }
 

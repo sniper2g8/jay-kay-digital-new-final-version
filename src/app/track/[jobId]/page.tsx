@@ -1,24 +1,30 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { 
-  CheckCircle, 
-  Clock, 
-  AlertCircle, 
-  Package, 
-  Truck, 
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { supabase } from "@/lib/supabase";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  CheckCircle,
+  Clock,
+  AlertCircle,
+  Package,
+  Truck,
   Calendar,
   DollarSign,
   Phone,
   Mail,
-  ExternalLink
-} from 'lucide-react';
-import Link from 'next/link';
+  ExternalLink,
+} from "lucide-react";
+import Link from "next/link";
 
 interface Job {
   id: string;
@@ -47,27 +53,33 @@ interface Customer {
 }
 
 const statusConfig = {
-  'pending': { label: 'Pending Review', color: 'bg-yellow-500', icon: Clock },
-  'approved': { label: 'Approved', color: 'bg-blue-500', icon: CheckCircle },
-  'in_progress': { label: 'In Progress', color: 'bg-purple-500', icon: Package },
-  'quality_check': { label: 'Quality Check', color: 'bg-orange-500', icon: AlertCircle },
-  'completed': { label: 'Completed', color: 'bg-green-500', icon: CheckCircle },
-  'delivered': { label: 'Delivered', color: 'bg-green-600', icon: Truck },
-  'cancelled': { label: 'Cancelled', color: 'bg-red-500', icon: AlertCircle },
-  'on_hold': { label: 'On Hold', color: 'bg-gray-500', icon: Clock },
+  pending: { label: "Pending Review", color: "bg-yellow-500", icon: Clock, progress: 10 },
+  approved: { label: "Approved", color: "bg-blue-500", icon: CheckCircle, progress: 25 },
+  in_progress: { label: "In Progress", color: "bg-purple-500", icon: Package, progress: 50 },
+  quality_check: {
+    label: "Quality Check",
+    color: "bg-orange-500",
+    icon: AlertCircle,
+    progress: 75
+  },
+  completed: { label: "Completed", color: "bg-green-500", icon: CheckCircle, progress: 90 },
+  Completed: { label: "Completed", color: "bg-green-500", icon: CheckCircle, progress: 90 },
+  delivered: { label: "Delivered", color: "bg-green-600", icon: Truck, progress: 100 },
+  cancelled: { label: "Cancelled", color: "bg-red-500", icon: AlertCircle, progress: 0 },
+  on_hold: { label: "On Hold", color: "bg-gray-500", icon: Clock, progress: 30 },
 };
 
 const priorityConfig = {
-  'low': { label: 'Low Priority', color: 'bg-gray-500' },
-  'normal': { label: 'Normal Priority', color: 'bg-blue-500' },
-  'high': { label: 'High Priority', color: 'bg-orange-500' },
-  'urgent': { label: 'Urgent', color: 'bg-red-500' },
+  low: { label: "Low Priority", color: "bg-gray-500" },
+  normal: { label: "Normal Priority", color: "bg-blue-500" },
+  high: { label: "High Priority", color: "bg-orange-500" },
+  urgent: { label: "Urgent", color: "bg-red-500" },
 };
 
 export default function JobTrackingPage() {
   const params = useParams();
   const jobId = params.jobId as string;
-  
+
   const [job, setJob] = useState<Job | null>(null);
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [loading, setLoading] = useState(true);
@@ -81,46 +93,79 @@ export default function JobTrackingPage() {
         setLoading(true);
         setError(null);
 
-        // Fetch job details
-        const { data: jobData, error: jobError } = await supabase
-          .from('jobs')
-          .select('*')
-          .eq('jobNo', jobId)
+        // Fetch job details using jobNo or id
+        let { data: jobData, error: jobError } = await supabase
+          .from("jobs")
+          .select("*")
+          .eq("jobNo", jobId)
           .single();
 
+        // If not found by jobNo, try by id
+        if (jobError && jobError.code === "PGRST116") {
+          const { data: jobDataById, error: jobErrorById } = await supabase
+            .from("jobs")
+            .select("*")
+            .eq("id", jobId)
+            .single();
+          
+          jobData = jobDataById;
+          jobError = jobErrorById;
+        }
+
         if (jobError) {
-          if (jobError.code === 'PGRST116') {
-            setError('Job not found. Please check the job ID and try again.');
+          if (jobError.code === "PGRST116") {
+            setError("Job not found. Please check the job ID and try again.");
           } else {
-            setError('Failed to load job details. Please try again later.');
+            setError("Failed to load job details. Please try again later.");
           }
           return;
         }
 
         setJob(jobData);
 
-        // Fetch customer details
-        if (jobData.customer_id) {
+        // Fetch customer details if available
+        if (jobData && jobData.customer_id) {
           const { data: customerData, error: customerError } = await supabase
-            .from('customers')
-            .select('*')
-            .eq('id', jobData.customer_id)
+            .from("customers")
+            .select("*")
+            .eq("id", jobData.customer_id)
             .single();
 
           if (!customerError) {
             setCustomer(customerData);
           }
         }
-
       } catch (err) {
-        console.error('Error fetching job details:', err);
-        setError('An unexpected error occurred. Please try again later.');
+        console.error("Error fetching job details:", err);
+        setError("An unexpected error occurred. Please try again later.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchJobDetails();
+
+    // Set up real-time updates
+    const subscription = supabase
+      .channel(`job-tracking-${jobId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'jobs',
+          filter: `jobNo=eq.${jobId}`
+        },
+        (payload) => {
+          console.log('Job updated:', payload);
+          fetchJobDetails(); // Refetch data when job changes
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [jobId]);
 
   if (loading) {
@@ -139,9 +184,11 @@ export default function JobTrackingPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto p-6">
           <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Job Not Found</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Job Not Found
+          </h1>
           <p className="text-gray-600 mb-6">
-            {error || 'The job you are looking for could not be found.'}
+            {error || "The job you are looking for could not be found."}
           </p>
           <Link href="/">
             <Button>
@@ -154,9 +201,29 @@ export default function JobTrackingPage() {
     );
   }
 
-  const statusInfo = statusConfig[job.status as keyof typeof statusConfig] || statusConfig.pending;
-  const priorityInfo = priorityConfig[job.priority as keyof typeof priorityConfig] || priorityConfig.normal;
+  const statusInfo =
+    statusConfig[job.status as keyof typeof statusConfig] ||
+    statusConfig.pending;
+  const priorityInfo =
+    priorityConfig[job.priority as keyof typeof priorityConfig] ||
+    priorityConfig.normal;
   const StatusIcon = statusInfo.icon;
+
+  // Progress Bar Component
+  const ProgressBar = ({ progress }: { progress: number }) => (
+    <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
+      <div
+        className={`h-3 rounded-full transition-all duration-500 ${
+          progress === 100 ? 'bg-green-500' : 
+          progress >= 75 ? 'bg-orange-500' :
+          progress >= 50 ? 'bg-purple-500' :
+          progress >= 25 ? 'bg-blue-500' :
+          'bg-yellow-500'
+        }`}
+        style={{ width: `${progress}%` }}
+      ></div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -166,11 +233,15 @@ export default function JobTrackingPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Job Tracking</h1>
-              <p className="text-gray-600">Track the progress of your printing job</p>
+              <p className="text-gray-600">
+                Track the progress of your printing job
+              </p>
             </div>
             <div className="text-right">
               <p className="text-sm text-gray-500">Jay Kay Digital Press</p>
-              <p className="text-sm text-gray-500">Professional Printing Services</p>
+              <p className="text-sm text-gray-500">
+                Professional Printing Services
+              </p>
             </div>
           </div>
         </div>
@@ -179,15 +250,18 @@ export default function JobTrackingPage() {
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="grid lg:grid-cols-3 gap-6">
-          
           {/* Job Status Card */}
           <div className="lg:col-span-2">
             <Card className="mb-6">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-xl">Job #{job.jobNo || job.id}</CardTitle>
-                    <CardDescription>{job.title || 'Print Job'}</CardDescription>
+                    <CardTitle className="text-xl">
+                      Job #{job.jobNo || job.id}
+                    </CardTitle>
+                    <CardDescription>
+                      {job.title || "Print Job"}
+                    </CardDescription>
                   </div>
                   <div className="text-right">
                     <Badge className={`${statusInfo.color} text-white mb-2`}>
@@ -205,7 +279,9 @@ export default function JobTrackingPage() {
                 <div className="space-y-4">
                   {job.description && (
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-2">Description</h4>
+                      <h4 className="font-medium text-gray-900 mb-2">
+                        Description
+                      </h4>
                       <p className="text-gray-600">{job.description}</p>
                     </div>
                   )}
@@ -216,7 +292,11 @@ export default function JobTrackingPage() {
                       <div>
                         <p className="text-sm font-medium">Order Date</p>
                         <p className="text-sm text-gray-600">
-                          {job.created_at ? new Date(job.created_at).toLocaleDateString('en-SL') : 'N/A'}
+                          {job.created_at
+                            ? new Date(job.created_at).toLocaleDateString(
+                                "en-SL",
+                              )
+                            : "N/A"}
                         </p>
                       </div>
                     </div>
@@ -225,9 +305,13 @@ export default function JobTrackingPage() {
                       <div className="flex items-center space-x-2">
                         <Clock className="h-4 w-4 text-gray-400" />
                         <div>
-                          <p className="text-sm font-medium">Estimated Completion</p>
+                          <p className="text-sm font-medium">
+                            Estimated Completion
+                          </p>
                           <p className="text-sm text-gray-600">
-                            {new Date(job.estimated_delivery).toLocaleDateString('en-SL')}
+                            {new Date(
+                              job.estimated_delivery,
+                            ).toLocaleDateString("en-SL")}
                           </p>
                         </div>
                       </div>
@@ -273,16 +357,20 @@ export default function JobTrackingPage() {
                 <CardContent>
                   <div className="space-y-3">
                     <div>
-                      <p className="font-medium text-gray-900">{customer.business_name}</p>
+                      <p className="font-medium text-gray-900">
+                        {customer.business_name}
+                      </p>
                       {customer.contact_person && (
-                        <p className="text-sm text-gray-600">{customer.contact_person}</p>
+                        <p className="text-sm text-gray-600">
+                          {customer.contact_person}
+                        </p>
                       )}
                     </div>
 
                     {customer.phone && (
                       <div className="flex items-center space-x-2">
                         <Phone className="h-4 w-4 text-gray-400" />
-                        <a 
+                        <a
                           href={`tel:${customer.phone}`}
                           className="text-sm text-blue-600 hover:underline"
                         >
@@ -294,7 +382,7 @@ export default function JobTrackingPage() {
                     {customer.email && (
                       <div className="flex items-center space-x-2">
                         <Mail className="h-4 w-4 text-gray-400" />
-                        <a 
+                        <a
                           href={`mailto:${customer.email}`}
                           className="text-sm text-blue-600 hover:underline"
                         >
@@ -317,30 +405,43 @@ export default function JobTrackingPage() {
                   <p className="text-sm text-gray-600">
                     For questions about your order, please contact us:
                   </p>
-                  
+
                   <div className="space-y-2">
                     <div className="flex items-center space-x-2">
                       <Phone className="h-4 w-4 text-gray-400" />
-                      <a 
-                        href="tel:+1234567890"
+                      <a
+                        href="tel:+23234788711"
                         className="text-sm text-blue-600 hover:underline"
                       >
-                        (123) 456-7890
+                        +232 34 788711
+                      </a>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Phone className="h-4 w-4 text-gray-400" />
+                      <a
+                        href="tel:+23230741062"
+                        className="text-sm text-blue-600 hover:underline"
+                      >
+                        +232 30 741062
                       </a>
                     </div>
 
                     <div className="flex items-center space-x-2">
                       <Mail className="h-4 w-4 text-gray-400" />
-                      <a 
-                        href="mailto:info@jaykaydigitalpress.com"
+                      <a
+                        href="mailto:jaykaydigitalpress@gmail.com"
                         className="text-sm text-blue-600 hover:underline"
                       >
-                        info@jaykaydigitalpress.com
+                        jaykaydigitalpress@gmail.com
                       </a>
                     </div>
                   </div>
 
                   <div className="pt-3 border-t">
+                    <p className="text-xs text-gray-500 mb-2">
+                      St. Edward School Avenue, By Caritas, Freetown, Sierra Leone
+                    </p>
                     <Link href="/">
                       <Button variant="outline" size="sm" className="w-full">
                         <ExternalLink className="h-4 w-4 mr-2" />

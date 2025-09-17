@@ -17,7 +17,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Jay Kay Digital Press - Professional Printing Services",
-  description: "Complete printing press management system with job tracking, invoicing, and customer management.",
+  description:
+    "Complete printing press management system with job tracking, invoicing, and customer management.",
   icons: {
     icon: "/favicon.ico",
   },
@@ -35,9 +36,7 @@ export default function RootLayout({
       >
         <ErrorBoundary>
           <AuthProvider>
-            <div className="animate-in fade-in duration-500">
-              {children}
-            </div>
+            <div className="animate-in fade-in duration-500">{children}</div>
           </AuthProvider>
         </ErrorBoundary>
         <Toaster position="top-right" richColors />

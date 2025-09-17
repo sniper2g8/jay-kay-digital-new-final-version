@@ -1,56 +1,78 @@
-const { createClient } = require('@supabase/supabase-js');
-const fs = require('fs');
-const path = require('path');
+const { createClient } = require("@supabase/supabase-js");
+const fs = require("fs");
+const path = require("path");
 
-require('dotenv').config({ path: '.env.local' });
+require("dotenv").config({ path: ".env.local" });
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseKey =
+  process.env.SUPABASE_SERVICE_ROLE_KEY ||
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
-  console.error('❌ Missing Supabase environment variables');
-  console.log('Need either SUPABASE_SERVICE_ROLE_KEY or NEXT_PUBLIC_SUPABASE_ANON_KEY');
+  console.error("❌ Missing Supabase environment variables");
+  console.log(
+    "Need either SUPABASE_SERVICE_ROLE_KEY or NEXT_PUBLIC_SUPABASE_ANON_KEY",
+  );
   process.exit(1);
 }
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function regenerateTypes() {
-  console.log('🔄 Regenerating database types...');
-  
+  console.log("🔄 Regenerating database types...");
+
   try {
     // Get schema information for all tables
     const { data: tables, error: tablesError } = await supabase
-      .from('information_schema.tables')
-      .select('table_name')
-      .eq('table_schema', 'public')
-      .eq('table_type', 'BASE TABLE');
-    
+      .from("information_schema.tables")
+      .select("table_name")
+      .eq("table_schema", "public")
+      .eq("table_type", "BASE TABLE");
+
     if (tablesError) {
-      console.error('❌ Error fetching tables:', tablesError);
+      console.error("❌ Error fetching tables:", tablesError);
       return;
     }
-    
-    console.log('📋 Found tables:', tables?.map(t => t.table_name).join(', '));
-    
+
+    console.log(
+      "📋 Found tables:",
+      tables?.map((t) => t.table_name).join(", "),
+    );
+
     // Check if the paper tables exist
-    const paperTables = ['paper_types', 'paper_sizes', 'paper_weights'];
-    const existingPaperTables = tables?.filter(t => paperTables.includes(t.table_name));
-    
-    console.log('📄 Paper tables found:', existingPaperTables?.map(t => t.table_name).join(', '));
-    
+    const paperTables = ["paper_types", "paper_sizes", "paper_weights"];
+    const existingPaperTables = tables?.filter((t) =>
+      paperTables.includes(t.table_name),
+    );
+
+    console.log(
+      "📄 Paper tables found:",
+      existingPaperTables?.map((t) => t.table_name).join(", "),
+    );
+
     if (existingPaperTables && existingPaperTables.length > 0) {
-      console.log('✅ Paper tables exist in database');
-      
+      console.log("✅ Paper tables exist in database");
+
       // Manual type generation for now since we don't have Supabase CLI set up
-      console.log('🛠️ Manually adding paper table types to database-generated.types.ts');
-      
-      const typesFilePath = path.join(__dirname, 'src', 'lib', 'database-generated.types.ts');
-      let typesContent = fs.readFileSync(typesFilePath, 'utf8');
-      
+      console.log(
+        "🛠️ Manually adding paper table types to database-generated.types.ts",
+      );
+
+      const typesFilePath = path.join(
+        __dirname,
+        "src",
+        "lib",
+        "database-generated.types.ts",
+      );
+      let typesContent = fs.readFileSync(typesFilePath, "utf8");
+
       // Check if paper types are already added
-      if (!typesContent.includes('paper_types') && !typesContent.includes('paper_sizes') && !typesContent.includes('paper_weights')) {
-        
+      if (
+        !typesContent.includes("paper_types") &&
+        !typesContent.includes("paper_sizes") &&
+        !typesContent.includes("paper_weights")
+      ) {
         // Find the Tables section and add paper tables
         const paperTypesDefinition = `
       paper_sizes: {
@@ -173,36 +195,41 @@ async function regenerateTypes() {
         }
         Relationships: []
       }`;
-        
+
         // Find the insertion point (before the closing of Tables)
-        const insertionPoint = typesContent.lastIndexOf('      }');
+        const insertionPoint = typesContent.lastIndexOf("      }");
         if (insertionPoint > -1) {
           const beforeInsertion = typesContent.substring(0, insertionPoint);
           const afterInsertion = typesContent.substring(insertionPoint);
-          
-          const updatedContent = beforeInsertion + paperTypesDefinition + '\n' + afterInsertion;
-          
+
+          const updatedContent =
+            beforeInsertion + paperTypesDefinition + "\n" + afterInsertion;
+
           // Create backup
-          fs.writeFileSync(typesFilePath + '.backup', typesContent);
-          
+          fs.writeFileSync(typesFilePath + ".backup", typesContent);
+
           // Write updated types
           fs.writeFileSync(typesFilePath, updatedContent);
-          
-          console.log('✅ Successfully added paper table types to database-generated.types.ts');
-          console.log('📄 Backup created at database-generated.types.ts.backup');
+
+          console.log(
+            "✅ Successfully added paper table types to database-generated.types.ts",
+          );
+          console.log(
+            "📄 Backup created at database-generated.types.ts.backup",
+          );
         } else {
-          console.error('❌ Could not find insertion point in types file');
+          console.error("❌ Could not find insertion point in types file");
         }
       } else {
-        console.log('ℹ️ Paper table types already exist in the types file');
+        console.log("ℹ️ Paper table types already exist in the types file");
       }
-      
     } else {
-      console.log('⚠️ Paper tables not found in database. You may need to create them first.');
+      console.log(
+        "⚠️ Paper tables not found in database. You may need to create them first.",
+      );
     }
-    
   } catch (error) {
-    console.error('❌ Error regenerating types:', error);
+    console.error("❌ Error regenerating types:", error);
   }
 }
 

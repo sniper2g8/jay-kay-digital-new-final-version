@@ -1,32 +1,32 @@
-const { Client } = require('pg');
-const fs = require('fs');
-const path = require('path');
+const { Client } = require("pg");
+const fs = require("fs");
+const path = require("path");
 
 // Load environment variables
-require('dotenv').config({ path: '.env.local' });
+require("dotenv").config({ path: ".env.local" });
 
 const DATABASE_URL = process.env.DATABASE_URL;
 
 if (!DATABASE_URL) {
-  console.error('❌ DATABASE_URL not found in environment variables');
+  console.error("❌ DATABASE_URL not found in environment variables");
   process.exit(1);
 }
 
 async function executeInvoiceSchemaDirectly() {
-  console.log('🚀 Executing Enhanced Invoice Management Schema Directly...\n');
+  console.log("🚀 Executing Enhanced Invoice Management Schema Directly...\n");
 
   const client = new Client({
     connectionString: DATABASE_URL,
     ssl: {
-      rejectUnauthorized: false
-    }
+      rejectUnauthorized: false,
+    },
   });
 
   try {
     // Connect to database
-    console.log('📡 Connecting to database...');
+    console.log("📡 Connecting to database...");
     await client.connect();
-    console.log('✅ Connected to Supabase PostgreSQL database\n');
+    console.log("✅ Connected to Supabase PostgreSQL database\n");
 
     // The complete SQL from your selected file
     const enhancedInvoiceSchema = `
@@ -568,27 +568,45 @@ UPDATE invoice_line_items SET
 WHERE total_price IS NULL OR total_price = 0;
 `;
 
-    console.log('⚡ Executing complete enhanced invoice management schema...');
-    console.log('This will create all tables, triggers, indexes, and policies...\n');
-    
+    console.log("⚡ Executing complete enhanced invoice management schema...");
+    console.log(
+      "This will create all tables, triggers, indexes, and policies...\n",
+    );
+
     await client.query(enhancedInvoiceSchema);
-    
-    console.log('✅ Schema executed successfully!\n');
+
+    console.log("✅ Schema executed successfully!\n");
 
     // Verification
-    console.log('🔍 Verifying deployment...\n');
+    console.log("🔍 Verifying deployment...\n");
 
-    const templatesResult = await client.query('SELECT COUNT(*) as count FROM invoice_templates');
-    console.log(`📋 Invoice Templates: ${templatesResult.rows[0].count} records`);
+    const templatesResult = await client.query(
+      "SELECT COUNT(*) as count FROM invoice_templates",
+    );
+    console.log(
+      `📋 Invoice Templates: ${templatesResult.rows[0].count} records`,
+    );
 
-    const allocationsResult = await client.query('SELECT COUNT(*) as count FROM payment_allocations');
-    console.log(`💰 Payment Allocations: ${allocationsResult.rows[0].count} records`);
+    const allocationsResult = await client.query(
+      "SELECT COUNT(*) as count FROM payment_allocations",
+    );
+    console.log(
+      `💰 Payment Allocations: ${allocationsResult.rows[0].count} records`,
+    );
 
-    const historyResult = await client.query('SELECT COUNT(*) as count FROM invoice_status_history');
-    console.log(`📊 Invoice Status History: ${historyResult.rows[0].count} records`);
+    const historyResult = await client.query(
+      "SELECT COUNT(*) as count FROM invoice_status_history",
+    );
+    console.log(
+      `📊 Invoice Status History: ${historyResult.rows[0].count} records`,
+    );
 
-    const recurringResult = await client.query('SELECT COUNT(*) as count FROM recurring_invoices');
-    console.log(`🔄 Recurring Invoices: ${recurringResult.rows[0].count} records`);
+    const recurringResult = await client.query(
+      "SELECT COUNT(*) as count FROM recurring_invoices",
+    );
+    console.log(
+      `🔄 Recurring Invoices: ${recurringResult.rows[0].count} records`,
+    );
 
     // Check enhanced columns
     const invoiceColumnsResult = await client.query(`
@@ -598,7 +616,9 @@ WHERE total_price IS NULL OR total_price = 0;
         AND column_name IN ('invoice_status', 'invoice_date', 'terms_days', 'template_id')
       ORDER BY column_name
     `);
-    console.log(`📝 Enhanced Invoice Columns: ${invoiceColumnsResult.rows.map(r => r.column_name).join(', ')}`);
+    console.log(
+      `📝 Enhanced Invoice Columns: ${invoiceColumnsResult.rows.map((r) => r.column_name).join(", ")}`,
+    );
 
     // Check triggers
     const triggersResult = await client.query(`
@@ -607,37 +627,48 @@ WHERE total_price IS NULL OR total_price = 0;
       WHERE trigger_name LIKE '%invoice%' 
       ORDER BY trigger_name
     `);
-    console.log(`⚡ Invoice Triggers: ${triggersResult.rows.length} triggers active`);
+    console.log(
+      `⚡ Invoice Triggers: ${triggersResult.rows.length} triggers active`,
+    );
 
-    console.log('\n🎉 Enhanced Invoice Management Schema Successfully Deployed!\n');
-    console.log('📊 Complete Summary:');
-    console.log('   ✅ Enhanced existing tables: invoices, payments, invoice_line_items');
-    console.log('   ✅ New tables: invoice_templates, payment_allocations, invoice_status_history, recurring_invoices');
-    console.log('   ✅ Triggers: Auto-calculation, status tracking, customer statement integration');
-    console.log('   ✅ Indexes: Performance optimization for queries');
-    console.log('   ✅ RLS Policies: Security and access control');
-    console.log('   ✅ Customer Statements Integration: Automatic transaction creation');
-    console.log('\n🚀 Invoice Management System is READY FOR USE!');
-
+    console.log(
+      "\n🎉 Enhanced Invoice Management Schema Successfully Deployed!\n",
+    );
+    console.log("📊 Complete Summary:");
+    console.log(
+      "   ✅ Enhanced existing tables: invoices, payments, invoice_line_items",
+    );
+    console.log(
+      "   ✅ New tables: invoice_templates, payment_allocations, invoice_status_history, recurring_invoices",
+    );
+    console.log(
+      "   ✅ Triggers: Auto-calculation, status tracking, customer statement integration",
+    );
+    console.log("   ✅ Indexes: Performance optimization for queries");
+    console.log("   ✅ RLS Policies: Security and access control");
+    console.log(
+      "   ✅ Customer Statements Integration: Automatic transaction creation",
+    );
+    console.log("\n🚀 Invoice Management System is READY FOR USE!");
   } catch (error) {
-    console.error('❌ Schema execution failed:', error.message);
-    
-    if (error.message.includes('permission denied')) {
-      console.error('\n💡 Permission Issue:');
-      console.error('   - Make sure DATABASE_URL has sufficient privileges');
-      console.error('   - Check connection string format');
+    console.error("❌ Schema execution failed:", error.message);
+
+    if (error.message.includes("permission denied")) {
+      console.error("\n💡 Permission Issue:");
+      console.error("   - Make sure DATABASE_URL has sufficient privileges");
+      console.error("   - Check connection string format");
     }
-    
-    if (error.message.includes('does not exist')) {
-      console.error('\n💡 Missing Dependencies:');
-      console.error('   - Ensure customers, jobs, appUsers tables exist');
-      console.error('   - Run customer statements migration first if needed');
+
+    if (error.message.includes("does not exist")) {
+      console.error("\n💡 Missing Dependencies:");
+      console.error("   - Ensure customers, jobs, appUsers tables exist");
+      console.error("   - Run customer statements migration first if needed");
     }
 
     process.exit(1);
   } finally {
     await client.end();
-    console.log('\n📡 Database connection closed');
+    console.log("\n📡 Database connection closed");
   }
 }
 

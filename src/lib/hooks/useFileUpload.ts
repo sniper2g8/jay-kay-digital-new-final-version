@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 
 export interface FileUpload {
   file: File;
   progress: number;
-  status: 'pending' | 'uploading' | 'completed' | 'error';
+  status: "pending" | "uploading" | "completed" | "error";
   id: string;
   uploadSpeed?: number; // bytes per second
   startTime?: number;
@@ -27,151 +27,180 @@ export const useFileUpload = () => {
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
-    
-    const newUploads: FileUpload[] = selectedFiles.map(file => ({
+
+    const newUploads: FileUpload[] = selectedFiles.map((file) => ({
       file,
       progress: 0,
-      status: 'pending',
-      id: crypto.randomUUID()
+      status: "pending",
+      id: crypto.randomUUID(),
     }));
-    
-    setFileUploads(prev => [...prev, ...newUploads]);
+
+    setFileUploads((prev) => [...prev, ...newUploads]);
   };
 
   const removeFile = (id: string) => {
-    setFileUploads(prev => prev.filter(upload => upload.id !== id));
+    setFileUploads((prev) => prev.filter((upload) => upload.id !== id));
   };
 
-  const uploadFiles = async (jobId: string, userId?: string): Promise<FileRecord[]> => {
+  const uploadFiles = async (
+    jobId: string,
+    userId?: string,
+  ): Promise<FileRecord[]> => {
     const uploadedFiles: FileRecord[] = [];
 
     for (let i = 0; i < fileUploads.length; i++) {
       const upload = fileUploads[i];
-      
-        try {
-          setFileUploads(prev => prev.map(u => 
-            u.id === upload.id ? { 
-              ...u, 
-              status: 'uploading', 
-              progress: 0, 
-              startTime: Date.now(),
-              uploadSpeed: 0,
-              estimatedTimeRemaining: 0
-            } : u
-          ));        const fileName = `${jobId}/${upload.file.name}`;
-        
+
+      try {
+        setFileUploads((prev) =>
+          prev.map((u) =>
+            u.id === upload.id
+              ? {
+                  ...u,
+                  status: "uploading",
+                  progress: 0,
+                  startTime: Date.now(),
+                  uploadSpeed: 0,
+                  estimatedTimeRemaining: 0,
+                }
+              : u,
+          ),
+        );
+        const fileName = `${jobId}/${upload.file.name}`;
+
         // Create FormData for XMLHttpRequest to track progress
         const formData = new FormData();
-        formData.append('file', upload.file);
-        
+        formData.append("file", upload.file);
+
         // Get upload URL from Supabase
         const { data: urlData, error: urlError } = await supabase.storage
-          .from('job-files')
+          .from("job-files")
           .createSignedUploadUrl(fileName);
-          
+
         if (urlError) {
-          console.warn('Signed URL creation failed, falling back to basic upload:', urlError);
-          
+          console.warn(
+            "Signed URL creation failed, falling back to basic upload:",
+            urlError,
+          );
+
           // Fallback to basic upload without progress tracking
           const { data, error } = await supabase.storage
-            .from('job-files')
+            .from("job-files")
             .upload(fileName, upload.file, {
-              cacheControl: '3600',
-              upsert: false
+              cacheControl: "3600",
+              upsert: false,
             });
-          
+
           if (error) {
-            console.error('Basic upload also failed:', error);
+            console.error("Basic upload also failed:", error);
             throw error;
           }
-          
-          setFileUploads(prev => prev.map(u => 
-            u.id === upload.id ? { ...u, status: 'completed', progress: 100 } : u
-          ));
-          
+
+          setFileUploads((prev) =>
+            prev.map((u) =>
+              u.id === upload.id
+                ? { ...u, status: "completed", progress: 100 }
+                : u,
+            ),
+          );
+
           const { data: fileUrl } = supabase.storage
-            .from('job-files')
+            .from("job-files")
             .getPublicUrl(data.path);
 
           uploadedFiles.push({
             entity_id: jobId,
-            entity_type: 'job',
+            entity_type: "job",
             file_name: upload.file.name,
             file_url: fileUrl.publicUrl,
             file_size: upload.file.size,
             file_type: upload.file.type,
-            uploaded_by: userId
+            uploaded_by: userId,
           });
         } else {
           // Use XMLHttpRequest for progress tracking
           await new Promise<void>((resolve, reject) => {
             const xhr = new XMLHttpRequest();
-            
+
             // Track upload progress
-            xhr.upload.addEventListener('progress', (e) => {
+            xhr.upload.addEventListener("progress", (e) => {
               if (e.lengthComputable) {
                 const percentComplete = Math.round((e.loaded / e.total) * 100);
                 const currentTime = Date.now();
-                
-                setFileUploads(prev => prev.map(u => {
-                  if (u.id === upload.id && u.startTime) {
-                    const elapsedTime = (currentTime - u.startTime) / 1000; // seconds
-                    const uploadSpeed = e.loaded / elapsedTime; // bytes per second
-                    const remainingBytes = e.total - e.loaded;
-                    const estimatedTimeRemaining = uploadSpeed > 0 ? remainingBytes / uploadSpeed : 0;
-                    
-                    return { 
-                      ...u, 
-                      progress: percentComplete,
-                      uploadSpeed,
-                      estimatedTimeRemaining
-                    };
-                  }
-                  return u;
-                }));
+
+                setFileUploads((prev) =>
+                  prev.map((u) => {
+                    if (u.id === upload.id && u.startTime) {
+                      const elapsedTime = (currentTime - u.startTime) / 1000; // seconds
+                      const uploadSpeed = e.loaded / elapsedTime; // bytes per second
+                      const remainingBytes = e.total - e.loaded;
+                      const estimatedTimeRemaining =
+                        uploadSpeed > 0 ? remainingBytes / uploadSpeed : 0;
+
+                      return {
+                        ...u,
+                        progress: percentComplete,
+                        uploadSpeed,
+                        estimatedTimeRemaining,
+                      };
+                    }
+                    return u;
+                  }),
+                );
               }
             });
-            
-            xhr.addEventListener('load', () => {
+
+            xhr.addEventListener("load", () => {
               if (xhr.status === 200) {
-                setFileUploads(prev => prev.map(u => 
-                  u.id === upload.id ? { ...u, status: 'completed', progress: 100 } : u
-                ));
+                setFileUploads((prev) =>
+                  prev.map((u) =>
+                    u.id === upload.id
+                      ? { ...u, status: "completed", progress: 100 }
+                      : u,
+                  ),
+                );
                 resolve();
               } else {
-                console.error('Upload failed with status:', xhr.status, 'Response:', xhr.responseText);
+                console.error(
+                  "Upload failed with status:",
+                  xhr.status,
+                  "Response:",
+                  xhr.responseText,
+                );
                 reject(new Error(`Upload failed with status ${xhr.status}`));
               }
             });
-            
-            xhr.addEventListener('error', () => {
-              reject(new Error('Upload failed due to network error'));
+
+            xhr.addEventListener("error", () => {
+              reject(new Error("Upload failed due to network error"));
             });
-            
-            xhr.open('POST', urlData.signedUrl);
+
+            xhr.open("POST", urlData.signedUrl);
             xhr.send(formData);
           });
-          
+
           // Get the public URL for the uploaded file
           const { data: fileUrl } = supabase.storage
-            .from('job-files')
+            .from("job-files")
             .getPublicUrl(fileName);
 
           uploadedFiles.push({
             entity_id: jobId,
-            entity_type: 'job',
+            entity_type: "job",
             file_name: upload.file.name,
             file_url: fileUrl.publicUrl,
             file_size: upload.file.size,
             file_type: upload.file.type,
-            uploaded_by: userId
+            uploaded_by: userId,
           });
         }
       } catch (err) {
-        console.error('Error uploading file:', err);
-        setFileUploads(prev => prev.map(u => 
-          u.id === upload.id ? { ...u, status: 'error', progress: 0 } : u
-        ));
+        console.error("Error uploading file:", err);
+        setFileUploads((prev) =>
+          prev.map((u) =>
+            u.id === upload.id ? { ...u, status: "error", progress: 0 } : u,
+          ),
+        );
         toast.error(`Failed to upload ${upload.file.name}`);
       }
     }
@@ -185,21 +214,24 @@ export const useFileUpload = () => {
 
   const getUploadProgress = (): number => {
     if (fileUploads.length === 0) return 0;
-    
-    const totalProgress = fileUploads.reduce((sum, upload) => sum + upload.progress, 0);
+
+    const totalProgress = fileUploads.reduce(
+      (sum, upload) => sum + upload.progress,
+      0,
+    );
     return Math.round(totalProgress / fileUploads.length);
   };
 
   const hasFailedUploads = (): boolean => {
-    return fileUploads.some(upload => upload.status === 'error');
+    return fileUploads.some((upload) => upload.status === "error");
   };
 
   const hasCompletedUploads = (): boolean => {
-    return fileUploads.some(upload => upload.status === 'completed');
+    return fileUploads.some((upload) => upload.status === "completed");
   };
 
   const isUploading = (): boolean => {
-    return fileUploads.some(upload => upload.status === 'uploading');
+    return fileUploads.some((upload) => upload.status === "uploading");
   };
 
   return {
@@ -212,6 +244,6 @@ export const useFileUpload = () => {
     hasFailedUploads,
     hasCompletedUploads,
     isUploading,
-    setFileUploads
+    setFileUploads,
   };
 };

@@ -1,5 +1,5 @@
-const { Client } = require('pg');
-require('dotenv').config({ path: '.env.local' });
+const { Client } = require("pg");
+require("dotenv").config({ path: ".env.local" });
 
 async function comprehensiveAuthFix() {
   const client = new Client({
@@ -8,16 +8,16 @@ async function comprehensiveAuthFix() {
     database: process.env.DATABASE_NAME,
     user: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
-    ssl: { rejectUnauthorized: false }
+    ssl: { rejectUnauthorized: false },
   });
 
   try {
     await client.connect();
-    console.log('🔧 Comprehensive Auth Fix - Resolving All Auth Issues\n');
+    console.log("🔧 Comprehensive Auth Fix - Resolving All Auth Issues\n");
 
     // Step 1: Check for any hidden auth issues
-    console.log('=== Step 1: Deep Auth Diagnosis ===');
-    
+    console.log("=== Step 1: Deep Auth Diagnosis ===");
+
     // Check if there are any problematic columns we missed
     const allColumns = await client.query(`
       SELECT column_name, data_type, is_nullable, column_default, character_maximum_length
@@ -32,14 +32,16 @@ async function comprehensiveAuthFix() {
       ORDER BY column_name
     `);
 
-    console.log('All auth-related columns:');
-    allColumns.rows.forEach(col => {
-      console.log(`  ${col.column_name}: ${col.data_type} (default: ${col.column_default || 'NULL'})`);
+    console.log("All auth-related columns:");
+    allColumns.rows.forEach((col) => {
+      console.log(
+        `  ${col.column_name}: ${col.data_type} (default: ${col.column_default || "NULL"})`,
+      );
     });
 
     // Step 2: Check for any users with problematic data
-    console.log('\n=== Step 2: Checking User Data Integrity ===');
-    
+    console.log("\n=== Step 2: Checking User Data Integrity ===");
+
     const userCheck = await client.query(`
       SELECT 
         id,
@@ -54,19 +56,21 @@ async function comprehensiveAuthFix() {
       ORDER BY email
     `);
 
-    console.log('User data integrity check:');
+    console.log("User data integrity check:");
     userCheck.rows.forEach((user, index) => {
       console.log(`  User ${index + 1}: ${user.email}`);
       console.log(`    ID: ${user.id}`);
-      console.log(`    Email confirmed: ${user.email_confirmed_at ? 'Yes' : 'No'}`);
+      console.log(
+        `    Email confirmed: ${user.email_confirmed_at ? "Yes" : "No"}`,
+      );
       console.log(`    Meta data length: ${user.meta_length}`);
       console.log(`    App meta length: ${user.app_meta_length}`);
-      console.log(`    Last sign in: ${user.last_sign_in_at || 'Never'}`);
+      console.log(`    Last sign in: ${user.last_sign_in_at || "Never"}`);
     });
 
     // Step 3: Force clean ALL potentially problematic fields
-    console.log('\n=== Step 3: Force Cleaning All Auth Fields ===');
-    
+    console.log("\n=== Step 3: Force Cleaning All Auth Fields ===");
+
     const cleanupResult = await client.query(`
       UPDATE auth.users 
       SET 
@@ -85,12 +89,12 @@ async function comprehensiveAuthFix() {
         email_change_confirm_status = 0
       WHERE 1=1
     `);
-    
+
     console.log(`✅ Cleaned ${cleanupResult.rowCount} user records`);
 
     // Step 4: Verify specific token values
-    console.log('\n=== Step 4: Token Verification ===');
-    
+    console.log("\n=== Step 4: Token Verification ===");
+
     const tokenVerification = await client.query(`
       SELECT 
         email,
@@ -109,19 +113,19 @@ async function comprehensiveAuthFix() {
         OR phone_change_token IS NOT NULL
         OR reauthentication_token IS NOT NULL
     `);
-    
+
     if (tokenVerification.rows.length > 0) {
-      console.log('⚠️  Found users with non-NULL tokens:');
-      tokenVerification.rows.forEach(user => {
+      console.log("⚠️  Found users with non-NULL tokens:");
+      tokenVerification.rows.forEach((user) => {
         console.log(`  ${user.email}: has non-NULL token values`);
       });
     } else {
-      console.log('✅ All users have NULL tokens');
+      console.log("✅ All users have NULL tokens");
     }
 
     // Step 5: Test a simple auth query that mimics what Supabase does
-    console.log('\n=== Step 5: Testing Auth Query Simulation ===');
-    
+    console.log("\n=== Step 5: Testing Auth Query Simulation ===");
+
     try {
       const authTest = await client.query(`
         SELECT 
@@ -135,30 +139,31 @@ async function comprehensiveAuthFix() {
         WHERE email = 'delsenterprise@gmail.com'
         LIMIT 1
       `);
-      
+
       if (authTest.rows.length > 0) {
         const user = authTest.rows[0];
-        console.log('✅ Auth query simulation successful');
+        console.log("✅ Auth query simulation successful");
         console.log(`  User ID: ${user.id}`);
         console.log(`  Email: ${user.email}`);
-        console.log(`  Tokens all NULL: ${
-          user.confirmation_token === null && 
-          user.recovery_token === null && 
-          user.email_change_token_current === null && 
-          user.phone_change_token === null
-        }`);
+        console.log(
+          `  Tokens all NULL: ${
+            user.confirmation_token === null &&
+            user.recovery_token === null &&
+            user.email_change_token_current === null &&
+            user.phone_change_token === null
+          }`,
+        );
       }
     } catch (authError) {
-      console.log('❌ Auth query simulation failed:', authError.message);
+      console.log("❌ Auth query simulation failed:", authError.message);
     }
 
-    console.log('\n🎉 Comprehensive Auth Fix Complete');
-    console.log('✅ All auth tokens cleaned and verified');
-    console.log('✅ User data integrity checked');
-    console.log('✅ Database triggers in place for future protection');
-
+    console.log("\n🎉 Comprehensive Auth Fix Complete");
+    console.log("✅ All auth tokens cleaned and verified");
+    console.log("✅ User data integrity checked");
+    console.log("✅ Database triggers in place for future protection");
   } catch (error) {
-    console.error('❌ Error in comprehensive auth fix:', error.message);
+    console.error("❌ Error in comprehensive auth fix:", error.message);
   } finally {
     try {
       await client.end();
@@ -168,8 +173,8 @@ async function comprehensiveAuthFix() {
   }
 }
 
-console.log('🚀 Starting Comprehensive Auth Fix...');
-console.log('📋 This will thoroughly diagnose and fix all auth-related issues');
-console.log('🔧 Includes deep cleaning and verification of all auth data\n');
+console.log("🚀 Starting Comprehensive Auth Fix...");
+console.log("📋 This will thoroughly diagnose and fix all auth-related issues");
+console.log("🔧 Includes deep cleaning and verification of all auth data\n");
 
 comprehensiveAuthFix().catch(console.error);

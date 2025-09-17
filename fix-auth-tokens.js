@@ -1,5 +1,5 @@
-const { Client } = require('pg');
-require('dotenv').config({ path: '.env.local' });
+const { Client } = require("pg");
+require("dotenv").config({ path: ".env.local" });
 
 async function fixAuthTokens() {
   const client = new Client({
@@ -8,15 +8,17 @@ async function fixAuthTokens() {
     database: process.env.DATABASE_NAME,
     user: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
-    ssl: { rejectUnauthorized: false }
+    ssl: { rejectUnauthorized: false },
   });
 
   try {
     await client.connect();
-    console.log('🔧 Fixing Supabase Auth Tokens - Setting Empty Strings to NULL\n');
+    console.log(
+      "🔧 Fixing Supabase Auth Tokens - Setting Empty Strings to NULL\n",
+    );
 
     // Step 1: Check current state
-    console.log('=== Current Token State ===');
+    console.log("=== Current Token State ===");
     const currentState = await client.query(`
       SELECT 
         COUNT(*) as total_users,
@@ -28,18 +30,26 @@ async function fixAuthTokens() {
         COUNT(CASE WHEN reauthentication_token = '' THEN 1 END) as empty_reauth_tokens
       FROM auth.users
     `);
-    
+
     const stats = currentState.rows[0];
     console.log(`Total users: ${stats.total_users}`);
-    console.log(`Empty confirmation tokens: ${stats.empty_confirmation_tokens}`);
+    console.log(
+      `Empty confirmation tokens: ${stats.empty_confirmation_tokens}`,
+    );
     console.log(`Empty recovery tokens: ${stats.empty_recovery_tokens}`);
-    console.log(`Empty email change new tokens: ${stats.empty_email_change_new_tokens}`);
-    console.log(`Empty email change current tokens: ${stats.empty_email_change_current_tokens}`);
-    console.log(`Empty phone change tokens: ${stats.empty_phone_change_tokens}`);
+    console.log(
+      `Empty email change new tokens: ${stats.empty_email_change_new_tokens}`,
+    );
+    console.log(
+      `Empty email change current tokens: ${stats.empty_email_change_current_tokens}`,
+    );
+    console.log(
+      `Empty phone change tokens: ${stats.empty_phone_change_tokens}`,
+    );
     console.log(`Empty reauth tokens: ${stats.empty_reauth_tokens}`);
 
     // Step 2: Apply the fix
-    console.log('\n=== Applying Fix ===');
+    console.log("\n=== Applying Fix ===");
     const fixResult = await client.query(`
       UPDATE auth.users 
       SET 
@@ -57,11 +67,11 @@ async function fixAuthTokens() {
         OR phone_change_token = ''
         OR reauthentication_token = ''
     `);
-    
+
     console.log(`✅ Updated ${fixResult.rowCount} user records`);
 
     // Step 3: Verify the fix
-    console.log('\n=== After Fix - Verification ===');
+    console.log("\n=== After Fix - Verification ===");
     const afterState = await client.query(`
       SELECT 
         COUNT(*) as total_users,
@@ -73,18 +83,30 @@ async function fixAuthTokens() {
         COUNT(CASE WHEN reauthentication_token IS NULL THEN 1 END) as null_reauth_tokens
       FROM auth.users
     `);
-    
+
     const afterStats = afterState.rows[0];
     console.log(`Total users: ${afterStats.total_users}`);
-    console.log(`NULL confirmation tokens: ${afterStats.null_confirmation_tokens} (should equal total)`);
-    console.log(`NULL recovery tokens: ${afterStats.null_recovery_tokens} (should equal total)`);
-    console.log(`NULL email change new tokens: ${afterStats.null_email_change_new_tokens} (should equal total)`);
-    console.log(`NULL email change current tokens: ${afterStats.null_email_change_current_tokens} (should equal total)`);
-    console.log(`NULL phone change tokens: ${afterStats.null_phone_change_tokens} (should equal total)`);
-    console.log(`NULL reauth tokens: ${afterStats.null_reauth_tokens} (should equal total)`);
+    console.log(
+      `NULL confirmation tokens: ${afterStats.null_confirmation_tokens} (should equal total)`,
+    );
+    console.log(
+      `NULL recovery tokens: ${afterStats.null_recovery_tokens} (should equal total)`,
+    );
+    console.log(
+      `NULL email change new tokens: ${afterStats.null_email_change_new_tokens} (should equal total)`,
+    );
+    console.log(
+      `NULL email change current tokens: ${afterStats.null_email_change_current_tokens} (should equal total)`,
+    );
+    console.log(
+      `NULL phone change tokens: ${afterStats.null_phone_change_tokens} (should equal total)`,
+    );
+    console.log(
+      `NULL reauth tokens: ${afterStats.null_reauth_tokens} (should equal total)`,
+    );
 
     // Step 4: Show sample users
-    console.log('\n=== Sample User Token Status ===');
+    console.log("\n=== Sample User Token Status ===");
     const sampleUsers = await client.query(`
       SELECT 
         email,
@@ -108,13 +130,16 @@ async function fixAuthTokens() {
       console.log(`  Recovery: ${user.recovery_status}`);
     });
 
-    console.log('\n🎉 Auth token fix completed successfully!');
-    console.log('✅ All empty string tokens have been set to proper NULL values');
-    console.log('🔐 Authentication should now work properly without null string conversion errors');
-
+    console.log("\n🎉 Auth token fix completed successfully!");
+    console.log(
+      "✅ All empty string tokens have been set to proper NULL values",
+    );
+    console.log(
+      "🔐 Authentication should now work properly without null string conversion errors",
+    );
   } catch (error) {
-    console.error('❌ Error fixing auth tokens:', error.message);
-    console.error('Full error:', error);
+    console.error("❌ Error fixing auth tokens:", error.message);
+    console.error("Full error:", error);
   } finally {
     try {
       await client.end();
@@ -124,8 +149,8 @@ async function fixAuthTokens() {
   }
 }
 
-console.log('🚀 Starting Auth Token Fix Process...');
+console.log("🚀 Starting Auth Token Fix Process...");
 console.log('📋 This will fix the "converting NULL to string" auth error');
-console.log('🔧 Setting empty string tokens to proper NULL values\n');
+console.log("🔧 Setting empty string tokens to proper NULL values\n");
 
 fixAuthTokens().catch(console.error);

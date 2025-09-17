@@ -1,10 +1,12 @@
 # 🔧 Jobs Table RLS Policy Fix
 
 ## ❌ Current Issue
+
 - Console Error: `Job creation error: {}`
 - Detailed Error: `Failed to create job: permission denied for table jobs`
 
 ## 🔍 Root Cause
+
 The jobs table has RLS (Row Level Security) enabled but only has SELECT policies for anonymous users. There are no INSERT policies for authenticated users.
 
 ## ✅ Solution
@@ -60,10 +62,12 @@ If you can't access the Supabase dashboard right now, I can implement a temporar
 After executing the SQL, the job submission should work without the permission denied error.
 
 ## 📋 Files Modified
+
 - `/src/app/dashboard/submit-job/page.tsx` - Fixed job data structure to match database schema
 - Enhanced error handling to show actual error messages instead of empty objects
 
 ## 🎯 Expected Result
+
 - ✅ Job submission works without permission errors
 - ✅ Console shows actual error messages instead of `{}`
 - ✅ New customer creation works

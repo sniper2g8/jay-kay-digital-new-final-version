@@ -1,5 +1,5 @@
-const { Client } = require('pg');
-require('dotenv').config({ path: '.env.local' });
+const { Client } = require("pg");
+require("dotenv").config({ path: ".env.local" });
 
 async function testAuthQueries() {
   const client = new Client({
@@ -8,15 +8,15 @@ async function testAuthQueries() {
     database: process.env.DATABASE_NAME,
     user: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
-    ssl: { rejectUnauthorized: false }
+    ssl: { rejectUnauthorized: false },
   });
 
   try {
     await client.connect();
-    console.log('Testing authentication queries...\n');
+    console.log("Testing authentication queries...\n");
 
     // Test 1: Check auth.users table structure
-    console.log('=== Testing auth.users access ===');
+    console.log("=== Testing auth.users access ===");
     try {
       const authUsersTest = await client.query(`
         SELECT 
@@ -32,21 +32,24 @@ async function testAuthQueries() {
         LIMIT 3
       `);
       console.log(`✓ Found ${authUsersTest.rows.length} users in auth.users`);
-      
+
       // Check for any remaining empty string tokens
       authUsersTest.rows.forEach((user, index) => {
         console.log(`User ${index + 1}:`);
         console.log(`  Email: ${user.email}`);
-        console.log(`  Confirmation Token: ${user.confirmation_token === '' ? 'EMPTY STRING (BAD)' : user.confirmation_token || 'NULL (GOOD)'}`);
-        console.log(`  Recovery Token: ${user.recovery_token === '' ? 'EMPTY STRING (BAD)' : user.recovery_token || 'NULL (GOOD)'}`);
+        console.log(
+          `  Confirmation Token: ${user.confirmation_token === "" ? "EMPTY STRING (BAD)" : user.confirmation_token || "NULL (GOOD)"}`,
+        );
+        console.log(
+          `  Recovery Token: ${user.recovery_token === "" ? "EMPTY STRING (BAD)" : user.recovery_token || "NULL (GOOD)"}`,
+        );
       });
-      
     } catch (error) {
-      console.log('❌ Error accessing auth.users:', error.message);
+      console.log("❌ Error accessing auth.users:", error.message);
     }
 
     // Test 2: Check appUsers table
-    console.log('\n=== Testing appUsers access ===');
+    console.log("\n=== Testing appUsers access ===");
     try {
       const appUsersTest = await client.query(`
         SELECT 
@@ -61,15 +64,16 @@ async function testAuthQueries() {
       `);
       console.log(`✓ Found ${appUsersTest.rows.length} users in appUsers`);
       appUsersTest.rows.forEach((user, index) => {
-        console.log(`User ${index + 1}: ${user.name} (${user.email}) - Role: ${user.primary_role}`);
+        console.log(
+          `User ${index + 1}: ${user.name} (${user.email}) - Role: ${user.primary_role}`,
+        );
       });
-      
     } catch (error) {
-      console.log('❌ Error accessing appUsers:', error.message);
+      console.log("❌ Error accessing appUsers:", error.message);
     }
 
     // Test 3: Test join between auth.users and appUsers
-    console.log('\n=== Testing auth.users + appUsers join ===');
+    console.log("\n=== Testing auth.users + appUsers join ===");
     try {
       const joinTest = await client.query(`
         SELECT 
@@ -84,17 +88,17 @@ async function testAuthQueries() {
       `);
       console.log(`✓ Successfully joined ${joinTest.rows.length} users`);
       joinTest.rows.forEach((user, index) => {
-        console.log(`Joined User ${index + 1}: ${user.name} (${user.email}) - Confirmed: ${user.email_confirmed_at ? 'Yes' : 'No'}`);
+        console.log(
+          `Joined User ${index + 1}: ${user.name} (${user.email}) - Confirmed: ${user.email_confirmed_at ? "Yes" : "No"}`,
+        );
       });
-      
     } catch (error) {
-      console.log('❌ Error in join query:', error.message);
+      console.log("❌ Error in join query:", error.message);
     }
 
-    console.log('\n🎉 Authentication query tests completed!');
-
+    console.log("\n🎉 Authentication query tests completed!");
   } catch (error) {
-    console.error('❌ Database connection failed:', error.message);
+    console.error("❌ Database connection failed:", error.message);
   } finally {
     try {
       await client.end();

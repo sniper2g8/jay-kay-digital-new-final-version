@@ -1,37 +1,51 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { 
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { 
-  ArrowLeft, 
+} from "@/components/ui/select";
+import {
+  ArrowLeft,
   Plus,
   Trash2,
   Calculator,
   Save,
   Send,
-  Loader2
-} from 'lucide-react';
-import Link from 'next/link';
-import { useCustomers } from '@/lib/hooks/useCustomers';
-import { useUninvoicedJobsByCustomer } from '@/lib/hooks/useJobs';
-import { useInvoiceTemplates, useInvoiceActions, type InvoiceFormData, type InvoiceLineItem } from '@/lib/hooks/useInvoiceManagement';
-import { formatCurrency, formatDate } from '@/lib/constants';
-import DashboardLayout from '@/components/DashboardLayout';
-import ProtectedDashboard from '@/components/ProtectedDashboard';
+  Loader2,
+} from "lucide-react";
+import Link from "next/link";
+import { useCustomers } from "@/lib/hooks/useCustomers";
+import { useUninvoicedJobsByCustomer } from "@/lib/hooks/useJobs";
+import {
+  useInvoiceActions,
+  type InvoiceFormData,
+  type InvoiceLineItem,
+} from "@/lib/hooks/useInvoiceManagement";
+import { formatCurrency, formatDate } from "@/lib/constants";
+import DashboardLayout from "@/components/DashboardLayout";
+import ProtectedDashboard from "@/components/ProtectedDashboard";
 
-interface InvoiceLineItemForm extends Omit<InvoiceLineItem, 'id' | 'invoice_id' | 'created_at' | 'updated_at'> {
+interface InvoiceLineItemForm
+  extends Omit<
+    InvoiceLineItem,
+    "id" | "invoice_id" | "created_at" | "updated_at"
+  > {
   tempId: string;
 }
 
@@ -44,112 +58,124 @@ interface CreateInvoicePageProps {
 function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
   const router = useRouter();
   const { data: customers, isLoading: customersLoading } = useCustomers();
-  const { data: templates, isLoading: templatesLoading } = useInvoiceTemplates();
+  // const { data: templates, isLoading: templatesLoading } = useInvoiceTemplates(); // Commented out - table doesn't exist
   const { createInvoice, createInvoiceFromJob } = useInvoiceActions();
 
   const [isLoading, setIsLoading] = useState(false);
   const [selectedJobIds, setSelectedJobIds] = useState<Set<string>>(new Set());
   const [formData, setFormData] = useState<InvoiceFormData>({
-    customer_id: '',
-    invoice_date: new Date().toISOString().split('T')[0],
+    customer_id: "",
+    invoice_date: new Date().toISOString().split("T")[0],
     terms_days: 30,
-    notes: '',
-    template_id: '',
-    line_items: []
+    notes: "",
+    template_id: "",
+    line_items: [],
   });
 
   // Get uninvoiced jobs for selected customer
-  const { data: uninvoicedJobs, isLoading: jobsLoading } = useUninvoicedJobsByCustomer(
-    formData.customer_id || null
-  );
+  const { data: uninvoicedJobs, isLoading: jobsLoading } =
+    useUninvoicedJobsByCustomer(formData.customer_id || null);
 
   const [lineItems, setLineItems] = useState<InvoiceLineItemForm[]>([
     {
-      tempId: '1',
-      description: '',
+      tempId: "1",
+      description: "",
       quantity: 1,
       unit_price: 0,
       total_price: 0,
       line_order: 1,
       discount_amount: 0,
       tax_rate: 0,
-      tax_amount: 0
-    }
+      tax_amount: 0,
+    },
   ]);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Set default template when templates load
-  useEffect(() => {
-    if (templates && templates.length > 0 && !formData.template_id) {
-      const defaultTemplate = templates.find(t => t.is_default) || templates[0];
-      setFormData(prev => ({ ...prev, template_id: defaultTemplate.id }));
-    }
-  }, [templates, formData.template_id]);
+  // Template functionality commented out - table doesn't exist in database
+  // useEffect(() => {
+  //   if (templates && templates.length > 0 && !formData.template_id) {
+  //     const defaultTemplate = templates.find(t => t.is_default) || templates[0];
+  //     setFormData(prev => ({ ...prev, template_id: defaultTemplate.id }));
+  //   }
+  // }, [formData.template_id]);
 
   // Calculate due date when invoice date or terms change
   useEffect(() => {
     if (formData.invoice_date && formData.terms_days) {
       const dueDate = new Date(formData.invoice_date);
       dueDate.setDate(dueDate.getDate() + formData.terms_days);
-      setFormData(prev => ({ ...prev, due_date: dueDate.toISOString().split('T')[0] }));
+      setFormData((prev) => ({
+        ...prev,
+        due_date: dueDate.toISOString().split("T")[0],
+      }));
     }
   }, [formData.invoice_date, formData.terms_days]);
 
-  const handleInputChange = (field: keyof InvoiceFormData, value: string | number) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
+  const handleInputChange = (
+    field: keyof InvoiceFormData,
+    value: string | number,
+  ) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+
     // Clear error when user starts typing
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+      setErrors((prev) => ({ ...prev, [field]: "" }));
     }
   };
 
-  const handleLineItemChange = (tempId: string, field: keyof InvoiceLineItemForm, value: string | number) => {
-    setLineItems(prev => prev.map(item => {
-      if (item.tempId === tempId) {
-        const updated = { ...item, [field]: value };
-        
-        // Auto-calculate total price
-        if (field === 'quantity' || field === 'unit_price') {
-          updated.total_price = updated.quantity * updated.unit_price;
+  const handleLineItemChange = (
+    tempId: string,
+    field: keyof InvoiceLineItemForm,
+    value: string | number,
+  ) => {
+    setLineItems((prev) =>
+      prev.map((item) => {
+        if (item.tempId === tempId) {
+          const updated = { ...item, [field]: value };
+
+          // Auto-calculate total price
+          if (field === "quantity" || field === "unit_price") {
+            updated.total_price = updated.quantity * updated.unit_price;
+          }
+
+          // Auto-calculate tax amount
+          if (field === "tax_rate" || field === "total_price") {
+            updated.tax_amount =
+              (updated.total_price * (updated.tax_rate || 0)) / 100;
+          }
+
+          return updated;
         }
-        
-        // Auto-calculate tax amount
-        if (field === 'tax_rate' || field === 'total_price') {
-          updated.tax_amount = (updated.total_price * (updated.tax_rate || 0)) / 100;
-        }
-        
-        return updated;
-      }
-      return item;
-    }));
+        return item;
+      }),
+    );
   };
 
   const addLineItem = () => {
     const newItem: InvoiceLineItemForm = {
       tempId: Date.now().toString(),
-      description: '',
+      description: "",
       quantity: 1,
       unit_price: 0,
       total_price: 0,
       line_order: lineItems.length + 1,
       discount_amount: 0,
       tax_rate: 0,
-      tax_amount: 0
+      tax_amount: 0,
     };
-    setLineItems(prev => [...prev, newItem]);
+    setLineItems((prev) => [...prev, newItem]);
   };
 
   const removeLineItem = (tempId: string) => {
     if (lineItems.length > 1) {
-      setLineItems(prev => prev.filter(item => item.tempId !== tempId));
+      setLineItems((prev) => prev.filter((item) => item.tempId !== tempId));
     }
   };
 
   // Job selection handlers
   const handleJobSelection = (jobId: string, selected: boolean) => {
-    setSelectedJobIds(prev => {
+    setSelectedJobIds((prev) => {
       const newSet = new Set(prev);
       if (selected) {
         newSet.add(jobId);
@@ -162,7 +188,7 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
 
   const handleSelectAllJobs = () => {
     if (uninvoicedJobs) {
-      setSelectedJobIds(new Set(uninvoicedJobs.map(job => job.id)));
+      setSelectedJobIds(new Set(uninvoicedJobs.map((job) => job.id)));
     }
   };
 
@@ -173,34 +199,48 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
   const addJobsToLineItems = () => {
     if (!uninvoicedJobs || selectedJobIds.size === 0) return;
 
-    const selectedJobs = uninvoicedJobs.filter(job => selectedJobIds.has(job.id));
-    const newLineItems: InvoiceLineItemForm[] = selectedJobs.map((job, index) => ({
-      tempId: `job-${job.id}`,
-      description: job.description || `Job: ${job.jobNo || job.id}`,
-      quantity: job.quantity || 1,
-      unit_price: job.final_cost || job.estimate_price || 0,
-      total_price: (job.final_cost || job.estimate_price || 0) * (job.quantity || 1),
-      line_order: lineItems.length + index + 1,
-      discount_amount: 0,
-      tax_rate: 0,
-      tax_amount: 0
-    }));
+    const selectedJobs = uninvoicedJobs.filter((job) =>
+      selectedJobIds.has(job.id),
+    );
+    const newLineItems: InvoiceLineItemForm[] = selectedJobs.map(
+      (job, index) => ({
+        tempId: `job-${job.id}`,
+        description: job.description || `Job: ${job.jobNo || job.id}`,
+        quantity: job.quantity || 1,
+        unit_price: job.final_cost || job.estimate_price || 0,
+        total_price:
+          (job.final_cost || job.estimate_price || 0) * (job.quantity || 1),
+        line_order: lineItems.length + index + 1,
+        discount_amount: 0,
+        tax_rate: 0,
+        tax_amount: 0,
+      }),
+    );
 
-    setLineItems(prev => [...prev, ...newLineItems]);
+    setLineItems((prev) => [...prev, ...newLineItems]);
     setSelectedJobIds(new Set()); // Clear selection after adding
   };
 
   const calculateTotals = () => {
-    const subtotal = lineItems.reduce((sum, item) => sum + (item.total_price || 0), 0);
-    const taxTotal = lineItems.reduce((sum, item) => sum + (item.tax_amount || 0), 0);
-    const discountTotal = lineItems.reduce((sum, item) => sum + (item.discount_amount || 0), 0);
+    const subtotal = lineItems.reduce(
+      (sum, item) => sum + (item.total_price || 0),
+      0,
+    );
+    const taxTotal = lineItems.reduce(
+      (sum, item) => sum + (item.tax_amount || 0),
+      0,
+    );
+    const discountTotal = lineItems.reduce(
+      (sum, item) => sum + (item.discount_amount || 0),
+      0,
+    );
     const total = subtotal + taxTotal - discountTotal;
 
     return {
       subtotal,
       taxTotal,
       discountTotal,
-      total
+      total,
     };
   };
 
@@ -208,24 +248,27 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
     const newErrors: Record<string, string> = {};
 
     if (!formData.customer_id) {
-      newErrors.customer_id = 'Customer is required';
+      newErrors.customer_id = "Customer is required";
     }
 
     if (!formData.invoice_date) {
-      newErrors.invoice_date = 'Invoice date is required';
+      newErrors.invoice_date = "Invoice date is required";
     }
 
-    if (lineItems.every(item => !item.description.trim())) {
-      newErrors.line_items = 'At least one line item with description is required';
+    if (lineItems.every((item) => !item.description.trim())) {
+      newErrors.line_items =
+        "At least one line item with description is required";
     }
 
     // Validate line items
     lineItems.forEach((item, index) => {
       if (item.description.trim() && item.unit_price <= 0) {
-        newErrors[`line_item_${index}_price`] = 'Unit price must be greater than 0';
+        newErrors[`line_item_${index}_price`] =
+          "Unit price must be greater than 0";
       }
       if (item.description.trim() && item.quantity <= 0) {
-        newErrors[`line_item_${index}_quantity`] = 'Quantity must be greater than 0';
+        newErrors[`line_item_${index}_quantity`] =
+          "Quantity must be greater than 0";
       }
     });
 
@@ -233,7 +276,7 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (action: 'save' | 'send') => {
+  const handleSubmit = async (action: "save" | "send") => {
     if (!validateForm()) {
       return;
     }
@@ -242,7 +285,7 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
     try {
       // Filter out empty line items and remove temp fields
       const validLineItems = lineItems
-        .filter(item => item.description.trim())
+        .filter((item) => item.description.trim())
         .map(({ tempId, ...item }) => {
           // Remove tempId from item
           void tempId; // Acknowledge we're not using tempId
@@ -251,7 +294,7 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
 
       const invoiceData: InvoiceFormData = {
         ...formData,
-        line_items: validLineItems
+        line_items: validLineItems,
       };
 
       let invoice;
@@ -261,23 +304,25 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
         invoice = await createInvoice(invoiceData);
       }
 
-      if (action === 'send') {
+      if (action === "send") {
         // TODO: Implement send functionality
-        console.log('Send invoice:', invoice.id);
+        console.log("Send invoice:", invoice.id);
       }
 
       router.push(`/dashboard/invoices/${invoice.id}`);
     } catch (error) {
-      console.error('Error creating invoice:', error);
+      console.error("Error creating invoice:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
   const totals = calculateTotals();
-  const selectedCustomer = customers?.find(c => c.id === formData.customer_id);
+  const selectedCustomer = customers?.find(
+    (c) => c.id === formData.customer_id,
+  );
 
-  if (customersLoading || templatesLoading) {
+  if (customersLoading) {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center min-h-screen">
@@ -305,7 +350,7 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
-              {params?.jobId ? 'Create Invoice from Job' : 'Create New Invoice'}
+              {params?.jobId ? "Create Invoice from Job" : "Create New Invoice"}
             </h1>
             <p className="text-muted-foreground mt-1">
               Generate a new invoice for services or products
@@ -328,9 +373,11 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
                 {/* Customer Selection */}
                 <div className="space-y-2">
                   <Label htmlFor="customer_id">Customer *</Label>
-                  <Select 
-                    value={formData.customer_id} 
-                    onValueChange={(value) => handleInputChange('customer_id', value)}
+                  <Select
+                    value={formData.customer_id}
+                    onValueChange={(value) =>
+                      handleInputChange("customer_id", value)
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select a customer" />
@@ -339,7 +386,8 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
                       {customers?.map((customer) => (
                         <SelectItem key={customer.id} value={customer.id}>
                           {customer.business_name}
-                          {customer.contact_person && ` - ${customer.contact_person}`}
+                          {customer.contact_person &&
+                            ` - ${customer.contact_person}`}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -350,98 +398,114 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
                 </div>
 
                 {/* Uninvoiced Jobs Section */}
-                {formData.customer_id && uninvoicedJobs && uninvoicedJobs.length > 0 && (
-                  <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-medium">Uninvoiced Jobs</h4>
-                        <p className="text-sm text-muted-foreground">
-                          Select jobs to add as line items
-                        </p>
+                {formData.customer_id &&
+                  uninvoicedJobs &&
+                  uninvoicedJobs.length > 0 && (
+                    <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium">Uninvoiced Jobs</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Select jobs to add as line items
+                          </p>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={handleSelectAllJobs}
+                          >
+                            Select All
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={handleClearJobSelection}
+                          >
+                            Clear
+                          </Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            onClick={addJobsToLineItems}
+                            disabled={selectedJobIds.size === 0}
+                          >
+                            Add Selected ({selectedJobIds.size})
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex gap-2">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={handleSelectAllJobs}
-                        >
-                          Select All
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={handleClearJobSelection}
-                        >
-                          Clear
-                        </Button>
-                        <Button
-                          type="button"
-                          size="sm"
-                          onClick={addJobsToLineItems}
-                          disabled={selectedJobIds.size === 0}
-                        >
-                          Add Selected ({selectedJobIds.size})
-                        </Button>
-                      </div>
-                    </div>
-                    
-                    <div className="grid gap-2 max-h-64 overflow-y-auto">
-                      {uninvoicedJobs.map((job) => (
-                        <div
-                          key={job.id}
-                          className="flex items-center space-x-3 p-3 border rounded-md bg-background hover:bg-muted/50 cursor-pointer"
-                          onClick={() => handleJobSelection(job.id, !selectedJobIds.has(job.id))}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedJobIds.has(job.id)}
-                            onChange={(e) => handleJobSelection(job.id, e.target.checked)}
-                            className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between">
-                              <p className="text-sm font-medium truncate">
-                                {job.jobNo || `Job ${job.id}`}
-                              </p>
-                              <span className="text-sm font-medium text-right">
-                                {formatCurrency(job.final_cost || job.estimate_price || 0)}
-                              </span>
-                            </div>
-                            <p className="text-sm text-muted-foreground truncate">
-                              {job.description || 'No description'}
-                            </p>
-                            <div className="flex justify-between items-center mt-1">
-                              <span className="text-xs text-muted-foreground">
-                                Status: {job.status}
-                              </span>
-                              {job.quantity && job.quantity > 1 && (
-                                <span className="text-xs text-muted-foreground">
-                                  Qty: {job.quantity}
+
+                      <div className="grid gap-2 max-h-64 overflow-y-auto">
+                        {uninvoicedJobs.map((job) => (
+                          <div
+                            key={job.id}
+                            className="flex items-center space-x-3 p-3 border rounded-md bg-background hover:bg-muted/50 cursor-pointer"
+                            onClick={() =>
+                              handleJobSelection(
+                                job.id,
+                                !selectedJobIds.has(job.id),
+                              )
+                            }
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedJobIds.has(job.id)}
+                              onChange={(e) =>
+                                handleJobSelection(job.id, e.target.checked)
+                              }
+                              className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium truncate">
+                                  {job.jobNo || `Job ${job.id}`}
+                                </p>
+                                <span className="text-sm font-medium text-right">
+                                  {formatCurrency(
+                                    job.final_cost || job.estimate_price || 0,
+                                  )}
                                 </span>
-                              )}
+                              </div>
+                              <p className="text-sm text-muted-foreground truncate">
+                                {job.description || "No description"}
+                              </p>
+                              <div className="flex justify-between items-center mt-1">
+                                <span className="text-xs text-muted-foreground">
+                                  Status: {job.status}
+                                </span>
+                                {job.quantity && job.quantity > 1 && (
+                                  <span className="text-xs text-muted-foreground">
+                                    Qty: {job.quantity}
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {formData.customer_id && uninvoicedJobs && uninvoicedJobs.length === 0 && !jobsLoading && (
-                  <div className="p-4 border rounded-lg bg-muted/50">
-                    <p className="text-sm text-muted-foreground text-center">
-                      No uninvoiced jobs found for this customer
-                    </p>
-                  </div>
-                )}
+                {formData.customer_id &&
+                  uninvoicedJobs &&
+                  uninvoicedJobs.length === 0 &&
+                  !jobsLoading && (
+                    <div className="p-4 border rounded-lg bg-muted/50">
+                      <p className="text-sm text-muted-foreground text-center">
+                        No uninvoiced jobs found for this customer
+                      </p>
+                    </div>
+                  )}
 
                 {formData.customer_id && jobsLoading && (
                   <div className="p-4 border rounded-lg bg-muted/50">
                     <div className="flex items-center justify-center">
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      <span className="text-sm text-muted-foreground">Loading jobs...</span>
+                      <span className="text-sm text-muted-foreground">
+                        Loading jobs...
+                      </span>
                     </div>
                   </div>
                 )}
@@ -454,18 +518,24 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
                       id="invoice_date"
                       type="date"
                       value={formData.invoice_date}
-                      onChange={(e) => handleInputChange('invoice_date', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("invoice_date", e.target.value)
+                      }
                     />
                     {errors.invoice_date && (
-                      <p className="text-sm text-red-600">{errors.invoice_date}</p>
+                      <p className="text-sm text-red-600">
+                        {errors.invoice_date}
+                      </p>
                     )}
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="terms_days">Payment Terms (Days)</Label>
-                    <Select 
-                      value={formData.terms_days.toString()} 
-                      onValueChange={(value) => handleInputChange('terms_days', parseInt(value))}
+                    <Select
+                      value={formData.terms_days.toString()}
+                      onValueChange={(value) =>
+                        handleInputChange("terms_days", parseInt(value))
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue />
@@ -480,8 +550,8 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
                   </div>
                 </div>
 
-                {/* Template Selection */}
-                <div className="space-y-2">
+                {/* Template Selection - Commented out since table doesn't exist */}
+                {/* <div className="space-y-2">
                   <Label htmlFor="template_id">Invoice Template</Label>
                   <Select 
                     value={formData.template_id} 
@@ -499,7 +569,7 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
+                </div> */}
 
                 {/* Notes */}
                 <div className="space-y-2">
@@ -508,7 +578,7 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
                     id="notes"
                     placeholder="Additional notes or instructions..."
                     value={formData.notes}
-                    onChange={(e) => handleInputChange('notes', e.target.value)}
+                    onChange={(e) => handleInputChange("notes", e.target.value)}
                     rows={3}
                   />
                 </div>
@@ -537,9 +607,14 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
               <CardContent>
                 <div className="space-y-4">
                   {lineItems.map((item, index) => (
-                    <div key={item.tempId} className="border rounded-lg p-4 space-y-4">
+                    <div
+                      key={item.tempId}
+                      className="border rounded-lg p-4 space-y-4"
+                    >
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">Item #{index + 1}</span>
+                        <span className="text-sm font-medium">
+                          Item #{index + 1}
+                        </span>
                         {lineItems.length > 1 && (
                           <Button
                             type="button"
@@ -551,17 +626,25 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
                           </Button>
                         )}
                       </div>
-                      
+
                       <div className="space-y-4">
                         <div>
                           <Label>Description *</Label>
                           <Input
                             placeholder="Item description..."
                             value={item.description}
-                            onChange={(e) => handleLineItemChange(item.tempId, 'description', e.target.value)}
+                            onChange={(e) =>
+                              handleLineItemChange(
+                                item.tempId,
+                                "description",
+                                e.target.value,
+                              )
+                            }
                           />
                           {errors[`line_item_${index}_description`] && (
-                            <p className="text-sm text-red-600">{errors[`line_item_${index}_description`]}</p>
+                            <p className="text-sm text-red-600">
+                              {errors[`line_item_${index}_description`]}
+                            </p>
                           )}
                         </div>
 
@@ -572,10 +655,18 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
                               type="number"
                               min="1"
                               value={item.quantity}
-                              onChange={(e) => handleLineItemChange(item.tempId, 'quantity', parseFloat(e.target.value) || 0)}
+                              onChange={(e) =>
+                                handleLineItemChange(
+                                  item.tempId,
+                                  "quantity",
+                                  parseFloat(e.target.value) || 0,
+                                )
+                              }
                             />
                             {errors[`line_item_${index}_quantity`] && (
-                              <p className="text-sm text-red-600">{errors[`line_item_${index}_quantity`]}</p>
+                              <p className="text-sm text-red-600">
+                                {errors[`line_item_${index}_quantity`]}
+                              </p>
                             )}
                           </div>
 
@@ -586,10 +677,18 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
                               min="0"
                               step="0.01"
                               value={item.unit_price}
-                              onChange={(e) => handleLineItemChange(item.tempId, 'unit_price', parseFloat(e.target.value) || 0)}
+                              onChange={(e) =>
+                                handleLineItemChange(
+                                  item.tempId,
+                                  "unit_price",
+                                  parseFloat(e.target.value) || 0,
+                                )
+                              }
                             />
                             {errors[`line_item_${index}_price`] && (
-                              <p className="text-sm text-red-600">{errors[`line_item_${index}_price`]}</p>
+                              <p className="text-sm text-red-600">
+                                {errors[`line_item_${index}_price`]}
+                              </p>
                             )}
                           </div>
 
@@ -601,14 +700,22 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
                               max="100"
                               step="0.01"
                               value={item.tax_rate}
-                              onChange={(e) => handleLineItemChange(item.tempId, 'tax_rate', parseFloat(e.target.value) || 0)}
+                              onChange={(e) =>
+                                handleLineItemChange(
+                                  item.tempId,
+                                  "tax_rate",
+                                  parseFloat(e.target.value) || 0,
+                                )
+                              }
                             />
                           </div>
 
                           <div>
                             <Label>Total</Label>
                             <div className="flex items-center h-10 px-3 border rounded-md bg-muted">
-                              {formatCurrency(item.total_price + (item.tax_amount || 0))}
+                              {formatCurrency(
+                                item.total_price + (item.tax_amount || 0),
+                              )}
                             </div>
                           </div>
                         </div>
@@ -625,8 +732,8 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
 
             {/* Actions */}
             <div className="flex gap-4">
-              <Button 
-                onClick={() => handleSubmit('save')} 
+              <Button
+                onClick={() => handleSubmit("save")}
                 disabled={isLoading}
                 className="flex-1"
               >
@@ -642,8 +749,8 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
                   </>
                 )}
               </Button>
-              <Button 
-                onClick={() => handleSubmit('send')} 
+              <Button
+                onClick={() => handleSubmit("send")}
                 disabled={isLoading}
                 variant="outline"
               >
@@ -666,32 +773,48 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
               <CardContent className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Subtotal:</span>
-                  <span className="font-medium">{formatCurrency(totals.subtotal)}</span>
+                  <span className="font-medium">
+                    {formatCurrency(totals.subtotal)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Tax:</span>
-                  <span className="font-medium">{formatCurrency(totals.taxTotal)}</span>
+                  <span className="font-medium">
+                    {formatCurrency(totals.taxTotal)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Discount:</span>
-                  <span className="font-medium">-{formatCurrency(totals.discountTotal)}</span>
+                  <span className="font-medium">
+                    -{formatCurrency(totals.discountTotal)}
+                  </span>
                 </div>
                 <div className="border-t pt-3">
                   <div className="flex justify-between">
                     <span className="font-semibold">Total:</span>
-                    <span className="font-semibold text-lg">{formatCurrency(totals.total)}</span>
+                    <span className="font-semibold text-lg">
+                      {formatCurrency(totals.total)}
+                    </span>
                   </div>
                 </div>
-                
+
                 {selectedCustomer && formData.due_date && (
                   <div className="mt-4 pt-4 border-t space-y-2">
                     <div>
-                      <Label className="text-sm font-medium text-muted-foreground">Customer</Label>
-                      <p className="font-medium">{selectedCustomer.business_name}</p>
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Customer
+                      </Label>
+                      <p className="font-medium">
+                        {selectedCustomer.business_name}
+                      </p>
                     </div>
                     <div>
-                      <Label className="text-sm font-medium text-muted-foreground">Due Date</Label>
-                      <p className="font-medium">{formatDate(formData.due_date)}</p>
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Due Date
+                      </Label>
+                      <p className="font-medium">
+                        {formatDate(formData.due_date)}
+                      </p>
                     </div>
                   </div>
                 )}
@@ -705,13 +828,16 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
               </CardHeader>
               <CardContent className="text-sm space-y-3">
                 <p>
-                  <strong>Save Draft:</strong> Create the invoice but don&apos;t send it yet. You can edit it later.
+                  <strong>Save Draft:</strong> Create the invoice but don&apos;t
+                  send it yet. You can edit it later.
                 </p>
                 <p>
-                  <strong>Save & Send:</strong> Create and immediately send the invoice to the customer.
+                  <strong>Save & Send:</strong> Create and immediately send the
+                  invoice to the customer.
                 </p>
                 <p>
-                  Tax rates are applied per line item. Use 0% for tax-exempt items.
+                  Tax rates are applied per line item. Use 0% for tax-exempt
+                  items.
                 </p>
               </CardContent>
             </Card>
@@ -724,7 +850,9 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
 
 export default function CreateInvoicePage({ params }: CreateInvoicePageProps) {
   return (
-    <ProtectedDashboard allowedRoles={['staff', 'manager', 'admin', 'super_admin']}>
+    <ProtectedDashboard
+      allowedRoles={["staff", "manager", "admin", "super_admin"]}
+    >
       <CreateInvoiceContent params={params} />
     </ProtectedDashboard>
   );

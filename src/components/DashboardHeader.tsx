@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { LogOut, User, Settings } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { LogOut, User, Settings } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function DashboardHeader() {
   const { user, signOut } = useAuth();
@@ -19,11 +19,11 @@ export default function DashboardHeader() {
 
   const handleSignOut = async () => {
     await signOut();
-    router.push('/');
+    router.push("/");
   };
 
   const getUserInitials = (email: string) => {
-    return email.split('@')[0].slice(0, 2).toUpperCase();
+    return email.split("@")[0].slice(0, 2).toUpperCase();
   };
 
   const getUserDisplayName = () => {
@@ -33,7 +33,7 @@ export default function DashboardHeader() {
     if (user?.user_metadata?.first_name && user?.user_metadata?.last_name) {
       return `${user.user_metadata.first_name} ${user.user_metadata.last_name}`;
     }
-    return user?.email?.split('@')[0] || 'User';
+    return user?.email?.split("@")[0] || "User";
   };
 
   return (
@@ -56,10 +56,13 @@ export default function DashboardHeader() {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+              <Button
+                variant="ghost"
+                className="relative h-10 w-10 rounded-full"
+              >
                 <Avatar className="h-10 w-10">
                   <AvatarFallback className="bg-blue-500 text-white">
-                    {user?.email ? getUserInitials(user.email) : 'U'}
+                    {user?.email ? getUserInitials(user.email) : "U"}
                   </AvatarFallback>
                 </Avatar>
               </Button>
@@ -74,7 +77,7 @@ export default function DashboardHeader() {
                 <span>Settings</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 className="flex items-center text-red-600 focus:text-red-600"
                 onClick={handleSignOut}
               >

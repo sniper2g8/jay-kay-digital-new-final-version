@@ -1,5 +1,5 @@
-const { Client } = require('pg');
-require('dotenv').config({ path: '.env.local' });
+const { Client } = require("pg");
+require("dotenv").config({ path: ".env.local" });
 
 async function checkTables() {
   const client = new Client({
@@ -8,12 +8,12 @@ async function checkTables() {
     database: process.env.DATABASE_NAME,
     user: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
-    ssl: { rejectUnauthorized: false }
+    ssl: { rejectUnauthorized: false },
   });
 
   try {
     await client.connect();
-    
+
     // Check services table
     const services = await client.query(`
       SELECT column_name, data_type, is_nullable 
@@ -21,9 +21,11 @@ async function checkTables() {
       WHERE table_name = 'services' AND table_schema = 'public' 
       ORDER BY ordinal_position
     `);
-    console.log('Services table:');
-    services.rows.forEach(r => console.log(`  ${r.column_name}: ${r.data_type}`));
-    
+    console.log("Services table:");
+    services.rows.forEach((r) =>
+      console.log(`  ${r.column_name}: ${r.data_type}`),
+    );
+
     // Check file_attachments table
     const fileAttachments = await client.query(`
       SELECT column_name, data_type, is_nullable 
@@ -31,11 +33,12 @@ async function checkTables() {
       WHERE table_name = 'file_attachments' AND table_schema = 'public' 
       ORDER BY ordinal_position
     `);
-    console.log('\nFile_attachments table:');
-    fileAttachments.rows.forEach(r => console.log(`  ${r.column_name}: ${r.data_type}`));
-    
+    console.log("\nFile_attachments table:");
+    fileAttachments.rows.forEach((r) =>
+      console.log(`  ${r.column_name}: ${r.data_type}`),
+    );
   } catch (error) {
-    console.error('Error:', error.message);
+    console.error("Error:", error.message);
   } finally {
     await client.end();
   }

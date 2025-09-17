@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Image from 'next/image';
-import { FileText, ImageIcon, File } from 'lucide-react';
+import { useState } from "react";
+import Image from "next/image";
+import { FileText, ImageIcon, File } from "lucide-react";
 
 interface FileThumbnailProps {
   fileUrl: string;
@@ -13,30 +13,32 @@ interface FileThumbnailProps {
   showFileName?: boolean;
 }
 
-export default function FileThumbnail({ 
-  fileUrl, 
-  fileName, 
+export default function FileThumbnail({
+  fileUrl,
+  fileName,
   fileType,
-  fileSize, 
+  fileSize,
   showFileName = true,
-  className = ''
+  className = "",
 }: FileThumbnailProps) {
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
 
-  const isImage = fileType?.startsWith('image/');
-  const isPDF = fileType === 'application/pdf';
-  const isDocument = fileType?.includes('word') || fileType?.includes('document');
-  const isSpreadsheet = fileType?.includes('sheet') || fileType?.includes('excel');
-  const isText = fileType?.startsWith('text/');
+  const isImage = fileType?.startsWith("image/");
+  const isPDF = fileType === "application/pdf";
+  const isDocument =
+    fileType?.includes("word") || fileType?.includes("document");
+  const isSpreadsheet =
+    fileType?.includes("sheet") || fileType?.includes("excel");
+  const isText = fileType?.startsWith("text/");
 
   const formatFileSize = (bytes: number | undefined): string => {
-    if (!bytes) return '';
-    if (bytes === 0) return '0 B';
+    if (!bytes) return "";
+    if (bytes === 0) return "0 B";
     const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const sizes = ["B", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
   };
 
   const getFileIcon = () => {
@@ -49,31 +51,45 @@ export default function FileThumbnail({
   };
 
   const getFileTypeColor = () => {
-    if (isPDF) return 'bg-red-500';
-    if (isDocument) return 'bg-blue-600';
-    if (isSpreadsheet) return 'bg-green-600';
-    if (isText) return 'bg-gray-600';
-    if (isImage) return 'bg-blue-500';
-    return 'bg-gray-500';
+    if (isPDF) return "bg-red-500";
+    if (isDocument) return "bg-blue-600";
+    if (isSpreadsheet) return "bg-green-600";
+    if (isText) return "bg-gray-600";
+    if (isImage) return "bg-blue-500";
+    return "bg-gray-500";
   };
 
   const getFileExtension = () => {
-    if (!fileType) return fileName.split('.').pop()?.toUpperCase().slice(0, 3) || 'FILE';
-    
-    const ext = fileType.split('/')[1];
+    if (!fileType)
+      return fileName.split(".").pop()?.toUpperCase().slice(0, 3) || "FILE";
+
+    const ext = fileType.split("/")[1];
     switch (ext) {
-      case 'pdf': return 'PDF';
-      case 'jpeg': case 'jpg': return 'JPG';
-      case 'png': return 'PNG';
-      case 'gif': return 'GIF';
-      case 'webp': return 'WEBP';
-      case 'msword': return 'DOC';
-      case 'vnd.openxmlformats-officedocument.wordprocessingml.document': return 'DOCX';
-      case 'vnd.ms-excel': return 'XLS';
-      case 'vnd.openxmlformats-officedocument.spreadsheetml.sheet': return 'XLSX';
-      case 'plain': return 'TXT';
-      case 'csv': return 'CSV';
-      default: return ext?.toUpperCase().slice(0, 3) || 'FILE';
+      case "pdf":
+        return "PDF";
+      case "jpeg":
+      case "jpg":
+        return "JPG";
+      case "png":
+        return "PNG";
+      case "gif":
+        return "GIF";
+      case "webp":
+        return "WEBP";
+      case "msword":
+        return "DOC";
+      case "vnd.openxmlformats-officedocument.wordprocessingml.document":
+        return "DOCX";
+      case "vnd.ms-excel":
+        return "XLS";
+      case "vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+        return "XLSX";
+      case "plain":
+        return "TXT";
+      case "csv":
+        return "CSV";
+      default:
+        return ext?.toUpperCase().slice(0, 3) || "FILE";
     }
   };
 
@@ -98,7 +114,7 @@ export default function FileThumbnail({
                 setImageError(true);
                 setImageLoading(false);
               }}
-              style={{ display: imageLoading ? 'none' : 'block' }}
+              style={{ display: imageLoading ? "none" : "block" }}
               unoptimized
             />
           </div>
@@ -107,9 +123,11 @@ export default function FileThumbnail({
             {getFileIcon()}
           </div>
         )}
-        
+
         {/* File Type Badge */}
-        <div className={`absolute top-1 right-1 ${getFileTypeColor()} text-white text-xs px-1 py-0.5 rounded text-center min-w-[24px]`}>
+        <div
+          className={`absolute top-1 right-1 ${getFileTypeColor()} text-white text-xs px-1 py-0.5 rounded text-center min-w-[24px]`}
+        >
           {getFileExtension()}
         </div>
       </div>
@@ -117,13 +135,14 @@ export default function FileThumbnail({
       {/* File Info */}
       {showFileName && (
         <div className="mt-2 w-16">
-          <p className="text-xs font-medium text-gray-900 truncate" title={fileName}>
+          <p
+            className="text-xs font-medium text-gray-900 truncate"
+            title={fileName}
+          >
             {fileName}
           </p>
           {fileSize && (
-            <p className="text-xs text-gray-500">
-              {formatFileSize(fileSize)}
-            </p>
+            <p className="text-xs text-gray-500">{formatFileSize(fileSize)}</p>
           )}
         </div>
       )}
@@ -143,7 +162,10 @@ export default function FileThumbnail({
             />
           </div>
           <div className="mt-2 p-2 bg-gray-50 rounded">
-            <p className="text-sm font-medium text-gray-900 truncate" title={fileName}>
+            <p
+              className="text-sm font-medium text-gray-900 truncate"
+              title={fileName}
+            >
               {fileName}
             </p>
             <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -162,7 +184,10 @@ export default function FileThumbnail({
               {getFileIcon()}
             </div>
             <div className="flex-1">
-              <p className="text-sm font-medium text-gray-900 truncate" title={fileName}>
+              <p
+                className="text-sm font-medium text-gray-900 truncate"
+                title={fileName}
+              >
                 {fileName}
               </p>
               <div className="flex justify-between text-xs text-gray-500 mt-1">

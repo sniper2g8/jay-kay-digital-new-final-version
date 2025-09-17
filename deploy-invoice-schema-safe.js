@@ -1,38 +1,40 @@
-const { Client } = require('pg');
-const fs = require('fs');
-const path = require('path');
+const { Client } = require("pg");
+const fs = require("fs");
+const path = require("path");
 
 // Load environment variables
-require('dotenv').config({ path: '.env.local' });
+require("dotenv").config({ path: ".env.local" });
 
 const DATABASE_URL = process.env.DATABASE_URL;
 
 if (!DATABASE_URL) {
-  console.error('❌ DATABASE_URL not found in environment variables');
+  console.error("❌ DATABASE_URL not found in environment variables");
   process.exit(1);
 }
 
 async function deployInvoiceSchemaIncremental() {
-  console.log('🚀 Deploying Enhanced Invoice Management Schema (Incremental)...\n');
+  console.log(
+    "🚀 Deploying Enhanced Invoice Management Schema (Incremental)...\n",
+  );
 
   const client = new Client({
     connectionString: DATABASE_URL,
     ssl: {
-      rejectUnauthorized: false
-    }
+      rejectUnauthorized: false,
+    },
   });
 
   try {
     // Connect to database
-    console.log('📡 Connecting to database...');
+    console.log("📡 Connecting to database...");
     await client.connect();
-    console.log('✅ Connected to Supabase PostgreSQL database\n');
+    console.log("✅ Connected to Supabase PostgreSQL database\n");
 
     // Execute schema in smaller chunks to handle conflicts gracefully
     const sqlCommands = [
       // 1. Enhance existing invoices table
       {
-        name: 'Enhance invoices table',
+        name: "Enhance invoices table",
         sql: `
         ALTER TABLE invoices 
         ADD COLUMN IF NOT EXISTS invoice_status VARCHAR(20) DEFAULT 'draft' CHECK (invoice_status IN ('draft', 'sent', 'viewed', 'paid', 'overdue', 'cancelled')),
@@ -46,18 +48,18 @@ async function deployInvoiceSchemaIncremental() {
         ADD COLUMN IF NOT EXISTS last_viewed_at TIMESTAMPTZ,
         ADD COLUMN IF NOT EXISTS generated_by UUID REFERENCES "appUsers"(id),
         ADD COLUMN IF NOT EXISTS template_id UUID;
-        `
+        `,
       },
 
       // 2. Enable RLS on invoice_line_items
       {
-        name: 'Enable RLS on invoice_line_items',
-        sql: `ALTER TABLE invoice_line_items ENABLE ROW LEVEL SECURITY;`
+        name: "Enable RLS on invoice_line_items",
+        sql: `ALTER TABLE invoice_line_items ENABLE ROW LEVEL SECURITY;`,
       },
 
       // 3. Enhance invoice_line_items table
       {
-        name: 'Enhance invoice_line_items table',
+        name: "Enhance invoice_line_items table",
         sql: `
         ALTER TABLE invoice_line_items 
         ADD COLUMN IF NOT EXISTS line_order INTEGER DEFAULT 1,
@@ -65,12 +67,12 @@ async function deployInvoiceSchemaIncremental() {
         ADD COLUMN IF NOT EXISTS tax_rate DECIMAL(5,2) DEFAULT 0,
         ADD COLUMN IF NOT EXISTS tax_amount DECIMAL(10,2) DEFAULT 0,
         ADD COLUMN IF NOT EXISTS job_id UUID REFERENCES jobs(id) ON DELETE SET NULL;
-        `
+        `,
       },
 
       // 4. Enhance payments table
       {
-        name: 'Enhance payments table',
+        name: "Enhance payments table",
         sql: `
         ALTER TABLE payments 
         ADD COLUMN IF NOT EXISTS payment_status VARCHAR(20) DEFAULT 'completed' CHECK (payment_status IN ('pending', 'completed', 'failed', 'refunded')),
@@ -81,12 +83,12 @@ async function deployInvoiceSchemaIncremental() {
         ADD COLUMN IF NOT EXISTS overpayment_amount DECIMAL(10,2) DEFAULT 0,
         ADD COLUMN IF NOT EXISTS refund_amount DECIMAL(10,2) DEFAULT 0,
         ADD COLUMN IF NOT EXISTS fees DECIMAL(10,2) DEFAULT 0;
-        `
+        `,
       },
 
       // 5. Create invoice_templates table
       {
-        name: 'Create invoice_templates table',
+        name: "Create invoice_templates table",
         sql: `
         CREATE TABLE IF NOT EXISTS invoice_templates (
           id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -108,12 +110,12 @@ async function deployInvoiceSchemaIncremental() {
           updated_at TIMESTAMPTZ DEFAULT NOW(),
           created_by UUID REFERENCES "appUsers"(id)
         );
-        `
+        `,
       },
 
       // 6. Create payment_allocations table
       {
-        name: 'Create payment_allocations table',
+        name: "Create payment_allocations table",
         sql: `
         CREATE TABLE IF NOT EXISTS payment_allocations (
           id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -126,12 +128,12 @@ async function deployInvoiceSchemaIncremental() {
           created_by UUID REFERENCES "appUsers"(id),
           created_at TIMESTAMPTZ DEFAULT NOW()
         );
-        `
+        `,
       },
 
       // 7. Create invoice_status_history table
       {
-        name: 'Create invoice_status_history table',
+        name: "Create invoice_status_history table",
         sql: `
         CREATE TABLE IF NOT EXISTS invoice_status_history (
           id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -144,12 +146,12 @@ async function deployInvoiceSchemaIncremental() {
           notes TEXT,
           created_at TIMESTAMPTZ DEFAULT NOW()
         );
-        `
+        `,
       },
 
       // 8. Create recurring_invoices table
       {
-        name: 'Create recurring_invoices table',
+        name: "Create recurring_invoices table",
         sql: `
         CREATE TABLE IF NOT EXISTS recurring_invoices (
           id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -167,8 +169,8 @@ async function deployInvoiceSchemaIncremental() {
           updated_at TIMESTAMPTZ DEFAULT NOW(),
           created_by UUID REFERENCES "appUsers"(id)
         );
-        `
-      }
+        `,
+      },
     ];
 
     // Execute each command individually
@@ -178,7 +180,10 @@ async function deployInvoiceSchemaIncremental() {
         await client.query(command.sql);
         console.log(`✅ ${command.name} - Success`);
       } catch (error) {
-        if (error.message.includes('already exists') || error.message.includes('duplicate column')) {
+        if (
+          error.message.includes("already exists") ||
+          error.message.includes("duplicate column")
+        ) {
           console.log(`⚠️  ${command.name} - Already exists (skipping)`);
         } else {
           console.error(`❌ ${command.name} - Error: ${error.message}`);
@@ -186,25 +191,25 @@ async function deployInvoiceSchemaIncremental() {
       }
     }
 
-    console.log('\n🔍 Creating indexes and policies...\n');
+    console.log("\n🔍 Creating indexes and policies...\n");
 
     // Create indexes (IF NOT EXISTS)
     const indexes = [
-      'CREATE INDEX IF NOT EXISTS idx_invoices_status ON invoices(invoice_status);',
-      'CREATE INDEX IF NOT EXISTS idx_invoices_date ON invoices(invoice_date);',
-      'CREATE INDEX IF NOT EXISTS idx_invoices_due_date ON invoices(due_date);',
-      'CREATE INDEX IF NOT EXISTS idx_invoices_customer_status ON invoices(customer_id, invoice_status);',
-      'CREATE INDEX IF NOT EXISTS idx_payments_status ON payments(payment_status);',
-      'CREATE INDEX IF NOT EXISTS idx_payments_customer ON payments(customer_id);',
-      'CREATE INDEX IF NOT EXISTS idx_payments_invoice ON payments(applied_to_invoice_id);',
-      'CREATE INDEX IF NOT EXISTS idx_payments_date ON payments(payment_date);'
+      "CREATE INDEX IF NOT EXISTS idx_invoices_status ON invoices(invoice_status);",
+      "CREATE INDEX IF NOT EXISTS idx_invoices_date ON invoices(invoice_date);",
+      "CREATE INDEX IF NOT EXISTS idx_invoices_due_date ON invoices(due_date);",
+      "CREATE INDEX IF NOT EXISTS idx_invoices_customer_status ON invoices(customer_id, invoice_status);",
+      "CREATE INDEX IF NOT EXISTS idx_payments_status ON payments(payment_status);",
+      "CREATE INDEX IF NOT EXISTS idx_payments_customer ON payments(customer_id);",
+      "CREATE INDEX IF NOT EXISTS idx_payments_invoice ON payments(applied_to_invoice_id);",
+      "CREATE INDEX IF NOT EXISTS idx_payments_date ON payments(payment_date);",
     ];
 
     for (const indexSql of indexes) {
       try {
         await client.query(indexSql);
       } catch (error) {
-        if (!error.message.includes('already exists')) {
+        if (!error.message.includes("already exists")) {
           console.log(`⚠️  Index creation warning: ${error.message}`);
         }
       }
@@ -212,7 +217,7 @@ async function deployInvoiceSchemaIncremental() {
 
     // Insert default template (if not exists)
     try {
-      console.log('📝 Creating default invoice template...');
+      console.log("📝 Creating default invoice template...");
       await client.query(`
         INSERT INTO invoice_templates (
           template_name,
@@ -242,35 +247,52 @@ async function deployInvoiceSchemaIncremental() {
           '#666666'
         ) ON CONFLICT DO NOTHING;
       `);
-      console.log('✅ Default template created');
+      console.log("✅ Default template created");
     } catch (error) {
       console.log(`⚠️  Template creation: ${error.message}`);
     }
 
     // Verify deployment
-    console.log('\n🔍 Verifying deployment...\n');
+    console.log("\n🔍 Verifying deployment...\n");
 
-    const templatesResult = await client.query('SELECT COUNT(*) as count FROM invoice_templates');
-    console.log(`📋 Invoice Templates: ${templatesResult.rows[0].count} records`);
+    const templatesResult = await client.query(
+      "SELECT COUNT(*) as count FROM invoice_templates",
+    );
+    console.log(
+      `📋 Invoice Templates: ${templatesResult.rows[0].count} records`,
+    );
 
-    const allocationsResult = await client.query('SELECT COUNT(*) as count FROM payment_allocations');
-    console.log(`💰 Payment Allocations: ${allocationsResult.rows[0].count} records`);
+    const allocationsResult = await client.query(
+      "SELECT COUNT(*) as count FROM payment_allocations",
+    );
+    console.log(
+      `💰 Payment Allocations: ${allocationsResult.rows[0].count} records`,
+    );
 
-    const historyResult = await client.query('SELECT COUNT(*) as count FROM invoice_status_history');
-    console.log(`📊 Invoice Status History: ${historyResult.rows[0].count} records`);
+    const historyResult = await client.query(
+      "SELECT COUNT(*) as count FROM invoice_status_history",
+    );
+    console.log(
+      `📊 Invoice Status History: ${historyResult.rows[0].count} records`,
+    );
 
-    const recurringResult = await client.query('SELECT COUNT(*) as count FROM recurring_invoices');
-    console.log(`🔄 Recurring Invoices: ${recurringResult.rows[0].count} records`);
+    const recurringResult = await client.query(
+      "SELECT COUNT(*) as count FROM recurring_invoices",
+    );
+    console.log(
+      `🔄 Recurring Invoices: ${recurringResult.rows[0].count} records`,
+    );
 
-    console.log('\n🎉 Enhanced Invoice Management Schema Deployment Complete!\n');
-    console.log('🚀 Your invoice management system is now ready!');
-
+    console.log(
+      "\n🎉 Enhanced Invoice Management Schema Deployment Complete!\n",
+    );
+    console.log("🚀 Your invoice management system is now ready!");
   } catch (error) {
-    console.error('❌ Deployment failed:', error.message);
+    console.error("❌ Deployment failed:", error.message);
     process.exit(1);
   } finally {
     await client.end();
-    console.log('\n📡 Database connection closed');
+    console.log("\n📡 Database connection closed");
   }
 }
 

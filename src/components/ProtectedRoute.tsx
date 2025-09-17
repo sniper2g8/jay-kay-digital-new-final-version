@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
-import { Loader2 } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import { Loader2 } from "lucide-react";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -11,31 +11,34 @@ interface ProtectedRouteProps {
   redirectTo?: string;
 }
 
-export default function ProtectedRoute({ 
-  children, 
+export default function ProtectedRoute({
+  children,
   requiredRole,
-  redirectTo = '/auth/login' 
+  redirectTo = "/auth/login",
 }: ProtectedRouteProps) {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    console.log('ProtectedRoute - Auth state check:', { user: !!user, loading });
-    
+    console.log("ProtectedRoute - Auth state check:", {
+      user: !!user,
+      loading,
+    });
+
     if (!loading) {
       if (!user) {
-        console.log('ProtectedRoute - No user, redirecting to login');
+        console.log("ProtectedRoute - No user, redirecting to login");
         // Not authenticated - redirect to login
         router.push(redirectTo);
       } else if (requiredRole) {
         // TODO: Check user role when we implement role system
         // For now, allow all authenticated users
-        console.log('ProtectedRoute - User authenticated, role check passed');
+        console.log("ProtectedRoute - User authenticated, role check passed");
         setChecking(false);
       } else {
         // Authenticated and no role required
-        console.log('ProtectedRoute - User authenticated, no role required');
+        console.log("ProtectedRoute - User authenticated, no role required");
         setChecking(false);
       }
     }

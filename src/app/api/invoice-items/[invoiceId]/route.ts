@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { Client } from 'pg';
+import { NextRequest, NextResponse } from "next/server";
+import { Client } from "pg";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { invoiceId: string } }
+  { params }: { params: Promise<{ invoiceId: string }> },
 ) {
   const client = new Client({
     connectionString: process.env.DATABASE_URL,
@@ -12,7 +12,11 @@ export async function GET(
   try {
     await client.connect();
 
-    const { rows } = await client.query(`
+    // Await the params Promise in Next.js 15
+    const resolvedParams = await params;
+
+    const { rows } = await client.query(
+      `
       SELECT 
         id,
         invoice_id,
@@ -28,14 +32,16 @@ export async function GET(
       FROM invoice_items 
       WHERE invoice_id = $1 
       ORDER BY id
-    `, [params.invoiceId]);
+    `,
+      [resolvedParams.invoiceId],
+    );
 
     return NextResponse.json(rows);
   } catch (error) {
-    console.error('Error fetching invoice items:', error);
+    console.error("Error fetching invoice items:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch invoice items' },
-      { status: 500 }
+      { error: "Failed to fetch invoice items" },
+      { status: 500 },
     );
   } finally {
     await client.end();

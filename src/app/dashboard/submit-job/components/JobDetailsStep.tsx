@@ -1,37 +1,48 @@
-import React from 'react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { FileText } from 'lucide-react';
-import { JobFormData, Service } from '@/lib/hooks/useJobSubmissionForm';
+import React from "react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { FileText } from "lucide-react";
+import { JobFormData, Service } from "@/lib/hooks/useJobSubmissionForm";
 
 interface JobDetailsStepProps {
   formData: JobFormData;
-  updateFormData: (field: keyof JobFormData, value: JobFormData[keyof JobFormData]) => void;
+  updateFormData: (
+    field: keyof JobFormData,
+    value: JobFormData[keyof JobFormData],
+  ) => void;
   services: Service[];
 }
 
 export default function JobDetailsStep({
   formData,
   updateFormData,
-  services
+  services,
 }: JobDetailsStepProps) {
   return (
     <div className="space-y-6">
       <div className="text-center mb-8">
         <FileText className="w-12 h-12 text-blue-600 mx-auto mb-4" />
         <h2 className="text-2xl font-bold text-gray-900">Job Details</h2>
-        <p className="text-gray-600">Provide basic information about your print job</p>
+        <p className="text-gray-600">
+          Provide basic information about your print job
+        </p>
       </div>
-      
+
       <div className="max-w-2xl mx-auto space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <Label htmlFor="service">Service Type *</Label>
-            <Select 
-              value={formData.service_id} 
-              onValueChange={(value) => updateFormData('service_id', value)}
+            <Select
+              value={formData.service_id}
+              onValueChange={(value) => updateFormData("service_id", value)}
             >
               <SelectTrigger className="mt-2">
                 <SelectValue placeholder="Select service..." />
@@ -52,13 +63,13 @@ export default function JobDetailsStep({
               </SelectContent>
             </Select>
           </div>
-          
+
           <div>
             <Label htmlFor="priority">Priority</Label>
-            <Select 
-              value={formData.priority} 
-              onValueChange={(value: 'low' | 'normal' | 'high' | 'urgent') => 
-                updateFormData('priority', value)
+            <Select
+              value={formData.priority}
+              onValueChange={(value: "low" | "normal" | "high" | "urgent") =>
+                updateFormData("priority", value)
               }
             >
               <SelectTrigger className="mt-2">
@@ -99,7 +110,7 @@ export default function JobDetailsStep({
           <Input
             id="title"
             value={formData.title}
-            onChange={(e) => updateFormData('title', e.target.value)}
+            onChange={(e) => updateFormData("title", e.target.value)}
             placeholder="Business Cards, Brochures, etc."
             className="mt-2"
           />
@@ -110,7 +121,7 @@ export default function JobDetailsStep({
           <Textarea
             id="description"
             value={formData.description}
-            onChange={(e) => updateFormData('description', e.target.value)}
+            onChange={(e) => updateFormData("description", e.target.value)}
             placeholder="Detailed description of the job..."
             rows={3}
             className="mt-2"
@@ -125,7 +136,9 @@ export default function JobDetailsStep({
               type="number"
               min="1"
               value={formData.quantity}
-              onChange={(e) => updateFormData('quantity', parseInt(e.target.value) || 1)}
+              onChange={(e) =>
+                updateFormData("quantity", parseInt(e.target.value) || 1)
+              }
               className="mt-2"
             />
           </div>
@@ -137,7 +150,9 @@ export default function JobDetailsStep({
               step="0.01"
               min="0"
               value={formData.unit_price}
-              onChange={(e) => updateFormData('unit_price', parseFloat(e.target.value) || 0)}
+              onChange={(e) =>
+                updateFormData("unit_price", parseFloat(e.target.value) || 0)
+              }
               className="mt-2"
             />
           </div>
@@ -149,7 +164,12 @@ export default function JobDetailsStep({
               step="0.01"
               min="0"
               value={formData.estimate_price}
-              onChange={(e) => updateFormData('estimate_price', parseFloat(e.target.value) || 0)}
+              onChange={(e) =>
+                updateFormData(
+                  "estimate_price",
+                  parseFloat(e.target.value) || 0,
+                )
+              }
               className="mt-2"
               placeholder="Total project estimate"
             />
@@ -164,7 +184,7 @@ export default function JobDetailsStep({
               id="due_date"
               type="date"
               value={formData.due_date}
-              onChange={(e) => updateFormData('due_date', e.target.value)}
+              onChange={(e) => updateFormData("due_date", e.target.value)}
               className="mt-2"
             />
           </div>
@@ -176,7 +196,7 @@ export default function JobDetailsStep({
           <Textarea
             id="requirements"
             value={formData.requirements}
-            onChange={(e) => updateFormData('requirements', e.target.value)}
+            onChange={(e) => updateFormData("requirements", e.target.value)}
             placeholder="Specific requirements, color preferences, etc."
             rows={3}
             className="mt-2"
@@ -188,7 +208,9 @@ export default function JobDetailsStep({
           <Textarea
             id="special_instructions"
             value={formData.special_instructions}
-            onChange={(e) => updateFormData('special_instructions', e.target.value)}
+            onChange={(e) =>
+              updateFormData("special_instructions", e.target.value)
+            }
             placeholder="Any special instructions for production..."
             rows={3}
             className="mt-2"
@@ -200,12 +222,30 @@ export default function JobDetailsStep({
           <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <h3 className="font-medium text-blue-800 mb-2">Job Preview</h3>
             <div className="text-sm text-blue-700 space-y-1">
-              <p><strong>Title:</strong> {formData.title}</p>
-              <p><strong>Quantity:</strong> {formData.quantity.toLocaleString()} units</p>
-              <p><strong>Unit Price:</strong> SLL {formData.unit_price.toFixed(2)}</p>
-              <p><strong>Estimated Total:</strong> SLL {(formData.quantity * formData.unit_price).toFixed(2)}</p>
-              <p><strong>Priority:</strong> {formData.priority}</p>
-              {formData.due_date && <p><strong>Due Date:</strong> {new Date(formData.due_date).toLocaleDateString('en-SL')}</p>}
+              <p>
+                <strong>Title:</strong> {formData.title}
+              </p>
+              <p>
+                <strong>Quantity:</strong> {formData.quantity.toLocaleString()}{" "}
+                units
+              </p>
+              <p>
+                <strong>Unit Price:</strong> SLL{" "}
+                {formData.unit_price.toFixed(2)}
+              </p>
+              <p>
+                <strong>Estimated Total:</strong> SLL{" "}
+                {(formData.quantity * formData.unit_price).toFixed(2)}
+              </p>
+              <p>
+                <strong>Priority:</strong> {formData.priority}
+              </p>
+              {formData.due_date && (
+                <p>
+                  <strong>Due Date:</strong>{" "}
+                  {new Date(formData.due_date).toLocaleDateString("en-SL")}
+                </p>
+              )}
             </div>
           </div>
         )}

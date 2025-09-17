@@ -1,5 +1,5 @@
-const { Client } = require('pg');
-require('dotenv').config({ path: '.env.local' });
+const { Client } = require("pg");
+require("dotenv").config({ path: ".env.local" });
 
 // Database connection using direct URL from .env.local
 const client = new Client({
@@ -9,10 +9,10 @@ const client = new Client({
 async function migrateInvoiceItems() {
   try {
     await client.connect();
-    console.log('✅ Connected to database');
+    console.log("✅ Connected to database");
 
     // First, let's examine the current invoices with JSONB items
-    console.log('\n📋 Current invoices with JSONB items:');
+    console.log("\n📋 Current invoices with JSONB items:");
     const invoicesResult = await client.query(`
       SELECT 
         id,
@@ -26,15 +26,15 @@ async function migrateInvoiceItems() {
     `);
 
     console.log(`Found ${invoicesResult.rows.length} invoices with items data`);
-    
+
     for (const invoice of invoicesResult.rows) {
       console.log(`\nInvoice ${invoice.invoice_number} (ID: ${invoice.id}):`);
-      console.log('Items JSONB:', JSON.stringify(invoice.items, null, 2));
-      console.log('Total Amount:', invoice.total_amount);
+      console.log("Items JSONB:", JSON.stringify(invoice.items, null, 2));
+      console.log("Total Amount:", invoice.total_amount);
     }
 
     // Check if invoice_items table exists and its structure
-    console.log('\n📊 Checking invoice_items table structure:');
+    console.log("\n📊 Checking invoice_items table structure:");
     const tableStructure = await client.query(`
       SELECT column_name, data_type, is_nullable, column_default
       FROM information_schema.columns 
@@ -43,8 +43,8 @@ async function migrateInvoiceItems() {
     `);
 
     if (tableStructure.rows.length === 0) {
-      console.log('❌ invoice_items table does not exist. Creating it...');
-      
+      console.log("❌ invoice_items table does not exist. Creating it...");
+
       // Create invoice_items table
       await client.query(`
         CREATE TABLE invoice_items (
@@ -85,34 +85,45 @@ async function migrateInvoiceItems() {
         );
       `);
 
-      console.log('✅ Created invoice_items table with RLS policies');
+      console.log("✅ Created invoice_items table with RLS policies");
     } else {
-      console.log('✅ invoice_items table exists');
-      tableStructure.rows.forEach(col => {
-        console.log(`  ${col.column_name}: ${col.data_type} ${col.is_nullable === 'NO' ? 'NOT NULL' : ''}`);
+      console.log("✅ invoice_items table exists");
+      tableStructure.rows.forEach((col) => {
+        console.log(
+          `  ${col.column_name}: ${col.data_type} ${col.is_nullable === "NO" ? "NOT NULL" : ""}`,
+        );
       });
     }
 
     // Now migrate the JSONB items to the invoice_items table
-    console.log('\n🔄 Starting migration of JSONB items to invoice_items table...');
+    console.log(
+      "\n🔄 Starting migration of JSONB items to invoice_items table...",
+    );
 
     let totalItemsMigrated = 0;
 
     for (const invoice of invoicesResult.rows) {
       console.log(`\n📝 Processing Invoice ${invoice.invoice_number}...`);
-      
+
       if (!invoice.items || !Array.isArray(invoice.items)) {
-        console.log(`  ⚠️ No valid items array found for invoice ${invoice.invoice_number}`);
+        console.log(
+          `  ⚠️ No valid items array found for invoice ${invoice.invoice_number}`,
+        );
         continue;
       }
 
       // Check if items already exist for this invoice
-      const existingItems = await client.query(`
+      const existingItems = await client.query(
+        `
         SELECT COUNT(*) as count FROM invoice_items WHERE invoice_id = $1
-      `, [invoice.id]);
+      `,
+        [invoice.id],
+      );
 
       if (existingItems.rows[0].count > 0) {
-        console.log(`  ℹ️ Invoice ${invoice.invoice_number} already has ${existingItems.rows[0].count} items in invoice_items table`);
+        console.log(
+          `  ℹ️ Invoice ${invoice.invoice_number} already has ${existingItems.rows[0].count} items in invoice_items table`,
+        );
         continue;
       }
 
@@ -122,13 +133,22 @@ async function migrateInvoiceItems() {
         console.log(`  📄 Processing item ${i + 1}:`, item);
 
         // Extract item data with fallbacks for different possible structures
-        const description = item.description || item.name || item.service || `Item ${i + 1}`;
+        const description =
+          item.description || item.name || item.service || `Item ${i + 1}`;
         const quantity = parseFloat(item.quantity) || 1;
-        const unitPrice = parseFloat(item.unit_price || item.unitPrice || item.price || 0);
-        const totalPrice = parseFloat(item.total_price || item.totalPrice || item.total || (quantity * unitPrice));
+        const unitPrice = parseFloat(
+          item.unit_price || item.unitPrice || item.price || 0,
+        );
+        const totalPrice = parseFloat(
+          item.total_price ||
+            item.totalPrice ||
+            item.total ||
+            quantity * unitPrice,
+        );
 
         // Insert the item
-        const insertResult = await client.query(`
+        const insertResult = await client.query(
+          `
           INSERT INTO invoice_items (
             invoice_id,
             description,
@@ -138,24 +158,30 @@ async function migrateInvoiceItems() {
             notes
           ) VALUES ($1, $2, $3, $4, $5, $6)
           RETURNING id
-        `, [
-          invoice.id,
-          description,
-          quantity,
-          unitPrice,
-          totalPrice,
-          item.notes || null
-        ]);
+        `,
+          [
+            invoice.id,
+            description,
+            quantity,
+            unitPrice,
+            totalPrice,
+            item.notes || null,
+          ],
+        );
 
-        console.log(`    ✅ Created invoice_item with ID: ${insertResult.rows[0].id}`);
+        console.log(
+          `    ✅ Created invoice_item with ID: ${insertResult.rows[0].id}`,
+        );
         totalItemsMigrated++;
       }
 
-      console.log(`  ✅ Migrated ${invoice.items.length} items for Invoice ${invoice.invoice_number}`);
+      console.log(
+        `  ✅ Migrated ${invoice.items.length} items for Invoice ${invoice.invoice_number}`,
+      );
     }
 
     // Verify migration
-    console.log('\n🔍 Verifying migration results:');
+    console.log("\n🔍 Verifying migration results:");
     const verificationResult = await client.query(`
       SELECT 
         i.invoice_number,
@@ -169,30 +195,37 @@ async function migrateInvoiceItems() {
       ORDER BY i.created_at DESC
     `);
 
-    console.log('\nMigration Summary:');
-    verificationResult.rows.forEach(row => {
+    console.log("\nMigration Summary:");
+    verificationResult.rows.forEach((row) => {
       console.log(`Invoice ${row.invoice_number}:`);
       console.log(`  Items migrated: ${row.item_count}`);
       console.log(`  Invoice total: $${row.invoice_total}`);
       console.log(`  Sum of items: $${row.items_total || 0}`);
-      console.log(`  Match: ${Math.abs(parseFloat(row.invoice_total) - parseFloat(row.items_total || 0)) < 0.01 ? '✅' : '❌'}`);
+      console.log(
+        `  Match: ${Math.abs(parseFloat(row.invoice_total) - parseFloat(row.items_total || 0)) < 0.01 ? "✅" : "❌"}`,
+      );
     });
 
-    console.log(`\n🎉 Migration completed! Total items migrated: ${totalItemsMigrated}`);
+    console.log(
+      `\n🎉 Migration completed! Total items migrated: ${totalItemsMigrated}`,
+    );
 
     // Ask if user wants to remove the JSONB items column
-    console.log('\n⚠️  NEXT STEPS:');
-    console.log('1. Verify the migrated data is correct');
-    console.log('2. Update your application code to use the invoice_items table');
-    console.log('3. Once verified, you can remove the JSONB items column with:');
-    console.log('   ALTER TABLE invoices DROP COLUMN items;');
-
+    console.log("\n⚠️  NEXT STEPS:");
+    console.log("1. Verify the migrated data is correct");
+    console.log(
+      "2. Update your application code to use the invoice_items table",
+    );
+    console.log(
+      "3. Once verified, you can remove the JSONB items column with:",
+    );
+    console.log("   ALTER TABLE invoices DROP COLUMN items;");
   } catch (error) {
-    console.error('❌ Migration failed:', error);
+    console.error("❌ Migration failed:", error);
     throw error;
   } finally {
     await client.end();
-    console.log('\n🔌 Database connection closed');
+    console.log("\n🔌 Database connection closed");
   }
 }
 
@@ -200,11 +233,11 @@ async function migrateInvoiceItems() {
 if (require.main === module) {
   migrateInvoiceItems()
     .then(() => {
-      console.log('✅ Migration script completed successfully');
+      console.log("✅ Migration script completed successfully");
       process.exit(0);
     })
     .catch((error) => {
-      console.error('❌ Migration script failed:', error);
+      console.error("❌ Migration script failed:", error);
       process.exit(1);
     });
 }

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 export interface QRCodeData {
   jobId: string;
@@ -11,37 +11,45 @@ export const useQRCodeGenerator = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const generateJobQRCode = async (jobId: string, jobNo?: string): Promise<QRCodeData | null> => {
+  const generateJobQRCode = async (
+    jobId: string,
+    jobNo?: string,
+  ): Promise<QRCodeData | null> => {
     try {
       setLoading(true);
       setError(null);
 
-      const baseUrl = typeof window !== 'undefined' ? window.location.origin : process.env.NEXT_PUBLIC_SITE_URL || '';
+      const baseUrl =
+        typeof window !== "undefined"
+          ? window.location.origin
+          : process.env.NEXT_PUBLIC_SITE_URL || "";
       const trackingUrl = `${baseUrl}/track/${jobNo || jobId}`;
-      
+
       // Update the job record with the tracking URL and QR code data
       const { error: updateError } = await supabase
-        .from('jobs')
+        .from("jobs")
         .update({
           tracking_url: trackingUrl,
-          qr_code: trackingUrl // Store the URL that the QR code represents
+          qr_code: trackingUrl, // Store the URL that the QR code represents
         })
-        .eq('id', jobId);
+        .eq("id", jobId);
 
       if (updateError) {
-        throw new Error(`Failed to update job with QR code: ${updateError.message}`);
+        throw new Error(
+          `Failed to update job with QR code: ${updateError.message}`,
+        );
       }
 
       return {
         jobId,
         qrCode: trackingUrl,
-        trackingUrl
+        trackingUrl,
       };
-
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to generate QR code';
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to generate QR code";
       setError(errorMessage);
-      console.error('Error generating QR code:', err);
+      console.error("Error generating QR code:", err);
       return null;
     } finally {
       setLoading(false);
@@ -54,9 +62,9 @@ export const useQRCodeGenerator = () => {
       setError(null);
 
       const { data, error: fetchError } = await supabase
-        .from('jobs')
-        .select('id, jobNo, qr_code, tracking_url')
-        .eq('id', jobId)
+        .from("jobs")
+        .select("id, jobNo, qr_code, tracking_url")
+        .eq("id", jobId)
         .single();
 
       if (fetchError) {
@@ -71,20 +79,23 @@ export const useQRCodeGenerator = () => {
       return {
         jobId,
         qrCode: data.qr_code,
-        trackingUrl: data.tracking_url
+        trackingUrl: data.tracking_url,
       };
-
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to get QR code';
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to get QR code";
       setError(errorMessage);
-      console.error('Error getting QR code:', err);
+      console.error("Error getting QR code:", err);
       return null;
     } finally {
       setLoading(false);
     }
   };
 
-  const regenerateJobQRCode = async (jobId: string, jobNo?: string): Promise<QRCodeData | null> => {
+  const regenerateJobQRCode = async (
+    jobId: string,
+    jobNo?: string,
+  ): Promise<QRCodeData | null> => {
     // Force regeneration by calling generateJobQRCode directly
     return await generateJobQRCode(jobId, jobNo);
   };
@@ -94,13 +105,14 @@ export const useQRCodeGenerator = () => {
     getJobQRCode,
     regenerateJobQRCode,
     loading,
-    error
+    error,
   };
 };
 
 // Utility function to create tracking URL
 export const createTrackingUrl = (jobNo: string, baseUrl?: string): string => {
-  const base = baseUrl || (typeof window !== 'undefined' ? window.location.origin : '');
+  const base =
+    baseUrl || (typeof window !== "undefined" ? window.location.origin : "");
   return `${base}/track/${jobNo}`;
 };
 

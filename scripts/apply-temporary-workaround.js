@@ -1,5 +1,5 @@
-const { Client } = require('pg');
-require('dotenv').config({ path: '.env.local' });
+const { Client } = require("pg");
+require("dotenv").config({ path: ".env.local" });
 
 async function applyTemporaryWorkaround() {
   const client = new Client({
@@ -8,14 +8,20 @@ async function applyTemporaryWorkaround() {
     database: process.env.DATABASE_NAME,
     user: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
-    ssl: { rejectUnauthorized: false }
+    ssl: { rejectUnauthorized: false },
   });
 
   try {
     await client.connect();
-    console.log('🔧 Applying TEMPORARY workaround for Supabase Auth service bug...\n');
-    console.log('⚠️  WARNING: This sets tokens to empty strings instead of NULL');
-    console.log('⚠️  This is NOT a proper fix - contact Supabase Support for permanent solution\n');
+    console.log(
+      "🔧 Applying TEMPORARY workaround for Supabase Auth service bug...\n",
+    );
+    console.log(
+      "⚠️  WARNING: This sets tokens to empty strings instead of NULL",
+    );
+    console.log(
+      "⚠️  This is NOT a proper fix - contact Supabase Support for permanent solution\n",
+    );
 
     // Apply the workaround
     const result = await client.query(`
@@ -49,17 +55,22 @@ async function applyTemporaryWorkaround() {
       LIMIT 5
     `);
 
-    console.log('\n📊 Token status after workaround:');
-    verification.rows.forEach(user => {
-      console.log(`  ${user.email}: confirmation=${user.confirmation_status}, recovery=${user.recovery_status}`);
+    console.log("\n📊 Token status after workaround:");
+    verification.rows.forEach((user) => {
+      console.log(
+        `  ${user.email}: confirmation=${user.confirmation_status}, recovery=${user.recovery_status}`,
+      );
     });
 
-    console.log('\n🎯 Temporary workaround completed!');
-    console.log('📧 IMPORTANT: Contact Supabase Support to fix their auth service');
-    console.log('🔗 Reference: "converting NULL to string is unsupported" in auth token scanning');
-
+    console.log("\n🎯 Temporary workaround completed!");
+    console.log(
+      "📧 IMPORTANT: Contact Supabase Support to fix their auth service",
+    );
+    console.log(
+      '🔗 Reference: "converting NULL to string is unsupported" in auth token scanning',
+    );
   } catch (error) {
-    console.error('❌ Workaround failed:', error.message);
+    console.error("❌ Workaround failed:", error.message);
   } finally {
     try {
       await client.end();
@@ -69,7 +80,9 @@ async function applyTemporaryWorkaround() {
   }
 }
 
-console.log('🚨 TEMPORARY WORKAROUND - NOT A PERMANENT FIX');
-console.log('This will set NULL tokens to empty strings to bypass Supabase auth service bug\n');
+console.log("🚨 TEMPORARY WORKAROUND - NOT A PERMANENT FIX");
+console.log(
+  "This will set NULL tokens to empty strings to bypass Supabase auth service bug\n",
+);
 
 applyTemporaryWorkaround().catch(console.error);

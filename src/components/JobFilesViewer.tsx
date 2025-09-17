@@ -1,18 +1,18 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { 
-  FileText, 
-  Download, 
-  Trash2, 
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  FileText,
+  Download,
+  Trash2,
   AlertCircle,
   Loader2,
-  RefreshCw
-} from 'lucide-react';
-import { useJobFiles } from '@/lib/hooks/useJobFiles';
-import FileThumbnail from '@/components/FileThumbnail';
-import { toast } from 'sonner';
+  RefreshCw,
+} from "lucide-react";
+import { useJobFiles } from "@/lib/hooks/useJobFiles";
+import FileThumbnail from "@/components/FileThumbnail";
+import { toast } from "sonner";
 
 interface JobFilesViewerProps {
   jobId: string | null;
@@ -23,20 +23,32 @@ interface JobFilesViewerProps {
 export const JobFilesViewer: React.FC<JobFilesViewerProps> = ({
   jobId,
   canDelete = false,
-  className
+  className,
 }) => {
-  const { files, loading, error, deleteFile, downloadFile, refreshFiles, hasFiles } = useJobFiles(jobId);
+  const {
+    files,
+    loading,
+    error,
+    deleteFile,
+    downloadFile,
+    refreshFiles,
+    hasFiles,
+  } = useJobFiles(jobId);
 
   const formatFileSize = (bytes: number | null | undefined): string => {
-    if (!bytes) return 'Unknown size';
-    if (bytes === 0) return '0 Bytes';
+    if (!bytes) return "Unknown size";
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
-  const handleDelete = async (fileId: string, fileName: string, fileUrl: string) => {
+  const handleDelete = async (
+    fileId: string,
+    fileName: string,
+    fileUrl: string,
+  ) => {
     if (!confirm(`Are you sure you want to delete "${fileName}"?`)) {
       return;
     }
@@ -45,14 +57,14 @@ export const JobFilesViewer: React.FC<JobFilesViewerProps> = ({
     if (success) {
       toast.success(`File "${fileName}" deleted successfully`);
     } else {
-      toast.error('Failed to delete file');
+      toast.error("Failed to delete file");
     }
   };
 
   const handleDownload = async (fileUrl: string, fileName: string) => {
     const success = await downloadFile(fileUrl, fileName);
     if (!success) {
-      toast.error('Failed to download file');
+      toast.error("Failed to download file");
     }
   };
 
@@ -88,11 +100,7 @@ export const JobFilesViewer: React.FC<JobFilesViewerProps> = ({
               <AlertCircle className="h-4 w-4" />
               <span>Error loading files: {error}</span>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={refreshFiles}
-            >
+            <Button variant="outline" size="sm" onClick={refreshFiles}>
               <RefreshCw className="h-4 w-4 mr-2" />
               Retry
             </Button>
@@ -109,11 +117,7 @@ export const JobFilesViewer: React.FC<JobFilesViewerProps> = ({
           <CardTitle className="text-lg">
             Job Files {hasFiles && `(${files.length})`}
           </CardTitle>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={refreshFiles}
-          >
+          <Button variant="outline" size="sm" onClick={refreshFiles}>
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh
           </Button>
@@ -142,7 +146,7 @@ export const JobFilesViewer: React.FC<JobFilesViewerProps> = ({
                     showFileName={false}
                     className="flex-shrink-0"
                   />
-                  
+
                   {/* File Details */}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 truncate">
@@ -154,7 +158,8 @@ export const JobFilesViewer: React.FC<JobFilesViewerProps> = ({
                         <>
                           <span>•</span>
                           <Badge variant="secondary" className="text-xs">
-                            {file.file_type.split('/')[1]?.toUpperCase() || 'FILE'}
+                            {file.file_type.split("/")[1]?.toUpperCase() ||
+                              "FILE"}
                           </Badge>
                         </>
                       )}
@@ -162,29 +167,35 @@ export const JobFilesViewer: React.FC<JobFilesViewerProps> = ({
                         <>
                           <span>•</span>
                           <span>
-                            {new Date(file.created_at).toLocaleDateString('en-SL')}
+                            {new Date(file.created_at).toLocaleDateString(
+                              "en-SL",
+                            )}
                           </span>
                         </>
                       )}
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-2 ml-4">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleDownload(file.file_url, file.file_name)}
+                    onClick={() =>
+                      handleDownload(file.file_url, file.file_name)
+                    }
                     className="px-3"
                   >
                     <Download className="h-4 w-4" />
                   </Button>
-                  
+
                   {canDelete && (
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleDelete(file.id, file.file_name, file.file_url)}
+                      onClick={() =>
+                        handleDelete(file.id, file.file_name, file.file_url)
+                      }
                       className="px-3 text-red-600 hover:text-red-700 hover:bg-red-50"
                     >
                       <Trash2 className="h-4 w-4" />

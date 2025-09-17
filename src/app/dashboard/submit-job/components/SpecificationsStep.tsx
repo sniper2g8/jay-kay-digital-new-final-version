@@ -1,40 +1,59 @@
-import React, { useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Settings, Package, Palette, Sparkles, Scissors, Layers, Zap, Grip, LucideIcon } from 'lucide-react';
-import { JobFormData } from '@/lib/hooks/useJobSubmissionForm';
-import { FinishOption } from '@/lib/hooks/usePaperSpecifications';
+import React, { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import {
+  Settings,
+  Package,
+  Palette,
+  Sparkles,
+  Scissors,
+  Layers,
+  Zap,
+  Grip,
+  LucideIcon,
+} from "lucide-react";
+import { JobFormData } from "@/lib/hooks/useJobSubmissionForm";
+import { FinishOption } from "@/lib/hooks/usePaperSpecifications";
 
 interface SpecificationsStepProps {
   formData: JobFormData;
-  updateFormData: (field: keyof JobFormData, value: JobFormData[keyof JobFormData]) => void;
+  updateFormData: (
+    field: keyof JobFormData,
+    value: JobFormData[keyof JobFormData],
+  ) => void;
   availablePaperTypes: string[];
   availablePaperWeights: number[];
   availableFinishingOptions: FinishOption[];
   finishingOptionPrices: Record<string, number>;
   setFinishingOptionPrices: (prices: Record<string, number>) => void;
-  paperSizesData?: { name: string; width_mm: number; height_mm: number; }[];
+  paperSizesData?: { name: string; width_mm: number; height_mm: number }[];
 }
 
 // Size presets from the original form
 const sizePresets = [
-  { name: 'A0 (841mm x 1189mm)', width: 33.1, height: 46.8, unit: 'inches' },
-  { name: 'A1 (594mm x 841mm)', width: 23.4, height: 33.1, unit: 'inches' },
-  { name: 'A2 (420mm x 594mm)', width: 16.5, height: 23.4, unit: 'inches' },
-  { name: 'A3 (297mm x 420mm)', width: 11.7, height: 16.5, unit: 'inches' },
-  { name: 'A4 (210mm x 297mm)', width: 8.27, height: 11.69, unit: 'inches' },
-  { name: 'A5 (148mm x 210mm)', width: 5.83, height: 8.27, unit: 'inches' },
-  { name: 'A6 (105mm x 148mm)', width: 4.13, height: 5.83, unit: 'inches' },
-  { name: 'Letter (8.5" x 11")', width: 8.5, height: 11, unit: 'inches' },
-  { name: 'Legal (8.5" x 14")', width: 8.5, height: 14, unit: 'inches' },
-  { name: 'Tabloid (11" x 17")', width: 11, height: 17, unit: 'inches' },
-  { name: 'Business Card (3.5" x 2")', width: 3.5, height: 2, unit: 'inches' },
-  { name: 'Postcard (4" x 6")', width: 4, height: 6, unit: 'inches' },
-  { name: 'Banner (36" x 72")', width: 36, height: 72, unit: 'inches' }
+  { name: "A0 (841mm x 1189mm)", width: 33.1, height: 46.8, unit: "inches" },
+  { name: "A1 (594mm x 841mm)", width: 23.4, height: 33.1, unit: "inches" },
+  { name: "A2 (420mm x 594mm)", width: 16.5, height: 23.4, unit: "inches" },
+  { name: "A3 (297mm x 420mm)", width: 11.7, height: 16.5, unit: "inches" },
+  { name: "A4 (210mm x 297mm)", width: 8.27, height: 11.69, unit: "inches" },
+  { name: "A5 (148mm x 210mm)", width: 5.83, height: 8.27, unit: "inches" },
+  { name: "A6 (105mm x 148mm)", width: 4.13, height: 5.83, unit: "inches" },
+  { name: 'Letter (8.5" x 11")', width: 8.5, height: 11, unit: "inches" },
+  { name: 'Legal (8.5" x 14")', width: 8.5, height: 14, unit: "inches" },
+  { name: 'Tabloid (11" x 17")', width: 11, height: 17, unit: "inches" },
+  { name: 'Business Card (3.5" x 2")', width: 3.5, height: 2, unit: "inches" },
+  { name: 'Postcard (4" x 6")', width: 4, height: 6, unit: "inches" },
+  { name: 'Banner (36" x 72")', width: 36, height: 72, unit: "inches" },
 ];
 
 export default function SpecificationsStep({
@@ -45,53 +64,94 @@ export default function SpecificationsStep({
   availableFinishingOptions,
   finishingOptionPrices,
   setFinishingOptionPrices,
-  paperSizesData
+  paperSizesData,
 }: SpecificationsStepProps) {
-  const [activeFinishingTab, setActiveFinishingTab] = useState('coating');
-  
+  const [activeFinishingTab, setActiveFinishingTab] = useState("coating");
+
   // Group finishing options by category
-  const finishingCategories = availableFinishingOptions.reduce((acc, option) => {
-    const category = option.category || 'other';
-    if (!acc[category]) {
-      acc[category] = [];
-    }
-    acc[category].push(option);
-    return acc;
-  }, {} as Record<string, FinishOption[]>);
+  const finishingCategories = availableFinishingOptions.reduce(
+    (acc, option) => {
+      const category = option.category || "other";
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push(option);
+      return acc;
+    },
+    {} as Record<string, FinishOption[]>,
+  );
 
   // Category metadata with icons and labels
-  const categoryInfo: Record<string, { label: string; icon: LucideIcon; description: string }> = {
-    coating: { label: 'Coating & Protection', icon: Layers, description: 'Protective coatings and lamination' },
-    cutting: { label: 'Cutting & Shaping', icon: Scissors, description: 'Die cutting, trimming, and shaping' },
-    binding: { label: 'Binding', icon: Grip, description: 'Spiral, perfect, and other binding options' },
-    finishing: { label: 'General Finishing', icon: Settings, description: 'Folding, scoring, and general finishing' },
-    texture: { label: 'Texture & Effects', icon: Sparkles, description: 'Embossing and textural effects' },
-    special: { label: 'Special Effects', icon: Zap, description: 'Foil stamping and premium effects' },
-    other: { label: 'Other Options', icon: Package, description: 'Additional finishing services' }
+  const categoryInfo: Record<
+    string,
+    { label: string; icon: LucideIcon; description: string }
+  > = {
+    coating: {
+      label: "Coating & Protection",
+      icon: Layers,
+      description: "Protective coatings and lamination",
+    },
+    cutting: {
+      label: "Cutting & Shaping",
+      icon: Scissors,
+      description: "Die cutting, trimming, and shaping",
+    },
+    binding: {
+      label: "Binding",
+      icon: Grip,
+      description: "Spiral, perfect, and other binding options",
+    },
+    finishing: {
+      label: "General Finishing",
+      icon: Settings,
+      description: "Folding, scoring, and general finishing",
+    },
+    texture: {
+      label: "Texture & Effects",
+      icon: Sparkles,
+      description: "Embossing and textural effects",
+    },
+    special: {
+      label: "Special Effects",
+      icon: Zap,
+      description: "Foil stamping and premium effects",
+    },
+    other: {
+      label: "Other Options",
+      icon: Package,
+      description: "Additional finishing services",
+    },
   };
 
   // Get available categories (only those with options)
   const availableCategories = Object.keys(finishingCategories).sort();
-  
+
   // Set first available category as default if current tab doesn't exist
   React.useEffect(() => {
-    if (availableCategories.length > 0 && !availableCategories.includes(activeFinishingTab)) {
+    if (
+      availableCategories.length > 0 &&
+      !availableCategories.includes(activeFinishingTab)
+    ) {
       setActiveFinishingTab(availableCategories[0]);
     }
   }, [availableCategories, activeFinishingTab]);
-  
-  const handleFinishingOptionChange = (optionId: string, checked: boolean, defaultPrice: number) => {
+
+  const handleFinishingOptionChange = (
+    optionId: string,
+    checked: boolean,
+    defaultPrice: number,
+  ) => {
     const updatedOptions = checked
       ? [...formData.finishing_options, optionId]
-      : formData.finishing_options.filter(id => id !== optionId);
-    
-    updateFormData('finishing_options', updatedOptions);
+      : formData.finishing_options.filter((id) => id !== optionId);
+
+    updateFormData("finishing_options", updatedOptions);
 
     // Update prices
     if (checked) {
       setFinishingOptionPrices({
         ...finishingOptionPrices,
-        [optionId]: defaultPrice
+        [optionId]: defaultPrice,
       });
     } else {
       const newPrices = { ...finishingOptionPrices };
@@ -100,18 +160,23 @@ export default function SpecificationsStep({
     }
   };
 
-  const totalFinishingCost = formData.finishing_options.reduce((total, optionId) => {
-    return total + (finishingOptionPrices[optionId] || 0);
-  }, 0);
+  const totalFinishingCost = formData.finishing_options.reduce(
+    (total, optionId) => {
+      return total + (finishingOptionPrices[optionId] || 0);
+    },
+    0,
+  );
 
   return (
     <div className="space-y-6">
       <div className="text-center mb-8">
         <Settings className="w-12 h-12 text-blue-600 mx-auto mb-4" />
         <h2 className="text-2xl font-bold text-gray-900">Specifications</h2>
-        <p className="text-gray-600">Configure size, paper, and finishing options</p>
+        <p className="text-gray-600">
+          Configure size, paper, and finishing options
+        </p>
       </div>
-      
+
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Size Specifications */}
         <Card>
@@ -124,10 +189,10 @@ export default function SpecificationsStep({
           <CardContent className="space-y-4">
             <div>
               <Label>Size Type</Label>
-              <Select 
-                value={formData.size_type} 
-                onValueChange={(value: 'standard' | 'custom') => 
-                  updateFormData('size_type', value)
+              <Select
+                value={formData.size_type}
+                onValueChange={(value: "standard" | "custom") =>
+                  updateFormData("size_type", value)
                 }
               >
                 <SelectTrigger className="mt-2">
@@ -140,12 +205,14 @@ export default function SpecificationsStep({
               </Select>
             </div>
 
-            {formData.size_type === 'standard' ? (
+            {formData.size_type === "standard" ? (
               <div>
                 <Label htmlFor="size_preset">Standard Size</Label>
-                <Select 
-                  value={formData.size_preset} 
-                  onValueChange={(value) => updateFormData('size_preset', value)}
+                <Select
+                  value={formData.size_preset}
+                  onValueChange={(value) =>
+                    updateFormData("size_preset", value)
+                  }
                 >
                   <SelectTrigger className="mt-2">
                     <SelectValue placeholder="Select size..." />
@@ -169,7 +236,12 @@ export default function SpecificationsStep({
                     step="0.1"
                     min="0"
                     value={formData.custom_width}
-                    onChange={(e) => updateFormData('custom_width', parseFloat(e.target.value) || 0)}
+                    onChange={(e) =>
+                      updateFormData(
+                        "custom_width",
+                        parseFloat(e.target.value) || 0,
+                      )
+                    }
                     className="mt-2"
                   />
                 </div>
@@ -181,16 +253,21 @@ export default function SpecificationsStep({
                     step="0.1"
                     min="0"
                     value={formData.custom_height}
-                    onChange={(e) => updateFormData('custom_height', parseFloat(e.target.value) || 0)}
+                    onChange={(e) =>
+                      updateFormData(
+                        "custom_height",
+                        parseFloat(e.target.value) || 0,
+                      )
+                    }
                     className="mt-2"
                   />
                 </div>
                 <div>
                   <Label htmlFor="custom_unit">Unit</Label>
-                  <Select 
-                    value={formData.custom_unit} 
-                    onValueChange={(value: 'inches' | 'cm' | 'mm') => 
-                      updateFormData('custom_unit', value)
+                  <Select
+                    value={formData.custom_unit}
+                    onValueChange={(value: "inches" | "cm" | "mm") =>
+                      updateFormData("custom_unit", value)
                     }
                   >
                     <SelectTrigger className="mt-2">
@@ -220,9 +297,9 @@ export default function SpecificationsStep({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="paper_type">Paper Type *</Label>
-                <Select 
-                  value={formData.paper_type} 
-                  onValueChange={(value) => updateFormData('paper_type', value)}
+                <Select
+                  value={formData.paper_type}
+                  onValueChange={(value) => updateFormData("paper_type", value)}
                 >
                   <SelectTrigger className="mt-2">
                     <SelectValue placeholder="Select paper type..." />
@@ -238,9 +315,11 @@ export default function SpecificationsStep({
               </div>
               <div>
                 <Label htmlFor="paper_weight">Paper Weight (GSM) *</Label>
-                <Select 
-                  value={formData.paper_weight.toString()} 
-                  onValueChange={(value) => updateFormData('paper_weight', parseInt(value))}
+                <Select
+                  value={formData.paper_weight.toString()}
+                  onValueChange={(value) =>
+                    updateFormData("paper_weight", parseInt(value))
+                  }
                 >
                   <SelectTrigger className="mt-2">
                     <SelectValue placeholder="Select weight..." />
@@ -265,28 +344,35 @@ export default function SpecificationsStep({
               <Sparkles className="h-5 w-5 text-blue-600" />
               Finishing Options
             </CardTitle>
-            <p className="text-sm text-gray-600">Choose professional finishing services to enhance your print</p>
+            <p className="text-sm text-gray-600">
+              Choose professional finishing services to enhance your print
+            </p>
           </CardHeader>
           <CardContent className="space-y-6">
             {availableCategories.length > 0 ? (
-              <Tabs value={activeFinishingTab} onValueChange={setActiveFinishingTab} className="w-full">
+              <Tabs
+                value={activeFinishingTab}
+                onValueChange={setActiveFinishingTab}
+                className="w-full"
+              >
                 {/* Enhanced Tab Navigation */}
                 <div className="relative">
                   <TabsList className="w-full h-auto p-1 bg-gray-100 rounded-xl grid grid-flow-col auto-cols-fr gap-1">
                     {availableCategories.map((category) => {
                       const info = categoryInfo[category];
                       const Icon = info?.icon || Package;
-                      const selectedInCategory = finishingCategories[category]?.filter(option => 
-                        formData.finishing_options.includes(option.id)
-                      ).length || 0;
-                      
+                      const selectedInCategory =
+                        finishingCategories[category]?.filter((option) =>
+                          formData.finishing_options.includes(option.id),
+                        ).length || 0;
+
                       return (
-                        <TabsTrigger 
-                          key={category} 
+                        <TabsTrigger
+                          key={category}
                           value={category}
                           className="relative flex flex-col items-center gap-1.5 h-auto py-3 px-2 rounded-lg transition-all duration-300 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:scale-105 hover:bg-gray-50 hover:scale-102 group"
                           style={{
-                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                           }}
                         >
                           <div className="relative">
@@ -308,28 +394,48 @@ export default function SpecificationsStep({
 
                 {/* Enhanced Tab Content */}
                 {availableCategories.map((category) => (
-                  <TabsContent key={category} value={category} className="mt-6 space-y-4">
+                  <TabsContent
+                    key={category}
+                    value={category}
+                    className="mt-6 space-y-4"
+                  >
                     {/* Category Header */}
                     <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100 hover:shadow-md transition-all duration-300 hover:scale-[1.02]">
-                      {React.createElement(categoryInfo[category]?.icon || Package, { 
-                        className: "h-6 w-6 text-blue-600 mt-0.5 flex-shrink-0 animate-pulse" 
-                      })}
+                      {React.createElement(
+                        categoryInfo[category]?.icon || Package,
+                        {
+                          className:
+                            "h-6 w-6 text-blue-600 mt-0.5 flex-shrink-0 animate-pulse",
+                        },
+                      )}
                       <div className="flex-1">
                         <h3 className="text-lg font-semibold text-gray-900 mb-1">
                           {categoryInfo[category]?.label || category}
                         </h3>
                         <p className="text-sm text-gray-600">
-                          {categoryInfo[category]?.description || 'Additional finishing options'}
+                          {categoryInfo[category]?.description ||
+                            "Additional finishing options"}
                         </p>
                         <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
                           <span className="flex items-center gap-1">
                             <div className="h-2 w-2 bg-gray-400 rounded-full"></div>
-                            {finishingCategories[category]?.length || 0} options available
+                            {finishingCategories[category]?.length || 0} options
+                            available
                           </span>
-                          {finishingCategories[category]?.filter(option => formData.finishing_options.includes(option.id)).length > 0 && (
+                          {finishingCategories[category]?.filter((option) =>
+                            formData.finishing_options.includes(option.id),
+                          ).length > 0 && (
                             <span className="flex items-center gap-1 text-blue-600 font-medium">
                               <div className="h-2 w-2 bg-blue-600 rounded-full animate-pulse"></div>
-                              {finishingCategories[category]?.filter(option => formData.finishing_options.includes(option.id)).length} selected
+                              {
+                                finishingCategories[category]?.filter(
+                                  (option) =>
+                                    formData.finishing_options.includes(
+                                      option.id,
+                                    ),
+                                ).length
+                              }{" "}
+                              selected
                             </span>
                           )}
                         </div>
@@ -339,32 +445,43 @@ export default function SpecificationsStep({
                     {/* Options Grid */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                       {finishingCategories[category]?.map((option) => {
-                        const isSelected = formData.finishing_options.includes(option.id);
+                        const isSelected = formData.finishing_options.includes(
+                          option.id,
+                        );
                         const customPrice = finishingOptionPrices[option.id];
-                        const defaultPrice = typeof option.pricing?.base === 'number' ? option.pricing.base : Number(option.pricing?.base) || 0;
+                        const defaultPrice =
+                          typeof option.pricing?.base === "number"
+                            ? option.pricing.base
+                            : Number(option.pricing?.base) || 0;
                         const finalPrice = customPrice || defaultPrice;
-                        
+
                         return (
-                          <div 
-                            key={option.id} 
+                          <div
+                            key={option.id}
                             className={`relative group border-2 rounded-xl p-4 transition-all duration-300 cursor-pointer hover:shadow-lg hover:-translate-y-1 ${
-                              isSelected 
-                                ? 'border-blue-200 bg-blue-50 shadow-md ring-2 ring-blue-100' 
-                                : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md'
+                              isSelected
+                                ? "border-blue-200 bg-blue-50 shadow-md ring-2 ring-blue-100"
+                                : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-md"
                             }`}
                             style={{
-                              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                              transition:
+                                "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                             }}
                             onClick={() => {
-                              const checkbox = document.getElementById(`finishing-${option.id}`) as HTMLInputElement;
+                              const checkbox = document.getElementById(
+                                `finishing-${option.id}`,
+                              ) as HTMLInputElement;
                               if (checkbox) {
                                 checkbox.click();
                                 // Add selection animation
-                                const card = document.getElementById(`card-${option.id}`);
+                                const card = document.getElementById(
+                                  `card-${option.id}`,
+                                );
                                 if (card) {
-                                  card.style.animation = 'none';
+                                  card.style.animation = "none";
                                   setTimeout(() => {
-                                    card.style.animation = 'selectionPulse 0.6s ease-out';
+                                    card.style.animation =
+                                      "selectionPulse 0.6s ease-out";
                                   }, 10);
                                 }
                               }
@@ -375,8 +492,16 @@ export default function SpecificationsStep({
                             {isSelected && (
                               <div className="absolute top-3 right-3 animate-in">
                                 <div className="h-6 w-6 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-full flex items-center justify-center shadow-lg ring-2 ring-white">
-                                  <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                  <svg
+                                    className="h-3.5 w-3.5"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                  >
+                                    <path
+                                      fillRule="evenodd"
+                                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                      clipRule="evenodd"
+                                    />
                                   </svg>
                                 </div>
                               </div>
@@ -387,11 +512,13 @@ export default function SpecificationsStep({
                               type="checkbox"
                               id={`finishing-${option.id}`}
                               checked={isSelected}
-                              onChange={(e) => handleFinishingOptionChange(
-                                option.id, 
-                                e.target.checked, 
-                                defaultPrice
-                              )}
+                              onChange={(e) =>
+                                handleFinishingOptionChange(
+                                  option.id,
+                                  e.target.checked,
+                                  defaultPrice,
+                                )
+                              }
                               className="sr-only"
                               suppressHydrationWarning={true}
                             />
@@ -403,16 +530,21 @@ export default function SpecificationsStep({
                                   {option.name}
                                 </h4>
                                 <div className="flex items-center gap-2">
-                                  <span className="text-sm text-gray-600">Starting at</span>
+                                  <span className="text-sm text-gray-600">
+                                    Starting at
+                                  </span>
                                   <span className="text-lg font-bold text-blue-600">
                                     ${defaultPrice.toFixed(2)}
                                   </span>
-                                  <span className="text-sm text-gray-500">per unit</span>
-                                  {customPrice !== undefined && customPrice !== defaultPrice && (
-                                    <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
-                                      Custom: ${customPrice.toFixed(2)}
-                                    </span>
-                                  )}
+                                  <span className="text-sm text-gray-500">
+                                    per unit
+                                  </span>
+                                  {customPrice !== undefined &&
+                                    customPrice !== defaultPrice && (
+                                      <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
+                                        Custom: ${customPrice.toFixed(2)}
+                                      </span>
+                                    )}
                                 </div>
                               </div>
 
@@ -420,35 +552,49 @@ export default function SpecificationsStep({
                               {isSelected && (
                                 <div className="bg-white border border-gray-200 rounded-lg p-3 space-y-3 animate-in slide-in-from-top-2 duration-300 shadow-sm">
                                   <div>
-                                    <Label htmlFor={`price-${option.id}`} className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                                    <Label
+                                      htmlFor={`price-${option.id}`}
+                                      className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                                    >
                                       <span className="h-2 w-2 bg-blue-600 rounded-full"></span>
                                       Custom Price (optional)
                                       {customPrice === 0 && (
-                                        <span className="text-xs text-green-600 font-medium">• Free service</span>
+                                        <span className="text-xs text-green-600 font-medium">
+                                          • Free service
+                                        </span>
                                       )}
                                     </Label>
                                     <div className="mt-2 relative">
-                                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-medium">$</span>
+                                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-medium">
+                                        $
+                                      </span>
                                       <Input
                                         id={`price-${option.id}`}
                                         type="number"
                                         step="0.01"
                                         min="0"
                                         placeholder={defaultPrice.toFixed(2)}
-                                        value={customPrice !== undefined ? customPrice.toString() : ''}
+                                        value={
+                                          customPrice !== undefined
+                                            ? customPrice.toString()
+                                            : ""
+                                        }
                                         onChange={(e) => {
                                           const inputValue = e.target.value;
                                           // Allow empty string or valid numbers including 0
-                                          if (inputValue === '') {
-                                            const newPrices = { ...finishingOptionPrices };
+                                          if (inputValue === "") {
+                                            const newPrices = {
+                                              ...finishingOptionPrices,
+                                            };
                                             delete newPrices[option.id];
                                             setFinishingOptionPrices(newPrices);
                                           } else {
-                                            const value = parseFloat(inputValue);
+                                            const value =
+                                              parseFloat(inputValue);
                                             if (!isNaN(value) && value >= 0) {
                                               setFinishingOptionPrices({
                                                 ...finishingOptionPrices,
-                                                [option.id]: value
+                                                [option.id]: value,
                                               });
                                             }
                                           }
@@ -458,7 +604,7 @@ export default function SpecificationsStep({
                                       />
                                     </div>
                                   </div>
-                                  
+
                                   <div className="flex items-center justify-between pt-2 border-t border-gray-100">
                                     <span className="text-sm text-gray-600 flex items-center gap-2">
                                       <span className="h-1.5 w-1.5 bg-gray-400 rounded-full"></span>
@@ -466,7 +612,9 @@ export default function SpecificationsStep({
                                     </span>
                                     <span className="text-lg font-bold text-green-600 flex items-center gap-1">
                                       <span className="h-2 w-2 bg-green-600 rounded-full animate-pulse"></span>
-                                      {finalPrice === 0 ? 'Free' : `$${(finalPrice * formData.quantity).toFixed(2)}`}
+                                      {finalPrice === 0
+                                        ? "Free"
+                                        : `$${(finalPrice * formData.quantity).toFixed(2)}`}
                                     </span>
                                   </div>
                                 </div>
@@ -478,20 +626,27 @@ export default function SpecificationsStep({
                     </div>
 
                     {/* Empty State */}
-                    {!finishingCategories[category] || finishingCategories[category].length === 0 && (
-                      <div className="text-center py-12">
-                        <Package className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                        <p className="text-gray-500">No options available in this category</p>
-                      </div>
-                    )}
+                    {!finishingCategories[category] ||
+                      (finishingCategories[category].length === 0 && (
+                        <div className="text-center py-12">
+                          <Package className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                          <p className="text-gray-500">
+                            No options available in this category
+                          </p>
+                        </div>
+                      ))}
                   </TabsContent>
                 ))}
               </Tabs>
             ) : (
               <div className="text-center py-12">
                 <Sparkles className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500 mb-2">No finishing options available</p>
-                <p className="text-sm text-gray-400">Finishing options depend on the selected service</p>
+                <p className="text-gray-500 mb-2">
+                  No finishing options available
+                </p>
+                <p className="text-sm text-gray-400">
+                  Finishing options depend on the selected service
+                </p>
               </div>
             )}
 
@@ -505,27 +660,39 @@ export default function SpecificationsStep({
                       <Sparkles className="h-5 w-5" />
                     </div>
                   </div>
-                  <h4 className="text-lg font-semibold text-gray-900">Selected Finishing Services</h4>
+                  <h4 className="text-lg font-semibold text-gray-900">
+                    Selected Finishing Services
+                  </h4>
                   <div className="ml-auto">
                     <div className="h-8 w-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
                       {formData.finishing_options.length}
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="space-y-3">
                   {formData.finishing_options.map((optionId, index) => {
-                    const option = availableFinishingOptions.find(o => o.id === optionId);
-                    const price = finishingOptionPrices[optionId] || (typeof option?.pricing?.base === 'number' ? option.pricing.base : Number(option?.pricing?.base) || 0);
-                    const categoryLabel = categoryInfo[option?.category || 'other']?.label || option?.category;
-                    const CategoryIcon = categoryInfo[option?.category || 'other']?.icon || Package;
-                    
+                    const option = availableFinishingOptions.find(
+                      (o) => o.id === optionId,
+                    );
+                    const price =
+                      finishingOptionPrices[optionId] ||
+                      (typeof option?.pricing?.base === "number"
+                        ? option.pricing.base
+                        : Number(option?.pricing?.base) || 0);
+                    const categoryLabel =
+                      categoryInfo[option?.category || "other"]?.label ||
+                      option?.category;
+                    const CategoryIcon =
+                      categoryInfo[option?.category || "other"]?.icon ||
+                      Package;
+
                     return (
-                      <div 
-                        key={optionId} 
+                      <div
+                        key={optionId}
                         className="flex items-center justify-between bg-white rounded-lg p-4 border border-green-100 hover:shadow-md transition-all duration-300 hover:scale-[1.02]"
                         style={{
-                          animationDelay: `${index * 100}ms`
+                          animationDelay: `${index * 100}ms`,
                         }}
                       >
                         <div className="flex items-center gap-3">
@@ -533,31 +700,42 @@ export default function SpecificationsStep({
                             <CategoryIcon className="h-5 w-5 text-gray-600" />
                           </div>
                           <div>
-                            <span className="font-medium text-gray-900">{option?.name}</span>
+                            <span className="font-medium text-gray-900">
+                              {option?.name}
+                            </span>
                             <div className="flex items-center gap-2 mt-1">
-                              <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                              <Badge
+                                variant="outline"
+                                className="text-xs bg-blue-50 text-blue-700 border-blue-200"
+                              >
                                 {categoryLabel}
                               </Badge>
                               <span className="text-xs text-gray-500 flex items-center gap-1">
                                 <span className="h-1 w-1 bg-gray-400 rounded-full"></span>
-                                {price === 0 ? 'Free service' : `$${price.toFixed(2)} × ${formData.quantity}`}
+                                {price === 0
+                                  ? "Free service"
+                                  : `$${price.toFixed(2)} × ${formData.quantity}`}
                               </span>
                             </div>
                           </div>
                         </div>
                         <div className="text-right">
                           <span className="text-lg font-bold text-green-600">
-                            {price === 0 ? 'Free' : `$${(price * formData.quantity).toFixed(2)}`}
+                            {price === 0
+                              ? "Free"
+                              : `$${(price * formData.quantity).toFixed(2)}`}
                           </span>
                         </div>
                       </div>
                     );
                   })}
-                  
+
                   <div className="border-t-2 border-green-200 pt-4 flex items-center justify-between bg-gradient-to-r from-green-100 to-emerald-100 rounded-lg p-4 hover:shadow-md transition-all duration-300">
                     <div className="flex items-center gap-2">
                       <div className="h-3 w-3 bg-green-600 rounded-full animate-pulse"></div>
-                      <span className="text-lg font-semibold text-gray-900">Total Finishing Cost:</span>
+                      <span className="text-lg font-semibold text-gray-900">
+                        Total Finishing Cost:
+                      </span>
                     </div>
                     <span className="text-2xl font-bold text-green-600 flex items-center gap-2">
                       <span className="h-2 w-2 bg-green-600 rounded-full"></span>
@@ -579,18 +757,23 @@ export default function SpecificationsStep({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
               <div>
                 <h4 className="font-medium text-gray-900 mb-2">Size</h4>
-                {formData.size_type === 'standard' ? (
-                  <Badge variant="outline">{formData.size_preset || 'Not selected'}</Badge>
+                {formData.size_type === "standard" ? (
+                  <Badge variant="outline">
+                    {formData.size_preset || "Not selected"}
+                  </Badge>
                 ) : (
                   <Badge variant="outline">
-                    {formData.custom_width} x {formData.custom_height} {formData.custom_unit}
+                    {formData.custom_width} x {formData.custom_height}{" "}
+                    {formData.custom_unit}
                   </Badge>
                 )}
               </div>
               <div>
                 <h4 className="font-medium text-gray-900 mb-2">Paper</h4>
                 <div className="space-y-1">
-                  <Badge variant="outline">{formData.paper_type || 'Not selected'}</Badge>
+                  <Badge variant="outline">
+                    {formData.paper_type || "Not selected"}
+                  </Badge>
                   <Badge variant="outline">{formData.paper_weight} GSM</Badge>
                 </div>
               </div>
@@ -598,10 +781,14 @@ export default function SpecificationsStep({
                 <h4 className="font-medium text-gray-900 mb-2">Finishing</h4>
                 <div className="space-y-1">
                   {formData.finishing_options.length > 0 ? (
-                    formData.finishing_options.map(optionId => {
-                      const option = availableFinishingOptions.find(o => o.id === optionId);
+                    formData.finishing_options.map((optionId) => {
+                      const option = availableFinishingOptions.find(
+                        (o) => o.id === optionId,
+                      );
                       return (
-                        <Badge key={optionId} variant="outline">{option?.name}</Badge>
+                        <Badge key={optionId} variant="outline">
+                          {option?.name}
+                        </Badge>
                       );
                     })
                   ) : (

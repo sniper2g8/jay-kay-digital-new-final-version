@@ -1,5 +1,5 @@
-const { Client } = require('pg');
-require('dotenv').config({ path: '.env.local' });
+const { Client } = require("pg");
+require("dotenv").config({ path: ".env.local" });
 
 async function checkAllAuthTokens() {
   const client = new Client({
@@ -8,12 +8,12 @@ async function checkAllAuthTokens() {
     database: process.env.DATABASE_NAME,
     user: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
-    ssl: { rejectUnauthorized: false }
+    ssl: { rejectUnauthorized: false },
   });
 
   try {
     await client.connect();
-    console.log('🔍 Checking ALL Auth Token Fields for Empty Strings\n');
+    console.log("🔍 Checking ALL Auth Token Fields for Empty Strings\n");
 
     // Check ALL token fields for empty strings
     const checkTokens = await client.query(`
@@ -53,16 +53,18 @@ async function checkAllAuthTokens() {
       ORDER BY email
     `);
 
-    console.log('=== Individual User Token Status ===');
+    console.log("=== Individual User Token Status ===");
     checkTokens.rows.forEach((user, index) => {
       console.log(`\nUser ${index + 1}: ${user.email}`);
       console.log(`  Confirmation Token: ${user.confirmation_token_status}`);
       console.log(`  Recovery Token: ${user.recovery_token_status}`);
       console.log(`  Email Change New: ${user.email_change_new_status}`);
-      console.log(`  Email Change Current: ${user.email_change_current_status}`);
+      console.log(
+        `  Email Change Current: ${user.email_change_current_status}`,
+      );
       console.log(`  Phone Change Token: ${user.phone_change_token_status}`);
       console.log(`  Reauth Token: ${user.reauth_token_status}`);
-      
+
       // Flag problematic users
       const hasEmptyStrings = [
         user.confirmation_token_status,
@@ -70,11 +72,13 @@ async function checkAllAuthTokens() {
         user.email_change_new_status,
         user.email_change_current_status,
         user.phone_change_token_status,
-        user.reauth_token_status
-      ].includes('EMPTY_STRING');
-      
+        user.reauth_token_status,
+      ].includes("EMPTY_STRING");
+
       if (hasEmptyStrings) {
-        console.log(`  ⚠️  WARNING: This user has EMPTY_STRING tokens that need fixing!`);
+        console.log(
+          `  ⚠️  WARNING: This user has EMPTY_STRING tokens that need fixing!`,
+        );
       }
     });
 
@@ -91,31 +95,37 @@ async function checkAllAuthTokens() {
       FROM auth.users
     `);
 
-    console.log('\n=== Summary of Empty String Tokens ===');
+    console.log("\n=== Summary of Empty String Tokens ===");
     const stats = summary.rows[0];
     console.log(`Total users: ${stats.total_users}`);
     console.log(`Empty confirmation tokens: ${stats.empty_confirmation}`);
     console.log(`Empty recovery tokens: ${stats.empty_recovery}`);
     console.log(`Empty email_change_token_new: ${stats.empty_email_new}`);
-    console.log(`Empty email_change_token_current: ${stats.empty_email_current}`);
+    console.log(
+      `Empty email_change_token_current: ${stats.empty_email_current}`,
+    );
     console.log(`Empty phone_change_token: ${stats.empty_phone_change}`);
     console.log(`Empty reauthentication_token: ${stats.empty_reauth}`);
 
-    const totalProblems = parseInt(stats.empty_confirmation) + 
-                         parseInt(stats.empty_recovery) + 
-                         parseInt(stats.empty_email_new) + 
-                         parseInt(stats.empty_email_current) + 
-                         parseInt(stats.empty_phone_change) + 
-                         parseInt(stats.empty_reauth);
+    const totalProblems =
+      parseInt(stats.empty_confirmation) +
+      parseInt(stats.empty_recovery) +
+      parseInt(stats.empty_email_new) +
+      parseInt(stats.empty_email_current) +
+      parseInt(stats.empty_phone_change) +
+      parseInt(stats.empty_reauth);
 
     if (totalProblems > 0) {
-      console.log(`\n🚨 FOUND ${totalProblems} EMPTY STRING TOKENS THAT NEED FIXING!`);
+      console.log(
+        `\n🚨 FOUND ${totalProblems} EMPTY STRING TOKENS THAT NEED FIXING!`,
+      );
     } else {
-      console.log('\n✅ All tokens are properly set to NULL - no empty strings found');
+      console.log(
+        "\n✅ All tokens are properly set to NULL - no empty strings found",
+      );
     }
-
   } catch (error) {
-    console.error('❌ Error checking auth tokens:', error.message);
+    console.error("❌ Error checking auth tokens:", error.message);
   } finally {
     try {
       await client.end();

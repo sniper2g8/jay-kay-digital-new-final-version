@@ -1,52 +1,56 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/contexts/AuthContext';
-import DashboardLayout from '@/components/DashboardLayout';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Building2, MapPin } from 'lucide-react';
-import Link from 'next/link';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
+import DashboardLayout from "@/components/DashboardLayout";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { ArrowLeft, Building2, MapPin } from "lucide-react";
+import Link from "next/link";
+import { toast } from "sonner";
 
 export default function AddCustomerPage() {
   const [formData, setFormData] = useState({
-    business_name: '',
-    contact_person: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    state: '',
-    zip_code: '',
-    notes: '',
-    status: 'active' as 'active' | 'inactive'
+    business_name: "",
+    contact_person: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    state: "",
+    zip_code: "",
+    notes: "",
+    status: "active" as "active" | "inactive",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { user } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.business_name || !formData.contact_person) {
-      toast.error('Business name and contact person are required');
+      toast.error("Business name and contact person are required");
       return;
     }
 
     setIsSubmitting(true);
-    
+
     try {
       // Generate human-readable ID
       const humanId = `JKDP-CUS-${String(Date.now()).slice(-6)}`;
-      
+
       const customerData = {
         id: crypto.randomUUID(),
         human_id: humanId,
@@ -59,41 +63,50 @@ export default function AddCustomerPage() {
         state: formData.state || null,
         zip_code: formData.zip_code || null,
         notes: formData.notes || null,
-        status: formData.status,
+        customer_status: formData.status,
+        customer_type: "business",
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       };
 
-      console.log('Creating customer:', customerData);
+      console.log("Creating customer:", customerData);
 
       const { data, error } = await supabase
-        .from('customers')
+        .from("customers")
         .insert([customerData])
         .select()
         .single();
 
       if (error) {
-        console.error('Customer creation error:', error);
-        
-        let userMessage = 'Failed to create customer.';
-        if (error.message.includes('permission denied')) {
-          userMessage = 'Permission denied. Please contact an administrator.';
-        } else if (error.message.includes('duplicate')) {
-          userMessage = 'A customer with this information already exists.';
+        console.error("Customer creation error:", error);
+        console.error("Full error object:", JSON.stringify(error, null, 2));
+
+        let userMessage = "Failed to create customer.";
+        if (error?.message) {
+          if (error.message.includes("permission denied")) {
+            userMessage = "Permission denied. Please contact an administrator.";
+          } else if (error.message.includes("duplicate")) {
+            userMessage = "A customer with this information already exists.";
+          } else {
+            userMessage = error.message;
+          }
         } else {
-          userMessage = error.message;
+          // Handle case where error object exists but has no message
+          userMessage = `Database error: ${error?.code || "Unknown error"}`;
         }
-        
+
         throw new Error(userMessage);
       }
 
-      console.log('Customer created:', data);
-      toast.success('Customer created successfully!');
-      router.push('/dashboard/customers');
-      
+      console.log("Customer created:", data);
+      toast.success("Customer created successfully!");
+      router.push("/dashboard/customers");
     } catch (err) {
-      console.error('Error creating customer:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to create customer. Please try again.';
+      console.error("Error creating customer:", err);
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Failed to create customer. Please try again.";
       toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
@@ -114,8 +127,12 @@ export default function AddCustomerPage() {
                 </Button>
               </Link>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Add New Customer</h1>
-                <p className="text-gray-600">Create a new customer profile for job management</p>
+                <h1 className="text-2xl font-bold text-gray-900">
+                  Add New Customer
+                </h1>
+                <p className="text-gray-600">
+                  Create a new customer profile for job management
+                </p>
               </div>
             </div>
           </div>
@@ -139,7 +156,12 @@ export default function AddCustomerPage() {
                     <Input
                       id="business_name"
                       value={formData.business_name}
-                      onChange={(e) => setFormData(prev => ({ ...prev, business_name: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          business_name: e.target.value,
+                        }))
+                      }
                       placeholder="ABC Marketing Solutions"
                       required
                     />
@@ -149,7 +171,12 @@ export default function AddCustomerPage() {
                     <Input
                       id="contact_person"
                       value={formData.contact_person}
-                      onChange={(e) => setFormData(prev => ({ ...prev, contact_person: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          contact_person: e.target.value,
+                        }))
+                      }
                       placeholder="John Doe"
                       required
                     />
@@ -163,7 +190,12 @@ export default function AddCustomerPage() {
                       id="email"
                       type="email"
                       value={formData.email}
-                      onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          email: e.target.value,
+                        }))
+                      }
                       placeholder="john@abcmarketing.com"
                     />
                   </div>
@@ -172,7 +204,12 @@ export default function AddCustomerPage() {
                     <Input
                       id="phone"
                       value={formData.phone}
-                      onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          phone: e.target.value,
+                        }))
+                      }
                       placeholder="(555) 123-4567"
                     />
                   </div>
@@ -180,10 +217,10 @@ export default function AddCustomerPage() {
 
                 <div>
                   <Label htmlFor="status">Status</Label>
-                  <Select 
-                    value={formData.status} 
-                    onValueChange={(value: 'active' | 'inactive') => 
-                      setFormData(prev => ({ ...prev, status: value }))
+                  <Select
+                    value={formData.status}
+                    onValueChange={(value: "active" | "inactive") =>
+                      setFormData((prev) => ({ ...prev, status: value }))
                     }
                   >
                     <SelectTrigger>
@@ -212,7 +249,12 @@ export default function AddCustomerPage() {
                   <Input
                     id="address"
                     value={formData.address}
-                    onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        address: e.target.value,
+                      }))
+                    }
                     placeholder="123 Main Street"
                   />
                 </div>
@@ -223,7 +265,12 @@ export default function AddCustomerPage() {
                     <Input
                       id="city"
                       value={formData.city}
-                      onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          city: e.target.value,
+                        }))
+                      }
                       placeholder="San Francisco"
                     />
                   </div>
@@ -232,7 +279,12 @@ export default function AddCustomerPage() {
                     <Input
                       id="state"
                       value={formData.state}
-                      onChange={(e) => setFormData(prev => ({ ...prev, state: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          state: e.target.value,
+                        }))
+                      }
                       placeholder="CA"
                     />
                   </div>
@@ -241,7 +293,12 @@ export default function AddCustomerPage() {
                     <Input
                       id="zip_code"
                       value={formData.zip_code}
-                      onChange={(e) => setFormData(prev => ({ ...prev, zip_code: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          zip_code: e.target.value,
+                        }))
+                      }
                       placeholder="94102"
                     />
                   </div>
@@ -260,7 +317,12 @@ export default function AddCustomerPage() {
                   <Textarea
                     id="notes"
                     value={formData.notes}
-                    onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        notes: e.target.value,
+                      }))
+                    }
                     placeholder="Any additional notes about this customer..."
                     rows={4}
                   />
@@ -280,7 +342,7 @@ export default function AddCustomerPage() {
                 disabled={isSubmitting}
                 className="min-w-[120px]"
               >
-                {isSubmitting ? 'Creating...' : 'Create Customer'}
+                {isSubmitting ? "Creating..." : "Create Customer"}
               </Button>
             </div>
           </form>

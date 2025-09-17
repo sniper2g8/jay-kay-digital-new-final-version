@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/lib/hooks/useUserRole";
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 
 interface ProtectedDashboardProps {
@@ -12,10 +12,10 @@ interface ProtectedDashboardProps {
   redirectPath?: string;
 }
 
-export default function ProtectedDashboard({ 
-  children, 
-  allowedRoles = ['super_admin', 'admin', 'manager', 'staff'],
-  redirectPath = '/customer-dashboard' 
+export default function ProtectedDashboard({
+  children,
+  allowedRoles = ["super_admin", "admin", "manager", "staff"],
+  redirectPath = "/customer-dashboard",
 }: ProtectedDashboardProps) {
   const { user, loading: authLoading } = useAuth();
   const { data: userData, isLoading: roleLoading } = useUserRole();
@@ -24,14 +24,24 @@ export default function ProtectedDashboard({
   useEffect(() => {
     if (!authLoading && !roleLoading && user && userData) {
       const userRole = userData.primary_role;
-      
+
       if (userRole && !allowedRoles.includes(userRole)) {
-        console.log(`🔒 User with role "${userRole}" accessing protected dashboard - redirecting to ${redirectPath}`);
+        console.log(
+          `🔒 User with role "${userRole}" accessing protected dashboard - redirecting to ${redirectPath}`,
+        );
         router.replace(redirectPath);
         return;
       }
     }
-  }, [user, userData, authLoading, roleLoading, router, allowedRoles, redirectPath]);
+  }, [
+    user,
+    userData,
+    authLoading,
+    roleLoading,
+    router,
+    allowedRoles,
+    redirectPath,
+  ]);
 
   // Show loading state while authentication is being determined
   if (authLoading || roleLoading) {

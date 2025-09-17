@@ -1,24 +1,25 @@
-const { createClient } = require('@supabase/supabase-js');
+const { createClient } = require("@supabase/supabase-js");
 
-const supabaseUrl = 'https://pnoxqzlxfuvjvufdjuqh.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBub3hxemx4ZnV2anZ1ZmRqdXFoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczOTMxMzMsImV4cCI6MjA3Mjk2OTEzM30.QG0B60xV9TO2PaUeEOkzgqXcVuSkHVq3yYfXWKaaDzc';
+const supabaseUrl = "https://pnoxqzlxfuvjvufdjuqh.supabase.co";
+const supabaseKey =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBub3hxemx4ZnV2anZ1ZmRqdXFoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczOTMxMzMsImV4cCI6MjA3Mjk2OTEzM30.QG0B60xV9TO2PaUeEOkzgqXcVuSkHVq3yYfXWKaaDzc";
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function createCustomerStatementsSchema() {
-  console.log('🏗️  Creating Customer Statements System');
-  console.log('=====================================\n');
-  
+  console.log("🏗️  Creating Customer Statements System");
+  console.log("=====================================\n");
+
   try {
-    console.log('📋 Step 1: Creating customer statements tables...');
-    
+    console.log("📋 Step 1: Creating customer statements tables...");
+
     // Note: Since we're using the client library with anon key, we can't execute DDL
     // This would need to be done via SQL editor in Supabase dashboard or with service role key
-    
-    console.log('⚠️  Table creation needs to be done via Supabase SQL Editor');
-    console.log('\n📝 SQL to execute in Supabase Dashboard:');
-    console.log('=====================================');
-    
+
+    console.log("⚠️  Table creation needs to be done via Supabase SQL Editor");
+    console.log("\n📝 SQL to execute in Supabase Dashboard:");
+    console.log("=====================================");
+
     const createTablesSQL = `
 -- =====================================================
 -- CUSTOMER STATEMENTS SYSTEM - Database Schema
@@ -387,31 +388,38 @@ BEGIN
   END IF;
 END $$;
     `;
-    
-    console.log(createTablesSQL);
-    console.log('\n✅ Copy and paste the above SQL into Supabase SQL Editor');
-    console.log('📍 Instructions:');
-    console.log('   1. Go to Supabase Dashboard → SQL Editor');
-    console.log('   2. Paste the SQL above');
-    console.log('   3. Click "Run" to execute');
-    console.log('   4. Verify table creation was successful');
-    
-    console.log('\n🎯 Tables Created:');
-    console.log('   • customer_statement_periods - Monthly/quarterly statement periods');
-    console.log('   • customer_statement_transactions - Individual transaction line items');
-    console.log('   • customer_account_balances - Current customer balances and credit limits');
-    console.log('   • statement_settings - Company info and statement formatting');
-    
-    console.log('\n🔧 Features Included:');
-    console.log('   • Automatic balance calculations');
-    console.log('   • Running balance tracking');
-    console.log('   • Credit limit management');
-    console.log('   • Statement period management');
-    console.log('   • Transaction categorization');
-    console.log('   • Row-level security');
 
+    console.log(createTablesSQL);
+    console.log("\n✅ Copy and paste the above SQL into Supabase SQL Editor");
+    console.log("📍 Instructions:");
+    console.log("   1. Go to Supabase Dashboard → SQL Editor");
+    console.log("   2. Paste the SQL above");
+    console.log('   3. Click "Run" to execute');
+    console.log("   4. Verify table creation was successful");
+
+    console.log("\n🎯 Tables Created:");
+    console.log(
+      "   • customer_statement_periods - Monthly/quarterly statement periods",
+    );
+    console.log(
+      "   • customer_statement_transactions - Individual transaction line items",
+    );
+    console.log(
+      "   • customer_account_balances - Current customer balances and credit limits",
+    );
+    console.log(
+      "   • statement_settings - Company info and statement formatting",
+    );
+
+    console.log("\n🔧 Features Included:");
+    console.log("   • Automatic balance calculations");
+    console.log("   • Running balance tracking");
+    console.log("   • Credit limit management");
+    console.log("   • Statement period management");
+    console.log("   • Transaction categorization");
+    console.log("   • Row-level security");
   } catch (error) {
-    console.error('❌ Migration preparation failed:', error);
+    console.error("❌ Migration preparation failed:", error);
   }
 }
 

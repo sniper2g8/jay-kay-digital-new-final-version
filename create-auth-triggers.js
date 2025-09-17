@@ -1,5 +1,5 @@
-const { Client } = require('pg');
-require('dotenv').config({ path: '.env.local' });
+const { Client } = require("pg");
+require("dotenv").config({ path: ".env.local" });
 
 async function createAuthTokenTriggers() {
   const client = new Client({
@@ -8,15 +8,15 @@ async function createAuthTokenTriggers() {
     database: process.env.DATABASE_NAME,
     user: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
-    ssl: { rejectUnauthorized: false }
+    ssl: { rejectUnauthorized: false },
   });
 
   try {
     await client.connect();
-    console.log('🔧 Creating Auth Token Safety Triggers\n');
+    console.log("🔧 Creating Auth Token Safety Triggers\n");
 
     // Create the function
-    console.log('=== Creating Token Handler Function ===');
+    console.log("=== Creating Token Handler Function ===");
     await client.query(`
       CREATE OR REPLACE FUNCTION public.safe_auth_token_handler()
       RETURNS trigger AS $$
@@ -50,35 +50,35 @@ async function createAuthTokenTriggers() {
       END;
       $$ LANGUAGE plpgsql;
     `);
-    console.log('✅ Created safe_auth_token_handler function');
+    console.log("✅ Created safe_auth_token_handler function");
 
     // Try to create triggers (might fail due to permissions)
     try {
-      console.log('\n=== Creating INSERT Trigger ===');
+      console.log("\n=== Creating INSERT Trigger ===");
       await client.query(`
         DROP TRIGGER IF EXISTS ensure_null_auth_tokens_insert ON auth.users;
       `);
-      
+
       await client.query(`
         CREATE TRIGGER ensure_null_auth_tokens_insert
           BEFORE INSERT ON auth.users
           FOR EACH ROW
           EXECUTE FUNCTION public.safe_auth_token_handler();
       `);
-      console.log('✅ Created INSERT trigger');
+      console.log("✅ Created INSERT trigger");
 
-      console.log('\n=== Creating UPDATE Trigger ===');
+      console.log("\n=== Creating UPDATE Trigger ===");
       await client.query(`
         DROP TRIGGER IF EXISTS ensure_null_auth_tokens_update ON auth.users;
       `);
-      
+
       await client.query(`
         CREATE TRIGGER ensure_null_auth_tokens_update
           BEFORE UPDATE ON auth.users
           FOR EACH ROW
           EXECUTE FUNCTION public.safe_auth_token_handler();
       `);
-      console.log('✅ Created UPDATE trigger');
+      console.log("✅ Created UPDATE trigger");
 
       // Verify triggers
       const triggers = await client.query(`
@@ -93,23 +93,29 @@ async function createAuthTokenTriggers() {
           AND trigger_name LIKE '%null_auth_tokens%'
       `);
 
-      console.log('\n=== Created Triggers ===');
-      triggers.rows.forEach(trigger => {
-        console.log(`${trigger.trigger_name}: ${trigger.event_manipulation} (${trigger.action_timing})`);
+      console.log("\n=== Created Triggers ===");
+      triggers.rows.forEach((trigger) => {
+        console.log(
+          `${trigger.trigger_name}: ${trigger.event_manipulation} (${trigger.action_timing})`,
+        );
       });
 
-      console.log('\n🎉 Auth Token Safety System Created!');
-      console.log('✅ Function and triggers will automatically convert empty strings to NULL');
+      console.log("\n🎉 Auth Token Safety System Created!");
+      console.log(
+        "✅ Function and triggers will automatically convert empty strings to NULL",
+      );
       console.log('✅ This prevents future "converting NULL to string" errors');
-
     } catch (triggerError) {
-      console.log('\n⚠️  Could not create triggers on auth.users (permission denied)');
-      console.log('This is expected - Supabase protects the auth schema');
-      console.log('However, the function is created and can be used manually if needed');
+      console.log(
+        "\n⚠️  Could not create triggers on auth.users (permission denied)",
+      );
+      console.log("This is expected - Supabase protects the auth schema");
+      console.log(
+        "However, the function is created and can be used manually if needed",
+      );
     }
-
   } catch (error) {
-    console.error('❌ Error creating auth token system:', error.message);
+    console.error("❌ Error creating auth token system:", error.message);
   } finally {
     try {
       await client.end();
@@ -119,8 +125,12 @@ async function createAuthTokenTriggers() {
   }
 }
 
-console.log('🚀 Creating Auth Token Safety System...');
-console.log('📋 This creates triggers to automatically fix empty string tokens');
-console.log('🔧 Prevents future "converting NULL to string" authentication errors\n');
+console.log("🚀 Creating Auth Token Safety System...");
+console.log(
+  "📋 This creates triggers to automatically fix empty string tokens",
+);
+console.log(
+  '🔧 Prevents future "converting NULL to string" authentication errors\n',
+);
 
 createAuthTokenTriggers().catch(console.error);

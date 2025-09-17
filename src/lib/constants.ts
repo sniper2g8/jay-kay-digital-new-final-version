@@ -2,27 +2,27 @@
 
 // Currency settings
 export const CURRENCY = {
-  CODE: 'SLL', // Sierra Leonean Leone
-  SYMBOL: 'SLL',
-  NAME: 'Sierra Leonean Leone',
-  LOCALE: 'en-SL' // English (Sierra Leone)
+  CODE: "SLL", // Sierra Leonean Leone
+  SYMBOL: "SLL",
+  NAME: "Sierra Leonean Leone",
+  LOCALE: "en-SL", // English (Sierra Leone)
 };
 
 // Region settings
 export const REGION = {
-  NAME: 'Sierra Leone',
-  COUNTRY_CODE: 'SL',
-  TIMEZONE: 'Africa/Freetown'
+  NAME: "Sierra Leone",
+  COUNTRY_CODE: "SL",
+  TIMEZONE: "Africa/Freetown",
 };
 
 // Formatting options
 export const FORMAT_OPTIONS = {
   CURRENCY: {
-    style: 'currency',
-    currency: 'SLL',
+    style: "currency",
+    currency: "SLL",
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }
+    maximumFractionDigits: 2,
+  },
 };
 
 // Default formatting function for currency
@@ -37,10 +37,10 @@ export const formatNumber = (number: number): string => {
 
 // Default formatting function for dates
 export const formatDate = (date: string | Date): string => {
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-  return dateObj.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
+  const dateObj = typeof date === "string" ? new Date(date) : date;
+  return dateObj.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
   });
 };

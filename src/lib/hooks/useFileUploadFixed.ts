@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 
 export interface FileUpload {
   file: File;
   progress: number;
-  status: 'pending' | 'uploading' | 'completed' | 'error';
+  status: "pending" | "uploading" | "completed" | "error";
   id: string;
   errorMessage?: string;
   uploadSpeed?: number;
@@ -35,48 +35,51 @@ export const useFileUploadFixed = () => {
 
   const addFiles = (files: File[]) => {
     // Validate file types and sizes
-    const validFiles = files.filter(file => {
+    const validFiles = files.filter((file) => {
       // Max file size: 10MB
       if (file.size > 10 * 1024 * 1024) {
         toast.error(`File ${file.name} is too large. Max size is 10MB.`);
         return false;
       }
-      
+
       // Allowed file types
       const allowedTypes = [
-        'application/pdf',
-        'image/jpeg',
-        'image/jpg', 
-        'image/png',
-        'image/gif',
-        'application/msword',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'text/plain'
+        "application/pdf",
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/gif",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "text/plain",
       ];
-      
+
       if (!allowedTypes.includes(file.type)) {
         toast.error(`File type ${file.type} is not allowed for ${file.name}`);
         return false;
       }
-      
+
       return true;
     });
-    
-    const newUploads: FileUpload[] = validFiles.map(file => ({
+
+    const newUploads: FileUpload[] = validFiles.map((file) => ({
       file,
       progress: 0,
-      status: 'pending',
-      id: crypto.randomUUID()
+      status: "pending",
+      id: crypto.randomUUID(),
     }));
-    
-    setFileUploads(prev => [...prev, ...newUploads]);
+
+    setFileUploads((prev) => [...prev, ...newUploads]);
   };
 
   const removeFile = (id: string) => {
-    setFileUploads(prev => prev.filter(upload => upload.id !== id));
+    setFileUploads((prev) => prev.filter((upload) => upload.id !== id));
   };
 
-  const uploadFiles = async (jobId: string, userId?: string): Promise<FileRecord[]> => {
+  const uploadFiles = async (
+    jobId: string,
+    userId?: string,
+  ): Promise<FileRecord[]> => {
     if (fileUploads.length === 0) {
       return [];
     }
@@ -86,142 +89,162 @@ export const useFileUploadFixed = () => {
 
     try {
       // Check authentication before starting upload
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
+
       if (sessionError) {
-        console.error('❌ Session error:', sessionError);
+        console.error("❌ Session error:", sessionError);
         throw new Error(`Authentication error: ${sessionError.message}`);
       }
-      
+
       if (!session) {
-        console.error('❌ No active session found');
-        throw new Error('You must be logged in to upload files');
+        console.error("❌ No active session found");
+        throw new Error("You must be logged in to upload files");
       }
 
-      console.log('✅ Authentication verified for user:', session.user.email);
-      console.log(`🚀 Starting upload of ${fileUploads.length} files for job ${jobId}`);
+      console.log("✅ Authentication verified for user:", session.user.email);
+      console.log(
+        `🚀 Starting upload of ${fileUploads.length} files for job ${jobId}`,
+      );
 
       // Use session user ID if not provided
       const uploadUserId = userId || session.user.id;
 
       for (const upload of fileUploads) {
-        if (upload.status === 'completed') {
-          console.log(`⏭️  Skipping already uploaded file: ${upload.file.name}`);
+        if (upload.status === "completed") {
+          console.log(
+            `⏭️  Skipping already uploaded file: ${upload.file.name}`,
+          );
           continue;
         }
 
         try {
           // Update status to uploading
-          setFileUploads(prev => prev.map(u => 
-            u.id === upload.id ? { ...u, status: 'uploading', progress: 0 } : u
-          ));
+          setFileUploads((prev) =>
+            prev.map((u) =>
+              u.id === upload.id
+                ? { ...u, status: "uploading", progress: 0 }
+                : u,
+            ),
+          );
 
           // Create unique filename with timestamp
           const timestamp = Date.now();
           const sanitizedFileName = upload.file.name
-            .replace(/[^a-zA-Z0-9.-]/g, '_')
-            .replace(/_{2,}/g, '_');
-          
+            .replace(/[^a-zA-Z0-9.-]/g, "_")
+            .replace(/_{2,}/g, "_");
+
           const fileName = `jobs/${jobId}/${timestamp}_${sanitizedFileName}`;
-          
+
           console.log(`📤 Uploading file: ${fileName}`);
 
           // Upload to Supabase Storage using the simple upload method
-          const { data: uploadData, error: uploadError } = await supabase.storage
-            .from('job-files')
-            .upload(fileName, upload.file, {
-              cacheControl: '3600',
-              upsert: false,
-              metadata: {
-                jobId: jobId,
-                originalName: upload.file.name,
-                uploadedBy: uploadUserId,
-                uploadDate: new Date().toISOString()
-              }
-            });
+          const { data: uploadData, error: uploadError } =
+            await supabase.storage
+              .from("job-files")
+              .upload(fileName, upload.file, {
+                cacheControl: "3600",
+                upsert: false,
+                metadata: {
+                  jobId: jobId,
+                  originalName: upload.file.name,
+                  uploadedBy: uploadUserId,
+                  uploadDate: new Date().toISOString(),
+                },
+              });
 
           if (uploadError) {
-            console.error('❌ Upload error:', uploadError);
+            console.error("❌ Upload error:", uploadError);
             throw uploadError;
           }
 
-          console.log('✅ File uploaded to storage:', uploadData.path);
+          console.log("✅ File uploaded to storage:", uploadData.path);
 
           // Update progress to 50% after upload
-          setFileUploads(prev => prev.map(u => 
-            u.id === upload.id ? { ...u, progress: 50 } : u
-          ));
+          setFileUploads((prev) =>
+            prev.map((u) => (u.id === upload.id ? { ...u, progress: 50 } : u)),
+          );
 
           // Get the public URL
           const { data: urlData } = supabase.storage
-            .from('job-files')
+            .from("job-files")
             .getPublicUrl(uploadData.path);
 
-          console.log('🔗 Public URL generated:', urlData.publicUrl);
+          console.log("🔗 Public URL generated:", urlData.publicUrl);
 
           // Save file record to database
           const fileRecord = {
             id: crypto.randomUUID(),
             entity_id: jobId,
-            entity_type: 'job',
+            entity_type: "job",
             file_name: upload.file.name,
             file_url: urlData.publicUrl,
             file_size: upload.file.size,
             file_type: upload.file.type,
-            uploaded_by: uploadUserId
+            uploaded_by: uploadUserId,
           };
 
           const { data: dbData, error: dbError } = await supabase
-            .from('file_attachments')
+            .from("file_attachments")
             .insert([fileRecord])
             .select()
             .single();
 
           if (dbError) {
-            console.error('❌ Database error:', dbError);
-            
+            console.error("❌ Database error:", dbError);
+
             // Clean up uploaded file if database insert fails
-            await supabase.storage
-              .from('job-files')
-              .remove([uploadData.path]);
-            
+            await supabase.storage.from("job-files").remove([uploadData.path]);
+
             throw dbError;
           }
 
-          console.log('✅ File record saved to database:', dbData.id);
+          console.log("✅ File record saved to database:", dbData.id);
 
           // Update progress to 100%
-          setFileUploads(prev => prev.map(u => 
-            u.id === upload.id ? { ...u, status: 'completed', progress: 100 } : u
-          ));
+          setFileUploads((prev) =>
+            prev.map((u) =>
+              u.id === upload.id
+                ? { ...u, status: "completed", progress: 100 }
+                : u,
+            ),
+          );
 
           uploadedFiles.push(dbData);
-          
-          toast.success(`File "${upload.file.name}" uploaded successfully`);
 
+          toast.success(`File "${upload.file.name}" uploaded successfully`);
         } catch (err: unknown) {
-          const errorMessage = err instanceof Error ? err.message : 'Upload failed';
+          const errorMessage =
+            err instanceof Error ? err.message : "Upload failed";
           console.error(`❌ Error uploading file ${upload.file.name}:`, err);
-          
-          setFileUploads(prev => prev.map(u => 
-            u.id === upload.id ? { 
-              ...u, 
-              status: 'error', 
-              progress: 0,
-              errorMessage: errorMessage
-            } : u
-          ));
-          
+
+          setFileUploads((prev) =>
+            prev.map((u) =>
+              u.id === upload.id
+                ? {
+                    ...u,
+                    status: "error",
+                    progress: 0,
+                    errorMessage: errorMessage,
+                  }
+                : u,
+            ),
+          );
+
           toast.error(`Failed to upload ${upload.file.name}: ${errorMessage}`);
         }
       }
 
-      console.log(`🎉 Upload complete! ${uploadedFiles.length} files uploaded successfully`);
-
+      console.log(
+        `🎉 Upload complete! ${uploadedFiles.length} files uploaded successfully`,
+      );
     } catch (globalError: unknown) {
-      const errorMessage = globalError instanceof Error ? globalError.message : 'Unknown error';
-      console.error('❌ Global upload error:', globalError);
-      toast.error('Upload process failed: ' + errorMessage);
+      const errorMessage =
+        globalError instanceof Error ? globalError.message : "Unknown error";
+      console.error("❌ Global upload error:", globalError);
+      toast.error("Upload process failed: " + errorMessage);
     } finally {
       setIsUploading(false);
     }
@@ -234,26 +257,31 @@ export const useFileUploadFixed = () => {
   };
 
   const clearCompletedFiles = () => {
-    setFileUploads(prev => prev.filter(upload => upload.status !== 'completed'));
+    setFileUploads((prev) =>
+      prev.filter((upload) => upload.status !== "completed"),
+    );
   };
 
   const getUploadProgress = (): number => {
     if (fileUploads.length === 0) return 0;
-    
-    const totalProgress = fileUploads.reduce((sum, upload) => sum + upload.progress, 0);
+
+    const totalProgress = fileUploads.reduce(
+      (sum, upload) => sum + upload.progress,
+      0,
+    );
     return Math.round(totalProgress / fileUploads.length);
   };
 
   const hasFailedUploads = (): boolean => {
-    return fileUploads.some(upload => upload.status === 'error');
+    return fileUploads.some((upload) => upload.status === "error");
   };
 
   const hasCompletedUploads = (): boolean => {
-    return fileUploads.some(upload => upload.status === 'completed');
+    return fileUploads.some((upload) => upload.status === "completed");
   };
 
   const hasPendingUploads = (): boolean => {
-    return fileUploads.some(upload => upload.status === 'pending');
+    return fileUploads.some((upload) => upload.status === "pending");
   };
 
   return {
@@ -269,6 +297,6 @@ export const useFileUploadFixed = () => {
     hasCompletedUploads,
     hasPendingUploads,
     isUploading,
-    setFileUploads
+    setFileUploads,
   };
 };

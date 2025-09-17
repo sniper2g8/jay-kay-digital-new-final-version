@@ -5,34 +5,36 @@ Since the automated scripts are having issues with your Supabase setup, here's h
 ## Step-by-Step Instructions
 
 ### 1. Open Supabase SQL Editor
+
 1. Go to your Supabase project dashboard
 2. Click on "SQL Editor" in the left sidebar
 
 ### 2. Run the Fix Query
+
 Copy and paste the following SQL query into the editor:
 
 ```sql
 -- Fix for "converting NULL to string is unsupported" error
 -- This converts empty string tokens to proper NULL values
 
-UPDATE auth.users 
-SET 
+UPDATE auth.users
+SET
   confirmation_token = NULLIF(confirmation_token, ''),
   recovery_token = NULLIF(recovery_token, ''),
   email_change_token_new = NULLIF(email_change_token_new, ''),
   email_change_token_current = NULLIF(email_change_token_current, ''),
   phone_change_token = NULLIF(phone_change_token, ''),
   reauthentication_token = NULLIF(reauthentication_token, '')
-WHERE 
-  confirmation_token = '' 
-  OR recovery_token = '' 
-  OR email_change_token_new = '' 
-  OR email_change_token_current = '' 
+WHERE
+  confirmation_token = ''
+  OR recovery_token = ''
+  OR email_change_token_new = ''
+  OR email_change_token_current = ''
   OR phone_change_token = ''
   OR reauthentication_token = '';
 
 -- Verify the fix worked
-SELECT 
+SELECT
   COUNT(*) as total_users,
   COUNT(CASE WHEN confirmation_token = '' THEN 1 END) as empty_confirmation_tokens,
   COUNT(CASE WHEN recovery_token = '' THEN 1 END) as empty_recovery_tokens,
@@ -42,21 +44,26 @@ FROM auth.users;
 ```
 
 ### 3. Execute the Query
+
 1. Click the "RUN" button
 2. Check the results - you should see a message indicating how many rows were updated
 
 ### 4. Verify the Results
+
 The verification query at the end will show you:
+
 - Total number of users
 - Count of empty string tokens (should be 0 after the fix)
 - Count of NULL tokens (should match the number of previously empty tokens)
 
 ### 5. Test Authentication
+
 Try logging into your application to verify the fix worked.
 
 ## What This Fix Does
 
 This fix addresses the specific error:
+
 ```
 error finding user: sql: Scan error on column index 3, name "confirmation_token": converting NULL to string is unsupported
 ```
@@ -81,7 +88,7 @@ BEGIN
   NEW.email_change_token_current = NULLIF(NEW.email_change_token_current, '');
   NEW.phone_change_token = NULLIF(NEW.phone_change_token, '');
   NEW.reauthentication_token = NULLIF(NEW.reauthentication_token, '');
-  
+
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;

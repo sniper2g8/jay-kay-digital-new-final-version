@@ -1,9 +1,15 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState } from "react";
+import { supabase } from "@/lib/supabase";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 interface TestResults {
   connection: string;
@@ -37,118 +43,129 @@ export default function SupabaseConnectionTest() {
     setResults(null);
 
     try {
-      console.log('Testing Supabase connection...');
-      
+      console.log("Testing Supabase connection...");
+
       // Test 1: Basic configuration check
       const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
       const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-      
-      console.log('Environment variables check:');
-      console.log('NEXT_PUBLIC_SUPABASE_URL:', url ? 'Set' : 'Missing');
-      console.log('NEXT_PUBLIC_SUPABASE_ANON_KEY:', key ? 'Set' : 'Missing');
-      console.log('URL value:', url);
-      console.log('Key (first 20 chars):', key?.substring(0, 20) + '...');
-      
+
+      console.log("Environment variables check:");
+      console.log("NEXT_PUBLIC_SUPABASE_URL:", url ? "Set" : "Missing");
+      console.log("NEXT_PUBLIC_SUPABASE_ANON_KEY:", key ? "Set" : "Missing");
+      console.log("URL value:", url);
+      console.log("Key (first 20 chars):", key?.substring(0, 20) + "...");
+
       if (!url || !key) {
-        throw new Error('Missing Supabase configuration. Check your .env.local file.');
+        throw new Error(
+          "Missing Supabase configuration. Check your .env.local file.",
+        );
       }
 
       // Test 2: Simple query to customers table
-      console.log('Attempting to query customers table...');
+      console.log("Attempting to query customers table...");
       const { data: customers, error: customersError } = await supabase
-        .from('customers')
-        .select('human_id, business_name')
+        .from("customers")
+        .select("human_id, business_name")
         .limit(5);
 
       if (customersError) {
-        console.error('Customers query error details:');
-        console.error('- Error object:', customersError);
-        console.error('- Error message:', customersError.message);
-        console.error('- Error code:', customersError.code);
-        console.error('- Error details:', customersError.details);
-        console.error('- Error hint:', customersError.hint);
-        console.error('- Error stringified:', JSON.stringify(customersError, null, 2));
-        
+        console.error("Customers query error details:");
+        console.error("- Error object:", customersError);
+        console.error("- Error message:", customersError.message);
+        console.error("- Error code:", customersError.code);
+        console.error("- Error details:", customersError.details);
+        console.error("- Error hint:", customersError.hint);
+        console.error(
+          "- Error stringified:",
+          JSON.stringify(customersError, null, 2),
+        );
+
         // Try to extract more information
         const errorKeys = Object.keys(customersError);
-        console.error('- Error object keys:', errorKeys);
-        
-        throw new Error(`Customers query failed: ${customersError.message || 'Unknown error'}`);
+        console.error("- Error object keys:", errorKeys);
+
+        throw new Error(
+          `Customers query failed: ${customersError.message || "Unknown error"}`,
+        );
       }
 
-      console.log('Customers query successful, got', customers?.length || 0, 'records');
+      console.log(
+        "Customers query successful, got",
+        customers?.length || 0,
+        "records",
+      );
 
       // Test 3: Count query
-      console.log('Attempting count query...');
+      console.log("Attempting count query...");
       const { count, error: countError } = await supabase
-        .from('customers')
-        .select('*', { count: 'exact', head: true });
+        .from("customers")
+        .select("*", { count: "exact", head: true });
 
       if (countError) {
-        console.error('Count query error:', countError);
-        console.error('Count query error message:', countError.message);
+        console.error("Count query error:", countError);
+        console.error("Count query error message:", countError.message);
         throw new Error(`Count query failed: ${countError.message}`);
       }
 
-      console.log('Count query successful, total records:', count);
+      console.log("Count query successful, total records:", count);
 
       // Test 4: Test other tables
-      console.log('Testing other table access...');
+      console.log("Testing other table access...");
       const { error: jobsError } = await supabase
-        .from('jobs')
-        .select('job_human_id')
+        .from("jobs")
+        .select("job_human_id")
         .limit(1);
 
       const { error: invoicesError } = await supabase
-        .from('invoices')
-        .select('invoice_no')
+        .from("invoices")
+        .select("invoice_no")
         .limit(1);
 
       const { error: paymentsError } = await supabase
-        .from('payments')
-        .select('id')
+        .from("payments")
+        .select("id")
         .limit(1);
 
       setResults({
-        connection: 'SUCCESS',
+        connection: "SUCCESS",
         customers: {
           count: count || 0,
           sample: customers || [],
-          error: null
+          error: null,
         },
         jobs: {
           accessible: !jobsError,
-          error: jobsError?.message || null
+          error: jobsError?.message || null,
         },
         invoices: {
           accessible: !invoicesError,
-          error: invoicesError?.message || null
+          error: invoicesError?.message || null,
         },
         payments: {
           accessible: !paymentsError,
-          error: paymentsError?.message || null
-        }
+          error: paymentsError?.message || null,
+        },
       });
 
-      console.log('Connection test completed successfully');
+      console.log("Connection test completed successfully");
     } catch (err) {
-      console.error('Connection test failed with error:', err);
-      console.error('Error type:', typeof err);
-      console.error('Error constructor:', err?.constructor?.name);
-      
+      console.error("Connection test failed with error:", err);
+      console.error("Error type:", typeof err);
+      console.error("Error constructor:", err?.constructor?.name);
+
       if (err instanceof Error) {
-        console.error('Error message:', err.message);
-        console.error('Error stack:', err.stack);
+        console.error("Error message:", err.message);
+        console.error("Error stack:", err.stack);
       }
-      
+
       // Try to get more error details
       try {
-        console.error('Error as JSON:', JSON.stringify(err, null, 2));
+        console.error("Error as JSON:", JSON.stringify(err, null, 2));
       } catch (jsonErr) {
-        console.error('Could not stringify error:', jsonErr);
+        console.error("Could not stringify error:", jsonErr);
       }
-      
-      setError(err instanceof Error ? err.message : 'Unknown error occurred');
+
+      setError(err instanceof Error ? err.message : "Unknown error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -163,12 +180,12 @@ export default function SupabaseConnectionTest() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <Button 
-          onClick={testConnection} 
+        <Button
+          onClick={testConnection}
           disabled={isLoading}
           className="w-full"
         >
-          {isLoading ? 'Testing Connection...' : 'Test Supabase Connection'}
+          {isLoading ? "Testing Connection..." : "Test Supabase Connection"}
         </Button>
 
         {error && (
@@ -181,7 +198,9 @@ export default function SupabaseConnectionTest() {
         {results && (
           <div className="space-y-3">
             <div className="p-4 bg-green-50 border border-green-200 rounded-md">
-              <h3 className="font-semibold text-green-800">Connection Status: {results.connection}</h3>
+              <h3 className="font-semibold text-green-800">
+                Connection Status: {results.connection}
+              </h3>
             </div>
 
             <div className="grid gap-3">
@@ -190,7 +209,9 @@ export default function SupabaseConnectionTest() {
                 <p>Total Records: {results.customers.count}</p>
                 <p>Sample Records: {results.customers.sample.length}</p>
                 {results.customers.error && (
-                  <p className="text-red-600">Error: {results.customers.error}</p>
+                  <p className="text-red-600">
+                    Error: {results.customers.error}
+                  </p>
                 )}
                 {results.customers.sample.length > 0 && (
                   <pre className="mt-2 text-xs bg-gray-100 p-2 rounded">
@@ -202,9 +223,24 @@ export default function SupabaseConnectionTest() {
               <div className="p-3 border rounded-md">
                 <h4 className="font-semibold">Other Tables</h4>
                 <div className="space-y-1 text-sm">
-                  <p>Jobs: {results.jobs.accessible ? '✅ Accessible' : '❌ Error: ' + results.jobs.error}</p>
-                  <p>Invoices: {results.invoices.accessible ? '✅ Accessible' : '❌ Error: ' + results.invoices.error}</p>
-                  <p>Payments: {results.payments.accessible ? '✅ Accessible' : '❌ Error: ' + results.payments.error}</p>
+                  <p>
+                    Jobs:{" "}
+                    {results.jobs.accessible
+                      ? "✅ Accessible"
+                      : "❌ Error: " + results.jobs.error}
+                  </p>
+                  <p>
+                    Invoices:{" "}
+                    {results.invoices.accessible
+                      ? "✅ Accessible"
+                      : "❌ Error: " + results.invoices.error}
+                  </p>
+                  <p>
+                    Payments:{" "}
+                    {results.payments.accessible
+                      ? "✅ Accessible"
+                      : "❌ Error: " + results.payments.error}
+                  </p>
                 </div>
               </div>
             </div>

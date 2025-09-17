@@ -7,7 +7,12 @@ export interface Database {
           human_id: string; // JKDP-ADM-001 format
           name: string;
           email: string;
-          primary_role: "super_admin" | "admin" | "manager" | "staff" | "customer";
+          primary_role:
+            | "super_admin"
+            | "admin"
+            | "manager"
+            | "staff"
+            | "customer";
           status: "active" | "inactive" | "suspended";
           created_at: string;
           updated_at: string;
@@ -20,7 +25,7 @@ export interface Database {
       customers: {
         Row: {
           id: string;
-          human_id: string; // JKDP-CUS-001 format 
+          human_id: string; // JKDP-CUS-001 format
           business_name: string;
           contact_person?: string;
           email?: string;
@@ -42,7 +47,12 @@ export interface Database {
           human_id: string; // FK to customers.human_id (JKDP-CUS-001)
           invoice_no: string; // FK to invoices.invoice_no (JKDP-INV-0001)
           amount: number;
-          payment_method: "cash" | "credit_card" | "bank_transfer" | "check" | "mobile_money";
+          payment_method:
+            | "cash"
+            | "credit_card"
+            | "bank_transfer"
+            | "check"
+            | "mobile_money";
           payment_date: string;
           reference_number?: string;
           notes?: string;
@@ -97,7 +107,14 @@ export interface Database {
           human_id: string; // FK to customers.human_id
           title: string;
           description?: string;
-          status: "pending" | "in_progress" | "review" | "completed" | "cancelled" | "on_hold" | "quote_sent";
+          status:
+            | "pending"
+            | "in_progress"
+            | "review"
+            | "completed"
+            | "cancelled"
+            | "on_hold"
+            | "quote_sent";
           priority: "low" | "medium" | "high" | "urgent";
           quantity?: number;
           unit_price?: number;
@@ -190,14 +207,14 @@ export interface Database {
 }
 
 // Export individual table types for easier use
-export type Customer = Database['public']['Tables']['customers']['Row'];
-export type Payment = Database['public']['Tables']['payments']['Row'];
-export type Invoice = Database['public']['Tables']['invoices']['Row'];
-export type InvoiceItem = Database['public']['Tables']['invoice_items']['Row'];
-export type Job = Database['public']['Tables']['jobs']['Row'];
-export type AppUser = Database['public']['Tables']['appUsers']['Row'];
-export type Role = Database['public']['Tables']['roles']['Row'];
-export type Permission = Database['public']['Tables']['permissions']['Row'];
-export type UserRole = Database['public']['Tables']['user_roles']['Row'];
-export type Service = Database['public']['Tables']['services']['Row'];
-export type Inventory = Database['public']['Tables']['inventory']['Row'];
+export type Customer = Database["public"]["Tables"]["customers"]["Row"];
+export type Payment = Database["public"]["Tables"]["payments"]["Row"];
+export type Invoice = Database["public"]["Tables"]["invoices"]["Row"];
+export type InvoiceItem = Database["public"]["Tables"]["invoice_items"]["Row"];
+export type Job = Database["public"]["Tables"]["jobs"]["Row"];
+export type AppUser = Database["public"]["Tables"]["appUsers"]["Row"];
+export type Role = Database["public"]["Tables"]["roles"]["Row"];
+export type Permission = Database["public"]["Tables"]["permissions"]["Row"];
+export type UserRole = Database["public"]["Tables"]["user_roles"]["Row"];
+export type Service = Database["public"]["Tables"]["services"]["Row"];
+export type Inventory = Database["public"]["Tables"]["inventory"]["Row"];

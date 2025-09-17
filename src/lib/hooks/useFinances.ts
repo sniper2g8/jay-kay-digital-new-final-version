@@ -1,9 +1,9 @@
-import useSWR from 'swr';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/contexts/AuthContext';
-import type { Database } from '@/lib/database-generated.types';
+import useSWR from "swr";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
+import type { Database } from "@/lib/database-generated.types";
 
-type Json = Database['public']['Tables']['invoices']['Row']['items'];
+type Json = Database["public"]["Tables"]["invoices"]["Row"]["items"];
 
 // Payment interface
 export interface Payment {
@@ -65,10 +65,10 @@ export interface InvoiceWithCustomer extends Invoice {
 // Fetcher function for payments
 const fetchPayments = async (): Promise<Payment[]> => {
   const { data, error } = await supabase
-    .from('payments')
-    .select('*')
-    .order('payment_date', { ascending: false });
-  
+    .from("payments")
+    .select("*")
+    .order("payment_date", { ascending: false });
+
   if (error) throw error;
   return (data as Payment[]) || [];
 };
@@ -76,10 +76,10 @@ const fetchPayments = async (): Promise<Payment[]> => {
 // Fetcher function for invoices
 const fetchInvoices = async (): Promise<Invoice[]> => {
   const { data, error } = await supabase
-    .from('invoices')
-    .select('*')
-    .order('created_at', { ascending: false });
-  
+    .from("invoices")
+    .select("*")
+    .order("created_at", { ascending: false });
+
   if (error) throw error;
   return (data as Invoice[]) || [];
 };
@@ -87,16 +87,16 @@ const fetchInvoices = async (): Promise<Invoice[]> => {
 // Fetcher for payments with customer names
 const fetchPaymentsWithCustomers = async (): Promise<PaymentWithCustomer[]> => {
   const { data: payments, error: paymentsError } = await supabase
-    .from('payments')
-    .select('*')
-    .order('payment_date', { ascending: false });
-  
+    .from("payments")
+    .select("*")
+    .order("payment_date", { ascending: false });
+
   if (paymentsError) throw paymentsError;
 
   const { data: customers, error: customersError } = await supabase
-    .from('customers')
-    .select('id, human_id, business_name');
-  
+    .from("customers")
+    .select("id, human_id, business_name");
+
   if (customersError) throw customersError;
 
   interface CustomerData {
@@ -116,10 +116,12 @@ const fetchPaymentsWithCustomers = async (): Promise<PaymentWithCustomer[]> => {
   });
 
   // Add customer names to payments
-  const paymentsWithCustomers = (payments as Payment[])?.map((payment: Payment) => ({
-    ...payment,
-    customer_name: customerMap.get(payment.customer_human_id) || 'Unknown Customer'
-  })) || [];
+  const paymentsWithCustomers =
+    (payments as Payment[])?.map((payment: Payment) => ({
+      ...payment,
+      customer_name:
+        customerMap.get(payment.customer_human_id) || "Unknown Customer",
+    })) || [];
 
   return paymentsWithCustomers as PaymentWithCustomer[];
 };
@@ -127,16 +129,16 @@ const fetchPaymentsWithCustomers = async (): Promise<PaymentWithCustomer[]> => {
 // Fetcher for invoices with customer names
 const fetchInvoicesWithCustomers = async (): Promise<InvoiceWithCustomer[]> => {
   const { data: invoices, error: invoicesError } = await supabase
-    .from('invoices')
-    .select('*')
-    .order('created_at', { ascending: false });
-  
+    .from("invoices")
+    .select("*")
+    .order("created_at", { ascending: false });
+
   if (invoicesError) throw invoicesError;
 
   const { data: customers, error: customersError } = await supabase
-    .from('customers')
-    .select('id, human_id, business_name');
-  
+    .from("customers")
+    .select("id, human_id, business_name");
+
   if (customersError) throw customersError;
 
   interface CustomerData {
@@ -156,72 +158,80 @@ const fetchInvoicesWithCustomers = async (): Promise<InvoiceWithCustomer[]> => {
   });
 
   // Add customer names to invoices
-  const invoicesWithCustomers = (invoices as Invoice[])?.map((invoice: Invoice) => ({
-    ...invoice,
-    customer_name: customerMap.get(invoice.customer_id || '') || 'Unknown Customer'
-  })) || [];
+  const invoicesWithCustomers =
+    (invoices as Invoice[])?.map((invoice: Invoice) => ({
+      ...invoice,
+      customer_name:
+        customerMap.get(invoice.customer_id || "") || "Unknown Customer",
+    })) || [];
 
   return invoicesWithCustomers as InvoiceWithCustomer[];
 };
 
 // Fetcher for payments by customer
-const fetchPaymentsByCustomer = async (customerHumanId: string): Promise<PaymentWithCustomer[]> => {
+const fetchPaymentsByCustomer = async (
+  customerHumanId: string,
+): Promise<PaymentWithCustomer[]> => {
   const { data: payments, error: paymentsError } = await supabase
-    .from('payments')
-    .select('*')
-    .eq('customer_human_id', customerHumanId)
-    .order('payment_date', { ascending: false });
-  
+    .from("payments")
+    .select("*")
+    .eq("customer_human_id", customerHumanId)
+    .order("payment_date", { ascending: false });
+
   if (paymentsError) throw paymentsError;
 
   // Get customer name
   const { data: customer, error: customerError } = await supabase
-    .from('customers')
-    .select('business_name')
-    .eq('customer_human_id', customerHumanId)
+    .from("customers")
+    .select("business_name")
+    .eq("customer_human_id", customerHumanId)
     .single();
-  
+
   if (customerError) throw customerError;
 
   interface CustomerNameData {
     business_name: string;
   }
 
-  const paymentsWithCustomer = (payments as Payment[])?.map((payment: Payment) => ({
-    ...payment,
-    customer_name: (customer as CustomerNameData).business_name
-  })) || [];
+  const paymentsWithCustomer =
+    (payments as Payment[])?.map((payment: Payment) => ({
+      ...payment,
+      customer_name: (customer as CustomerNameData).business_name,
+    })) || [];
 
   return paymentsWithCustomer as PaymentWithCustomer[];
 };
 
 // Fetcher for invoices by customer
-const fetchInvoicesByCustomer = async (customerHumanId: string): Promise<InvoiceWithCustomer[]> => {
+const fetchInvoicesByCustomer = async (
+  customerHumanId: string,
+): Promise<InvoiceWithCustomer[]> => {
   const { data: invoices, error: invoicesError } = await supabase
-    .from('invoices')
-    .select('*')
-    .eq('customer_human_id', customerHumanId)
-    .order('created_at', { ascending: false });
-  
+    .from("invoices")
+    .select("*")
+    .eq("customer_human_id", customerHumanId)
+    .order("created_at", { ascending: false });
+
   if (invoicesError) throw invoicesError;
 
   // Get customer name
   const { data: customer, error: customerError } = await supabase
-    .from('customers')
-    .select('business_name')
-    .eq('customer_human_id', customerHumanId)
+    .from("customers")
+    .select("business_name")
+    .eq("customer_human_id", customerHumanId)
     .single();
-  
+
   if (customerError) throw customerError;
 
   interface CustomerNameData {
     business_name: string;
   }
 
-  const invoicesWithCustomer = (invoices as Invoice[])?.map((invoice: Invoice) => ({
-    ...invoice,
-    customer_name: (customer as CustomerNameData).business_name
-  })) || [];
+  const invoicesWithCustomer =
+    (invoices as Invoice[])?.map((invoice: Invoice) => ({
+      ...invoice,
+      customer_name: (customer as CustomerNameData).business_name,
+    })) || [];
 
   return invoicesWithCustomer as InvoiceWithCustomer[];
 };
@@ -229,111 +239,119 @@ const fetchInvoicesByCustomer = async (customerHumanId: string): Promise<Invoice
 // Hook to get all payments
 export const usePayments = () => {
   const { user, session } = useAuth();
-  
-  return useSWR(
-    user && session ? 'payments' : null, 
-    fetchPayments, 
-    {
-      refreshInterval: 30000, // Refresh every 30 seconds
-      revalidateOnFocus: true,
-      errorRetryCount: 3
-    }
-  );
+
+  return useSWR(user && session ? "payments" : null, fetchPayments, {
+    refreshInterval: 30000, // Refresh every 30 seconds
+    revalidateOnFocus: true,
+    errorRetryCount: 3,
+  });
 };
 
 // Hook to get all invoices
 export const useInvoices = () => {
   const { user, session } = useAuth();
-  
-  return useSWR(
-    user && session ? 'invoices' : null, 
-    fetchInvoices, 
-    {
-      refreshInterval: 30000, // Refresh every 30 seconds
-      revalidateOnFocus: true,
-      errorRetryCount: 3
-    }
-  );
+
+  return useSWR(user && session ? "invoices" : null, fetchInvoices, {
+    refreshInterval: 30000, // Refresh every 30 seconds
+    revalidateOnFocus: true,
+    errorRetryCount: 3,
+  });
 };
 
 // Hook to get payments with customer information
 export const usePaymentsWithCustomers = () => {
   const { user, session } = useAuth();
-  
+
   return useSWR(
-    user && session ? 'payments-with-customers' : null, 
-    fetchPaymentsWithCustomers, 
+    user && session ? "payments-with-customers" : null,
+    fetchPaymentsWithCustomers,
     {
       refreshInterval: 30000, // Refresh every 30 seconds
       revalidateOnFocus: true,
-      errorRetryCount: 3
-    }
+      errorRetryCount: 3,
+    },
   );
 };
 
 // Hook to get invoices with customer information
 export const useInvoicesWithCustomers = () => {
   const { user, session } = useAuth();
-  
+
   return useSWR(
-    user && session ? 'invoices-with-customers' : null, 
-    fetchInvoicesWithCustomers, 
+    user && session ? "invoices-with-customers" : null,
+    fetchInvoicesWithCustomers,
     {
       refreshInterval: 30000, // Refresh every 30 seconds
       revalidateOnFocus: true,
-      errorRetryCount: 3
-    }
+      errorRetryCount: 3,
+    },
   );
 };
 
 // Hook to get payments for specific customer
 export const usePaymentsByCustomer = (customerHumanId: string | null) => {
   const { user, session } = useAuth();
-  
+
   return useSWR(
-    user && session && customerHumanId ? `payments-customer-${customerHumanId}` : null,
-    () => customerHumanId ? fetchPaymentsByCustomer(customerHumanId) : null,
+    user && session && customerHumanId
+      ? `payments-customer-${customerHumanId}`
+      : null,
+    () => (customerHumanId ? fetchPaymentsByCustomer(customerHumanId) : null),
     {
       refreshInterval: 30000,
       revalidateOnFocus: true,
-      errorRetryCount: 3
-    }
+      errorRetryCount: 3,
+    },
   );
 };
 
 // Hook to get invoices for specific customer
 export const useInvoicesByCustomer = (customerHumanId: string | null) => {
   const { user, session } = useAuth();
-  
+
   return useSWR(
-    user && session && customerHumanId ? `invoices-customer-${customerHumanId}` : null,
-    () => customerHumanId ? fetchInvoicesByCustomer(customerHumanId) : null,
+    user && session && customerHumanId
+      ? `invoices-customer-${customerHumanId}`
+      : null,
+    () => (customerHumanId ? fetchInvoicesByCustomer(customerHumanId) : null),
     {
       refreshInterval: 30000,
       revalidateOnFocus: true,
-      errorRetryCount: 3
-    }
+      errorRetryCount: 3,
+    },
   );
 };
 
 // Hook to get financial statistics
 export const useFinancialStats = () => {
   const { user, session } = useAuth();
-  
+
   return useSWR(
-    user && session ? 'financial-stats' : null, 
+    user && session ? "financial-stats" : null,
     async () => {
       const [invoices, payments] = await Promise.all([
         fetchInvoices(),
-        fetchPayments()
+        fetchPayments(),
       ]);
-      
-      const totalRevenue = invoices.reduce((sum, invoice) => sum + (invoice.total || invoice.grandTotal || 0), 0);
-      const totalPaid = payments.reduce((sum, payment) => sum + (payment.amount || 0), 0);
-      const paidInvoices = invoices.filter(inv => inv.status === 'paid');
-      const pendingInvoices = invoices.filter(inv => inv.status === 'pending' || inv.payment_status === 'pending');
-      const totalPending = pendingInvoices.reduce((sum, invoice) => sum + (invoice.total || invoice.grandTotal || 0), 0);
-      const collectionRate = totalRevenue > 0 ? (totalPaid / totalRevenue) * 100 : 0;
+
+      const totalRevenue = invoices.reduce(
+        (sum, invoice) => sum + (invoice.total || invoice.grandTotal || 0),
+        0,
+      );
+      const totalPaid = payments.reduce(
+        (sum, payment) => sum + (payment.amount || 0),
+        0,
+      );
+      const paidInvoices = invoices.filter((inv) => inv.status === "paid");
+      const pendingInvoices = invoices.filter(
+        (inv) => inv.status === "pending" || inv.payment_status === "pending",
+      );
+      const totalPending = pendingInvoices.reduce(
+        (sum, invoice) => sum + (invoice.total || invoice.grandTotal || 0),
+        0,
+      );
+      const collectionRate =
+        totalRevenue > 0 ? (totalPaid / totalRevenue) * 100 : 0;
 
       return {
         total_revenue: totalRevenue,
@@ -344,14 +362,14 @@ export const useFinancialStats = () => {
         total_invoices: invoices.length,
         total_payments: payments.length,
         collection_rate: Math.round(collectionRate),
-        currency: 'SLL' // Sierra Leonean Leone
+        currency: "SLL", // Sierra Leonean Leone
       };
-    }, 
+    },
     {
       refreshInterval: 60000, // Refresh every minute
       revalidateOnFocus: true,
-      errorRetryCount: 2
-    }
+      errorRetryCount: 2,
+    },
   );
 };
 
@@ -360,10 +378,10 @@ export const financialMutations = {
   // Get payment data for testing
   getPayments: async () => {
     const { data, error } = await supabase
-      .from('payments')
-      .select('*')
+      .from("payments")
+      .select("*")
       .limit(10);
-    
+
     if (error) throw error;
     return data;
   },
@@ -371,11 +389,11 @@ export const financialMutations = {
   // Get invoice data for testing
   getInvoices: async () => {
     const { data, error } = await supabase
-      .from('invoices')
-      .select('*')
+      .from("invoices")
+      .select("*")
       .limit(10);
-    
+
     if (error) throw error;
     return data;
-  }
+  },
 };

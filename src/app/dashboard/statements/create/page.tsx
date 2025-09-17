@@ -1,32 +1,38 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { 
-  ArrowLeft, 
+} from "@/components/ui/select";
+import {
+  ArrowLeft,
   Calendar,
   Users,
   FileText,
   Loader2,
-  Save
-} from 'lucide-react';
-import Link from 'next/link';
-import { useCustomers } from '@/lib/hooks/useCustomers';
-import { useStatementActions } from '@/lib/hooks/useStatements';
-import { formatDate } from '@/lib/constants';
-import DashboardLayout from '@/components/DashboardLayout';
-import ProtectedDashboard from '@/components/ProtectedDashboard';
+  Save,
+} from "lucide-react";
+import Link from "next/link";
+import { useCustomers } from "@/lib/hooks/useCustomers";
+import { useStatementActions } from "@/lib/hooks/useStatements";
+import { formatDate } from "@/lib/constants";
+import DashboardLayout from "@/components/DashboardLayout";
+import ProtectedDashboard from "@/components/ProtectedDashboard";
 
 interface StatementFormData {
   customer_id: string;
@@ -41,30 +47,34 @@ function CreateStatementContent() {
   const { createStatementPeriod, isLoading: creating } = useStatementActions();
 
   const [formData, setFormData] = useState<StatementFormData>({
-    customer_id: '',
-    period_start: '',
-    period_end: '',
-    statement_date: new Date().toISOString().split('T')[0]
+    customer_id: "",
+    period_start: "",
+    period_end: "",
+    statement_date: new Date().toISOString().split("T")[0],
   });
 
   const [errors, setErrors] = useState<Partial<StatementFormData>>({});
 
   const handleInputChange = (field: keyof StatementFormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
+    setFormData((prev) => ({ ...prev, [field]: value }));
+
     // Clear error when user starts typing
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
 
     // Auto-calculate period end when start date changes
-    if (field === 'period_start' && value) {
+    if (field === "period_start" && value) {
       const startDate = new Date(value);
-      const endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0); // Last day of month
-      setFormData(prev => ({ 
-        ...prev, 
+      const endDate = new Date(
+        startDate.getFullYear(),
+        startDate.getMonth() + 1,
+        0,
+      ); // Last day of month
+      setFormData((prev) => ({
+        ...prev,
         period_start: value,
-        period_end: endDate.toISOString().split('T')[0]
+        period_end: endDate.toISOString().split("T")[0],
       }));
     }
   };
@@ -73,25 +83,25 @@ function CreateStatementContent() {
     const newErrors: Partial<StatementFormData> = {};
 
     if (!formData.customer_id) {
-      newErrors.customer_id = 'Customer is required';
+      newErrors.customer_id = "Customer is required";
     }
 
     if (!formData.period_start) {
-      newErrors.period_start = 'Period start date is required';
+      newErrors.period_start = "Period start date is required";
     }
 
     if (!formData.period_end) {
-      newErrors.period_end = 'Period end date is required';
+      newErrors.period_end = "Period end date is required";
     }
 
     if (formData.period_start && formData.period_end) {
       if (new Date(formData.period_start) >= new Date(formData.period_end)) {
-        newErrors.period_end = 'End date must be after start date';
+        newErrors.period_end = "End date must be after start date";
       }
     }
 
     if (!formData.statement_date) {
-      newErrors.statement_date = 'Statement date is required';
+      newErrors.statement_date = "Statement date is required";
     }
 
     setErrors(newErrors);
@@ -106,15 +116,15 @@ function CreateStatementContent() {
     }
 
     try {
-      console.log('Submitting form data:', formData);
+      console.log("Submitting form data:", formData);
       const newStatement = await createStatementPeriod(formData);
-      console.log('Statement created successfully:', newStatement);
+      console.log("Statement created successfully:", newStatement);
       router.push(`/dashboard/statements/${newStatement.id}`);
     } catch (error) {
-      console.error('Error creating statement:', {
-        message: error instanceof Error ? error.message : 'Unknown error',
+      console.error("Error creating statement:", {
+        message: error instanceof Error ? error.message : "Unknown error",
         details: error,
-        formData: formData
+        formData: formData,
       });
     }
   };
@@ -123,42 +133,68 @@ function CreateStatementContent() {
   const getQuickDates = () => {
     const today = new Date();
     const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-    
-    const firstDayOfLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-    const lastDayOfLastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+    const lastDayOfMonth = new Date(
+      today.getFullYear(),
+      today.getMonth() + 1,
+      0,
+    );
+
+    const firstDayOfLastMonth = new Date(
+      today.getFullYear(),
+      today.getMonth() - 1,
+      1,
+    );
+    const lastDayOfLastMonth = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      0,
+    );
 
     return {
       currentMonth: {
-        start: firstDayOfMonth.toISOString().split('T')[0],
-        end: lastDayOfMonth.toISOString().split('T')[0],
-        label: 'Current Month'
+        start: firstDayOfMonth.toISOString().split("T")[0],
+        end: lastDayOfMonth.toISOString().split("T")[0],
+        label: "Current Month",
       },
       lastMonth: {
-        start: firstDayOfLastMonth.toISOString().split('T')[0],
-        end: lastDayOfLastMonth.toISOString().split('T')[0],
-        label: 'Last Month'
+        start: firstDayOfLastMonth.toISOString().split("T")[0],
+        end: lastDayOfLastMonth.toISOString().split("T")[0],
+        label: "Last Month",
       },
       quarter: {
-        start: new Date(today.getFullYear(), Math.floor(today.getMonth() / 3) * 3, 1).toISOString().split('T')[0],
-        end: new Date(today.getFullYear(), Math.floor(today.getMonth() / 3) * 3 + 3, 0).toISOString().split('T')[0],
-        label: 'Current Quarter'
-      }
+        start: new Date(
+          today.getFullYear(),
+          Math.floor(today.getMonth() / 3) * 3,
+          1,
+        )
+          .toISOString()
+          .split("T")[0],
+        end: new Date(
+          today.getFullYear(),
+          Math.floor(today.getMonth() / 3) * 3 + 3,
+          0,
+        )
+          .toISOString()
+          .split("T")[0],
+        label: "Current Quarter",
+      },
     };
   };
 
   const quickDates = getQuickDates();
 
-  const applyQuickDate = (preset: 'currentMonth' | 'lastMonth' | 'quarter') => {
+  const applyQuickDate = (preset: "currentMonth" | "lastMonth" | "quarter") => {
     const dates = quickDates[preset];
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       period_start: dates.start,
-      period_end: dates.end
+      period_end: dates.end,
     }));
   };
 
-  const selectedCustomer = customers?.find(c => c.id === formData.customer_id);
+  const selectedCustomer = customers?.find(
+    (c) => c.id === formData.customer_id,
+  );
 
   if (customersLoading) {
     return (
@@ -187,7 +223,9 @@ function CreateStatementContent() {
             </Button>
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Create Statement Period</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+              Create Statement Period
+            </h1>
             <p className="text-muted-foreground mt-1">
               Generate a new statement period for a customer account
             </p>
@@ -201,7 +239,8 @@ function CreateStatementContent() {
               <CardHeader>
                 <CardTitle>Statement Period Details</CardTitle>
                 <CardDescription>
-                  Configure the customer and date range for this statement period
+                  Configure the customer and date range for this statement
+                  period
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -209,9 +248,11 @@ function CreateStatementContent() {
                   {/* Customer Selection */}
                   <div className="space-y-2">
                     <Label htmlFor="customer_id">Customer *</Label>
-                    <Select 
-                      value={formData.customer_id} 
-                      onValueChange={(value) => handleInputChange('customer_id', value)}
+                    <Select
+                      value={formData.customer_id}
+                      onValueChange={(value) =>
+                        handleInputChange("customer_id", value)
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select a customer">
@@ -229,9 +270,13 @@ function CreateStatementContent() {
                         {customers?.map((customer) => (
                           <SelectItem key={customer.id} value={customer.id}>
                             <div className="flex flex-col">
-                              <span className="font-medium">{customer.business_name}</span>
+                              <span className="font-medium">
+                                {customer.business_name}
+                              </span>
                               <span className="text-sm text-muted-foreground">
-                                {customer.contact_person && `${customer.contact_person} • `}{customer.email}
+                                {customer.contact_person &&
+                                  `${customer.contact_person} • `}
+                                {customer.email}
                               </span>
                             </div>
                           </SelectItem>
@@ -239,7 +284,9 @@ function CreateStatementContent() {
                       </SelectContent>
                     </Select>
                     {errors.customer_id && (
-                      <p className="text-sm text-red-600">{errors.customer_id}</p>
+                      <p className="text-sm text-red-600">
+                        {errors.customer_id}
+                      </p>
                     )}
                   </div>
 
@@ -251,7 +298,7 @@ function CreateStatementContent() {
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={() => applyQuickDate('currentMonth')}
+                        onClick={() => applyQuickDate("currentMonth")}
                       >
                         <Calendar className="h-4 w-4 mr-2" />
                         {quickDates.currentMonth.label}
@@ -260,7 +307,7 @@ function CreateStatementContent() {
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={() => applyQuickDate('lastMonth')}
+                        onClick={() => applyQuickDate("lastMonth")}
                       >
                         <Calendar className="h-4 w-4 mr-2" />
                         {quickDates.lastMonth.label}
@@ -269,7 +316,7 @@ function CreateStatementContent() {
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={() => applyQuickDate('quarter')}
+                        onClick={() => applyQuickDate("quarter")}
                       >
                         <Calendar className="h-4 w-4 mr-2" />
                         {quickDates.quarter.label}
@@ -285,10 +332,14 @@ function CreateStatementContent() {
                         id="period_start"
                         type="date"
                         value={formData.period_start}
-                        onChange={(e) => handleInputChange('period_start', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("period_start", e.target.value)
+                        }
                       />
                       {errors.period_start && (
-                        <p className="text-sm text-red-600">{errors.period_start}</p>
+                        <p className="text-sm text-red-600">
+                          {errors.period_start}
+                        </p>
                       )}
                     </div>
 
@@ -298,10 +349,14 @@ function CreateStatementContent() {
                         id="period_end"
                         type="date"
                         value={formData.period_end}
-                        onChange={(e) => handleInputChange('period_end', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("period_end", e.target.value)
+                        }
                       />
                       {errors.period_end && (
-                        <p className="text-sm text-red-600">{errors.period_end}</p>
+                        <p className="text-sm text-red-600">
+                          {errors.period_end}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -313,10 +368,14 @@ function CreateStatementContent() {
                       id="statement_date"
                       type="date"
                       value={formData.statement_date}
-                      onChange={(e) => handleInputChange('statement_date', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("statement_date", e.target.value)
+                      }
                     />
                     {errors.statement_date && (
-                      <p className="text-sm text-red-600">{errors.statement_date}</p>
+                      <p className="text-sm text-red-600">
+                        {errors.statement_date}
+                      </p>
                     )}
                     <p className="text-sm text-muted-foreground">
                       The date this statement is generated (usually today)
@@ -325,8 +384,8 @@ function CreateStatementContent() {
 
                   {/* Submit Button */}
                   <div className="flex gap-4 pt-4">
-                    <Button 
-                      type="submit" 
+                    <Button
+                      type="submit"
                       disabled={creating}
                       className="flex-1"
                     >
@@ -343,9 +402,7 @@ function CreateStatementContent() {
                       )}
                     </Button>
                     <Button asChild variant="outline">
-                      <Link href="/dashboard/statements">
-                        Cancel
-                      </Link>
+                      <Link href="/dashboard/statements">Cancel</Link>
                     </Button>
                   </div>
                 </form>
@@ -356,42 +413,66 @@ function CreateStatementContent() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Preview */}
-            {formData.customer_id && formData.period_start && formData.period_end && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Statement Preview</CardTitle>
-                  <CardDescription>Preview of the statement being created</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <Label className="text-sm font-medium text-muted-foreground">Customer</Label>
-                      <p className="font-medium">{selectedCustomer?.business_name}</p>
-                      <p className="text-sm text-muted-foreground">{selectedCustomer?.contact_person}</p>
+            {formData.customer_id &&
+              formData.period_start &&
+              formData.period_end && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Statement Preview</CardTitle>
+                    <CardDescription>
+                      Preview of the statement being created
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div>
+                        <Label className="text-sm font-medium text-muted-foreground">
+                          Customer
+                        </Label>
+                        <p className="font-medium">
+                          {selectedCustomer?.business_name}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {selectedCustomer?.contact_person}
+                        </p>
+                      </div>
+
+                      <div>
+                        <Label className="text-sm font-medium text-muted-foreground">
+                          Statement Period
+                        </Label>
+                        <p className="font-medium">
+                          {formatDate(formData.period_start)} -{" "}
+                          {formatDate(formData.period_end)}
+                        </p>
+                      </div>
+
+                      <div>
+                        <Label className="text-sm font-medium text-muted-foreground">
+                          Statement Date
+                        </Label>
+                        <p className="font-medium">
+                          {formatDate(formData.statement_date)}
+                        </p>
+                      </div>
+
+                      <div>
+                        <Label className="text-sm font-medium text-muted-foreground">
+                          Period Duration
+                        </Label>
+                        <p className="font-medium">
+                          {Math.ceil(
+                            (new Date(formData.period_end).getTime() -
+                              new Date(formData.period_start).getTime()) /
+                              (1000 * 60 * 60 * 24),
+                          )}{" "}
+                          days
+                        </p>
+                      </div>
                     </div>
-                    
-                    <div>
-                      <Label className="text-sm font-medium text-muted-foreground">Statement Period</Label>
-                      <p className="font-medium">
-                        {formatDate(formData.period_start)} - {formatDate(formData.period_end)}
-                      </p>
-                    </div>
-                    
-                    <div>
-                      <Label className="text-sm font-medium text-muted-foreground">Statement Date</Label>
-                      <p className="font-medium">{formatDate(formData.statement_date)}</p>
-                    </div>
-                    
-                    <div>
-                      <Label className="text-sm font-medium text-muted-foreground">Period Duration</Label>
-                      <p className="font-medium">
-                        {Math.ceil((new Date(formData.period_end).getTime() - new Date(formData.period_start).getTime()) / (1000 * 60 * 60 * 24))} days
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+                  </CardContent>
+                </Card>
+              )}
 
             {/* Help */}
             <Card>
@@ -403,8 +484,8 @@ function CreateStatementContent() {
               </CardHeader>
               <CardContent className="text-sm space-y-3">
                 <p>
-                  Statement periods group customer transactions by date range to provide 
-                  account summaries and balance tracking.
+                  Statement periods group customer transactions by date range to
+                  provide account summaries and balance tracking.
                 </p>
                 <p>
                   <strong>Typical workflow:</strong>
@@ -427,7 +508,9 @@ function CreateStatementContent() {
 
 export default function CreateStatementPage() {
   return (
-    <ProtectedDashboard allowedRoles={['staff', 'manager', 'admin', 'super_admin']}>
+    <ProtectedDashboard
+      allowedRoles={["staff", "manager", "admin", "super_admin"]}
+    >
       <CreateStatementContent />
     </ProtectedDashboard>
   );

@@ -1,5 +1,5 @@
-const { Client } = require('pg');
-require('dotenv').config({ path: '.env.local' });
+const { Client } = require("pg");
+require("dotenv").config({ path: ".env.local" });
 
 async function forceRefreshAuthTokens() {
   const client = new Client({
@@ -8,12 +8,14 @@ async function forceRefreshAuthTokens() {
     database: process.env.DATABASE_NAME,
     user: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
-    ssl: { rejectUnauthorized: false }
+    ssl: { rejectUnauthorized: false },
   });
 
   try {
     await client.connect();
-    console.log('🔧 Force Refreshing Auth Tokens - Setting ALL to NULL explicitly\n');
+    console.log(
+      "🔧 Force Refreshing Auth Tokens - Setting ALL to NULL explicitly\n",
+    );
 
     // Force set ALL possible token fields to NULL, regardless of current value
     const forceUpdate = await client.query(`
@@ -34,7 +36,7 @@ async function forceRefreshAuthTokens() {
         email_change_sent_at = NULL
       WHERE 1=1
     `);
-    
+
     console.log(`✅ Force updated ${forceUpdate.rowCount} user records`);
 
     // Also check if there are any new columns we missed
@@ -47,9 +49,11 @@ async function forceRefreshAuthTokens() {
       ORDER BY column_name
     `);
 
-    console.log('\n=== All Token Columns in auth.users ===');
-    columnCheck.rows.forEach(col => {
-      console.log(`${col.column_name}: ${col.data_type}, nullable: ${col.is_nullable}, default: ${col.column_default}`);
+    console.log("\n=== All Token Columns in auth.users ===");
+    columnCheck.rows.forEach((col) => {
+      console.log(
+        `${col.column_name}: ${col.data_type}, nullable: ${col.is_nullable}, default: ${col.column_default}`,
+      );
     });
 
     // Verify all token fields are now NULL
@@ -68,27 +72,48 @@ async function forceRefreshAuthTokens() {
         COUNT(CASE WHEN reauthentication_token = '' THEN 1 END) as empty_reauth_check
       FROM auth.users
     `);
-    
+
     const stats = verification.rows[0];
-    console.log('\n=== Verification Results ===');
+    console.log("\n=== Verification Results ===");
     console.log(`Total users: ${stats.total_users}`);
-    console.log(`NULL confirmation tokens: ${stats.null_confirmation} (should equal total)`);
-    console.log(`NULL recovery tokens: ${stats.null_recovery} (should equal total)`);
-    console.log(`NULL email_change_token_new: ${stats.null_email_new} (should equal total)`);
-    console.log(`NULL email_change_token_current: ${stats.null_email_current} (should equal total)`);
-    console.log(`NULL phone_change_token: ${stats.null_phone_change} (should equal total)`);
-    console.log(`NULL reauthentication_token: ${stats.null_reauth} (should equal total)`);
-    console.log('---');
-    console.log(`Empty string confirmation tokens: ${stats.empty_confirmation} (should be 0)`);
-    console.log(`Empty string recovery tokens: ${stats.empty_recovery} (should be 0)`);
-    console.log(`Empty string phone_change tokens: ${stats.empty_phone_change} (should be 0)`);
-    console.log(`Empty string reauth tokens: ${stats.empty_reauth_check} (should be 0)`);
+    console.log(
+      `NULL confirmation tokens: ${stats.null_confirmation} (should equal total)`,
+    );
+    console.log(
+      `NULL recovery tokens: ${stats.null_recovery} (should equal total)`,
+    );
+    console.log(
+      `NULL email_change_token_new: ${stats.null_email_new} (should equal total)`,
+    );
+    console.log(
+      `NULL email_change_token_current: ${stats.null_email_current} (should equal total)`,
+    );
+    console.log(
+      `NULL phone_change_token: ${stats.null_phone_change} (should equal total)`,
+    );
+    console.log(
+      `NULL reauthentication_token: ${stats.null_reauth} (should equal total)`,
+    );
+    console.log("---");
+    console.log(
+      `Empty string confirmation tokens: ${stats.empty_confirmation} (should be 0)`,
+    );
+    console.log(
+      `Empty string recovery tokens: ${stats.empty_recovery} (should be 0)`,
+    );
+    console.log(
+      `Empty string phone_change tokens: ${stats.empty_phone_change} (should be 0)`,
+    );
+    console.log(
+      `Empty string reauth tokens: ${stats.empty_reauth_check} (should be 0)`,
+    );
 
-    console.log('\n🎉 Force refresh completed - all auth tokens explicitly set to NULL');
-
+    console.log(
+      "\n🎉 Force refresh completed - all auth tokens explicitly set to NULL",
+    );
   } catch (error) {
-    console.error('❌ Error force refreshing auth tokens:', error.message);
-    console.error('Full error:', error);
+    console.error("❌ Error force refreshing auth tokens:", error.message);
+    console.error("Full error:", error);
   } finally {
     try {
       await client.end();
@@ -98,8 +123,8 @@ async function forceRefreshAuthTokens() {
   }
 }
 
-console.log('🚀 Starting Force Auth Token Refresh...');
-console.log('📋 This will explicitly set ALL auth tokens to NULL');
-console.log('🔧 This should resolve any cached or lingering auth issues\n');
+console.log("🚀 Starting Force Auth Token Refresh...");
+console.log("📋 This will explicitly set ALL auth tokens to NULL");
+console.log("🔧 This should resolve any cached or lingering auth issues\n");
 
 forceRefreshAuthTokens().catch(console.error);

@@ -1,17 +1,28 @@
-'use client';
+"use client";
 
-import { AlertTriangle, Shield, Database, Key } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { AlertTriangle, Shield, Database, Key } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 interface DatabasePermissionErrorProps {
   error?: string;
   onRetry?: () => void;
 }
 
-export default function DatabasePermissionError({ error, onRetry }: DatabasePermissionErrorProps) {
-  const isPermissionError = error?.includes('permission denied') || error?.includes('42501');
-  const isRLSError = error?.includes('Row Level Security') || error?.includes('access denied');
+export default function DatabasePermissionError({
+  error,
+  onRetry,
+}: DatabasePermissionErrorProps) {
+  const isPermissionError =
+    error?.includes("permission denied") || error?.includes("42501");
+  const isRLSError =
+    error?.includes("Row Level Security") || error?.includes("access denied");
 
   if (!isPermissionError && !isRLSError) {
     return null;
@@ -22,10 +33,13 @@ export default function DatabasePermissionError({ error, onRetry }: DatabasePerm
       <CardHeader>
         <div className="flex items-center gap-2">
           <Shield className="h-5 w-5 text-amber-600" />
-          <CardTitle className="text-amber-800">Database Permission Required</CardTitle>
+          <CardTitle className="text-amber-800">
+            Database Permission Required
+          </CardTitle>
         </div>
         <CardDescription className="text-amber-700">
-          Your database has Row Level Security (RLS) enabled, which is great for security!
+          Your database has Row Level Security (RLS) enabled, which is great for
+          security!
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -35,8 +49,9 @@ export default function DatabasePermissionError({ error, onRetry }: DatabasePerm
             What&apos;s happening?
           </h4>
           <p className="text-sm text-amber-700 mt-2">
-            Anonymous users cannot access the database tables because Row Level Security (RLS) policies 
-            are protecting your data. This is a security feature, not an error.
+            Anonymous users cannot access the database tables because Row Level
+            Security (RLS) policies are protecting your data. This is a security
+            feature, not an error.
           </p>
         </div>
 
@@ -46,16 +61,24 @@ export default function DatabasePermissionError({ error, onRetry }: DatabasePerm
             How to fix this?
           </h4>
           <div className="text-sm text-amber-700 mt-2 space-y-2">
-            <p><strong>Option 1 (Recommended):</strong> Implement proper user authentication</p>
+            <p>
+              <strong>Option 1 (Recommended):</strong> Implement proper user
+              authentication
+            </p>
             <ul className="list-disc list-inside ml-4 space-y-1">
               <li>Add login/signup functionality</li>
               <li>Create RLS policies based on user roles</li>
               <li>Secure access to sensitive data</li>
             </ul>
-            
-            <p><strong>Option 2 (Development only):</strong> Enable anonymous access</p>
+
+            <p>
+              <strong>Option 2 (Development only):</strong> Enable anonymous
+              access
+            </p>
             <ul className="list-disc list-inside ml-4 space-y-1">
-              <li>Run the SQL script in <code>enable-anonymous-access.sql</code></li>
+              <li>
+                Run the SQL script in <code>enable-anonymous-access.sql</code>
+              </li>
               <li>Go to your Supabase dashboard → SQL Editor</li>
               <li>Execute the provided SQL commands</li>
             </ul>
@@ -68,12 +91,13 @@ export default function DatabasePermissionError({ error, onRetry }: DatabasePerm
             Quick Test
           </h4>
           <p className="text-sm text-amber-700 mt-2">
-            After applying the SQL script or implementing authentication, click the button below to test the connection.
+            After applying the SQL script or implementing authentication, click
+            the button below to test the connection.
           </p>
           {onRetry && (
-            <Button 
-              onClick={onRetry} 
-              variant="outline" 
+            <Button
+              onClick={onRetry}
+              variant="outline"
               className="mt-3 border-amber-300 text-amber-800 hover:bg-amber-100"
             >
               Test Connection Again
@@ -86,7 +110,9 @@ export default function DatabasePermissionError({ error, onRetry }: DatabasePerm
             <summary className="text-sm font-medium text-gray-700 cursor-pointer">
               View Error Details
             </summary>
-            <pre className="text-xs text-gray-600 mt-2 whitespace-pre-wrap">{error}</pre>
+            <pre className="text-xs text-gray-600 mt-2 whitespace-pre-wrap">
+              {error}
+            </pre>
           </details>
         )}
       </CardContent>
