@@ -65,7 +65,7 @@ interface InvoiceData {
 function InvoiceEditContent() {
   const router = useRouter();
   const params = useParams();
-  const invoiceId = params.invoiceId as string;
+  const invoiceId = params.id as string;
 
   const [invoice, setInvoice] = useState<InvoiceData | null>(null);
   const [isLoading, setIsLoading] = useState(true);

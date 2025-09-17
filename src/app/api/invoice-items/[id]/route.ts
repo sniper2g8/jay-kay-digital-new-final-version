@@ -3,7 +3,7 @@ import { Client } from "pg";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ invoiceId: string }> },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const client = new Client({
     connectionString: process.env.DATABASE_URL,
@@ -33,7 +33,7 @@ export async function GET(
       WHERE invoice_id = $1 
       ORDER BY id
     `,
-      [resolvedParams.invoiceId],
+      [resolvedParams.id],
     );
 
     return NextResponse.json(rows);

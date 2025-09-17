@@ -79,6 +79,7 @@ import { supabase } from "@/lib/supabase";
 import { formatCurrency, formatDate } from "@/lib/constants";
 import DashboardLayout from "@/components/DashboardLayout";
 import ProtectedDashboard from "@/components/ProtectedDashboard";
+import { InvoiceTemplate } from "@/components/InvoiceTemplate";
 import type { Invoice } from "@/lib/database.types";
 
 interface InvoiceItem {
@@ -185,6 +186,7 @@ function InvoiceDetailContent() {
   });
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [showMoreActions, setShowMoreActions] = useState(false);
+  const [showTemplateView, setShowTemplateView] = useState(false);
 
   const fetchInvoiceDetails = useCallback(async () => {
     try {
@@ -464,6 +466,26 @@ function InvoiceDetailContent() {
             </Button>
 
             <div className="flex flex-wrap items-center gap-2">
+              {/* Template View Toggle */}
+              <Button 
+                variant={showTemplateView ? "default" : "outline"} 
+                size="sm" 
+                onClick={() => setShowTemplateView(!showTemplateView)}
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                {showTemplateView ? "List View" : "Template View"}
+              </Button>
+
+              {/* Print Button */}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => window.print()}
+              >
+                <Printer className="h-4 w-4 mr-2" />
+                Print
+              </Button>
+
               {invoice.invoice_status === "draft" && (
                 <>
                   <Button variant="outline" size="sm" asChild>
@@ -722,6 +744,30 @@ function InvoiceDetailContent() {
           </div>
         </div>
 
+        {/* Conditional Template View */}
+        {showTemplateView ? (
+          <div className="mt-8">
+            <InvoiceTemplate
+              invoice={{
+                id: invoice.id,
+                invoiceNo: invoice.invoiceNo,
+                created_at: invoice.created_at,
+                invoice_date: invoice.invoice_date,
+                invoice_status: invoice.invoice_status,
+                terms_days: invoice.terms_days,
+                notes: invoice.notes,
+                subtotal: displaySubtotal,
+                tax: displayTax,
+                discount: displayDiscount,
+                total: displayTotal,
+                amountPaid: amountPaid
+              }}
+              customer={invoice.customer}
+              items={invoice.invoice_items || []}
+            />
+          </div>
+        ) : (
+          <>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
@@ -1142,6 +1188,8 @@ function InvoiceDetailContent() {
             </Card>
           </div>
         </div>
+        </>
+        )}
       </div>
     </DashboardLayout>
   );
