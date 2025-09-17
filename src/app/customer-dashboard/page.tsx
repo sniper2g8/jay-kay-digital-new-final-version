@@ -78,9 +78,6 @@ export default function CustomerDashboard() {
   const userName = userData?.name || user.email?.split('@')[0] || 'User';
 
   // Format currency using the shared formatCurrency function
-  const formatCurrencyLocal = (amount: number) => {
-    return formatCurrency(amount);
-  };
 
   // Format date using Sierra Leone locale
   const formatDate = (dateStr: string | null) => {

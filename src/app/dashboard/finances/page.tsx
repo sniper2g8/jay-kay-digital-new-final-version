@@ -22,7 +22,6 @@ import Link from "next/link";
 import { useInvoicesWithCustomers, usePaymentsWithCustomers, useFinancialStats } from '@/lib/hooks/useFinances';
 import DashboardLayout from "@/components/DashboardLayout";
 import ProtectedDashboard from "@/components/ProtectedDashboard";
-import { usePaymentsByCustomer, useInvoicesByCustomer } from '@/lib/hooks/useFinances';
 import { formatCurrency } from '@/lib/constants';
 
 const getInvoiceStatusColor = (status: string | null) => {

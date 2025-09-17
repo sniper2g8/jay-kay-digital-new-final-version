@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -74,9 +75,11 @@ export default function SignupPage() {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <div className="mx-auto bg-red-600 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-4">
-              <img 
+              <Image 
                 src="/JK_Logo.jpg" 
                 alt="Jay Kay Digital Press Logo" 
+                width={40}
+                height={40}
                 className="w-10 h-10 object-contain"
               />
             </div>
@@ -120,9 +123,11 @@ export default function SignupPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="mx-auto bg-red-600 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-4">
-            <img 
+            <Image 
               src="/JK_Logo.jpg" 
               alt="Jay Kay Digital Press Logo" 
+              width={40}
+              height={40}
               className="w-10 h-10 object-contain"
             />
           </div>

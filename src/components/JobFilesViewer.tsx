@@ -11,7 +11,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { useJobFiles } from '@/lib/hooks/useJobFiles';
-import { FileThumbnail } from '@/components/FileThumbnail';
+import FileThumbnail from '@/components/FileThumbnail';
 import { toast } from 'sonner';
 
 interface JobFilesViewerProps {

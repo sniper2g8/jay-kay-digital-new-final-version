@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+'use client';
+
+import { useState } from 'react';
+import Image from 'next/image';
 import { FileText, ImageIcon, File } from 'lucide-react';
 
 interface FileThumbnailProps {
@@ -10,14 +13,14 @@ interface FileThumbnailProps {
   showFileName?: boolean;
 }
 
-export const FileThumbnail: React.FC<FileThumbnailProps> = ({
-  fileUrl,
-  fileName,
+export default function FileThumbnail({ 
+  fileUrl, 
+  fileName, 
   fileType,
-  fileSize,
-  className = '',
-  showFileName = true
-}) => {
+  fileSize, 
+  showFileName = true,
+  className = ''
+}: FileThumbnailProps) {
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
 
@@ -75,9 +78,8 @@ export const FileThumbnail: React.FC<FileThumbnailProps> = ({
   };
 
   return (
-    <div className={`relative group ${className}`}>
-      {/* Thumbnail Container */}
-      <div className="relative w-16 h-16 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 flex items-center justify-center">
+    <div className={`group relative inline-block ${className}`}>
+      <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-gray-200 bg-white">
         {isImage && !imageError ? (
           <div className="relative w-full h-full">
             {imageLoading && (
@@ -85,9 +87,10 @@ export const FileThumbnail: React.FC<FileThumbnailProps> = ({
                 <div className="animate-pulse bg-gray-200 w-full h-full"></div>
               </div>
             )}
-            <img
+            <Image
               src={fileUrl}
               alt={`Thumbnail of ${fileName}`}
+              fill
               className="w-full h-full object-cover"
               loading="lazy"
               onLoad={() => setImageLoading(false)}
@@ -96,6 +99,7 @@ export const FileThumbnail: React.FC<FileThumbnailProps> = ({
                 setImageLoading(false);
               }}
               style={{ display: imageLoading ? 'none' : 'block' }}
+              unoptimized
             />
           </div>
         ) : (
@@ -128,11 +132,14 @@ export const FileThumbnail: React.FC<FileThumbnailProps> = ({
       {isImage && !imageError && (
         <div className="absolute z-20 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 top-0 left-full ml-2 bg-white border border-gray-200 rounded-lg shadow-xl p-2 max-w-sm">
           <div className="relative">
-            <img
+            <Image
               src={fileUrl}
               alt={`Preview of ${fileName}`}
+              width={256}
+              height={256}
               className="max-w-64 max-h-64 object-contain rounded"
               loading="lazy"
+              unoptimized
             />
           </div>
           <div className="mt-2 p-2 bg-gray-50 rounded">
@@ -177,6 +184,4 @@ export const FileThumbnail: React.FC<FileThumbnailProps> = ({
       )}
     </div>
   );
-};
-
-export default FileThumbnail;
+}

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -47,9 +48,11 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/">
-            <img 
+            <Image 
               src="/JK_Logo.jpg" 
               alt="Jay Kay Digital Press Logo" 
+              width={64}
+              height={64}
               className="h-16 w-16 object-contain mx-auto mb-4"
             />
           </Link>

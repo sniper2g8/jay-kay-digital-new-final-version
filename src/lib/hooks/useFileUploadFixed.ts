@@ -8,6 +8,8 @@ export interface FileUpload {
   status: 'pending' | 'uploading' | 'completed' | 'error';
   id: string;
   errorMessage?: string;
+  uploadSpeed?: number;
+  estimatedTimeRemaining?: number;
 }
 
 export interface FileRecord {
