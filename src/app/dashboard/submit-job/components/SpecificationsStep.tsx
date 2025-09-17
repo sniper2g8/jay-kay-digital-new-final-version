@@ -393,6 +393,7 @@ export default function SpecificationsStep({
                                 defaultPrice
                               )}
                               className="sr-only"
+                              suppressHydrationWarning={true}
                             />
 
                             {/* Option Content */}

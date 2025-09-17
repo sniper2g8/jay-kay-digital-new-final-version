@@ -59,6 +59,7 @@ export default function FilesStep({
             className="hidden"
             id="file-upload"
             accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.tiff,.eps,.ai,.psd"
+            suppressHydrationWarning={true}
           />
           <Label htmlFor="file-upload">
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400 hover:bg-gray-50 transition-colors">

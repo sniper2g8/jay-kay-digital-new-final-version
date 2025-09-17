@@ -168,7 +168,7 @@ export default function Home() {
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" asChild className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white text-lg py-6 px-8">
+              <Button size="lg" variant="outline" asChild className="border-white text-white hover:bg-white/10 text-lg py-6 px-8 bg-transparent">
                 <Link href="/track">
                   Track Order
                 </Link>
@@ -304,7 +304,7 @@ export default function Home() {
                 Create Account
               </Link>
             </Button>
-            <Button size="lg" variant="outline" asChild className="border-white text-white hover:bg-white/10">
+            <Button size="lg" variant="outline" asChild className="border-white text-white hover:bg-white/10 text-lg py-6 px-8 bg-transparent">
               <Link href="#contact">
                 Contact Sales
               </Link>
@@ -370,6 +370,7 @@ export default function Home() {
                       type="text" 
                       placeholder="Your Name" 
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      suppressHydrationWarning={true}
                     />
                   </div>
                   <div>
@@ -377,6 +378,7 @@ export default function Home() {
                       type="email" 
                       placeholder="Your Email" 
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      suppressHydrationWarning={true}
                     />
                   </div>
                   <div>
@@ -384,9 +386,10 @@ export default function Home() {
                       placeholder="Your Message" 
                       rows={4}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      suppressHydrationWarning={true}
                     ></textarea>
                   </div>
-                  <Button type="submit" className="w-full bg-red-600 hover:bg-red-700">
+                  <Button type="submit" className="w-full bg-red-600 hover:bg-red-700" suppressHydrationWarning={true}>
                     Send Message
                   </Button>
                 </form>
