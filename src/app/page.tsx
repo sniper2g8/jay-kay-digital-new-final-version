@@ -19,6 +19,7 @@ import {
 import Link from "next/link";
 import { useAuth } from '@/contexts/AuthContext';
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 export default function Home() {
   const { user } = useAuth();
@@ -219,9 +220,14 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row items-center gap-12">
             <div className="lg:w-1/2">
-              <div className="bg-gray-200 border-2 border-dashed rounded-xl w-full h-96 flex items-center justify-center">
-                <span className="text-gray-500">Company Image</span>
-              </div>
+              <Image 
+                src="/services/company image.jpeg" 
+                alt="Jay Kay Digital Press - Professional Printing Services" 
+                width={600}
+                height={400}
+                className="w-full h-auto rounded-xl shadow-lg"
+                suppressHydrationWarning={true}
+              />
             </div>
             <div className="lg:w-1/2">
               <h2 className="text-3xl md:text-4xl font-bold text-black mb-6">
@@ -304,7 +310,7 @@ export default function Home() {
                 Create Account
               </Link>
             </Button>
-            <Button size="lg" variant="outline" asChild className="border-white text-white hover:bg-white/10 text-lg py-6 px-8 bg-transparent">
+            <Button size="lg" variant="outline" asChild className="border-white text-white bg-transparent hover:bg-white hover:text-red-700">
               <Link href="#contact">
                 Contact Sales
               </Link>
