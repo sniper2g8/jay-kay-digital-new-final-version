@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -298,9 +299,18 @@ export default function RoleBasedNav({ className }: RoleBasedNavProps) {
       >
         <div className="p-4">
           <div className="mb-6">
-            <h2 className="text-lg font-bold text-foreground">
-              Jay Kay Digital Press
-            </h2>
+            <div className="flex items-center space-x-3 mb-2">
+              <Image 
+                src="/logo-icon.svg" 
+                alt="Jay Kay Digital Press Logo" 
+                width={40}
+                height={40}
+                className="w-10 h-10"
+              />
+              <h2 className="text-lg font-bold text-foreground">
+                Jay Kay Digital Press
+              </h2>
+            </div>
             {userData && (
               <div className="mt-3">
                 <p className="text-sm font-medium text-foreground truncate">
@@ -332,9 +342,18 @@ export default function RoleBasedNav({ className }: RoleBasedNavProps) {
           <SheetContent side="left" className="w-80 p-0 bg-background">
             <div className="p-6">
               <div className="mb-6">
-                <h2 className="text-xl font-bold text-foreground">
-                  Jay Kay Digital Press
-                </h2>
+                <div className="flex items-center space-x-3 mb-2">
+                  <Image 
+                    src="/logo-icon.svg" 
+                    alt="Jay Kay Digital Press Logo" 
+                    width={40}
+                    height={40}
+                    className="w-10 h-10"
+                  />
+                  <h2 className="text-xl font-bold text-foreground">
+                    Jay Kay Digital Press
+                  </h2>
+                </div>
                 {userData && (
                   <div className="mt-3">
                     <p className="text-sm font-medium text-foreground truncate">

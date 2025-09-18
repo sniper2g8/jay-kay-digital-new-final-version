@@ -109,7 +109,7 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <Image
-                src="/JK_Logo.jpg"
+                src="/logo-icon.svg"
                 alt="Jay Kay Digital Press Logo"
                 width={40}
                 height={40}
@@ -534,7 +534,7 @@ export default function Home() {
             <div>
               <div className="flex items-center space-x-3 mb-4">
                 <Image
-                  src="/JK_Logo.jpg"
+                  src="/logo-icon.svg"
                   alt="Jay Kay Digital Press Logo"
                   width={32}
                   height={32}

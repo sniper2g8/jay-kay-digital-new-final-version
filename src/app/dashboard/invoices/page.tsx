@@ -22,7 +22,8 @@ import {
   AlertCircle,
   Eye,
   Edit,
-  Loader2
+  Loader2,
+  QrCode
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -303,6 +304,18 @@ function InvoicesContent() {
                           <Link href={`/dashboard/invoices/${invoice.id}/edit`}>
                             <Edit className="h-4 w-4" />
                           </Link>
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="ghost"
+                          onClick={() => {
+                            const url = `${window.location.origin}/invoices/${invoice.id}`;
+                            navigator.clipboard.writeText(url);
+                            // You could add a toast notification here
+                          }}
+                          title="Copy invoice link"
+                        >
+                          <QrCode className="h-4 w-4" />
                         </Button>
                         <Button size="sm" variant="ghost">
                           <MoreHorizontal className="h-4 w-4" />

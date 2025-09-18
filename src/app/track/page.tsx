@@ -8,7 +8,9 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { supabase } from '@/lib/supabase';
-import { Search, Clock, CheckCircle, AlertCircle, Truck, Package } from 'lucide-react';
+import { Search, Clock, CheckCircle, AlertCircle, Truck, Package, QrCode, Share2 } from 'lucide-react';
+import QRCodeGenerator from '@/components/QRCodeGenerator';
+import BrandHeader from '@/components/BrandHeader';
 
 interface JobTrackingInfo {
   id: string;
@@ -149,15 +151,19 @@ export default function TrackJobPage() {
   const currentPriority = jobInfo && jobInfo.priority ? priorityConfig[jobInfo.priority.toLowerCase() as keyof typeof priorityConfig] || priorityConfig.medium : null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12">
-      <div className="container mx-auto px-4 max-w-4xl">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Track Your Job</h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Enter your job tracking number to check the current status and progress of your printing job.
-          </p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Company Branding Header */}
+      <BrandHeader variant="full" showTagline={true} />
+
+      <div className="py-12">
+        <div className="container mx-auto px-4 max-w-4xl">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">Track Your Job</h1>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Enter your job tracking number to check the current status and progress of your printing job.
+            </p>
+          </div>
 
         {/* Search Section */}
         <Card className="mb-8">
@@ -334,6 +340,79 @@ export default function TrackJobPage() {
               </CardContent>
             </Card>
 
+            {/* QR Code Sharing */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <QrCode className="h-5 w-5" />
+                  Share Job Tracking
+                </CardTitle>
+                <CardDescription>
+                  Share this job tracking information with others
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div className="text-center">
+                      <QRCodeGenerator
+                        data={`${window.location.origin}/track/${jobInfo.jobNo || jobInfo.id}`}
+                        size={180}
+                        className="mx-auto"
+                      />
+                    </div>
+                    <p className="text-sm text-gray-600 text-center">
+                      Scan with mobile device to view job status
+                    </p>
+                  </div>
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-semibold text-gray-900 mb-2">Quick Access</h4>
+                      <p className="text-sm text-gray-600 mb-3">
+                        Use this QR code to quickly access job status on any device
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const url = `${window.location.origin}/track/${jobInfo.jobNo || jobInfo.id}`;
+                          navigator.clipboard.writeText(url);
+                          // You could add a toast notification here
+                        }}
+                        className="w-full"
+                      >
+                        <Share2 className="h-4 w-4 mr-2" />
+                        Copy Tracking Link
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const url = `${window.location.origin}/track/${jobInfo.jobNo || jobInfo.id}`;
+                          if (navigator.share) {
+                            navigator.share({
+                              title: `Job #${jobInfo.jobNo || jobInfo.id} - Jay Kay Digital Press`,
+                              text: `Track your printing job: ${jobInfo.title || 'Print Job'}`,
+                              url: url,
+                            });
+                          } else {
+                            // Fallback for browsers that don't support Web Share API
+                            navigator.clipboard.writeText(url);
+                          }
+                        }}
+                        className="w-full"
+                      >
+                        <Share2 className="h-4 w-4 mr-2" />
+                        Share Job
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Contact Information */}
             <Card>
               <CardContent className="pt-6">
@@ -343,7 +422,7 @@ export default function TrackJobPage() {
                     If you have any questions about your job, please contact us:
                   </p>
                   <div className="flex justify-center space-x-6 text-sm">
-                    <span className="text-blue-600">📞 +232-XXX-XXXX</span>
+                    <span className="text-blue-600">📞 +232 34 788711</span>
                     <span className="text-blue-600">✉️ info@jaykaypress.com</span>
                   </div>
                 </div>
@@ -351,6 +430,7 @@ export default function TrackJobPage() {
             </Card>
           </div>
         )}
+        </div>
       </div>
     </div>
   );

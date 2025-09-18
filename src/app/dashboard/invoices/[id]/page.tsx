@@ -1039,7 +1039,7 @@ function InvoiceDetailContent() {
                   <label className="text-sm font-medium text-muted-foreground">
                     Currency
                   </label>
-                  <p className="text-sm">{invoice.currency || "USD"}</p>
+                  <p className="text-sm">{invoice.currency || "SLL"}</p>
                 </div>
               </CardContent>
             </Card>

@@ -91,13 +91,35 @@ function InvoiceEditContent() {
       setIsLoading(true);
       setError(null);
 
+      // Fetch invoice data
       const { data, error } = await supabase
         .from('invoices')
-        .select('*')
+        .select(`
+          *,
+          customers (
+            id,
+            business_name,
+            contact_person,
+            email,
+            phone,
+            address,
+            city,
+            state,
+            zip_code
+          )
+        `)
         .eq('id', invoiceId)
         .single();
 
       if (error) throw error;
+
+      // Fetch invoice items separately using the API endpoint
+      const itemsResponse = await fetch("/api/invoice-items/" + invoiceId);
+      const itemsData = itemsResponse.ok ? await itemsResponse.json() : [];
+      
+      if (!itemsResponse.ok) {
+        console.warn("Failed to fetch invoice items:", itemsResponse.statusText);
+      }
 
       if (data) {
         // Parse Firebase timestamps
@@ -107,29 +129,35 @@ function InvoiceEditContent() {
         const issueDate = issueDateString ? new Date(issueDateString) : new Date();
         const dueDate = dueDateString ? new Date(dueDateString) : new Date();
 
-        // Parse invoice items
-        let items: InvoiceLineItem[] = [];
-        try {
-          items = data.items ? JSON.parse(data.items as string) : [];
-        } catch (e) {
-          console.warn('Failed to parse invoice items:', e);
-          items = [];
-        }
+        // Transform items from API to match our interface
+        const items: InvoiceLineItem[] = itemsData.map((item: {
+          id: string;
+          description?: string;
+          quantity?: number;
+          unit_price?: number;
+          total_price?: number;
+        }) => ({
+          id: item.id,
+          description: item.description || '',
+          quantity: item.quantity || 1,
+          unitPrice: item.unit_price || 0,
+          total: item.total_price || ((item.quantity || 1) * (item.unit_price || 0))
+        }));
 
         const invoiceData: InvoiceData = {
           id: data.id,
           invoiceNo: data.invoiceNo || 'INV-000',
-          customerName: data.customerName || '',
-          customerEmail: '', // Not available in current schema
-          customerPhone: '', // Not available in current schema
+          customerName: data.customers?.business_name || data.customerName || '',
+          customerEmail: data.customers?.email || '',
+          customerPhone: data.customers?.phone || '',
           issueDate: issueDate,
           dueDate: dueDate,
-          status: data.payment_status || 'draft',
+          status: data.payment_status || data.status || 'draft',
           notes: data.notes || '',
           items: items,
           subtotal: data.subtotal || 0,
           tax: data.tax || 0,
-          total: data.total || 0
+          total: data.total || data.amountDue || 0
         };
 
         setInvoice(invoiceData);
@@ -221,28 +249,56 @@ function InvoiceEditContent() {
 
       const { subtotal, taxAmount, total } = calculateTotals();
 
+      // Update the main invoice data
       const updateData = {
         customerName: formData.customerName,
         issueDate: new Date(formData.issueDate).toISOString(),
         dueDate: new Date(formData.dueDate).toISOString(),
         payment_status: formData.status as "pending" | "partial" | "paid" | "overdue" | "cancelled",
         notes: formData.notes || null,
-        items: JSON.stringify(formData.items),
         subtotal: subtotal,
         tax: taxAmount,
         total: total,
         updated_at: new Date().toISOString()
       };
 
-      const { error } = await supabase
+      const { error: invoiceError } = await supabase
         .from('invoices')
         .update(updateData)
         .eq('id', invoiceId);
 
-      if (error) throw error;
+      if (invoiceError) throw invoiceError;
 
-      // Redirect back to invoice list
-      router.push('/dashboard/invoices');
+      // Update invoice items using the API endpoint
+      try {
+        const itemsToSave = formData.items.map(item => ({
+          invoice_id: invoiceId,
+          description: item.description,
+          quantity: item.quantity,
+          unit_price: item.unitPrice,
+          total_price: item.total,
+          job_no: null // Can be linked to jobs later if needed
+        }));
+
+        const itemsResponse = await fetch(`/api/invoice-items/${invoiceId}`, {
+          method: 'PUT', // Update all items
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(itemsToSave)
+        });
+
+        if (!itemsResponse.ok) {
+          const errorText = await itemsResponse.text();
+          throw new Error(`Failed to save invoice items: ${errorText}`);
+        }
+      } catch (itemsError) {
+        console.error('Error saving invoice items:', itemsError);
+        // Continue even if items fail - at least the invoice is saved
+      }
+
+      // Redirect back to invoice detail page
+      router.push(`/dashboard/invoices/${invoiceId}`);
     } catch (error) {
       console.error('Error saving invoice:', error);
       setError('Failed to save invoice. Please try again.');

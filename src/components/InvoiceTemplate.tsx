@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { formatCurrency, formatDate } from "@/lib/constants";
@@ -87,15 +88,24 @@ export function InvoiceTemplate({
       {/* Company Header with Jay Kay Digital Press Branding */}
       <div className="bg-gradient-to-r from-red-600 to-red-700 text-white p-8 rounded-t-lg">
         <div className="flex justify-between items-start">
-          <div className="space-y-2">
-            <h1 className="text-4xl font-bold tracking-wide">
-              Jay Kay Digital Press
-            </h1>
-            <p className="text-red-100 text-lg font-medium">
-              Professional Printing Services
-            </p>
-            <div className="bg-yellow-400 text-red-800 px-3 py-1 rounded-full text-sm font-semibold inline-block">
-              Quality • Speed • Reliability
+          <div className="flex items-start space-x-4">
+            <Image 
+              src="/logo-icon.svg" 
+              alt="Jay Kay Digital Press Logo" 
+              width={60}
+              height={60}
+              className="bg-white rounded-full p-2"
+            />
+            <div className="space-y-2">
+              <h1 className="text-4xl font-bold tracking-wide">
+                Jay Kay Digital Press
+              </h1>
+              <p className="text-red-100 text-lg font-medium">
+                Professional Printing Services
+              </p>
+              <div className="bg-yellow-400 text-red-800 px-3 py-1 rounded-full text-sm font-semibold inline-block">
+                Quality • Speed • Reliability
+              </div>
             </div>
           </div>
           <div className="text-right space-y-1">

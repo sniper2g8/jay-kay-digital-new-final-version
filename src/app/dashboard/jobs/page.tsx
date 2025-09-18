@@ -28,6 +28,7 @@ import {
   Printer,
   Loader2,
   X,
+  QrCode,
 } from "lucide-react";
 import Link from "next/link";
 import { useJobsWithCustomers, useJobStats } from "@/lib/hooks/useJobs";
@@ -549,12 +550,12 @@ function JobsContent() {
                                 <User className="h-3 w-3 mr-1" />
                                 {job.assigned_to || "Unassigned"}
                               </div>
-                              {job.dueDate && (
+                              {job.estimated_delivery && (
                                 <div className="flex items-center">
                                   <Calendar className="h-3 w-3 mr-1" />
                                   Due:{" "}
-                                  {typeof job.dueDate === "string"
-                                    ? new Date(job.dueDate).toLocaleDateString(
+                                  {typeof job.estimated_delivery === "string"
+                                    ? new Date(job.estimated_delivery).toLocaleDateString(
                                         "en-SL",
                                       )
                                     : "TBD"}
@@ -573,8 +574,8 @@ function JobsContent() {
                             <p className="text-sm font-medium text-gray-900">
                               SLL{" "}
                               {(
+                                job.final_price ||
                                 job.estimate_price ||
-                                job.final_cost ||
                                 0
                               ).toLocaleString()}
                             </p>
@@ -582,25 +583,39 @@ function JobsContent() {
                               SLL{" "}
                               {(
                                 job.unit_price ||
-                                (job.final_cost || 0) / (job.quantity || 1)
+                                (job.final_price || 0) / (job.quantity || 1)
                               ).toFixed(2)}
                               /unit
                             </p>
                             {job.estimate_price &&
-                              job.final_cost &&
-                              job.estimate_price !== job.final_cost && (
+                              job.final_price &&
+                              job.estimate_price !== job.final_price && (
                                 <p className="text-xs text-blue-600">
-                                  Final: SLL {job.final_cost.toLocaleString()}
+                                  Final: SLL {job.final_price.toLocaleString()}
                                 </p>
                               )}
                           </div>
-                          <Button variant="outline" size="sm" asChild>
-                            <Link
-                              href={`/dashboard/jobs/${job.jobNo || job.id}`}
+                          <div className="flex space-x-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => {
+                                const url = `${window.location.origin}/track/${job.jobNo || job.id}`;
+                                navigator.clipboard.writeText(url);
+                                // You could add a toast notification here
+                              }}
+                              title="Copy tracking link"
                             >
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Link>
-                          </Button>
+                              <QrCode className="h-4 w-4" />
+                            </Button>
+                            <Button variant="outline" size="sm" asChild>
+                              <Link
+                                href={`/dashboard/jobs/${job.jobNo || job.id}`}
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Link>
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     );

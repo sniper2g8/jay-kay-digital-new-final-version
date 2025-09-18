@@ -1,0 +1,7 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="24" cy="24" r="22" fill="#dc2626" stroke="#eab308" stroke-width="2"/>
+  
+  <!-- Letters J and K -->
+  <text x="13" y="32" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">JK</text>
+</svg>

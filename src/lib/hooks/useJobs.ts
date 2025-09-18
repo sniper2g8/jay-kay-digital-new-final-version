@@ -4,9 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import type { Database } from "@/lib/database-generated.types";
 
-type Json = Database["public"]["Tables"]["jobs"]["Row"]["delivery"];
-
-// Job interface - updated to match database schema
+// Job interface - updated to match new consolidated schema
 export interface Job {
   id: string;
   jobNo: string | null;
@@ -18,9 +16,8 @@ export interface Job {
   priority: Database["public"]["Enums"]["priority_level"] | null;
   quantity: number | null;
   unit_price: number | null;
+  final_price: number | null;
   estimate_price: number | null;
-  estimated_cost: number | null;
-  final_cost: number | null;
   estimated_delivery: string | null;
   actual_delivery: string | null;
   assigned_to: string | null;
@@ -33,23 +30,10 @@ export interface Job {
   qr_code: string | null;
   tracking_url: string | null;
   submittedDate: string | null;
-  dueDate: Json | null;
-  delivery: Json | null;
-  estimate: Json | null;
-  files: Json | null;
-  finishIds: Json | null;
-  finishOptions: Json | null;
-  finishPrices: Json | null;
-  lf: Json | null;
-  paper: Json | null;
-  size: Json | null;
-  specifications: Json | null;
   __open: boolean | null;
   created_at: string | null;
   updated_at: string | null;
-  createdAt: Json | null;
   createdBy: string | null;
-  updatedAt: Json | null;
 }
 
 // Job with customer information
@@ -65,7 +49,7 @@ const fetchJobs = async (): Promise<Job[]> => {
     .order("created_at", { ascending: false });
 
   if (error) throw error;
-  return (data as Job[]) || [];
+  return (data as unknown as Job[]) || [];
 };
 
 // Fetcher for uninvoiced jobs by customer
@@ -95,7 +79,7 @@ const fetchUninvoicedJobsByCustomer = async (
 
   // Add customer names to jobs
   const jobsWithCustomers =
-    (jobs as Job[])?.map((job: Job) => ({
+    (jobs as unknown as Job[])?.map((job: Job) => ({
       ...job,
       customer_name: customerName,
     })) || [];
@@ -131,7 +115,7 @@ const fetchJobsWithCustomers = async (): Promise<JobWithCustomer[]> => {
 
   // Add customer names to jobs
   const jobsWithCustomers =
-    (jobs as Job[])?.map((job: Job) => ({
+    (jobs as unknown as Job[])?.map((job: Job) => ({
       ...job,
       customer_name:
         customerMap.get(job.customer_id || "") || "Unknown Customer",
@@ -156,7 +140,7 @@ const fetchJobByNumber = async (
   const { data: customer, error: customerError } = await supabase
     .from("customers")
     .select("business_name")
-    .eq("id", (job as Job).customer_id || "")
+    .eq("id", (job as unknown as Job).customer_id || "")
     .single();
 
   if (customerError) throw customerError;
@@ -166,7 +150,7 @@ const fetchJobByNumber = async (
   }
 
   return {
-    ...(job as Job),
+    ...(job as unknown as Job),
     customer_name: (customer as CustomerNameData).business_name,
   } as JobWithCustomer;
 };
@@ -197,7 +181,7 @@ const fetchJobsByCustomer = async (
   }
 
   const jobsWithCustomer =
-    (jobs as Job[])?.map((job: Job) => ({
+    (jobs as unknown as Job[])?.map((job: Job) => ({
       ...job,
       customer_name: (customer as CustomerNameData).business_name,
     })) || [];
@@ -332,61 +316,20 @@ export const useJobStats = () => {
       const completed = jobs.filter((job) => job.status === "completed").length;
       const pending = jobs.filter((job) => job.status === "pending").length;
 
-      // Improved value calculation that consolidates estimate fields
+      // Improved value calculation using new consolidated cost columns
       let totalValue = 0;
       let jobsWithPricing = 0;
 
       jobs.forEach((job) => {
         let jobValue = 0;
 
-        // Priority order: final_cost -> estimate_price -> estimated_cost -> estimate JSON
-        if (job.final_cost && job.final_cost > 0) {
-          jobValue = job.final_cost;
+        // Priority order: final_price -> unit_price * quantity -> estimate_price -> fallback to 0
+        if (job.final_price && job.final_price > 0) {
+          jobValue = job.final_price;
+        } else if (job.unit_price && job.unit_price > 0) {
+          jobValue = job.unit_price * (job.quantity || 1);
         } else if (job.estimate_price && job.estimate_price > 0) {
           jobValue = job.estimate_price;
-        } else if (job.estimated_cost && job.estimated_cost > 0) {
-          jobValue = job.estimated_cost;
-        } else if (job.estimate && typeof job.estimate === "object") {
-          // Extract pricing from JSON estimate field - based on database analysis
-          const estimate = job.estimate as Record<string, unknown>;
-          // Database analysis shows all jobs use estimate.total field
-          if (
-            estimate.total &&
-            typeof estimate.total === "number" &&
-            estimate.total > 0
-          ) {
-            jobValue = estimate.total;
-          } else if (
-            estimate.total_price &&
-            typeof estimate.total_price === "number" &&
-            estimate.total_price > 0
-          ) {
-            jobValue = estimate.total_price;
-          } else if (
-            estimate.totalPrice &&
-            typeof estimate.totalPrice === "number" &&
-            estimate.totalPrice > 0
-          ) {
-            jobValue = estimate.totalPrice;
-          } else if (
-            estimate.price &&
-            typeof estimate.price === "number" &&
-            estimate.price > 0
-          ) {
-            jobValue = estimate.price;
-          } else if (
-            estimate.cost &&
-            typeof estimate.cost === "number" &&
-            estimate.cost > 0
-          ) {
-            jobValue = estimate.cost;
-          } else if (
-            estimate.amount &&
-            typeof estimate.amount === "number" &&
-            estimate.amount > 0
-          ) {
-            jobValue = estimate.amount;
-          }
         }
 
         if (jobValue > 0) {

@@ -203,18 +203,38 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
       selectedJobIds.has(job.id),
     );
     const newLineItems: InvoiceLineItemForm[] = selectedJobs.map(
-      (job, index) => ({
-        tempId: `job-${job.id}`,
-        description: job.description || `Job: ${job.jobNo || job.id}`,
-        quantity: job.quantity || 1,
-        unit_price: job.final_cost || job.estimate_price || 0,
-        total_price:
-          (job.final_cost || job.estimate_price || 0) * (job.quantity || 1),
-        line_order: lineItems.length + index + 1,
-        discount_amount: 0,
-        tax_rate: 0,
-        tax_amount: 0,
-      }),
+      (job, index) => {
+        // Use new consolidated cost structure
+        // Priority: final_price -> unit_price * quantity -> estimate_price -> fallback to 0
+        let unitPrice = 0;
+        let totalPrice = 0;
+        
+        if (job.final_price && job.final_price > 0) {
+          // If final_price exists, use it as total and calculate unit price
+          totalPrice = job.final_price;
+          unitPrice = job.quantity && job.quantity > 0 ? job.final_price / job.quantity : job.final_price;
+        } else if (job.unit_price && job.unit_price > 0) {
+          // Use unit_price and calculate total
+          unitPrice = job.unit_price;
+          totalPrice = job.unit_price * (job.quantity || 1);
+        } else if (job.estimate_price && job.estimate_price > 0) {
+          // Fallback to estimate_price
+          unitPrice = job.estimate_price;
+          totalPrice = job.estimate_price * (job.quantity || 1);
+        }
+
+        return {
+          tempId: `job-${job.id}`,
+          description: job.description || `Job: ${job.jobNo || job.id}`,
+          quantity: job.quantity || 1,
+          unit_price: unitPrice,
+          total_price: totalPrice,
+          line_order: lineItems.length + index + 1,
+          discount_amount: 0,
+          tax_rate: 0,
+          tax_amount: 0,
+        };
+      },
     );
 
     setLineItems((prev) => [...prev, ...newLineItems]);
@@ -464,7 +484,10 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
                                 </p>
                                 <span className="text-sm font-medium text-right">
                                   {formatCurrency(
-                                    job.final_cost || job.estimate_price || 0,
+                                    job.final_price || 
+                                    (job.unit_price ? job.unit_price * (job.quantity || 1) : 0) ||
+                                    job.estimate_price || 
+                                    0,
                                   )}
                                 </span>
                               </div>

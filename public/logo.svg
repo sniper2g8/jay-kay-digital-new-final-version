@@ -1,0 +1,17 @@
+<svg width="200" height="80" viewBox="0 0 200 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="40" cy="40" r="35" fill="#dc2626" stroke="#eab308" stroke-width="2"/>
+  
+  <!-- Letters J and K -->
+  <text x="25" y="55" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="white">JK</text>
+  
+  <!-- Company name -->
+  <text x="85" y="30" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#dc2626">JAY KAY</text>
+  <text x="85" y="50" font-family="Arial, sans-serif" font-size="14" font-weight="600" fill="#000000">DIGITAL PRESS</text>
+  
+  <!-- Decorative elements -->
+  <rect x="85" y="55" width="80" height="2" fill="#eab308"/>
+  <circle cx="90" cy="65" r="2" fill="#dc2626"/>
+  <circle cx="100" cy="65" r="2" fill="#eab308"/>
+  <circle cx="110" cy="65" r="2" fill="#dc2626"/>
+</svg>

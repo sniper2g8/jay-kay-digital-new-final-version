@@ -12,6 +12,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { LogOut, User, Settings } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { LogoVariants } from "@/components/Logo";
 
 export default function DashboardHeader() {
   const { user, signOut } = useAuth();
@@ -39,11 +40,14 @@ export default function DashboardHeader() {
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold text-gray-900">
-            Jay Kay Digital Press
-          </h1>
-          <p className="text-sm text-gray-600">Management Dashboard</p>
+        <div className="flex items-center space-x-3">
+          <LogoVariants.NavLogo showText={false} />
+          <div>
+            <h1 className="text-xl font-semibold text-gray-900">
+              Jay Kay Digital Press
+            </h1>
+            <p className="text-sm text-gray-600">Management Dashboard</p>
+          </div>
         </div>
 
         <div className="flex items-center space-x-4">
