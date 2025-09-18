@@ -679,11 +679,7 @@ async function updateCustomerBalance(customerId: string) {
   try {
     // Note: Customer balance is now tracked in customer_statement_periods table
     // No need to maintain a separate account balances table
-    console.log(
-      "Customer balance update for:",
-      customerId,
-      "- balance now tracked in statement periods",
-    );
+    
   } catch (error) {
     console.error("Error updating customer balance:", error);
   }

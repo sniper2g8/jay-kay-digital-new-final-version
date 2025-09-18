@@ -68,22 +68,17 @@ export default function ProtectedRoute({
     };
 
     const performAuthCheck = async () => {
-      console.log("ProtectedRoute - Auth state check:", {
-        user: !!user,
-        loading,
-        requiredRole
-      });
-
+      
       if (!loading) {
         if (!user) {
-          console.log("ProtectedRoute - No user, redirecting to login");
+          
           router.push(redirectTo);
           return;
         }
 
         // If no role required, just check authentication
         if (!requiredRole) {
-          console.log("ProtectedRoute - User authenticated, no role required");
+          
           setChecking(false);
           return;
         }
@@ -93,33 +88,26 @@ export default function ProtectedRoute({
         setUserRole(role);
 
         if (!role) {
-          console.log("ProtectedRoute - Could not fetch user role");
+          
           setAccessDenied(true);
           setChecking(false);
           return;
         }
 
         if (role.status !== 'active') {
-          console.log("ProtectedRoute - User account not active:", role.status);
+          
           setAccessDenied(true);
           setChecking(false);
           return;
         }
 
         if (!hasRequiredAccess(role.primary_role, requiredRole)) {
-          console.log("ProtectedRoute - Insufficient permissions:", {
-            userRole: role.primary_role,
-            requiredRole
-          });
+          
           setAccessDenied(true);
           setChecking(false);
           return;
         }
 
-        console.log("ProtectedRoute - Access granted:", {
-          userRole: role.primary_role,
-          requiredRole
-        });
         setChecking(false);
       }
     };

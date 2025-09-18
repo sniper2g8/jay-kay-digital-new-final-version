@@ -58,12 +58,7 @@ export const useJobFiles = (jobId: string | null) => {
         const isExpired = Date.now() - cached.timestamp > CACHE_DURATION;
 
         if (!isExpired) {
-          console.log(
-            "📋 Using cached files for job:",
-            jobId,
-            "Files:",
-            cached.files.length,
-          );
+          
           setFiles(cached.files);
           return;
         }
@@ -73,13 +68,12 @@ export const useJobFiles = (jobId: string | null) => {
       setError(null);
 
       try {
-        console.log("🔍 Fetching files for job:", jobId);
-
+        
         let entityId = jobId;
 
         // If jobId is human-readable (JKDP-JOB-XXXX), resolve to UUID
         if (jobId.startsWith("JKDP-JOB-")) {
-          console.log("🔄 Resolving human-readable job ID to UUID:", jobId);
+          
           const { data: jobData, error: jobError } = await supabase
             .from("jobs")
             .select("id")
@@ -100,7 +94,7 @@ export const useJobFiles = (jobId: string | null) => {
           }
 
           entityId = jobData.id;
-          console.log("✅ Resolved to UUID:", entityId);
+          
         }
 
         // Query files using the resolved UUID (or direct UUID if passed)
@@ -170,8 +164,7 @@ export const useJobFiles = (jobId: string | null) => {
 
   const deleteFile = async (fileId: string, filePath?: string) => {
     try {
-      console.log("🗑️  Deleting file:", fileId);
-
+      
       // Delete from database first
       const { error: dbError } = await supabase
         .from("file_attachments")
@@ -204,7 +197,7 @@ export const useJobFiles = (jobId: string | null) => {
             );
             // Don't throw error here as database deletion succeeded
           } else {
-            console.log("✅ File deleted from storage");
+            
           }
         }
       }
@@ -215,7 +208,6 @@ export const useJobFiles = (jobId: string | null) => {
       }
       await fetchFiles(true); // Force refresh
 
-      console.log("✅ File deleted successfully");
       return true;
     } catch (err) {
       const errorMessage = serializeError(err);
@@ -227,27 +219,23 @@ export const useJobFiles = (jobId: string | null) => {
 
   const downloadFile = async (fileUrl: string, fileName: string) => {
     try {
-      console.log("⬇️  Downloading file:", fileName, "from:", fileUrl);
-
+      
       // Handle blob URLs (temporary URLs from browser)
       if (fileUrl.startsWith("blob:")) {
-        console.log("🔄 Detected blob URL, attempting direct download...");
+        
         const link = document.createElement("a");
         link.href = fileUrl;
         link.download = fileName;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        console.log("✅ Blob download initiated");
+        
         return true;
       }
 
       // Handle Supabase storage URLs - now that bucket is public, use direct download
       if (fileUrl.includes("/storage/v1/object/")) {
-        console.log(
-          "🔄 Detected Supabase storage URL, using direct download...",
-        );
-
+        
         try {
           // First try direct URL download since bucket is public
           const response = await fetch(fileUrl, {
@@ -271,21 +259,19 @@ export const useJobFiles = (jobId: string | null) => {
             // Clean up
             URL.revokeObjectURL(url);
 
-            console.log("✅ Download completed via direct URL");
             return true;
           } else {
-            console.log("⚠️  Direct URL failed with status:", response.status);
+            
           }
         } catch (fetchError) {
-          console.log("⚠️  Direct URL fetch failed:", fetchError);
+          
         }
 
         // Fallback: Extract file path and use storage API
         const urlParts = fileUrl.split("/storage/v1/object/public/job-files/");
         if (urlParts.length > 1) {
           const filePath = urlParts[1];
-          console.log("� Falling back to storage API for path:", filePath);
-
+          
           const { data, error } = await supabase.storage
             .from("job-files")
             .download(filePath);
@@ -308,14 +294,13 @@ export const useJobFiles = (jobId: string | null) => {
             // Clean up the blob URL
             URL.revokeObjectURL(url);
 
-            console.log("✅ Download completed via storage API");
             return true;
           }
         }
       }
 
       // Final fallback: try direct download with fetch
-      console.log("🔄 Attempting final fallback direct fetch download...");
+      
       const response = await fetch(fileUrl, {
         method: "GET",
         headers: {
@@ -342,7 +327,6 @@ export const useJobFiles = (jobId: string | null) => {
       // Clean up
       URL.revokeObjectURL(url);
 
-      console.log("✅ Download completed via fallback fetch");
       return true;
     } catch (err) {
       console.error("❌ Error downloading file:", serializeError(err));

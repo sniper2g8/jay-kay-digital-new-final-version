@@ -43,16 +43,11 @@ export default function SupabaseConnectionTest() {
     setResults(null);
 
     try {
-      console.log("Testing Supabase connection...");
-
+      
       // Test 1: Basic configuration check
       const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
       const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-      console.log("Environment variables check:");
-      console.log("NEXT_PUBLIC_SUPABASE_URL:", url ? "Set" : "Missing");
-      console.log("NEXT_PUBLIC_SUPABASE_ANON_KEY:", key ? "Set" : "Missing");
-      console.log("URL value:", url);
       console.log("Key (first 20 chars):", key?.substring(0, 20) + "...");
 
       if (!url || !key) {
@@ -62,7 +57,7 @@ export default function SupabaseConnectionTest() {
       }
 
       // Test 2: Simple query to customers table
-      console.log("Attempting to query customers table...");
+      
       const { data: customers, error: customersError } = await supabase
         .from("customers")
         .select("human_id, business_name")
@@ -89,14 +84,8 @@ export default function SupabaseConnectionTest() {
         );
       }
 
-      console.log(
-        "Customers query successful, got",
-        customers?.length || 0,
-        "records",
-      );
-
       // Test 3: Count query
-      console.log("Attempting count query...");
+      
       const { count, error: countError } = await supabase
         .from("customers")
         .select("*", { count: "exact", head: true });
@@ -107,10 +96,8 @@ export default function SupabaseConnectionTest() {
         throw new Error(`Count query failed: ${countError.message}`);
       }
 
-      console.log("Count query successful, total records:", count);
-
       // Test 4: Test other tables
-      console.log("Testing other table access...");
+      
       const { error: jobsError } = await supabase
         .from("jobs")
         .select("job_human_id")
@@ -147,7 +134,6 @@ export default function SupabaseConnectionTest() {
         },
       });
 
-      console.log("Connection test completed successfully");
     } catch (err) {
       console.error("Connection test failed with error:", err);
       console.error("Error type:", typeof err);

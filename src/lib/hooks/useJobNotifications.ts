@@ -39,7 +39,7 @@ export async function notifyJobSubmission(jobData: {
     };
 
     await notificationService.sendJobSubmissionNotification(notificationData);
-    console.log(`Job submission notifications sent for job ${notificationData.job_number}`);
+    
   } catch (error) {
     console.error('Error sending job submission notifications:', error);
   }
@@ -82,7 +82,7 @@ export async function notifyJobStatusChange(jobData: {
     };
 
     await notificationService.sendJobStatusChangeNotification(notificationData);
-    console.log(`Job status change notifications sent for job ${notificationData.job_number}`);
+    
   } catch (error) {
     console.error('Error sending job status change notifications:', error);
   }

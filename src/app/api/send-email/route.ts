@@ -56,7 +56,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('Email sent successfully:', data);
     return NextResponse.json(
       { 
         success: true, 

@@ -134,8 +134,7 @@ export default function JobTrackingPage() {
       try {
         setLoading(true);
         setError(null);
-        console.log("Fetching job details for:", jobId);
-
+        
         // Check if jobId is in job number format (JKDP-JOB-XXXX) or UUID format
         const isJobNumber = /^JKDP-JOB-\d+$/i.test(jobId);
         const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(jobId);
@@ -151,14 +150,12 @@ export default function JobTrackingPage() {
             .eq("jobNo", jobId)
             .single();
 
-          console.log("Job by number result:", { jobByNumber, jobByNumberError });
-
           if (jobByNumberError) {
             console.error("Job not found by jobNo:", jobByNumberError);
             throw new Error(`Job not found with job number: ${jobId}`);
           }
           finalJobData = jobByNumber;
-          console.log("Found job by jobNo:", finalJobData);
+          
         } else if (isUUID) {
           // If it's a UUID, search by ID
           console.log("Fetching job by ID (UUID format):", jobId);
@@ -168,17 +165,14 @@ export default function JobTrackingPage() {
             .eq("id", jobId)
             .single();
 
-          console.log("Job fetch result:", { jobData, jobError });
-
           if (jobError) {
             console.error("Error fetching job by ID:", jobError);
             throw new Error(`Database error: ${jobError.message || JSON.stringify(jobError)}`);
           }
           finalJobData = jobData;
-          console.log("Found job by ID:", finalJobData);
+          
         } else {
           // If format is unclear, try both approaches with proper error handling
-          console.log("Unknown format, trying both ID and jobNo...");
           
           // Try as job number first (more likely to be human-readable)
           const { data: jobByNumber, error: jobByNumberError } = await supabase
@@ -212,7 +206,7 @@ export default function JobTrackingPage() {
         }
 
         // Set the job data
-        console.log("Final job data:", finalJobData);
+        
         setJob(finalJobData as unknown as Job);
 
         // Note: Customer information is not fetched for privacy protection
@@ -250,19 +244,17 @@ export default function JobTrackingPage() {
 
   const getStatusConfig = (status: string | null): StatusConfig => {
     if (!status) {
-      console.log("Status is null/undefined, using pending as default");
+      
       return statusConfig.pending;
     }
-    
-    console.log("Looking up status config for:", status);
+
     const config = statusConfig[status as keyof typeof statusConfig];
     
     if (!config) {
       console.warn(`Status '${status}' not found in statusConfig, using pending as fallback`);
       return statusConfig.pending;
     }
-    
-    console.log("Found status config:", config);
+
     return config;
   };
 
@@ -282,7 +274,7 @@ export default function JobTrackingPage() {
           url: currentUrl,
         });
       } catch (err) {
-        console.log('Error sharing:', err);
+        
         copyToClipboard(currentUrl);
       }
     } else {

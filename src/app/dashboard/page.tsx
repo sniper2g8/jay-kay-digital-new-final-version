@@ -40,13 +40,6 @@ function DashboardContent() {
   const { data: financialStats, isLoading: financialStatsLoading } =
     useFinancialStats();
 
-  console.log("Dashboard - Auth state:", {
-    hasUser: !!user,
-    hasSession: !!session,
-    authLoading,
-    shouldFetchData,
-  });
-
   // Show loading state while authentication is being determined
   if (authLoading) {
     return (

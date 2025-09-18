@@ -124,7 +124,7 @@ export function ProfessionalInvoicePDF({
   const handlePrint = useReactToPrint({
     contentRef: invoiceRef,
     documentTitle: `Invoice_${invoice.invoiceNo || invoice.id.slice(0, 8)}`,
-    onAfterPrint: () => console.log('Invoice printed successfully'),
+    onAfterPrint: () => {}
   });
 
   return (

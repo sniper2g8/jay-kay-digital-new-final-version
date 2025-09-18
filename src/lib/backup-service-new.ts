@@ -13,8 +13,7 @@ export class BackupService {
     
     try {
       // TODO: Implement when backup_logs table is created
-      console.log(`Creating backup ${backupId} with config:`, config);
-
+      
       // Log audit event
       await AuditLogger.logSystemEvent(
         `Backup job initiated: ${config.backup_type} backup to ${config.storage_location}`,
@@ -42,12 +41,10 @@ export class BackupService {
   private static async executeBackup(backupId: string, _config: BackupJobConfig): Promise<void> {
     try {
       // TODO: Implement actual backup logic
-      console.log(`Executing backup ${backupId}...`);
       
       // Simulate backup process
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      console.log(`Backup ${backupId} completed successfully`);
+
     } catch (error) {
       console.error(`Backup execution failed for ${backupId}:`, error);
       throw error;
@@ -57,14 +54,13 @@ export class BackupService {
   // Get backup logs with filters
   static async getBackupLogs(): Promise<{ data: BackupLog[]; count: number }> {
     // TODO: Implement when backup_logs table is created
-    console.log('Getting backup logs...');
+    
     return { data: [], count: 0 };
   }
 
   // Get backup statistics
   static async getBackupStatistics(): Promise<BackupStatistics> {
     // TODO: Implement when backup tables are created
-    console.log('Getting backup statistics...');
     
     return {
       total_backups: 0,
@@ -86,21 +82,21 @@ export class BackupService {
   // Restore from backup
   static async restoreFromBackup(backupId: string): Promise<void> {
     // TODO: Implement restore functionality
-    console.log(`Restoring from backup ${backupId}...`);
+    
     throw new Error('Restore functionality not yet implemented');
   }
 
   // Delete backup
   static async deleteBackup(backupId: string): Promise<void> {
     // TODO: Implement backup deletion
-    console.log(`Deleting backup ${backupId}...`);
+    
     throw new Error('Backup deletion not yet implemented');
   }
 
   // Verify backup integrity
   static async verifyBackup(backupId: string): Promise<boolean> {
     // TODO: Implement backup verification
-    console.log(`Verifying backup ${backupId}...`);
+    
     return true;
   }
 }
@@ -110,32 +106,32 @@ export class BackupScheduleService {
   // Create backup schedule
   static async createSchedule(schedule: Omit<BackupSchedule, 'id' | 'created_at' | 'updated_at'>): Promise<string> {
     // TODO: Implement when backup_schedules table is created
-    console.log('Creating backup schedule:', schedule);
+    
     return crypto.randomUUID();
   }
 
   // Get all backup schedules
   static async getSchedules(): Promise<BackupSchedule[]> {
     // TODO: Implement when backup_schedules table is created
-    console.log('Getting backup schedules...');
+    
     return [];
   }
 
   // Update backup schedule
   static async updateSchedule(id: string, updates: Partial<BackupSchedule>): Promise<void> {
     // TODO: Implement schedule updates
-    console.log(`Updating schedule ${id}:`, updates);
+    
   }
 
   // Delete backup schedule
   static async deleteSchedule(id: string): Promise<void> {
     // TODO: Implement schedule deletion
-    console.log(`Deleting schedule ${id}...`);
+    
   }
 
   // Execute scheduled backups
   static async executeScheduledBackups(): Promise<void> {
     // TODO: Implement scheduled backup execution
-    console.log('Executing scheduled backups...');
+    
   }
 }

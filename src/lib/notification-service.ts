@@ -374,7 +374,6 @@ class NotificationService {
         throw new Error(`Email sending failed: ${response.statusText}`);
       }
 
-      console.log(`Email sent successfully to ${to}`);
     } catch (error) {
       console.error('Error sending email:', error);
       throw error;
@@ -402,7 +401,6 @@ class NotificationService {
         throw new Error(`SMS sending failed: ${response.statusText}`);
       }
 
-      console.log(`SMS sent successfully to ${to}`);
     } catch (error) {
       console.error('Error sending SMS:', error);
       throw error;

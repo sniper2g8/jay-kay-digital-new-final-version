@@ -44,8 +44,7 @@ export const useJobSubmission = () => {
 
       // Generate formatted job number with human-readable format
       const jobNumber = `JKDP-JOB-${String(nextJobNumber).padStart(4, "0")}`;
-      console.log("Generated job number:", jobNumber);
-
+      
       // Prepare specifications with all details
       const specifications = {
         requirements: formData.requirements,
@@ -87,8 +86,6 @@ export const useJobSubmission = () => {
         finishOptions: formData.finishing_options,
         finishPrices: finishingOptionPrices,
       };
-
-      console.log("Submitting job data:", jobData);
 
       const { data: job, error: jobError } = await supabase
         .from("jobs")
@@ -136,8 +133,7 @@ export const useJobSubmission = () => {
       mutate("jobs");
       mutate("jobs-with-customers");
       mutate("job-stats");
-      console.log("Cache invalidated after job submission");
-
+      
       router.push(`/dashboard/jobs`);
 
       return job;
@@ -151,9 +147,7 @@ export const useJobSubmission = () => {
         if (err.message.includes("permission denied")) {
           errorMessage =
             "Database permissions need to be configured. Please contact support.";
-          console.log(
-            "🔧 SOLUTION: Execute the SQL in add-auth-policies.sql in your Supabase dashboard",
-          );
+          
         } else if (err.message.includes("Network request failed")) {
           errorMessage = "Network error. Please check your connection.";
         } else if (err.message.includes("duplicate")) {

@@ -192,14 +192,14 @@ export function InvoiceManagement() {
 
   // Save invoice
   const saveInvoice = () => {
-    console.log("Saving invoice:", { invoice, items, selectedCustomer });
+    
     // In a real app, this would make an API call to save the invoice
     alert("Invoice saved successfully!");
   };
 
   // Send invoice
   const sendInvoice = () => {
-    console.log("Sending invoice:", { invoice, items, selectedCustomer });
+    
     // In a real app, this would send the invoice to the customer
     alert("Invoice sent successfully!");
   };

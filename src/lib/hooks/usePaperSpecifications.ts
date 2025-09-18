@@ -343,7 +343,7 @@ const fallbackFinishOptions: FinishOption[] = [
 // Fetcher functions with fallback
 const fetchPaperSizes = async (): Promise<PaperSize[]> => {
   try {
-    console.log("🔍 Attempting to fetch paper sizes from database...");
+    
     // Fetch paper sizes with proper typing
     const { data, error } = await supabase
       .from("paper_sizes")
@@ -351,29 +351,26 @@ const fetchPaperSizes = async (): Promise<PaperSize[]> => {
       .order("name");
 
     if (error) {
-      console.log(
-        "⚠️ Database fetch failed, using fallback data:",
-        error.message,
-      );
+      
       return fallbackPaperSizes;
     }
 
     if (data && data.length > 0) {
-      console.log("✅ Successfully fetched paper sizes from database");
+      
       return data;
     } else {
-      console.log("📋 No data in database, using fallback");
+      
       return fallbackPaperSizes;
     }
   } catch {
-    console.log("❌ Error fetching paper sizes, using fallback data");
+    
     return fallbackPaperSizes;
   }
 };
 
 const fetchPaperWeights = async (): Promise<PaperWeight[]> => {
   try {
-    console.log("🔍 Attempting to fetch paper weights from database...");
+    
     // Fetch paper weights with proper typing
     const { data, error } = await supabase
       .from("paper_weights")
@@ -381,29 +378,26 @@ const fetchPaperWeights = async (): Promise<PaperWeight[]> => {
       .order("weight_gsm");
 
     if (error) {
-      console.log(
-        "⚠️ Database fetch failed, using fallback data:",
-        error.message,
-      );
+      
       return fallbackPaperWeights;
     }
 
     if (data && data.length > 0) {
-      console.log("✅ Successfully fetched paper weights from database");
+      
       return data;
     } else {
-      console.log("📋 No data in database, using fallback");
+      
       return fallbackPaperWeights;
     }
   } catch {
-    console.log("❌ Error fetching paper weights, using fallback data");
+    
     return fallbackPaperWeights;
   }
 };
 
 const fetchPaperTypes = async (): Promise<PaperType[]> => {
   try {
-    console.log("🔍 Attempting to fetch paper types from database...");
+    
     // Fetch paper types with proper typing
     const { data, error } = await supabase
       .from("paper_types")
@@ -411,22 +405,19 @@ const fetchPaperTypes = async (): Promise<PaperType[]> => {
       .order("name");
 
     if (error) {
-      console.log(
-        "⚠️ Database fetch failed, using fallback data:",
-        error.message,
-      );
+      
       return fallbackPaperTypes;
     }
 
     if (data && data.length > 0) {
-      console.log("✅ Successfully fetched paper types from database");
+      
       return data;
     } else {
-      console.log("📋 No data in database, using fallback");
+      
       return fallbackPaperTypes;
     }
   } catch {
-    console.log("❌ Error fetching paper types, using fallback data");
+    
     return fallbackPaperTypes;
   }
 };
@@ -458,7 +449,7 @@ const fetchFinishOptions = async (): Promise<FinishOption[]> => {
 
     return transformedData.length > 0 ? transformedData : fallbackFinishOptions;
   } catch {
-    console.log("Using fallback finish options data");
+    
     return fallbackFinishOptions;
   }
 };

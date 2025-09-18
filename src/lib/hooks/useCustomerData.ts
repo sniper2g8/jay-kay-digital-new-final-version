@@ -67,8 +67,6 @@ export const useCustomerData = () => {
       setLoading(true);
       setError(null);
 
-      console.log("🔍 Fetching data for customer:", user.email);
-
       // First, get the customer record to find their customer_id
       const { data: customerData, error: customerError } = await supabase
         .from("appUsers")
@@ -83,7 +81,7 @@ export const useCustomerData = () => {
       }
 
       if (!customerData) {
-        console.log("ℹ️ No customer record found for user");
+        
         setJobs([]);
         setInvoices([]);
         setLoading(false);
@@ -91,8 +89,7 @@ export const useCustomerData = () => {
       }
 
       const customerId = customerData.id;
-      console.log("✅ Customer ID found:", customerId);
-
+      
       // Fetch customer's jobs only - using correct column names
       const { data: jobsData, error: jobsError } = await supabase
         .from("jobs")
@@ -119,7 +116,7 @@ export const useCustomerData = () => {
         console.error("❌ Error fetching jobs:", jobsError);
         setJobs([]);
       } else {
-        console.log("✅ Customer jobs found:", jobsData?.length || 0);
+        
         setJobs(jobsData || []);
       }
 
@@ -146,7 +143,7 @@ export const useCustomerData = () => {
         console.error("❌ Error fetching invoices:", invoicesError);
         setInvoices([]);
       } else {
-        console.log("✅ Customer invoices found:", invoicesData?.length || 0);
+        
         setInvoices(invoicesData || []);
       }
 
@@ -188,7 +185,7 @@ export const useCustomerData = () => {
       };
 
       setStats(newStats);
-      console.log("✅ Customer stats calculated:", newStats);
+      
     } catch (err) {
       console.error("❌ Error fetching customer data:", err);
       setError(err instanceof Error ? err.message : "Failed to load your data");

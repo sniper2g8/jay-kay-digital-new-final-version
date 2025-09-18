@@ -26,9 +26,7 @@ export default function ProtectedDashboard({
       const userRole = userData.primary_role;
 
       if (userRole && !allowedRoles.includes(userRole)) {
-        console.log(
-          `🔒 User with role "${userRole}" accessing protected dashboard - redirecting to ${redirectPath}`,
-        );
+        
         router.replace(redirectPath);
         return;
       }

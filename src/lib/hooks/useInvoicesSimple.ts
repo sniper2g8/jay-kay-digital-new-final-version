@@ -73,8 +73,6 @@ export function useInvoicesData() {
       setIsLoading(true);
       setError(null);
 
-      console.log('Fetching invoices from database...');
-
       // Get invoices with customer data
       const { data: invoicesData, error: invoicesError } = await supabase
         .from('invoices')
@@ -107,10 +105,8 @@ export function useInvoicesData() {
         throw invoicesError;
       }
 
-      console.log('Raw invoice data:', invoicesData);
-
       if (!invoicesData || invoicesData.length === 0) {
-        console.log('No invoices found');
+        
         setInvoices([]);
         setStats({
           total_invoices: 0,
@@ -182,9 +178,6 @@ export function useInvoicesData() {
             statsData.total_pending += invoice.amount_due;
         }
       });
-
-      console.log('Transformed invoices:', transformedInvoices.length);
-      console.log('Stats:', statsData);
 
       setInvoices(transformedInvoices);
       setStats(statsData);

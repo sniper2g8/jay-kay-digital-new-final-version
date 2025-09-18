@@ -12,15 +12,13 @@ export default function DatabaseTestPage() {
     setTestResult("");
 
     try {
-      console.log("Testing database access...");
-
+      
       // First check auth status
       const {
         data: { session },
         error: sessionError,
       } = await supabase.auth.getSession();
-      console.log("Session check:", { hasSession: !!session, sessionError });
-
+      
       // Test simple query
       const { data, error } = await supabase
         .from("customers")
@@ -31,7 +29,7 @@ export default function DatabaseTestPage() {
         console.error("Database error:", error);
         setTestResult(`Database Error: ${error.message} (Code: ${error.code})`);
       } else {
-        console.log("Database success:", data);
+        
         setTestResult(`Success! Found ${data?.length || 0} customers`);
       }
     } catch (err) {

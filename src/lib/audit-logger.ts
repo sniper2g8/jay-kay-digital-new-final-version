@@ -47,7 +47,7 @@ export class AuditLogger {
       // }
       
       // For now, just console log the audit entry
-      console.log('Audit Log Entry:', auditEntry);
+      
     } catch (error) {
       console.error('Audit logging error:', error);
     }
@@ -162,7 +162,7 @@ export class AuditLogService {
     //   .order('timestamp', { ascending: false });
 
     // For now, return empty data
-    console.log('Audit log filters:', filters);
+    
     return { data: [], count: 0 };
 
     // Apply filters
@@ -183,7 +183,6 @@ export class AuditLogService {
   // Get audit statistics
   static async getAuditStatistics(): Promise<AuditStatistics> {
     // TODO: Implement when audit_logs table is available
-    console.log('Getting audit statistics...');
     
     return {
       total_events: 0,
@@ -200,7 +199,7 @@ export class AuditLogService {
   // Clean up old audit logs
   static async cleanupOldLogs(retentionDays: number = 90): Promise<number> {
     // TODO: Implement when audit_logs table is available
-    console.log(`Would cleanup logs older than ${retentionDays} days`);
+    
     return 0;
   }
 

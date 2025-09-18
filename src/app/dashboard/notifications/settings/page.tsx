@@ -124,7 +124,7 @@ function NotificationSettingsContent() {
         }
       } else {
         // Insert new preferences (this may fail due to schema constraints, but we'll handle it)
-        console.log('No existing preferences found. This is expected behavior.');
+        
       }
 
       setLastSaved(new Date());

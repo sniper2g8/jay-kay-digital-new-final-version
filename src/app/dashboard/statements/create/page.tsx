@@ -116,9 +116,9 @@ function CreateStatementContent() {
     }
 
     try {
-      console.log("Submitting form data:", formData);
+      
       const newStatement = await createStatementPeriod(formData);
-      console.log("Statement created successfully:", newStatement);
+      
       router.push(`/dashboard/statements/${newStatement.id}`);
     } catch (error) {
       console.error("Error creating statement:", {

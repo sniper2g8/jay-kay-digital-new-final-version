@@ -326,7 +326,7 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
 
       if (action === "send") {
         // TODO: Implement send functionality
-        console.log("Send invoice:", invoice.id);
+        
       }
 
       router.push(`/dashboard/invoices/${invoice.id}`);

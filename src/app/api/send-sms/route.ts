@@ -73,7 +73,6 @@ export async function POST(request: NextRequest) {
       to: formattedTo,
     });
 
-    console.log('SMS sent successfully:', messageResponse.sid);
     return NextResponse.json(
       { 
         success: true, 

@@ -104,19 +104,12 @@ export const useFileUploadFixed = () => {
         throw new Error("You must be logged in to upload files");
       }
 
-      console.log("✅ Authentication verified for user:", session.user.email);
-      console.log(
-        `🚀 Starting upload of ${fileUploads.length} files for job ${jobId}`,
-      );
-
       // Use session user ID if not provided
       const uploadUserId = userId || session.user.id;
 
       for (const upload of fileUploads) {
         if (upload.status === "completed") {
-          console.log(
-            `⏭️  Skipping already uploaded file: ${upload.file.name}`,
-          );
+          
           continue;
         }
 
@@ -143,8 +136,6 @@ export const useFileUploadFixed = () => {
             .replace(/_{2,}/g, "_");
 
           const fileName = `jobs/${jobId}/${timestamp}_${sanitizedFileName}`;
-
-          console.log(`📤 Uploading file: ${fileName}`);
 
           // Simulate upload progress with intervals
           const startTime = Date.now();
@@ -198,8 +189,6 @@ export const useFileUploadFixed = () => {
               throw uploadError;
             }
 
-            console.log("✅ File uploaded to storage:", uploadData.path);
-
             // Update progress to 95% after upload
             setFileUploads((prev) =>
               prev.map((u) => 
@@ -213,8 +202,6 @@ export const useFileUploadFixed = () => {
             const { data: urlData } = supabase.storage
               .from("job-files")
               .getPublicUrl(uploadData.path);
-
-            console.log("🔗 Public URL generated:", urlData.publicUrl);
 
             // Save file record to database
             const fileRecord = {
@@ -242,8 +229,6 @@ export const useFileUploadFixed = () => {
 
               throw dbError;
             }
-
-            console.log("✅ File record saved to database:", dbData.id);
 
             // Update progress to 100%
             setFileUploads((prev) =>
@@ -283,9 +268,6 @@ export const useFileUploadFixed = () => {
         }
       }
 
-      console.log(
-        `🎉 Upload complete! ${uploadedFiles.length} files uploaded successfully`,
-      );
     } catch (globalError: unknown) {
       const errorMessage =
         globalError instanceof Error ? globalError.message : "Unknown error";

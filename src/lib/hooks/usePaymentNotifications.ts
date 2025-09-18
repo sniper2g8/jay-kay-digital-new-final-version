@@ -56,7 +56,7 @@ export async function notifyPaymentRecorded(paymentData: {
     };
 
     await notificationService.sendPaymentRecordNotification(notificationData);
-    console.log(`Payment notifications sent for payment ${paymentData.id}`);
+    
   } catch (error) {
     console.error('Error sending payment notifications:', error);
   }
@@ -97,7 +97,7 @@ export async function notifyInvoiceGenerated(invoiceData: {
     };
 
     await notificationService.sendInvoiceNotification(notificationData);
-    console.log(`Invoice notifications sent for invoice ${invoiceData.invoiceNo}`);
+    
   } catch (error) {
     console.error('Error sending invoice notifications:', error);
   }

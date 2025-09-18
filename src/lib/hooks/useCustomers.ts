@@ -43,20 +43,12 @@ const fetchCustomers = async (): Promise<Customer[]> => {
   }
 
   try {
-    console.log(
-      "🚨 fetchCustomers called - This should NOT happen if user is not authenticated!",
-    );
-
+    
     // Check current session status
     const {
       data: { session },
     } = await supabase.auth.getSession();
-    console.log("Current session in fetchCustomers:", {
-      hasSession: !!session,
-      userEmail: session?.user?.email || "no user",
-    });
 
-    console.log("Fetching customers from Supabase...");
     const { data, error } = await supabase
       .from("customers")
       .select("*")
@@ -107,7 +99,6 @@ const fetchCustomers = async (): Promise<Customer[]> => {
       throw error;
     }
 
-    console.log("Successfully fetched customers:", data?.length || 0);
     return (data as Customer[]) || [];
   } catch (error) {
     console.error("Error fetching customers - Full error object:", error);
@@ -196,18 +187,13 @@ export const useCustomers = () => {
   const isBuildTime = typeof window === "undefined";
 
   if (!isBuildTime) {
-    console.log("useCustomers hook - Auth state:", {
-      hasUser: !!user,
-      hasSession: !!session,
-      loading,
-      userEmail: user?.email || "no user",
-    });
+    
   }
 
   const shouldFetch = user && session && !loading && !isBuildTime;
 
   if (!isBuildTime) {
-    console.log("useCustomers - shouldFetch:", shouldFetch);
+    
   }
 
   return useSWR(

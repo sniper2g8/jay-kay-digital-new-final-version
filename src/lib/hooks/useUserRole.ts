@@ -39,7 +39,7 @@ const fetchUserRole = async (userId: string): Promise<UserWithRole | null> => {
   }
 
   if (!session) {
-    console.log("No session in fetchUserRole - user not authenticated");
+    
     return null;
   }
 
@@ -54,7 +54,7 @@ const fetchUserRole = async (userId: string): Promise<UserWithRole | null> => {
     if (error) {
       // Don't log error if user simply doesn't exist in appUsers table yet
       if (error.code === "PGRST116") {
-        console.log("User not found in appUsers table:", userId);
+        
         return null;
       }
       console.error("Error fetching user role:", error);

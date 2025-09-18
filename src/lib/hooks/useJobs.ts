@@ -209,7 +209,7 @@ export const useJobs = () => {
         "postgres_changes",
         { event: "*", schema: "public", table: "jobs" },
         (payload) => {
-          console.log("Real-time job update:", payload);
+          
           // Revalidate SWR cache when jobs table changes
           mutate("jobs");
           // Also revalidate related caches
@@ -251,7 +251,7 @@ export const useJobsWithCustomers = () => {
         "postgres_changes",
         { event: "*", schema: "public", table: "jobs" },
         (payload) => {
-          console.log("Real-time job update for jobs-with-customers:", payload);
+          
           mutate("jobs-with-customers");
           mutate("jobs");
           mutate("job-stats");
@@ -261,7 +261,7 @@ export const useJobsWithCustomers = () => {
         "postgres_changes",
         { event: "*", schema: "public", table: "customers" },
         (payload) => {
-          console.log("Real-time customer update:", payload);
+          
           mutate("jobs-with-customers");
         },
       )
@@ -369,7 +369,7 @@ export const useJobStats = () => {
         "postgres_changes",
         { event: "*", schema: "public", table: "jobs" },
         (payload) => {
-          console.log("Real-time job update for job-stats:", payload);
+          
           mutate("job-stats");
           mutate("jobs");
           mutate("jobs-with-customers");
