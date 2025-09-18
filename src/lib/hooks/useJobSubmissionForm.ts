@@ -54,6 +54,20 @@ export interface Service {
   active: boolean | null;
   slug: string | null;
   imageUrl: string | null;
+  options: unknown; // JSON field from database
+}
+
+export interface ServiceOptions {
+  finishIds?: string[];
+  paper?: {
+    types?: string[];
+    weightsGsm?: number[];
+  };
+  sizing?: {
+    standardSizes?: string[];
+    supportsCustom?: boolean;
+    supportsStandard?: boolean;
+  };
 }
 
 const initialFormData: JobFormData = {
@@ -206,7 +220,7 @@ export const useJobSubmissionForm = () => {
     try {
       const { data, error } = await supabase
         .from("services")
-        .select("id, title, description, specSchema, active, slug, imageUrl")
+        .select("id, title, description, specSchema, active, slug, imageUrl, options")
         .eq("active", true)
         .order("title", { ascending: true });
 
@@ -255,42 +269,33 @@ export const useJobSubmissionForm = () => {
       return;
     }
 
-    // Try to match service with specifications
-    const serviceKey = selectedService.title
-      ?.toLowerCase()
-      .replace(/\s+/g, "_")
-      .replace(/[^a-z0-9_]/g, "");
-    const serviceSpec =
-      serviceSpecifications[serviceKey as keyof typeof serviceSpecifications];
+    // Parse service options from database
+    const serviceOptions = selectedService.options as ServiceOptions | null;
 
-    if (serviceSpec) {
-      // Filter based on service specifications
-      const filteredPaperTypes = paperTypes.data
-        .filter((type) => serviceSpec.paper_types.includes(type.name))
-        .map((type) => type.name);
+    if (serviceOptions) {
+      // Filter based on actual service options from database
+      const filteredPaperTypes = serviceOptions.paper?.types || [];
+      const filteredPaperWeights = serviceOptions.paper?.weightsGsm || [];
+      const availableFinishIds = serviceOptions.finishIds || [];
 
-      const filteredPaperWeights = paperWeights.data
-        .filter((weight) =>
-          serviceSpec.paper_weights.includes(weight.weight_gsm),
-        )
-        .map((weight) => weight.weight_gsm);
+      // Filter finishing options by the service's finishIds
+      const filteredFinishing = finishOptions.data?.filter((option) =>
+        availableFinishIds.includes(option.id),
+      ) || [];
 
-      const filteredFinishing = finishOptions.data.filter((option) =>
-        serviceSpec.finishing_options.includes(option.id),
-      );
-
+      // Set available options (use defaults if service doesn't specify)
       setAvailablePaperTypes(
         filteredPaperTypes.length > 0
           ? filteredPaperTypes
-          : paperTypes.data.map((p) => p.name),
+          : paperTypes.data?.map((p) => p.name) || [],
       );
       setAvailablePaperWeights(
         filteredPaperWeights.length > 0
           ? filteredPaperWeights
-          : paperWeights.data.map((p) => p.weight_gsm),
+          : paperWeights.data?.map((p) => p.weight_gsm) || [],
       );
       setAvailableFinishingOptions(
-        filteredFinishing.length > 0 ? filteredFinishing : finishOptions.data,
+        filteredFinishing.length > 0 ? filteredFinishing : finishOptions.data || [],
       );
 
       // Reset selections if they're no longer valid
@@ -310,11 +315,23 @@ export const useJobSubmissionForm = () => {
           paper_weight: filteredPaperWeights[0],
         }));
       }
+
+      // Reset finishing options if any are no longer valid
+      const validFinishingOptions = formData.finishing_options.filter(optionId =>
+        availableFinishIds.length === 0 || availableFinishIds.includes(optionId)
+      );
+      
+      if (validFinishingOptions.length !== formData.finishing_options.length) {
+        setFormData((prev) => ({
+          ...prev,
+          finishing_options: validFinishingOptions,
+        }));
+      }
     } else {
-      // Use all available options if service not found in specifications
-      setAvailablePaperTypes(paperTypes.data.map((p) => p.name));
-      setAvailablePaperWeights(paperWeights.data.map((p) => p.weight_gsm));
-      setAvailableFinishingOptions(finishOptions.data);
+      // Use all available options if service has no specific constraints
+      setAvailablePaperTypes(paperTypes.data?.map((p) => p.name) || []);
+      setAvailablePaperWeights(paperWeights.data?.map((p) => p.weight_gsm) || []);
+      setAvailableFinishingOptions(finishOptions.data || []);
     }
   }, [
     services,
@@ -324,7 +341,6 @@ export const useJobSubmissionForm = () => {
     paperTypes.data,
     paperWeights.data,
     finishOptions.data,
-    serviceSpecifications,
   ]);
 
   // Create new customer

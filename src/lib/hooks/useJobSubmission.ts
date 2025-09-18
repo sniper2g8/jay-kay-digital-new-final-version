@@ -45,7 +45,7 @@ export const useJobSubmission = () => {
       // Generate formatted job number with human-readable format
       const jobNumber = `JKDP-JOB-${String(nextJobNumber).padStart(4, "0")}`;
       
-      // Prepare specifications with all details
+      // Prepare specifications with all details including finishing options
       const specifications = {
         requirements: formData.requirements,
         special_instructions: formData.special_instructions,
@@ -62,6 +62,12 @@ export const useJobSubmission = () => {
         paper: {
           type: formData.paper_type,
           weight: formData.paper_weight,
+        },
+        // Store finishing options in specifications (proper place according to DB schema)
+        finishing: {
+          selected_finish_ids: formData.finishing_options || [],
+          finish_prices: finishingOptionPrices || {},
+          total_finishing_cost: Object.values(finishingOptionPrices || {}).reduce((sum, price) => sum + price, 0),
         },
       };
 
@@ -81,10 +87,6 @@ export const useJobSubmission = () => {
         specifications: specifications,
         submittedDate: new Date().toISOString(),
         createdBy: user?.id || null,
-        // Finishing options data
-        finishIds: formData.finishing_options,
-        finishOptions: formData.finishing_options,
-        finishPrices: finishingOptionPrices,
       };
 
       const { data: job, error: jobError } = await supabase

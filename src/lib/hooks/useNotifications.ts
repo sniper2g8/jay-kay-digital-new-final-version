@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface CreateNotificationData {
   title: string;
@@ -20,6 +21,7 @@ export interface NotificationFilters {
 export function useNotifications() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
   const createNotification = useCallback(async (data: CreateNotificationData) => {
     try {
@@ -56,21 +58,25 @@ export function useNotifications() {
     }
   }, []);
 
-  const getNotifications = useCallback(async (userId: string, filters: NotificationFilters = {}) => {
+  const getNotifications = useCallback(async (userId?: string, filters: NotificationFilters = {}) => {
     try {
       setIsLoading(true);
       setError(null);
 
+      // Use current user ID if not provided
+      const targetUserId = userId || user?.id;
+      
       // Validate userId
-      if (!userId) {
-        console.warn('getNotifications called without valid userId');
+      if (!targetUserId) {
+        console.warn('getNotifications called without valid userId and no authenticated user');
+        setError('User not authenticated');
         return [];
       }
 
       let query = supabase
         .from('notifications')
         .select('*')
-        .eq('recipient_id', userId)
+        .eq('recipient_id', targetUserId)
         .order('created_at', { ascending: false });
 
       if (filters.type && filters.type !== 'all') {
@@ -96,30 +102,55 @@ export function useNotifications() {
       const { data, error: fetchError } = await query;
 
       if (fetchError) {
-        console.error('Error fetching notifications:', fetchError);
+        // Handle RLS permission errors gracefully
+        if (fetchError.message.includes('permission denied') || fetchError.code === '42501') {
+          console.warn('Notifications table access denied - RLS policies need configuration');
+          return []; // Return empty array instead of throwing error
+        }
+        
+        console.error('Error fetching notifications:', {
+          message: fetchError.message || 'Unknown error',
+          code: fetchError.code || 'No code',
+          details: fetchError.details || 'No details',
+          hint: fetchError.hint || 'No hint',
+          userId: targetUserId
+        });
         setError('Failed to fetch notifications');
         return [];
       }
 
       return data || [];
     } catch (err) {
-      console.error('Error fetching notifications:', err);
+      const errorDetails = err instanceof Error ? {
+        name: err.name,
+        message: err.message,
+        stack: err.stack
+      } : err;
+      console.error('Error fetching notifications:', errorDetails);
       setError('Failed to fetch notifications');
       return [];
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [user]);
 
   const markAsRead = useCallback(async (notificationId: string) => {
     try {
       setIsLoading(true);
       setError(null);
 
+      if (!user?.id) {
+        console.warn('markAsRead called without authenticated user');
+        setError('User not authenticated');
+        return false;
+      }
+
       const { error: updateError } = await supabase
         .from('notifications')
         .update({ read_at: new Date().toISOString() })
-        .eq('id', notificationId);
+        .eq('id', notificationId)
+        .eq('recipient_id', user.id)
+        .is('read_at', null);
 
       if (updateError) {
         console.error('Error marking notification as read:', updateError);
@@ -135,17 +166,26 @@ export function useNotifications() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [user]);
 
-  const markAllAsRead = async (userId: string) => {
+  const markAllAsRead = async (userId?: string) => {
     try {
       setIsLoading(true);
       setError(null);
 
+      // Use current user ID if not provided
+      const targetUserId = userId || user?.id;
+      
+      if (!targetUserId) {
+        console.warn('markAllAsRead called without valid userId and no authenticated user');
+        setError('User not authenticated');
+        return false;
+      }
+
       const { error: updateError } = await supabase
         .from('notifications')
         .update({ read_at: new Date().toISOString() })
-        .eq('recipient_id', userId)
+        .eq('recipient_id', targetUserId)
         .is('read_at', null);
 
       if (updateError) {
@@ -190,31 +230,57 @@ export function useNotifications() {
     }
   };
 
-  const getUnreadCount = useCallback(async (userId: string) => {
+  const getUnreadCount = useCallback(async (userId?: string) => {
     try {
-      // Validate userId
-      if (!userId) {
-        console.warn('getUnreadCount called without valid userId');
+      // Use current user ID if not provided
+      const targetUserId = userId || user?.id;
+      
+      if (!targetUserId) {
+        console.warn('getUnreadCount called without valid userId and no authenticated user');
+        return 0;
+      }
+
+      // Ensure we have an authenticated session
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        console.warn('getUnreadCount called without authenticated session');
         return 0;
       }
 
       const { count, error: countError } = await supabase
         .from('notifications')
         .select('*', { count: 'exact', head: true })
-        .eq('recipient_id', userId)
+        .eq('recipient_id', targetUserId)
         .is('read_at', null);
 
       if (countError) {
-        console.error('Error getting unread count:', countError);
+        // Handle RLS permission errors gracefully
+        if (countError.message.includes('permission denied') || countError.code === '42501') {
+          console.warn('Notifications table access denied - RLS policies need configuration');
+          return 0; // Return 0 instead of throwing error
+        }
+        
+        console.error('Error getting unread count:', {
+          message: countError.message || 'Unknown error',
+          code: countError.code || 'No code',
+          details: countError.details || 'No details',
+          hint: countError.hint || 'No hint',
+          userId: targetUserId
+        });
         return 0;
       }
 
       return count || 0;
     } catch (err) {
-      console.error('Error getting unread count:', err);
+      const errorDetails = err instanceof Error ? {
+        name: err.name,
+        message: err.message,
+        stack: err.stack
+      } : err;
+      console.error('Error getting unread count:', errorDetails);
       return 0;
     }
-  }, []);
+  }, [user]);
 
   // Helper functions for common notification types
   const notifyJobUpdate = async (userId: string, jobId: string, status: string, jobTitle: string) => {

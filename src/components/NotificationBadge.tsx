@@ -40,7 +40,7 @@ export default function NotificationBadge() {
     }
     
     try {
-      const count = await getUnreadCount(user.id);
+      const count = await getUnreadCount(); // Removed user.id parameter
       setUnreadCount(count);
     } catch (error) {
       console.error('Error fetching unread count:', {
@@ -50,7 +50,7 @@ export default function NotificationBadge() {
       });
       setUnreadCount(0);
     }
-  }, [user?.id]);
+  }, [user?.id, getUnreadCount]);
 
   const fetchRecentNotifications = useCallback(async () => {
     if (!user?.id) {
@@ -59,7 +59,7 @@ export default function NotificationBadge() {
     }
     
     try {
-      const notifications = await getNotifications(user.id, { limit: 5 });
+      const notifications = await getNotifications(undefined, { limit: 5 }); // Removed user.id parameter
       setRecentNotifications(notifications as Notification[]);
     } catch (error) {
       console.error('Error fetching notifications:', {
@@ -69,7 +69,7 @@ export default function NotificationBadge() {
       });
       setRecentNotifications([]);
     }
-  }, [user?.id]);
+  }, [user?.id, getNotifications]);
 
   useEffect(() => {
     if (user?.id) {
@@ -105,7 +105,7 @@ export default function NotificationBadge() {
   }, [user, fetchUnreadCount, fetchRecentNotifications]);
 
   const handleNotificationClick = async (notificationId: string) => {
-    await markAsRead(notificationId);
+    await markAsRead(notificationId); // Removed user ID parameter
     await fetchUnreadCount();
     await fetchRecentNotifications();
   };

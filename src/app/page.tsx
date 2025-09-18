@@ -32,8 +32,10 @@ export default function Home() {
   const { user } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     // Only run on client side
     if (typeof window !== "undefined") {
       const handleScroll = () => {
@@ -43,6 +45,17 @@ export default function Home() {
       return () => window.removeEventListener("scroll", handleScroll);
     }
   }, []);
+
+  // Prevent hydration mismatch by not rendering dynamic content until mounted
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-white via-red-50 to-yellow-50">
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-red-600"></div>
+        </div>
+      </div>
+    );
+  }
 
   const services = [
     {
