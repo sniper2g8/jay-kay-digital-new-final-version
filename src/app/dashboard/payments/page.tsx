@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -41,6 +42,7 @@ interface PaymentStats {
 }
 
 export default function PaymentsPage() {
+  const router = useRouter();
   const [payments, setPayments] = useState<Payment[]>([]);
   const [stats, setStats] = useState<PaymentStats>({
     totalReceived: 0,
@@ -222,12 +224,21 @@ export default function PaymentsPage() {
             <p className="text-gray-600 mt-1">Track and manage all payments and transactions</p>
           </div>
         </div>
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Record Payment
-            </Button>
+        <div className="flex items-center space-x-3">
+          <Button
+            variant="outline"
+            onClick={() => router.push("/dashboard/payments/invoices")}
+            className="flex items-center space-x-2"
+          >
+            <FileText className="h-4 w-4" />
+            <span>Invoice Management</span>
+          </Button>
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Record Payment
+              </Button>
           </DialogTrigger>
           <DialogContent className="max-w-md">
             <DialogHeader>
@@ -341,6 +352,7 @@ export default function PaymentsPage() {
             </div>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       {/* Payment Statistics Cards */}

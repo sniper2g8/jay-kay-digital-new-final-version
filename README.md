@@ -20,6 +20,29 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Invoice Management System
+
+This project includes a professional invoice management system with the following features:
+
+- Simplified, professional invoice templates
+- Comprehensive invoice creation and management interface
+- PDF generation and printing capabilities
+- Real-time calculation of totals
+- Tax and discount handling
+
+### Key Components
+
+- `SimplifiedInvoiceTemplate` - Clean, professional invoice design
+- `InvoiceManagement` - Full-featured invoice creation interface
+- `ProfessionalInvoicePDF` - PDF generation and print functionality
+
+### Accessing the Invoice System
+
+- `/invoice` - Main invoice management page
+- `/invoice/dashboard` - Invoice dashboard
+- `/invoice/demo` - Demo of the invoice template
+- `/invoice/template` - Invoice template preview
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

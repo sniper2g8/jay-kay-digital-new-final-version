@@ -25,33 +25,36 @@ interface Customer {
   country?: string;
 }
 
-interface InvoiceTemplateProps {
-  invoice: {
-    id: string;
-    invoiceNo?: string;
-    created_at: string;
-    invoice_date?: string;
-    invoice_status?: string;
-    payment_status?: string;
-    terms_days?: number;
-    notes?: string;
-    subtotal?: number;
-    tax?: number;
-    tax_rate?: number;
-    discount?: number;
-    total?: number;
-    amountPaid?: number;
-    currency?: string;
-  };
+interface InvoiceData {
+  id: string;
+  invoiceNo?: string;
+  created_at: string;
+  invoice_date?: string;
+  invoice_status?: string;
+  payment_status?: string;
+  terms_days?: number;
+  notes?: string;
+  subtotal?: number;
+  tax?: number;
+  tax_rate?: number;
+  discount?: number;
+  total?: number;
+  amountPaid?: number;
+  currency?: string;
+}
+
+interface SimplifiedInvoiceTemplateProps {
+  invoice: InvoiceData;
   customer?: Customer;
   items: InvoiceItem[];
 }
 
-export function InvoiceTemplate({ 
+export function SimplifiedInvoiceTemplate({ 
   invoice, 
   customer, 
   items
-}: InvoiceTemplateProps) {
+}: SimplifiedInvoiceTemplateProps) {
+  // Calculate totals
   const subtotal = invoice.subtotal || items.reduce((sum, item) => sum + item.total_price, 0);
   const taxRate = invoice.tax_rate || 0;
   const tax = invoice.tax || (subtotal * taxRate / 100);
@@ -61,7 +64,7 @@ export function InvoiceTemplate({
   const amountDue = total - amountPaid;
   const currency = invoice.currency || 'SLL';
 
-  // Calculate due date
+  // Calculate dates
   const invoiceDate = invoice.invoice_date ? new Date(invoice.invoice_date) : new Date(invoice.created_at);
   const dueDate = new Date(invoiceDate);
   dueDate.setDate(dueDate.getDate() + (invoice.terms_days || 30));
