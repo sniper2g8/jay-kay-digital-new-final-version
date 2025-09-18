@@ -45,48 +45,40 @@ export const useJobSubmission = () => {
       // Generate formatted job number with human-readable format
       const jobNumber = `JKDP-JOB-${String(nextJobNumber).padStart(4, "0")}`;
       
-      // Prepare specifications with all details including finishing options
-      const specifications = {
-        requirements: formData.requirements,
-        special_instructions: formData.special_instructions,
-        unit_price: formData.unit_price,
-        size:
-          formData.size_type === "standard"
-            ? { type: "standard", preset: formData.size_preset }
-            : {
-                type: "custom",
-                width: formData.custom_width,
-                height: formData.custom_height,
-                unit: formData.custom_unit,
-              },
-        paper: {
-          type: formData.paper_type,
-          weight: formData.paper_weight,
-        },
-        // Store finishing options in specifications (proper place according to DB schema)
-        finishing: {
-          selected_finish_ids: formData.finishing_options || [],
-          finish_prices: finishingOptionPrices || {},
-          total_finishing_cost: Object.values(finishingOptionPrices || {}).reduce((sum, price) => sum + price, 0),
-        },
-      };
+      // Get customer and service names for display
+      const { data: customer } = await supabase
+        .from("customers")
+        .select("business_name")
+        .eq("id", formData.customer_id)
+        .single();
+        
+      const { data: service } = await supabase
+        .from("services")
+        .select("title")
+        .eq("id", formData.service_id)
+        .single();
 
-      // Create job record matching the actual database schema
-      const jobData = {
+      // Create job record matching the ACTUAL database schema
+      const jobData: any = {
         id: jobId || crypto.randomUUID(),
         jobNo: jobNumber,
         customer_id: formData.customer_id,
         service_id: formData.service_id,
+        customerName: customer?.business_name || null,
+        serviceName: service?.title || null,
         title: formData.title,
         description: formData.description || null,
         status: "pending",
         priority: formData.priority,
         quantity: formData.quantity,
-        estimated_cost: estimatedPrice,
+        estimate_price: estimatedPrice, // Use correct column name
         estimated_delivery: formData.due_date || null,
-        specifications: specifications,
+        unit_price: formData.unit_price || null,
+        job_type: "other", // Default value
         submittedDate: new Date().toISOString(),
         createdBy: user?.id || null,
+        // Note: specifications column doesn't exist in the actual schema
+        // We'll need to store specifications data differently if needed
       };
 
       const { data: job, error: jobError } = await supabase
@@ -112,6 +104,8 @@ export const useJobSubmission = () => {
           userMessage = "A job with this information already exists.";
         } else if (jobError.message.includes("foreign key")) {
           userMessage = "Invalid customer or service selected.";
+        } else if (jobError.message.includes("schema cache")) {
+          userMessage = "Database schema mismatch. Please contact support.";
         }
 
         throw new Error(userMessage);
@@ -119,9 +113,14 @@ export const useJobSubmission = () => {
 
       // Attach files if any were uploaded
       if (uploadedFileRecords.length > 0) {
+        const fileAttachments = uploadedFileRecords.map(file => ({
+          ...file,
+          job_id: job.id
+        }));
+        
         const { error: filesError } = await supabase
           .from("file_attachments")
-          .insert(uploadedFileRecords);
+          .insert(fileAttachments);
 
         if (filesError) {
           console.error("File attachment error:", filesError);
@@ -149,7 +148,6 @@ export const useJobSubmission = () => {
         if (err.message.includes("permission denied")) {
           errorMessage =
             "Database permissions need to be configured. Please contact support.";
-          
         } else if (err.message.includes("Network request failed")) {
           errorMessage = "Network error. Please check your connection.";
         } else if (err.message.includes("duplicate")) {

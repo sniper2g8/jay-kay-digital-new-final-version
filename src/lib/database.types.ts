@@ -102,9 +102,9 @@ export interface Database {
       };
       jobs: {
         Row: {
+          // Core fields
           id: string;
-          job_number: string; // JKDP-JOB-2024-001 format
-          human_id: string; // FK to customers.human_id
+          jobNo: string; // JKDP-JOB-0001 format (was job_number)
           title: string;
           description?: string;
           status:
@@ -115,19 +115,45 @@ export interface Database {
             | "cancelled"
             | "on_hold"
             | "quote_sent";
-          priority: "low" | "medium" | "high" | "urgent";
+          priority: "low" | "normal" | "high" | "urgent";
           quantity?: number;
+          submittedDate: string;
+          createdBy?: string;
+          
+          // References
+          customer_id: string;
+          service_id: string;
+          invoice_id?: string;
+          
+          // Display fields
+          customerName?: string;
+          serviceName?: string;
+          invoiceNo?: string;
+          
+          // Pricing
           unit_price?: number;
-          total_amount?: number;
-          order_date?: string;
-          due_date?: string;
+          estimate_price?: number; // Was estimated_cost
+          final_price?: number;
+          
+          // Dates
+          estimated_delivery?: string;
+          actual_delivery?: string;
+          
+          // Assignment
           assigned_to?: string;
-          print_method?: string;
-          paper_type?: string;
-          finishing?: string;
-          requirements?: string;
+          
+          // Type
+          job_type?: "other" | "business_cards" | "flyers" | "banners" | "books" | "brochures" | "letterheads" | "calendars" | "stickers" | "certificates";
+          
+          // Metadata
           created_at: string;
           updated_at: string;
+          
+          // Additional fields
+          qr_code?: string;
+          tracking_url?: string;
+          __open?: boolean;
+          invoiced?: boolean;
         };
       };
       roles: {
@@ -166,13 +192,21 @@ export interface Database {
       services: {
         Row: {
           id: string;
-          name: string;
+          title: string; // Was name
           description?: string;
           base_price?: number;
           category?: string;
           is_active: boolean;
           created_at: string;
           updated_at: string;
+          specSchema?: string;
+          active?: boolean;
+          slug?: string;
+          imageUrl?: string;
+          createdAt?: string;
+          options?: string;
+          sortOrder?: number;
+          isPopular?: boolean;
         };
       };
       inventory: {

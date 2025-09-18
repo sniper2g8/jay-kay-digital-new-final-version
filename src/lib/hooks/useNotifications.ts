@@ -108,25 +108,30 @@ export function useNotifications() {
           return []; // Return empty array instead of throwing error
         }
         
-        console.error('Error fetching notifications:', {
-          message: fetchError.message || 'Unknown error',
-          code: fetchError.code || 'No code',
-          details: fetchError.details || 'No details',
-          hint: fetchError.hint || 'No hint',
-          userId: targetUserId
-        });
+        // Only log meaningful error information
+        const errorInfo = [];
+        if (fetchError.message) errorInfo.push(`message: ${fetchError.message}`);
+        if (fetchError.code) errorInfo.push(`code: ${fetchError.code}`);
+        if (fetchError.details) errorInfo.push(`details: ${fetchError.details}`);
+        if (fetchError.hint) errorInfo.push(`hint: ${fetchError.hint}`);
+        
+        if (errorInfo.length > 0) {
+          console.error('Error fetching notifications:', errorInfo.join(', '));
+        } else {
+          console.error('Error fetching notifications: Unknown database error');
+        }
         setError('Failed to fetch notifications');
         return [];
       }
 
       return data || [];
     } catch (err) {
-      const errorDetails = err instanceof Error ? {
-        name: err.name,
-        message: err.message,
-        stack: err.stack
-      } : err;
-      console.error('Error fetching notifications:', errorDetails);
+      // Only log meaningful error information
+      if (err instanceof Error && err.message) {
+        console.error('Error fetching notifications:', err.message);
+      } else {
+        console.error('Error fetching notifications: Unknown error occurred');
+      }
       setError('Failed to fetch notifications');
       return [];
     } finally {
@@ -260,24 +265,29 @@ export function useNotifications() {
           return 0; // Return 0 instead of throwing error
         }
         
-        console.error('Error getting unread count:', {
-          message: countError.message || 'Unknown error',
-          code: countError.code || 'No code',
-          details: countError.details || 'No details',
-          hint: countError.hint || 'No hint',
-          userId: targetUserId
-        });
+        // Only log meaningful error information
+        const errorInfo = [];
+        if (countError.message) errorInfo.push(`message: ${countError.message}`);
+        if (countError.code) errorInfo.push(`code: ${countError.code}`);
+        if (countError.details) errorInfo.push(`details: ${countError.details}`);
+        if (countError.hint) errorInfo.push(`hint: ${countError.hint}`);
+        
+        if (errorInfo.length > 0) {
+          console.error('Error getting unread count:', errorInfo.join(', '));
+        } else {
+          console.error('Error getting unread count: Unknown database error');
+        }
         return 0;
       }
 
       return count || 0;
     } catch (err) {
-      const errorDetails = err instanceof Error ? {
-        name: err.name,
-        message: err.message,
-        stack: err.stack
-      } : err;
-      console.error('Error getting unread count:', errorDetails);
+      // Only log meaningful error information
+      if (err instanceof Error && err.message) {
+        console.error('Error getting unread count:', err.message);
+      } else {
+        console.error('Error getting unread count: Unknown error occurred');
+      }
       return 0;
     }
   }, [user]);

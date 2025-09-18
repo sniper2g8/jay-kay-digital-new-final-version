@@ -29,50 +29,76 @@ interface Notification {
 export default function NotificationBadge() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [recentNotifications, setRecentNotifications] = useState<Notification[]>([]);
+  const [isNotificationEnabled, setIsNotificationEnabled] = useState(false);
   const { user } = useAuth();
   const { getUnreadCount, getNotifications, markAsRead } = useNotifications();
   const router = useRouter();
 
+  // Check if notifications are enabled in environment
+  const notificationsEnabled = process.env.NEXT_PUBLIC_ENABLE_NOTIFICATIONS !== 'false';
+
   const fetchUnreadCount = useCallback(async () => {
-    if (!user?.id) {
+    if (!user?.id || !isNotificationEnabled || !notificationsEnabled) {
       setUnreadCount(0);
       return;
     }
     
     try {
-      const count = await getUnreadCount(); // Removed user.id parameter
+      const count = await getUnreadCount();
       setUnreadCount(count);
     } catch (error) {
-      console.error('Error fetching unread count:', {
-        message: error instanceof Error ? error.message : 'Unknown error',
-        userId: user?.id,
-        error: error
-      });
+      // Silently handle errors - don't log to console to avoid spam
       setUnreadCount(0);
     }
-  }, [user?.id, getUnreadCount]);
+  }, [user?.id, getUnreadCount, isNotificationEnabled, notificationsEnabled]);
 
   const fetchRecentNotifications = useCallback(async () => {
-    if (!user?.id) {
+    if (!user?.id || !isNotificationEnabled || !notificationsEnabled) {
       setRecentNotifications([]);
       return;
     }
     
     try {
-      const notifications = await getNotifications(undefined, { limit: 5 }); // Removed user.id parameter
+      const notifications = await getNotifications(undefined, { limit: 5 });
       setRecentNotifications(notifications as Notification[]);
     } catch (error) {
-      console.error('Error fetching notifications:', {
-        message: error instanceof Error ? error.message : 'Unknown error',
-        userId: user?.id,
-        error: error
-      });
+      // Silently handle errors - don't log to console to avoid spam
       setRecentNotifications([]);
     }
-  }, [user?.id, getNotifications]);
+  }, [user?.id, getNotifications, isNotificationEnabled, notificationsEnabled]);
+
+  // Check if notifications table is accessible
+  const checkNotificationAccess = useCallback(async () => {
+    if (!user?.id || !notificationsEnabled) {
+      setIsNotificationEnabled(false);
+      return;
+    }
+
+    try {
+      // Try a simple count query to check if we have access
+      await getUnreadCount();
+      setIsNotificationEnabled(true);
+    } catch (error) {
+      // If we get an error, disable notifications
+      setIsNotificationEnabled(false);
+    }
+  }, [user?.id, getUnreadCount, notificationsEnabled]);
 
   useEffect(() => {
-    if (user?.id) {
+    if (user?.id && notificationsEnabled) {
+      // First check if we have access to notifications
+      checkNotificationAccess();
+    } else {
+      // Reset state when user is not available or notifications disabled
+      setUnreadCount(0);
+      setRecentNotifications([]);
+      setIsNotificationEnabled(false);
+    }
+  }, [user?.id, notificationsEnabled, checkNotificationAccess]);
+
+  useEffect(() => {
+    if (isNotificationEnabled && user?.id) {
+      // Only fetch data if notifications are enabled and accessible
       fetchUnreadCount();
       fetchRecentNotifications();
       
@@ -97,15 +123,13 @@ export default function NotificationBadge() {
       return () => {
         supabase.removeChannel(channel);
       };
-    } else {
-      // Reset state when user is not available
-      setUnreadCount(0);
-      setRecentNotifications([]);
     }
-  }, [user, fetchUnreadCount, fetchRecentNotifications]);
+  }, [isNotificationEnabled, user?.id, fetchUnreadCount, fetchRecentNotifications]);
 
   const handleNotificationClick = async (notificationId: string) => {
-    await markAsRead(notificationId); // Removed user ID parameter
+    if (!isNotificationEnabled) return;
+    
+    await markAsRead(notificationId);
     await fetchUnreadCount();
     await fetchRecentNotifications();
   };
@@ -134,6 +158,11 @@ export default function NotificationBadge() {
     if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
     return `${Math.floor(diffInMinutes / 1440)}d ago`;
   };
+
+  // Don't render notification badge if notifications are disabled or not accessible
+  if (!notificationsEnabled || !isNotificationEnabled) {
+    return null;
+  }
 
   return (
     <DropdownMenu>
