@@ -271,160 +271,6 @@ export default function JobDetailPage() {
                       </p>
                     </div>
                   </div>
-
-                  {job.specifications && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-700">
-                        Specifications
-                      </label>
-                      <div className="bg-gray-50 rounded-md p-4 mt-1 space-y-3">
-                        {(() => {
-                          const specs =
-                            typeof job.specifications === "string"
-                              ? JSON.parse(job.specifications)
-                              : job.specifications;
-
-                          return (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              {specs.requirements && (
-                                <div>
-                                  <h4 className="font-medium text-gray-900 mb-1">
-                                    Requirements
-                                  </h4>
-                                  <p className="text-sm text-gray-700">
-                                    {specs.requirements}
-                                  </p>
-                                </div>
-                              )}
-
-                              {specs.special_instructions && (
-                                <div>
-                                  <h4 className="font-medium text-gray-900 mb-1">
-                                    Special Instructions
-                                  </h4>
-                                  <p className="text-sm text-gray-700">
-                                    {specs.special_instructions}
-                                  </p>
-                                </div>
-                              )}
-
-                              {specs.size && (
-                                <div>
-                                  <h4 className="font-medium text-gray-900 mb-1">
-                                    Size
-                                  </h4>
-                                  <p className="text-sm text-gray-700">
-                                    {specs.size.type === "standard"
-                                      ? `Standard: ${specs.size.preset}`
-                                      : `Custom: ${specs.size.width} × ${specs.size.height} ${specs.size.unit}`}
-                                  </p>
-                                </div>
-                              )}
-
-                              {specs.paper && (
-                                <div>
-                                  <h4 className="font-medium text-gray-900 mb-1">
-                                    Paper
-                                  </h4>
-                                  <p className="text-sm text-gray-700">
-                                    {specs.paper.type} - {specs.paper.weight}
-                                  </p>
-                                </div>
-                              )}
-
-                              {specs.finishing_options &&
-                                specs.finishing_options.length > 0 && (
-                                  <div>
-                                    <h4 className="font-medium text-gray-900 mb-2">
-                                      Finishing Options
-                                    </h4>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                      {specs.finishing_options.map(
-                                        (
-                                          option:
-                                            | string
-                                            | {
-                                                id?: string;
-                                                name?: string;
-                                                category?: string;
-                                                description?: string;
-                                              },
-                                          index: number,
-                                        ) => {
-                                          const optionName =
-                                            typeof option === "string"
-                                              ? option
-                                              : option.name || option.id;
-                                          const optionCategory =
-                                            typeof option === "object"
-                                              ? option.category
-                                              : null;
-                                          const optionDescription =
-                                            typeof option === "object"
-                                              ? option.description
-                                              : null;
-
-                                          return (
-                                            <div
-                                              key={index}
-                                              className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-3 hover:shadow-md transition-all duration-200"
-                                            >
-                                              <div className="flex items-start justify-between">
-                                                <div className="flex-1">
-                                                  <span className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium mb-1">
-                                                    {optionName}
-                                                  </span>
-                                                  {optionCategory && (
-                                                    <p className="text-xs text-gray-600 capitalize mb-1">
-                                                      Category:{" "}
-                                                      {optionCategory.replace(
-                                                        "_",
-                                                        " ",
-                                                      )}
-                                                    </p>
-                                                  )}
-                                                  {optionDescription && (
-                                                    <p className="text-xs text-gray-700">
-                                                      {optionDescription}
-                                                    </p>
-                                                  )}
-                                                </div>
-                                                <div className="flex-shrink-0 ml-2">
-                                                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                                                </div>
-                                              </div>
-                                            </div>
-                                          );
-                                        },
-                                      )}
-                                    </div>
-                                    <div className="mt-2 text-xs text-gray-500">
-                                      {specs.finishing_options.length} finishing
-                                      option
-                                      {specs.finishing_options.length !== 1
-                                        ? "s"
-                                        : ""}{" "}
-                                      selected
-                                    </div>
-                                  </div>
-                                )}
-
-                              {specs.unit_price && (
-                                <div>
-                                  <h4 className="font-medium text-gray-900 mb-1">
-                                    Unit Price
-                                  </h4>
-                                  <p className="text-sm text-gray-700">
-                                    ${specs.unit_price}
-                                  </p>
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })()}
-                      </div>
-                    </div>
-                  )}
                 </CardContent>
               </Card>
 
@@ -493,16 +339,16 @@ export default function JobDetailPage() {
                   )}
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">
-                      Estimated Cost
+                      Estimated Price
                     </span>
                     <span className="font-medium">
-                      SLL {(job.estimated_cost || 0).toLocaleString()}
+                      SLL {(job.estimate_price || 0).toLocaleString()}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Final Cost</span>
+                    <span className="text-sm text-gray-600">Final Price</span>
                     <span className="font-medium">
-                      SLL {(job.final_cost || 0).toLocaleString()}
+                      SLL {(job.final_price || 0).toLocaleString()}
                     </span>
                   </div>
                   <div className="flex justify-between pt-2 border-t">
@@ -511,7 +357,7 @@ export default function JobDetailPage() {
                       SLL{" "}
                       {(
                         job.unit_price ||
-                        (job.final_cost || 0) / (job.quantity || 1)
+                        (job.final_price || 0) / (job.quantity || 1)
                       ).toFixed(2)}
                     </span>
                   </div>

@@ -63,9 +63,8 @@ export default function EditJobPage() {
     priority: "medium",
     quantity: 0,
     unit_price: 0,
+    final_price: 0,
     estimate_price: 0,
-    estimated_cost: 0,
-    final_cost: 0,
     estimated_delivery: "",
     actual_delivery: "",
     assigned_to: "",
@@ -82,9 +81,8 @@ export default function EditJobPage() {
         priority: job.priority || "medium",
         quantity: job.quantity || 0,
         unit_price: job.unit_price || 0,
+        final_price: job.final_price || 0,
         estimate_price: job.estimate_price || 0,
-        estimated_cost: job.estimated_cost || 0,
-        final_cost: job.final_cost || 0,
         estimated_delivery: job.estimated_delivery
           ? job.estimated_delivery.split("T")[0]
           : "",
@@ -92,13 +90,7 @@ export default function EditJobPage() {
           ? job.actual_delivery.split("T")[0]
           : "",
         assigned_to: job.assigned_to || "",
-        special_instructions:
-          typeof job.specifications === "object" && job.specifications !== null
-            ? (job.specifications as { special_instructions?: string })
-                ?.special_instructions || ""
-            : typeof job.specifications === "string"
-              ? job.specifications
-              : "",
+        special_instructions: "",
       });
     }
   }, [job]);
@@ -225,15 +217,6 @@ export default function EditJobPage() {
     setIsSubmitting(true);
 
     try {
-      // Prepare specifications
-      const specifications = {
-        special_instructions: formData.special_instructions,
-        // Preserve existing specifications if they exist
-        ...(job?.specifications && typeof job.specifications === "object"
-          ? job.specifications
-          : {}),
-      };
-
       if (!job) {
         throw new Error("Job data not available");
       }
@@ -247,13 +230,11 @@ export default function EditJobPage() {
           priority: formData.priority as "low" | "normal" | "high" | "urgent",
           quantity: formData.quantity,
           unit_price: formData.unit_price,
+          final_price: formData.final_price,
           estimate_price: formData.estimate_price,
-          estimated_cost: formData.estimated_cost,
-          final_cost: formData.final_cost,
           estimated_delivery: formData.estimated_delivery || null,
           actual_delivery: formData.actual_delivery || null,
           assigned_to: formData.assigned_to || null,
-          specifications: specifications,
           updated_at: new Date().toISOString(),
         })
         .eq("id", job.id);
@@ -571,15 +552,15 @@ export default function EditJobPage() {
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="estimated_cost">Estimated Cost</Label>
+                      <Label htmlFor="estimate_price">Estimate Price</Label>
                       <Input
-                        id="estimated_cost"
+                        id="estimate_price"
                         type="number"
                         step="0.01"
-                        value={formData.estimated_cost}
+                        value={formData.estimate_price}
                         onChange={(e) =>
                           handleInputChange(
-                            "estimated_cost",
+                            "estimate_price",
                             parseFloat(e.target.value) || 0,
                           )
                         }
@@ -588,15 +569,15 @@ export default function EditJobPage() {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="final_cost">Final Cost</Label>
+                      <Label htmlFor="final_price">Final Price</Label>
                       <Input
-                        id="final_cost"
+                        id="final_price"
                         type="number"
                         step="0.01"
-                        value={formData.final_cost}
+                        value={formData.final_price}
                         onChange={(e) =>
                           handleInputChange(
-                            "final_cost",
+                            "final_price",
                             parseFloat(e.target.value) || 0,
                           )
                         }
@@ -682,101 +663,13 @@ export default function EditJobPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {(() => {
-                      try {
-                        const specs =
-                          typeof job?.specifications === "string"
-                            ? JSON.parse(job.specifications)
-                            : job?.specifications || {};
-
-                        if (
-                          specs.finishing_options &&
-                          specs.finishing_options.length > 0
-                        ) {
-                          return (
-                            <>
-                              <Label>Selected Finishing Options</Label>
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                {specs.finishing_options.map(
-                                  (
-                                    option:
-                                      | string
-                                      | {
-                                          id?: string;
-                                          name?: string;
-                                          category?: string;
-                                        },
-                                    index: number,
-                                  ) => {
-                                    const optionName =
-                                      typeof option === "string"
-                                        ? option
-                                        : option.name || option.id;
-                                    const optionCategory =
-                                      typeof option === "object"
-                                        ? option.category
-                                        : null;
-
-                                    return (
-                                      <div
-                                        key={index}
-                                        className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-3"
-                                      >
-                                        <div className="flex items-center justify-between">
-                                          <div>
-                                            <span className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
-                                              {optionName}
-                                            </span>
-                                            {optionCategory && (
-                                              <p className="text-xs text-gray-600 capitalize mt-1">
-                                                Category:{" "}
-                                                {optionCategory.replace(
-                                                  "_",
-                                                  " ",
-                                                )}
-                                              </p>
-                                            )}
-                                          </div>
-                                          <div className="w-2 h-2 bg-green-400 rounded-full flex-shrink-0"></div>
-                                        </div>
-                                      </div>
-                                    );
-                                  },
-                                )}
-                              </div>
-                              <p className="text-xs text-gray-500">
-                                {specs.finishing_options.length} finishing
-                                option
-                                {specs.finishing_options.length !== 1
-                                  ? "s"
-                                  : ""}{" "}
-                                applied
-                              </p>
-                            </>
-                          );
-                        } else {
-                          return (
-                            <div className="text-center py-4 text-gray-500">
-                              <FileText className="h-8 w-8 mx-auto mb-2 text-gray-300" />
-                              <p>No finishing options specified for this job</p>
-                              <p className="text-xs mt-1">
-                                Finishing options are set during job submission
-                              </p>
-                            </div>
-                          );
-                        }
-                      } catch {
-                        return (
-                          <div className="text-center py-4 text-gray-500">
-                            <AlertTriangle className="h-8 w-8 mx-auto mb-2 text-yellow-500" />
-                            <p>Unable to load finishing options</p>
-                            <p className="text-xs mt-1">
-                              Specifications data may be corrupted
-                            </p>
-                          </div>
-                        );
-                      }
-                    })()}
+                    <div className="text-center py-4 text-gray-500">
+                      <FileText className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                      <p>No finishing options available</p>
+                      <p className="text-xs mt-1">
+                        Finishing options are set during job creation
+                      </p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

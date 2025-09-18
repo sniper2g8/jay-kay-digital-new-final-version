@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import {
@@ -58,6 +58,14 @@ interface Customer {
   city: string | null;
   state: string | null;
   zip_code: string | null;
+}
+
+interface StatusConfig {
+  label: string;
+  color: string;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  progress: number;
+  description?: string;
 }
 
 const statusConfig = {
@@ -128,11 +136,13 @@ export default function JobTrackingPage() {
         setError(null);
 
         // First try to fetch by job ID
-        let { data: jobData, error: jobError } = await supabase
+        const { data: jobData, error: jobError } = await supabase
           .from("jobs")
           .select("*")
           .eq("id", jobId)
           .single();
+
+        let finalJobData = jobData;
 
         // If not found by ID, try by job number
         if (jobError && jobError.code === "PGRST116") {
@@ -145,19 +155,17 @@ export default function JobTrackingPage() {
           if (jobByNumberError) {
             throw new Error("Job not found");
           }
-          jobData = jobByNumber;
+          finalJobData = jobByNumber;
         } else if (jobError) {
           throw jobError;
         }
 
-        setJob(jobData);
-
         // Fetch customer details if customer_id exists
-        if (jobData?.customer_id) {
+        if (finalJobData?.customer_id) {
           const { data: customerData, error: customerError } = await supabase
             .from("customers")
             .select("*")
-            .eq("id", jobData.customer_id)
+            .eq("id", finalJobData.customer_id)
             .single();
 
           if (customerError) {
@@ -179,7 +187,7 @@ export default function JobTrackingPage() {
     }
   }, [jobId]);
 
-  const getStatusConfig = (status: string | null) => {
+  const getStatusConfig = (status: string | null): StatusConfig => {
     if (!status) return statusConfig.pending;
     return statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
   };
