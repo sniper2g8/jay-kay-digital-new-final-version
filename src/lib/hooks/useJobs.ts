@@ -124,6 +124,44 @@ const fetchJobsWithCustomers = async (): Promise<JobWithCustomer[]> => {
   return jobsWithCustomers as JobWithCustomer[];
 };
 
+// Fetcher for specific job by ID
+const fetchJobById = async (
+  jobId: string,
+): Promise<JobWithCustomer> => {
+  const { data: job, error: jobError } = await supabase
+    .from("jobs")
+    .select("*")
+    .eq("id", jobId)
+    .single();
+
+  if (jobError) throw jobError;
+
+  // Get customer info
+  const { data: customer, error: customerError } = await supabase
+    .from("customers")
+    .select("business_name")
+    .eq("id", (job as unknown as Job).customer_id || "")
+    .single();
+
+  if (customerError) {
+    console.error("Customer fetch error:", customerError);
+    // Return job without customer name if customer not found
+    return {
+      ...(job as unknown as Job),
+      customer_name: "Unknown Customer",
+    } as JobWithCustomer;
+  }
+
+  interface CustomerNameData {
+    business_name: string;
+  }
+
+  return {
+    ...(job as unknown as Job),
+    customer_name: (customer as CustomerNameData)?.business_name || "Unknown Customer",
+  } as JobWithCustomer;
+};
+
 // Fetcher for specific job by job number
 const fetchJobByNumber = async (
   jobNumber: string,
@@ -275,10 +313,22 @@ export const useJobsWithCustomers = () => {
   return swrResult;
 };
 
-// Hook to get specific job by job number
-export const useJob = (jobNumber: string | null) => {
+// Hook to get specific job by ID
+export const useJob = (jobId: string | null) => {
   return useSWR(
-    jobNumber ? `job-${jobNumber}` : null,
+    jobId ? `job-${jobId}` : null,
+    () => (jobId ? fetchJobById(jobId) : null),
+    {
+      revalidateOnFocus: true,
+      errorRetryCount: 3,
+    },
+  );
+};
+
+// Hook to get specific job by job number
+export const useJobByNumber = (jobNumber: string | null) => {
+  return useSWR(
+    jobNumber ? `job-number-${jobNumber}` : null,
     () => (jobNumber ? fetchJobByNumber(jobNumber) : null),
     {
       revalidateOnFocus: true,

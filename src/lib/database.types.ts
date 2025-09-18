@@ -223,6 +223,82 @@ export interface Database {
           updated_at: string;
         };
       };
+      job_specifications: {
+        Row: {
+          id: string;
+          job_id: string;
+          size_type: string;
+          size_preset: string;
+          custom_width: number;
+          custom_height: number;
+          size_unit: string;
+          paper_type: string;
+          paper_weight: number;
+          finishing_options: any;
+          special_instructions: string;
+          requirements: string;
+          created_at: string;
+          updated_at: string;
+        };
+      };
+      paper_sizes: {
+        Row: {
+          id: string;
+          name: string;
+          series: string;
+          width_mm: number;
+          height_mm: number;
+          width_inches: number;
+          height_inches: number;
+          category: string;
+          description: string;
+          common_uses: string[];
+          active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+      };
+      paper_weights: {
+        Row: {
+          id: string;
+          gsm: number;
+          name: string;
+          category: string;
+          description: string;
+          common_uses: string[];
+          thickness_mm: number;
+          opacity_percent: number;
+          active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+      };
+      paper_types: {
+        Row: {
+          id: string;
+          name: string;
+          category: string;
+          description: string;
+          finish: string;
+          grain_direction: string;
+          compatible_weights: number[];
+          common_uses: string[];
+          active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+      };
+      finish_options: {
+        Row: {
+          id: string;
+          name: string;
+          category: string;
+          pricing: any;
+          parameters: any;
+          appliesTo: any;
+          active: boolean;
+        };
+      };
     };
     Views: {
       unified_user_roles: {
@@ -252,3 +328,8 @@ export type Permission = Database["public"]["Tables"]["permissions"]["Row"];
 export type UserRole = Database["public"]["Tables"]["user_roles"]["Row"];
 export type Service = Database["public"]["Tables"]["services"]["Row"];
 export type Inventory = Database["public"]["Tables"]["inventory"]["Row"];
+export type JobSpecification = Database["public"]["Tables"]["job_specifications"]["Row"];
+export type PaperSize = Database["public"]["Tables"]["paper_sizes"]["Row"];
+export type PaperWeight = Database["public"]["Tables"]["paper_weights"]["Row"];
+export type PaperType = Database["public"]["Tables"]["paper_types"]["Row"];
+export type FinishOption = Database["public"]["Tables"]["finish_options"]["Row"];

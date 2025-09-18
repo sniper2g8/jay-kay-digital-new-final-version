@@ -34,6 +34,7 @@
     "@types/jspdf": "^2.0.0",
     "@types/pg": "^8.15.5",
     "@types/qrcode": "^1.5.5",
+    "@types/uuid": "^11.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "crypto": "^1.0.1",

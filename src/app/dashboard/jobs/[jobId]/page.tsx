@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -29,20 +29,127 @@ import {
   Building,
   Loader2,
   ExternalLink,
+  Ruler,
+  File,
+  Scissors,
+  Info,
 } from "lucide-react";
-import { useJob } from "@/lib/hooks/useJobs";
+import { useJob, useJobByNumber } from "@/lib/hooks/useJobs";
 import DashboardLayout from "@/components/DashboardLayout";
 import { JobFilesViewer } from "@/components/JobFilesViewer";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { mutate } from "swr";
 
+// Define types for job with specifications
+interface JobWithSpecifications {
+  id: string;
+  jobNo: string | null;
+  customer_id: string | null;
+  customerName: string | null;
+  title: string | null;
+  description: string | null;
+  status: string | null;
+  priority: any | null;
+  quantity: number | null;
+  unit_price: number | null;
+  final_price: number | null;
+  estimate_price: number | null;
+  estimated_delivery: string | null;
+  actual_delivery: string | null;
+  assigned_to: string | null;
+  job_type: any | null;
+  service_id: string | null;
+  serviceName: string | null;
+  invoice_id: string | null;
+  invoiced: boolean | null;
+  invoiceNo: string | null;
+  qr_code: string | null;
+  tracking_url: string | null;
+  submittedDate: string | null;
+  __open: boolean | null;
+  created_at: string | null;
+  updated_at: string | null;
+  createdBy: string | null;
+  customer_name?: string;
+  // Specification fields
+  size_type?: string;
+  size_preset?: string;
+  custom_width?: number;
+  custom_height?: number;
+  size_unit?: string;
+  paper_type?: string;
+  paper_weight?: number;
+  finishing_options?: any;
+  special_instructions?: string;
+  requirements?: string;
+}
+
+// Function to check if a string is a valid UUID
+const isUUID = (str: string): boolean => {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(str);
+};
+
+// Function to check if a string is a job number format
+const isJobNumber = (str: string): boolean => {
+  // Job numbers follow the pattern JKDP-JOB-XXXX where XXXX is digits
+  const jobNoRegex = /^JKDP-JOB-\d{4}$/i;
+  return jobNoRegex.test(str);
+};
+
 export default function JobDetailPage() {
   const params = useParams();
   const router = useRouter();
   const jobId = params.jobId as string;
 
-  const { data: job, error: jobError, isLoading: jobLoading } = useJob(jobId);
+  // Determine if we're using UUID or jobNo
+  const isUUIDParam = isUUID(jobId);
+  const isJobNoParam = isJobNumber(jobId);
+  
+  // Use appropriate hook based on parameter type
+  const { data: jobByUUID, error: jobUUIDError, isLoading: jobUUIDLoading } = useJob(isUUIDParam ? jobId : null);
+  const { data: jobByNumber, error: jobNumberError, isLoading: jobNumberLoading } = useJobByNumber(isJobNoParam ? jobId : null);
+  
+  // Use the appropriate job data
+  const job = isUUIDParam ? jobByUUID : isJobNoParam ? jobByNumber : null;
+  const jobError = isUUIDParam ? jobUUIDError : isJobNoParam ? jobNumberError : null;
+  const jobLoading = isUUIDParam ? jobUUIDLoading : isJobNoParam ? jobNumberLoading : false;
+  
+  // Enhanced job with specifications
+  const [enhancedJob, setEnhancedJob] = useState<JobWithSpecifications | null>(null);
+  const [specsLoading, setSpecsLoading] = useState(false);
+
+  // Fetch job specifications from the jobs table
+  useEffect(() => {
+    if (!jobId || !job) return;
+    
+    const fetchJobSpecs = async () => {
+      setSpecsLoading(true);
+      
+      try {
+        // Since we've migrated the data to the jobs table, we can get it directly
+        // But we need to refresh the job data to get the new columns
+        const { data, error } = await supabase
+          .from("jobs")
+          .select("*")
+          .eq(isUUIDParam ? "id" : "jobNo", jobId)
+          .single();
+        
+        if (error) {
+          console.error("Error fetching job specs:", error);
+        } else {
+          setEnhancedJob(data as JobWithSpecifications);
+        }
+      } catch (error) {
+        console.error("Error fetching job specifications:", error);
+      } finally {
+        setSpecsLoading(false);
+      }
+    };
+    
+    fetchJobSpecs();
+  }, [jobId, job, isUUIDParam]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -72,7 +179,40 @@ export default function JobDetailPage() {
     }
   };
 
-  if (jobLoading) {
+  // Get selected finish options names
+  const getSelectedFinishOptions = () => {
+    if (!enhancedJob?.finishing_options) return [];
+    
+    // Parse the finishing options if it's a string
+    let finishingOptions = enhancedJob.finishing_options;
+    if (typeof finishingOptions === 'string') {
+      try {
+        finishingOptions = JSON.parse(finishingOptions);
+      } catch (e) {
+        console.error("Error parsing finishing options:", e);
+        return [];
+      }
+    }
+    
+    // If it's an object with selected_options property
+    if (finishingOptions.selected_options && Array.isArray(finishingOptions.selected_options)) {
+      return finishingOptions.selected_options;
+    }
+    
+    // If it's a simple array
+    if (Array.isArray(finishingOptions)) {
+      return finishingOptions;
+    }
+    
+    // If it's an object with keys as option IDs
+    if (typeof finishingOptions === 'object' && finishingOptions !== null) {
+      return Object.keys(finishingOptions);
+    }
+    
+    return [];
+  };
+
+  if (jobLoading || specsLoading) {
     return (
       <DashboardLayout>
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -157,7 +297,7 @@ export default function JobDetailPage() {
                           status: newStatus,
                           updated_at: new Date().toISOString(),
                         })
-                        .eq("id", job.id);
+                        .eq(isUUIDParam ? "id" : "jobNo", jobId);
 
                       if (error) {
                         console.error("Status update error:", error);
@@ -165,7 +305,11 @@ export default function JobDetailPage() {
                       } else {
                         toast.success("Status updated successfully");
                         // Refresh the job data
-                        mutate(`job-${jobId}`);
+                        if (isUUIDParam) {
+                          mutate(`job-${jobId}`);
+                        } else if (isJobNoParam) {
+                          mutate(`job-number-${jobId}`);
+                        }
                       }
                     } catch (error) {
                       console.error("Status update error:", error);
@@ -201,7 +345,7 @@ export default function JobDetailPage() {
                         const { error } = await supabase
                           .from("jobs")
                           .delete()
-                          .eq("id", job.id);
+                          .eq(isUUIDParam ? "id" : "jobNo", jobId);
 
                         if (error) {
                           console.error("Delete error:", error);
@@ -274,8 +418,124 @@ export default function JobDetailPage() {
                 </CardContent>
               </Card>
 
+              {/* Job Specifications */}
+              {(enhancedJob?.size_type || enhancedJob?.paper_type || enhancedJob?.finishing_options) && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <Info className="h-5 w-5 mr-2" />
+                      Specifications
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* Size Specifications */}
+                    {enhancedJob?.size_type && (
+                      <div>
+                        <h3 className="text-sm font-medium text-gray-700 mb-2 flex items-center">
+                          <Ruler className="h-4 w-4 mr-2" />
+                          Size
+                        </h3>
+                        <div className="grid grid-cols-2 gap-4 pl-6">
+                          <div>
+                            <label className="text-xs text-gray-500">Type</label>
+                            <p className="text-gray-900 font-medium capitalize">
+                              {enhancedJob.size_type || "N/A"}
+                            </p>
+                          </div>
+                          {enhancedJob.size_type === "standard" && enhancedJob.size_preset && (
+                            <div>
+                              <label className="text-xs text-gray-500">Preset</label>
+                              <p className="text-gray-900 font-medium">
+                                {enhancedJob.size_preset || "N/A"}
+                              </p>
+                            </div>
+                          )}
+                          {enhancedJob.size_type === "custom" && (
+                            <>
+                              <div>
+                                <label className="text-xs text-gray-500">Width</label>
+                                <p className="text-gray-900 font-medium">
+                                  {enhancedJob.custom_width} {enhancedJob.size_unit}
+                                </p>
+                              </div>
+                              <div>
+                                <label className="text-xs text-gray-500">Height</label>
+                                <p className="text-gray-900 font-medium">
+                                  {enhancedJob.custom_height} {enhancedJob.size_unit}
+                                </p>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Paper Specifications */}
+                    {(enhancedJob?.paper_type || enhancedJob?.paper_weight) && (
+                      <div>
+                        <h3 className="text-sm font-medium text-gray-700 mb-2 flex items-center">
+                          <File className="h-4 w-4 mr-2" />
+                          Paper
+                        </h3>
+                        <div className="grid grid-cols-2 gap-4 pl-6">
+                          <div>
+                            <label className="text-xs text-gray-500">Type</label>
+                            <p className="text-gray-900 font-medium">
+                              {enhancedJob.paper_type || "N/A"}
+                            </p>
+                          </div>
+                          <div>
+                            <label className="text-xs text-gray-500">Weight</label>
+                            <p className="text-gray-900 font-medium">
+                              {enhancedJob.paper_weight ? `${enhancedJob.paper_weight} GSM` : "N/A"}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Finishing Options */}
+                    {getSelectedFinishOptions().length > 0 && (
+                      <div>
+                        <h3 className="text-sm font-medium text-gray-700 mb-2 flex items-center">
+                          <Scissors className="h-4 w-4 mr-2" />
+                          Finishing Options
+                        </h3>
+                        <div className="flex flex-wrap gap-2 pl-6">
+                          {getSelectedFinishOptions().map((option: string, index: number) => (
+                            <Badge key={index} variant="secondary">
+                              {option}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Special Instructions */}
+                    {enhancedJob?.special_instructions && (
+                      <div>
+                        <label className="text-sm font-medium text-gray-700">
+                          Special Instructions
+                        </label>
+                        <p className="text-gray-900 mt-1">{enhancedJob.special_instructions}</p>
+                      </div>
+                    )}
+
+                    {/* Requirements */}
+                    {enhancedJob?.requirements && (
+                      <div>
+                        <label className="text-sm font-medium text-gray-700">
+                          Requirements
+                        </label>
+                        <p className="text-gray-900 mt-1">{enhancedJob.requirements}</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Files */}
-              <JobFilesViewer jobId={jobId} canDelete={true} />
+              <JobFilesViewer jobId={job.id} canDelete={true} />
             </div>
 
             {/* Sidebar */}

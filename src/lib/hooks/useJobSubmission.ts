@@ -113,9 +113,14 @@ export const useJobSubmission = () => {
 
       // Attach files if any were uploaded
       if (uploadedFileRecords.length > 0) {
+        // Fix the file attachment structure to match the actual database schema
         const fileAttachments = uploadedFileRecords.map(file => ({
           ...file,
-          job_id: job.id
+          entity_id: job.id,     // Use entity_id instead of job_id
+          entity_type: "job",    // Specify the entity type
+          // Don't set uploaded_by to avoid foreign key constraint issues
+          // The database will handle this or it can be null
+          created_at: new Date().toISOString(),
         }));
         
         const { error: filesError } = await supabase
