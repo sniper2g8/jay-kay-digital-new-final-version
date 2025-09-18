@@ -109,11 +109,11 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <Image
-                src="/logo-icon.svg"
+                src="/JK_Logo.jpg"
                 alt="Jay Kay Digital Press Logo"
                 width={40}
                 height={40}
-                className="h-10 w-10 object-contain"
+                className="h-10 w-10 object-cover rounded-md"
               />
               <div>
                 <h1 className="text-xl font-bold text-white">
@@ -534,11 +534,11 @@ export default function Home() {
             <div>
               <div className="flex items-center space-x-3 mb-4">
                 <Image
-                  src="/logo-icon.svg"
+                  src="/JK_Logo.jpg"
                   alt="Jay Kay Digital Press Logo"
                   width={32}
                   height={32}
-                  className="h-8 w-8 object-contain"
+                  className="h-8 w-8 object-cover rounded-md"
                 />
                 <div>
                   <p className="font-semibold">Jay Kay Digital Press</p>

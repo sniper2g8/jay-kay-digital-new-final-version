@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { LogOut, User, Settings } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { LogoVariants } from "@/components/Logo";
+import NotificationBadge from "@/components/NotificationBadge";
 
 export default function DashboardHeader() {
   const { user, signOut } = useAuth();
@@ -51,6 +52,8 @@ export default function DashboardHeader() {
         </div>
 
         <div className="flex items-center space-x-4">
+          <NotificationBadge />
+          
           <div className="text-right">
             <p className="text-sm font-medium text-gray-900">
               {getUserDisplayName()}

@@ -154,7 +154,14 @@ export function useStatementPeriods() {
 
       setData(periods || []);
     } catch (err) {
-      console.error("Error fetching statement periods:", err);
+      // Enhanced error logging for debugging
+      console.error("Error fetching statement periods:", {
+        error: err,
+        message: err instanceof Error ? err.message : "Unknown error",
+        stack: err instanceof Error ? err.stack : undefined,
+        errorType: typeof err,
+        errorDetails: JSON.stringify(err, null, 2)
+      });
       setError(
         err instanceof Error ? err.message : "Failed to load statement periods",
       );

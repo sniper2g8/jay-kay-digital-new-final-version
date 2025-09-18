@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
   Users,
   FileText,
@@ -24,6 +24,8 @@ import {
   Printer,
   LogOut,
   User,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { useUserRole, type UserRole } from "@/lib/hooks/useUserRole";
 import { useAuth } from "@/contexts/AuthContext";
@@ -183,6 +185,7 @@ export default function RoleBasedNav({ className }: RoleBasedNavProps) {
   const { signOut } = useAuth();
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   // Handle logout
   const handleLogout = async () => {
@@ -207,7 +210,7 @@ export default function RoleBasedNav({ className }: RoleBasedNavProps) {
     return item.roles.includes(userData.primary_role);
   });
 
-  const NavItems = ({ mobile = false }: { mobile?: boolean }) => (
+  const NavItems = ({ mobile = false, collapsed = false }: { mobile?: boolean; collapsed?: boolean }) => (
     <div className={`space-y-1 ${mobile ? "px-4" : ""} flex flex-col h-full`}>
       <div className="flex-1 space-y-1">
         {visibleItems.map((item) => {
@@ -215,25 +218,27 @@ export default function RoleBasedNav({ className }: RoleBasedNavProps) {
           const Icon = item.icon;
 
           return (
-            <Link key={item.href} href={item.href}>
+            <Link key={item.href} href={item.href} title={collapsed ? item.label : undefined}>
               <Button
                 variant={isActive ? "default" : "ghost"}
-                className={`w-full justify-start ${mobile ? "h-12" : "h-10"} ${
+                className={`w-full ${collapsed ? "justify-center px-2" : "justify-start"} ${mobile ? "h-12" : "h-10"} ${
                   isActive
                     ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
                     : "text-foreground hover:text-primary hover:bg-accent"
                 } transition-all duration-200`}
                 onClick={() => mobile && setIsMobileMenuOpen(false)}
               >
-                <Icon className={`${mobile ? "h-5 w-5" : "h-4 w-4"} mr-3`} />
-                <div className="flex flex-col items-start">
-                  <span className="font-medium">{item.label}</span>
-                  {mobile && item.description && (
-                    <span className="text-xs text-muted-foreground font-normal mt-0.5">
-                      {item.description}
-                    </span>
-                  )}
-                </div>
+                <Icon className={`${mobile ? "h-5 w-5" : "h-4 w-4"} ${collapsed ? "" : "mr-3"}`} />
+                {!collapsed && (
+                  <div className="flex flex-col items-start">
+                    <span className="font-medium">{item.label}</span>
+                    {mobile && item.description && (
+                      <span className="text-xs text-muted-foreground font-normal mt-0.5">
+                        {item.description}
+                      </span>
+                    )}
+                  </div>
+                )}
               </Button>
             </Link>
           );
@@ -245,34 +250,40 @@ export default function RoleBasedNav({ className }: RoleBasedNavProps) {
         {/* User Profile Button */}
         <Button
           variant="ghost"
-          className={`w-full justify-start ${mobile ? "h-12" : "h-10"} text-foreground hover:text-primary hover:bg-accent transition-all duration-200`}
+          className={`w-full ${collapsed ? "justify-center px-2" : "justify-start"} ${mobile ? "h-12" : "h-10"} text-white hover:text-white hover:bg-accent transition-all duration-200`}
+          title={collapsed ? "Profile" : undefined}
         >
-          <User className={`${mobile ? "h-5 w-5" : "h-4 w-4"} mr-3`} />
-          <div className="flex flex-col items-start">
-            <span className="font-medium">Profile</span>
-            {mobile && (
-              <span className="text-xs text-muted-foreground font-normal mt-0.5">
-                Account settings and preferences
-              </span>
-            )}
-          </div>
+          <User className={`${mobile ? "h-5 w-5" : "h-4 w-4"} ${collapsed ? "" : "mr-3"}`} />
+          {!collapsed && (
+            <div className="flex flex-col items-start">
+              <span className="font-medium">Profile</span>
+              {mobile && (
+                <span className="text-xs text-white/70 font-normal mt-0.5">
+                  Account settings and preferences
+                </span>
+              )}
+            </div>
+          )}
         </Button>
 
         {/* Logout Button */}
         <Button
           variant="ghost"
-          className={`w-full justify-start ${mobile ? "h-12" : "h-10"} text-destructive hover:text-destructive hover:bg-destructive/10 transition-all duration-200`}
+          className={`w-full ${collapsed ? "justify-center px-2" : "justify-start"} ${mobile ? "h-12" : "h-10"} text-destructive hover:text-destructive hover:bg-destructive/10 transition-all duration-200`}
           onClick={handleLogout}
+          title={collapsed ? "Sign Out" : undefined}
         >
-          <LogOut className={`${mobile ? "h-5 w-5" : "h-4 w-4"} mr-3`} />
-          <div className="flex flex-col items-start">
-            <span className="font-medium">Sign Out</span>
-            {mobile && (
-              <span className="text-xs text-destructive font-normal mt-0.5">
-                Logout from your account
-              </span>
-            )}
-          </div>
+          <LogOut className={`${mobile ? "h-5 w-5" : "h-4 w-4"} ${collapsed ? "" : "mr-3"}`} />
+          {!collapsed && (
+            <div className="flex flex-col items-start">
+              <span className="font-medium">Sign Out</span>
+              {mobile && (
+                <span className="text-xs text-destructive font-normal mt-0.5">
+                  Logout from your account
+                </span>
+              )}
+            </div>
+          )}
         </Button>
       </div>
     </div>
@@ -295,23 +306,42 @@ export default function RoleBasedNav({ className }: RoleBasedNavProps) {
     <>
       {/* Desktop Sidebar */}
       <div
-        className={`hidden lg:block w-64 bg-background border-r border-border ${className}`}
+        className={`hidden lg:block ${isCollapsed ? 'w-16' : 'w-64'} bg-background border-r border-border transition-all duration-300 ${className}`}
       >
-        <div className="p-4">
+        <div className="p-4 h-screen flex flex-col">
           <div className="mb-6">
-            <div className="flex items-center space-x-3 mb-2">
-              <Image 
-                src="/logo-icon.svg" 
-                alt="Jay Kay Digital Press Logo" 
-                width={40}
-                height={40}
-                className="w-10 h-10"
-              />
-              <h2 className="text-lg font-bold text-foreground">
-                Jay Kay Digital Press
-              </h2>
+            {/* Logo and Collapse Toggle */}
+            <div className="flex items-center justify-between mb-2">
+              <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'}`}>
+                <Image 
+                  src="/JK_Logo.jpg" 
+                  alt="Jay Kay Digital Press Logo" 
+                  width={40}
+                  height={40}
+                  className="w-10 h-10 rounded-md object-cover"
+                />
+                {!isCollapsed && (
+                  <h2 className="text-lg font-bold text-foreground">
+                    Jay Kay Digital Press
+                  </h2>
+                )}
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                className="h-8 w-8 hover:bg-accent"
+              >
+                {isCollapsed ? (
+                  <ChevronRight className="h-4 w-4" />
+                ) : (
+                  <ChevronLeft className="h-4 w-4" />
+                )}
+              </Button>
             </div>
-            {userData && (
+            
+            {/* User Info */}
+            {userData && !isCollapsed && (
               <div className="mt-3">
                 <p className="text-sm font-medium text-foreground truncate">
                   {userData.name || userData.email}
@@ -322,7 +352,7 @@ export default function RoleBasedNav({ className }: RoleBasedNavProps) {
               </div>
             )}
           </div>
-          <NavItems />
+          <NavItems collapsed={isCollapsed} />
         </div>
       </div>
 
@@ -340,15 +370,18 @@ export default function RoleBasedNav({ className }: RoleBasedNavProps) {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-80 p-0 bg-background">
+            <SheetTitle className="sr-only">
+              Navigation Menu
+            </SheetTitle>
             <div className="p-6">
               <div className="mb-6">
                 <div className="flex items-center space-x-3 mb-2">
                   <Image 
-                    src="/logo-icon.svg" 
+                    src="/JK_Logo.jpg" 
                     alt="Jay Kay Digital Press Logo" 
                     width={40}
                     height={40}
-                    className="w-10 h-10"
+                    className="w-10 h-10 rounded-md object-cover"
                   />
                   <h2 className="text-xl font-bold text-foreground">
                     Jay Kay Digital Press

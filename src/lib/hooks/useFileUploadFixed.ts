@@ -125,7 +125,13 @@ export const useFileUploadFixed = () => {
           setFileUploads((prev) =>
             prev.map((u) =>
               u.id === upload.id
-                ? { ...u, status: "uploading", progress: 0 }
+                ? { 
+                    ...u, 
+                    status: "uploading", 
+                    progress: 0,
+                    uploadSpeed: 0,
+                    estimatedTimeRemaining: 0 
+                  }
                 : u,
             ),
           );
@@ -140,81 +146,121 @@ export const useFileUploadFixed = () => {
 
           console.log(`📤 Uploading file: ${fileName}`);
 
-          // Upload to Supabase Storage using the simple upload method
-          const { data: uploadData, error: uploadError } =
-            await supabase.storage
-              .from("job-files")
-              .upload(fileName, upload.file, {
-                cacheControl: "3600",
-                upsert: false,
-                metadata: {
-                  jobId: jobId,
-                  originalName: upload.file.name,
-                  uploadedBy: uploadUserId,
-                  uploadDate: new Date().toISOString(),
-                },
-              });
+          // Simulate upload progress with intervals
+          const startTime = Date.now();
+          const fileSize = upload.file.size;
+          
+          const progressInterval = setInterval(() => {
+            setFileUploads((prev) =>
+              prev.map((u) => {
+                if (u.id === upload.id && u.status === "uploading") {
+                  const currentTime = Date.now();
+                  const elapsedSeconds = (currentTime - startTime) / 1000;
+                  const estimatedTotalTime = Math.max(2, fileSize / (1024 * 1024) * 2); // 2 seconds per MB minimum
+                  const newProgress = Math.min(90, (elapsedSeconds / estimatedTotalTime) * 100);
+                  
+                  const uploadSpeed = fileSize * (newProgress / 100) / elapsedSeconds;
+                  const remainingProgress = 100 - newProgress;
+                  const estimatedTimeRemaining = remainingProgress > 0 ? (remainingProgress / 100) * estimatedTotalTime - elapsedSeconds : 0;
+                  
+                  return {
+                    ...u,
+                    progress: Math.round(newProgress),
+                    uploadSpeed: uploadSpeed,
+                    estimatedTimeRemaining: Math.max(0, estimatedTimeRemaining)
+                  };
+                }
+                return u;
+              })
+            );
+          }, 200); // Update every 200ms
 
-          if (uploadError) {
-            console.error("❌ Upload error:", uploadError);
+          try {
+            // Upload to Supabase Storage using the simple upload method
+            const { data: uploadData, error: uploadError } =
+              await supabase.storage
+                .from("job-files")
+                .upload(fileName, upload.file, {
+                  cacheControl: "3600",
+                  upsert: false,
+                  metadata: {
+                    jobId: jobId,
+                    originalName: upload.file.name,
+                    uploadedBy: uploadUserId,
+                    uploadDate: new Date().toISOString(),
+                  },
+                });
+
+            clearInterval(progressInterval);
+
+            if (uploadError) {
+              console.error("❌ Upload error:", uploadError);
+              throw uploadError;
+            }
+
+            console.log("✅ File uploaded to storage:", uploadData.path);
+
+            // Update progress to 95% after upload
+            setFileUploads((prev) =>
+              prev.map((u) => 
+                u.id === upload.id 
+                  ? { ...u, progress: 95, uploadSpeed: 0, estimatedTimeRemaining: 0 } 
+                  : u
+              ),
+            );
+
+            // Get the public URL
+            const { data: urlData } = supabase.storage
+              .from("job-files")
+              .getPublicUrl(uploadData.path);
+
+            console.log("🔗 Public URL generated:", urlData.publicUrl);
+
+            // Save file record to database
+            const fileRecord = {
+              id: crypto.randomUUID(),
+              entity_id: jobId,
+              entity_type: "job",
+              file_name: upload.file.name,
+              file_url: urlData.publicUrl,
+              file_size: upload.file.size,
+              file_type: upload.file.type,
+              uploaded_by: uploadUserId,
+            };
+
+            const { data: dbData, error: dbError } = await supabase
+              .from("file_attachments")
+              .insert([fileRecord])
+              .select()
+              .single();
+
+            if (dbError) {
+              console.error("❌ Database error:", dbError);
+
+              // Clean up uploaded file if database insert fails
+              await supabase.storage.from("job-files").remove([uploadData.path]);
+
+              throw dbError;
+            }
+
+            console.log("✅ File record saved to database:", dbData.id);
+
+            // Update progress to 100%
+            setFileUploads((prev) =>
+              prev.map((u) =>
+                u.id === upload.id
+                  ? { ...u, status: "completed", progress: 100, uploadSpeed: 0, estimatedTimeRemaining: 0 }
+                  : u,
+              ),
+            );
+
+            uploadedFiles.push(dbData);
+            toast.success(`File "${upload.file.name}" uploaded successfully`);
+            
+          } catch (uploadError) {
+            clearInterval(progressInterval);
             throw uploadError;
           }
-
-          console.log("✅ File uploaded to storage:", uploadData.path);
-
-          // Update progress to 50% after upload
-          setFileUploads((prev) =>
-            prev.map((u) => (u.id === upload.id ? { ...u, progress: 50 } : u)),
-          );
-
-          // Get the public URL
-          const { data: urlData } = supabase.storage
-            .from("job-files")
-            .getPublicUrl(uploadData.path);
-
-          console.log("🔗 Public URL generated:", urlData.publicUrl);
-
-          // Save file record to database
-          const fileRecord = {
-            id: crypto.randomUUID(),
-            entity_id: jobId,
-            entity_type: "job",
-            file_name: upload.file.name,
-            file_url: urlData.publicUrl,
-            file_size: upload.file.size,
-            file_type: upload.file.type,
-            uploaded_by: uploadUserId,
-          };
-
-          const { data: dbData, error: dbError } = await supabase
-            .from("file_attachments")
-            .insert([fileRecord])
-            .select()
-            .single();
-
-          if (dbError) {
-            console.error("❌ Database error:", dbError);
-
-            // Clean up uploaded file if database insert fails
-            await supabase.storage.from("job-files").remove([uploadData.path]);
-
-            throw dbError;
-          }
-
-          console.log("✅ File record saved to database:", dbData.id);
-
-          // Update progress to 100%
-          setFileUploads((prev) =>
-            prev.map((u) =>
-              u.id === upload.id
-                ? { ...u, status: "completed", progress: 100 }
-                : u,
-            ),
-          );
-
-          uploadedFiles.push(dbData);
-
-          toast.success(`File "${upload.file.name}" uploaded successfully`);
         } catch (err: unknown) {
           const errorMessage =
             err instanceof Error ? err.message : "Upload failed";

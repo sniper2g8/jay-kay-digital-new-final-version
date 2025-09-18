@@ -56,11 +56,11 @@ export default function LoginPage() {
         <div className="text-center mb-8">
           <Link href="/">
             <Image
-              src="/logo-icon.svg"
+              src="/JK_Logo.jpg"
               alt="Jay Kay Digital Press Logo"
               width={64}
               height={64}
-              className="h-16 w-16 object-contain mx-auto mb-4"
+              className="h-16 w-16 object-cover rounded-lg mx-auto mb-4"
             />
           </Link>
           <h1 className="text-3xl font-bold text-gray-900">

@@ -69,6 +69,10 @@ const getPriorityColor = (priority: string) => {
 };
 
 export default function JobBoard() {
+  return <JobBoardContent />;
+}
+
+function JobBoardContent() {
   const [jobs, setJobs] = useState<JobBoardData[]>([]);
   const [stats, setStats] = useState<WaitingAreaStats>({
     total_jobs: 0,
@@ -84,6 +88,16 @@ export default function JobBoard() {
     try {
       setIsLoading(true);
 
+      // Debug environment variables on first run
+      if (typeof window !== 'undefined') {
+        console.log('🔧 Job Board Debug Info:', {
+          hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+          hasAnonKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+          supabaseUrlPrefix: process.env.NEXT_PUBLIC_SUPABASE_URL?.substring(0, 20) + '...',
+          timestamp: new Date().toISOString()
+        });
+      }
+
       // Fetch jobs with customer information
       const { data: jobsData, error: jobsError } = await supabase
         .from('jobs')
@@ -93,7 +107,6 @@ export default function JobBoard() {
           title,
           status,
           priority,
-          dueDate,
           created_at,
           updated_at
         `)
@@ -101,7 +114,10 @@ export default function JobBoard() {
         .order('created_at', { ascending: false })
         .limit(20);
 
-      if (jobsError) throw jobsError;
+      if (jobsError) {
+        console.error('Supabase query error:', jobsError);
+        throw jobsError;
+      }
 
       // Transform data for display (no customer information for privacy)
       const transformedJobs: JobBoardData[] = (jobsData || []).map(job => ({
@@ -110,7 +126,7 @@ export default function JobBoard() {
         title: job.title || 'Print Job',
         status: job.status || 'pending',
         priority: job.priority || 'medium',
-        due_date: job.dueDate as string || null,
+        due_date: null, // Due date not available in this format
         created_at: job.created_at || '',
         updated_at: job.updated_at || '',
         estimated_completion: estimateCompletion(job.status || 'pending', job.created_at || '')
@@ -141,7 +157,67 @@ export default function JobBoard() {
 
       setLastUpdated(new Date());
     } catch (error) {
-      console.error('Error fetching job board data:', error);
+      // Comprehensive error logging for debugging
+      console.group('🔴 Job Board Data Fetch Error');
+      console.error('Raw error object:', error);
+      
+      // Try different ways to extract error information
+      const errorDetails = {
+        message: 'Unknown error',
+        code: undefined as string | undefined,
+        details: undefined as string | undefined,
+        hint: undefined as string | undefined,
+        name: undefined as string | undefined,
+        stack: undefined as string | undefined
+      };
+
+      if (error instanceof Error) {
+        errorDetails.message = error.message;
+        errorDetails.name = error.name;
+        errorDetails.stack = error.stack;
+      } else if (error && typeof error === 'object') {
+        // Handle Supabase-specific error format
+        const supabaseError = error as Record<string, unknown>;
+        errorDetails.message = (typeof supabaseError.message === 'string' ? supabaseError.message : String(error));
+        errorDetails.code = (typeof supabaseError.code === 'string' ? supabaseError.code : undefined);
+        errorDetails.details = (typeof supabaseError.details === 'string' ? supabaseError.details : undefined);
+        errorDetails.hint = (typeof supabaseError.hint === 'string' ? supabaseError.hint : undefined);
+      } else {
+        errorDetails.message = String(error);
+      }
+
+      console.error('Parsed error details:', errorDetails);
+      
+      // Environment check
+      console.error('Environment check:', {
+        supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL ? 'Set' : 'Not set',
+        supabaseUrlLength: process.env.NEXT_PUBLIC_SUPABASE_URL?.length || 0,
+        nodeEnv: process.env.NODE_ENV,
+        timestamp: new Date().toISOString()
+      });
+
+      // Check if it's an RLS (Row Level Security) error
+      if (errorDetails.code === '42501' || errorDetails.message?.includes('permission') || errorDetails.message?.includes('policy')) {
+        console.error('🔒 This appears to be a Row Level Security (RLS) policy error');
+        console.error('💡 The job board might need anonymous access or public read permissions');
+      }
+
+      // Check if it's a network/connection error
+      if (errorDetails.message?.includes('fetch') || errorDetails.message?.includes('network')) {
+        console.error('🌐 This appears to be a network connectivity error');
+      }
+
+      console.groupEnd();
+      
+      // Set empty state with user-friendly message
+      setJobs([]);
+      setStats({
+        total_jobs: 0,
+        in_progress: 0,
+        pending: 0,
+        completed_today: 0,
+        average_wait_time: '0 mins'
+      });
     } finally {
       setIsLoading(false);
     }

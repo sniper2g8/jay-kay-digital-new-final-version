@@ -93,11 +93,11 @@ export default function SignupPage() {
           <div className="text-center mb-8">
             <div className="mx-auto bg-red-600 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-4">
               <Image
-                src="/logo-icon.svg"
+                src="/JK_Logo.jpg"
                 alt="Jay Kay Digital Press Logo"
                 width={40}
                 height={40}
-                className="w-10 h-10 object-contain"
+                className="w-10 h-10 object-cover rounded-md"
               />
             </div>
             <h1 className="text-3xl font-bold text-gray-900">
@@ -145,11 +145,11 @@ export default function SignupPage() {
         <div className="text-center mb-8">
           <div className="mx-auto bg-red-600 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-4">
             <Image
-              src="/logo-icon.svg"
+              src="/JK_Logo.jpg"
               alt="Jay Kay Digital Press Logo"
               width={40}
               height={40}
-              className="w-10 h-10 object-contain"
+              className="w-10 h-10 object-cover rounded-md"
             />
           </div>
           <h1 className="text-3xl font-bold text-gray-900">

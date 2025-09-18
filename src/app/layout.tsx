@@ -20,9 +20,9 @@ export const metadata: Metadata = {
   description:
     "Complete printing press management system with job tracking, invoicing, and customer management.",
   icons: {
-    icon: "/logo-icon.svg",
-    shortcut: "/logo-icon.svg",
-    apple: "/logo-icon.svg",
+    icon: "/JK_Logo.jpg",
+    shortcut: "/JK_Logo.jpg",
+    apple: "/JK_Logo.jpg",
   },
 };
 

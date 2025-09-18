@@ -1,9 +1,8 @@
-import React from "react";
-import { Label } from "@/components/ui/label";
+import React, { useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Upload, FileText, X, CheckCircle, AlertCircle } from "lucide-react";
+import { Upload, FileText, X, CheckCircle, AlertCircle, Cloud, Zap } from "lucide-react";
 import { FileUpload } from "@/lib/hooks/useFileUploadFixed";
 
 // Helper functions for formatting
@@ -30,6 +29,7 @@ interface FilesStepProps {
   hasFailedUploads: () => boolean;
   hasCompletedUploads: () => boolean;
   isUploading: () => boolean;
+  addFiles: (files: File[]) => void;
 }
 
 export default function FilesStep({
@@ -40,7 +40,34 @@ export default function FilesStep({
   hasFailedUploads,
   hasCompletedUploads,
   isUploading,
+  addFiles,
 }: FilesStepProps) {
+  const [isDragOver, setIsDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    if (droppedFiles.length > 0) {
+      addFiles(droppedFiles);
+    }
+  };
+
+  const handleUploadAreaClick = () => {
+    fileInputRef.current?.click();
+  };
   return (
     <div className="space-y-6">
       <div className="text-center mb-8">
@@ -55,6 +82,7 @@ export default function FilesStep({
         {/* File Upload Area */}
         <div>
           <input
+            ref={fileInputRef}
             type="file"
             multiple
             onChange={handleFileSelect}
@@ -63,20 +91,42 @@ export default function FilesStep({
             accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.tiff,.eps,.ai,.psd"
             suppressHydrationWarning={true}
           />
-          <Label htmlFor="file-upload">
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400 hover:bg-gray-50 transition-colors">
-              <Upload className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-              <p className="text-lg font-medium text-gray-600 mb-2">
-                Click to upload files or drag and drop
-              </p>
-              <p className="text-sm text-gray-500">
-                PDF, DOC, JPG, PNG, AI, PSD files supported
-              </p>
-              <p className="text-xs text-gray-400 mt-2">
-                Maximum file size: 50MB per file
-              </p>
+          <div
+            className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+              isDragOver 
+                ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/30' 
+                : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50 dark:border-gray-600 dark:hover:border-gray-500'
+            }`}
+            onClick={handleUploadAreaClick}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
+            <div className="space-y-4">
+              <div className="flex justify-center">
+                {isDragOver ? (
+                  <Cloud className="h-12 w-12 text-blue-500" />
+                ) : (
+                  <Upload className="h-12 w-12 text-gray-400" />
+                )}
+              </div>
+              <div>
+                <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
+                  {isDragOver ? 'Drop files here' : 'Click to upload files or drag and drop'}
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  PDF, DOC, JPG, PNG, AI, PSD files supported
+                </p>
+                <p className="text-xs text-gray-400 mt-1">
+                  Maximum file size: 50MB per file
+                </p>
+              </div>
+              <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
+                <Zap className="h-4 w-4" />
+                <span>Supports multiple files</span>
+              </div>
             </div>
-          </Label>
+          </div>
         </div>
 
         {/* Upload Progress */}

@@ -16,7 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, User } from "lucide-react";
+import { Plus, User, Phone, Mail } from "lucide-react";
 import {
   JobFormData,
   NewCustomerData,
@@ -82,15 +82,26 @@ export default function CustomerStep({
               <SelectContent>
                 {customers.map((customer) => (
                   <SelectItem key={customer.id} value={customer.id}>
-                    <div className="flex flex-col">
-                      <span className="font-medium">
-                        {customer.business_name}
-                      </span>
-                      {customer.contact_person && (
-                        <span className="text-sm text-gray-500">
-                          {customer.contact_person}
-                        </span>
-                      )}
+                    <div className="flex items-center space-x-3 py-1">
+                      <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0">
+                        {customer.business_name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="font-medium text-gray-900 truncate">
+                          {customer.business_name}
+                        </div>
+                        <div className="text-sm text-gray-500 flex items-center space-x-2">
+                          {customer.contact_person && (
+                            <span className="truncate">{customer.contact_person}</span>
+                          )}
+                          {customer.contact_person && customer.phone && (
+                            <span>•</span>
+                          )}
+                          {customer.phone && (
+                            <span className="truncate">{customer.phone}</span>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </SelectItem>
                 ))}
@@ -217,7 +228,7 @@ export default function CustomerStep({
 
         {/* Compact Selected Customer Preview */}
         {formData.customer_id && (
-          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+          <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
             {(() => {
               const selectedCustomer = customers.find(
                 (c) => c.id === formData.customer_id,
@@ -225,18 +236,35 @@ export default function CustomerStep({
               return selectedCustomer ? (
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                    <div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0">
                       {selectedCustomer.business_name.charAt(0).toUpperCase()}
                     </div>
-                    <div>
-                      <p className="font-medium text-blue-900 text-sm">
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium text-blue-900 text-sm truncate">
                         {selectedCustomer.business_name}
-                      </p>
-                      <p className="text-xs text-blue-600">
-                        {selectedCustomer.contact_person}
-                        {selectedCustomer.phone &&
-                          ` • ${selectedCustomer.phone}`}
-                      </p>
+                      </div>
+                      <div className="text-xs text-blue-700 space-y-1">
+                        {selectedCustomer.contact_person && (
+                          <div className="flex items-center space-x-1">
+                            <User className="w-3 h-3" />
+                            <span className="truncate">{selectedCustomer.contact_person}</span>
+                          </div>
+                        )}
+                        <div className="flex items-center space-x-4">
+                          {selectedCustomer.phone && (
+                            <div className="flex items-center space-x-1">
+                              <Phone className="w-3 h-3" />
+                              <span>{selectedCustomer.phone}</span>
+                            </div>
+                          )}
+                          {selectedCustomer.email && (
+                            <div className="flex items-center space-x-1">
+                              <Mail className="w-3 h-3" />
+                              <span className="truncate">{selectedCustomer.email}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <Button
@@ -244,7 +272,7 @@ export default function CustomerStep({
                     variant="ghost"
                     size="sm"
                     onClick={() => updateFormData("customer_id", "")}
-                    className="text-blue-600 hover:text-blue-800"
+                    className="text-blue-600 hover:text-blue-800 flex-shrink-0 ml-2"
                   >
                     Change
                   </Button>

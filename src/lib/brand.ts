@@ -31,8 +31,8 @@ export const BRAND_COLORS = {
 
 export const BRAND_ASSETS = {
   logo: {
-    main: '/logo.svg',
-    icon: '/logo-icon.svg',
+    main: '/JK_Logo.jpg',
+    icon: '/JK_Logo.jpg',
   },
   gradients: {
     primary: 'bg-gradient-to-r from-red-600 to-red-700',

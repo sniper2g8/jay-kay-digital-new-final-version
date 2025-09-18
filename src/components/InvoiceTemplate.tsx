@@ -90,11 +90,11 @@ export function InvoiceTemplate({
         <div className="flex justify-between items-start">
           <div className="flex items-start space-x-4">
             <Image 
-              src="/logo-icon.svg" 
+              src="/JK_Logo.jpg" 
               alt="Jay Kay Digital Press Logo" 
               width={60}
               height={60}
-              className="bg-white rounded-full p-2"
+              className="bg-white rounded-lg p-2 object-cover"
             />
             <div className="space-y-2">
               <h1 className="text-4xl font-bold tracking-wide">

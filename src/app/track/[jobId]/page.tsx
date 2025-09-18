@@ -18,7 +18,6 @@ import {
   Settings,
   Truck,
   AlertCircle,
-  Calendar,
   Phone,
   Mail,
   ExternalLink,
@@ -44,18 +43,14 @@ interface Job {
   quantity: number | null;
   qr_code: string | null;
   tracking_url: string | null;
-}
-
-interface Customer {
-  id: string;
-  business_name: string | null;
-  contact_person: string | null;
-  email: string | null;
-  phone: string | null;
-  address: string | null;
-  city: string | null;
-  state: string | null;
-  zip_code: string | null;
+  // Additional fields from database
+  actual_delivery?: string | null;
+  assigned_to?: string | null;
+  createdAt?: unknown;
+  createdBy?: string | null;
+  updatedAt?: unknown;
+  __open?: boolean | null;
+  [key: string]: unknown; // Allow additional properties
 }
 
 interface StatusConfig {
@@ -69,7 +64,7 @@ interface StatusConfig {
 const statusConfig = {
   pending: { label: "Pending Review", color: "bg-yellow-500", icon: Clock, progress: 10 },
   approved: { label: "Approved", color: "bg-blue-500", icon: CheckCircle, progress: 25 },
-  "in-progress": {
+  in_progress: {
     label: "In Progress",
     color: "bg-blue-600",
     icon: Settings,
@@ -91,6 +86,14 @@ const statusConfig = {
     description: "Your job is ready for pickup or delivery.",
   },
   completed: {
+    label: "Completed",
+    color: "bg-green-100 text-green-800 border-green-200",
+    icon: CheckCircle,
+    progress: 100,
+    description: "Your job has been completed and delivered.",
+  },
+  // Handle alternative status values for compatibility
+  Completed: {
     label: "Completed",
     color: "bg-green-100 text-green-800 border-green-200",
     icon: CheckCircle,
@@ -122,8 +125,7 @@ export default function JobTrackingPage() {
   const params = useParams();
   const jobId = params.jobId as string;
 
-  const [job] = useState<Job | null>(null);
-  const [customer, setCustomer] = useState<Customer | null>(null);
+  const [job, setJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -132,49 +134,110 @@ export default function JobTrackingPage() {
       try {
         setLoading(true);
         setError(null);
+        console.log("Fetching job details for:", jobId);
 
-        // First try to fetch by job ID
-        const { data: jobData, error: jobError } = await supabase
-          .from("jobs")
-          .select("*")
-          .eq("id", jobId)
-          .single();
-
-        let finalJobData = jobData;
-
-        // If not found by ID, try by job number
-        if (jobError && jobError.code === "PGRST116") {
+        // Check if jobId is in job number format (JKDP-JOB-XXXX) or UUID format
+        const isJobNumber = /^JKDP-JOB-\d+$/i.test(jobId);
+        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(jobId);
+        
+        let finalJobData = null;
+        
+        if (isJobNumber) {
+          // If it's a job number, search by jobNo first
+          console.log("Fetching job by jobNo (job number format):", jobId);
           const { data: jobByNumber, error: jobByNumberError } = await supabase
             .from("jobs")
             .select("*")
             .eq("jobNo", jobId)
             .single();
 
+          console.log("Job by number result:", { jobByNumber, jobByNumberError });
+
           if (jobByNumberError) {
-            throw new Error("Job not found");
+            console.error("Job not found by jobNo:", jobByNumberError);
+            throw new Error(`Job not found with job number: ${jobId}`);
           }
           finalJobData = jobByNumber;
-        } else if (jobError) {
-          throw jobError;
-        }
-
-        // Fetch customer details if customer_id exists
-        if (finalJobData?.customer_id) {
-          const { data: customerData, error: customerError } = await supabase
-            .from("customers")
+          console.log("Found job by jobNo:", finalJobData);
+        } else if (isUUID) {
+          // If it's a UUID, search by ID
+          console.log("Fetching job by ID (UUID format):", jobId);
+          const { data: jobData, error: jobError } = await supabase
+            .from("jobs")
             .select("*")
-            .eq("id", finalJobData.customer_id)
+            .eq("id", jobId)
             .single();
 
-          if (customerError) {
-            console.error("Failed to fetch customer:", customerError);
+          console.log("Job fetch result:", { jobData, jobError });
+
+          if (jobError) {
+            console.error("Error fetching job by ID:", jobError);
+            throw new Error(`Database error: ${jobError.message || JSON.stringify(jobError)}`);
+          }
+          finalJobData = jobData;
+          console.log("Found job by ID:", finalJobData);
+        } else {
+          // If format is unclear, try both approaches with proper error handling
+          console.log("Unknown format, trying both ID and jobNo...");
+          
+          // Try as job number first (more likely to be human-readable)
+          const { data: jobByNumber, error: jobByNumberError } = await supabase
+            .from("jobs")
+            .select("*")
+            .eq("jobNo", jobId)
+            .single();
+
+          if (!jobByNumberError && jobByNumber) {
+            finalJobData = jobByNumber;
+            console.log("Found job by jobNo (fallback):", finalJobData);
           } else {
-            setCustomer(customerData);
+            // Only try UUID if it could potentially be a UUID format
+            if (jobId.length === 36 && jobId.includes('-')) {
+              const { data: jobData, error: jobError } = await supabase
+                .from("jobs")
+                .select("*")
+                .eq("id", jobId)
+                .single();
+
+              if (!jobError && jobData) {
+                finalJobData = jobData;
+                console.log("Found job by ID (fallback):", finalJobData);
+              }
+            }
+            
+            if (!finalJobData) {
+              throw new Error(`Job not found with identifier: ${jobId}. Please check the job number or ID.`);
+            }
           }
         }
+
+        // Set the job data
+        console.log("Final job data:", finalJobData);
+        setJob(finalJobData as unknown as Job);
+
+        // Note: Customer information is not fetched for privacy protection
+        
       } catch (err) {
         console.error("Error fetching job details:", err);
-        setError(err instanceof Error ? err.message : "Failed to load job details");
+        
+        // More detailed error handling
+        let errorMessage = "Failed to load job details";
+        if (err instanceof Error) {
+          errorMessage = err.message;
+        } else if (typeof err === 'object' && err !== null) {
+          errorMessage = JSON.stringify(err);
+        } else if (typeof err === 'string') {
+          errorMessage = err;
+        }
+        
+        console.error("Error details:", {
+          error: err,
+          jobId,
+          supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL ? "configured" : "missing",
+          supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "configured" : "missing"
+        });
+        
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }
@@ -186,18 +249,26 @@ export default function JobTrackingPage() {
   }, [jobId]);
 
   const getStatusConfig = (status: string | null): StatusConfig => {
-    if (!status) return statusConfig.pending;
-    return statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
+    if (!status) {
+      console.log("Status is null/undefined, using pending as default");
+      return statusConfig.pending;
+    }
+    
+    console.log("Looking up status config for:", status);
+    const config = statusConfig[status as keyof typeof statusConfig];
+    
+    if (!config) {
+      console.warn(`Status '${status}' not found in statusConfig, using pending as fallback`);
+      return statusConfig.pending;
+    }
+    
+    console.log("Found status config:", config);
+    return config;
   };
 
   const getPriorityConfig = (priority: string | null) => {
     if (!priority) return priorityConfig.low;
     return priorityConfig[priority as keyof typeof priorityConfig] || priorityConfig.low;
-  };
-
-  const formatCurrency = (amount: number | null) => {
-    if (!amount) return "SLL 0";
-    return `SLL ${amount.toLocaleString()}`;
   };
 
   const shareJob = async () => {
@@ -305,13 +376,6 @@ export default function JobTrackingPage() {
               </div>
             </CardHeader>
             <CardContent>
-              {job.description && (
-                <div className="mb-6">
-                  <h3 className="font-semibold mb-2">Description</h3>
-                  <p className="text-gray-700">{job.description}</p>
-                </div>
-              )}
-
               {/* Status Progress */}
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-2">
@@ -335,17 +399,17 @@ export default function JobTrackingPage() {
               </div>
 
               {/* Job Details Grid */}
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-1 gap-6">
                 <div>
                   <h3 className="font-semibold mb-3">Job Information</h3>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Job ID:</span>
-                      <span className="font-medium">{job.id}</span>
+                      <span className="text-gray-600">Job Number:</span>
+                      <span className="font-medium">{job.jobNo || job.id}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Quantity:</span>
-                      <span className="font-medium">{job.quantity || 1}</span>
+                      <span className="text-gray-600">Service:</span>
+                      <span className="font-medium">{job.title || "Printing Service"}</span>
                     </div>
                     {job.estimated_delivery && (
                       <div className="flex justify-between">
@@ -363,95 +427,9 @@ export default function JobTrackingPage() {
                     </div>
                   </div>
                 </div>
-
-                <div>
-                  <h3 className="font-semibold mb-3">Pricing</h3>
-                  <div className="space-y-2 text-sm">
-                    {job.estimate_price && (
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Estimate:</span>
-                        <span className="font-medium">{formatCurrency(job.estimate_price)}</span>
-                      </div>
-                    )}
-                    {job.unit_price && (
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Unit Price:</span>
-                        <span className="font-medium">{formatCurrency(job.unit_price)}</span>
-                      </div>
-                    )}
-                    {job.final_price && (
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Final Price:</span>
-                        <span className="font-medium text-green-600">{formatCurrency(job.final_price)}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
               </div>
             </CardContent>
           </Card>
-
-          {/* Customer Information */}
-          {customer && (
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle>Customer Information</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <div className="space-y-2 text-sm">
-                      <div>
-                        <span className="text-gray-600">Business:</span>
-                        <p className="font-medium">{customer.business_name}</p>
-                      </div>
-                      {customer.contact_person && (
-                        <div>
-                          <span className="text-gray-600">Contact:</span>
-                          <p className="font-medium">{customer.contact_person}</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <div className="space-y-2 text-sm">
-                      {customer.email && (
-                        <div className="flex items-center gap-2">
-                          <Mail className="h-4 w-4 text-gray-400" />
-                          <a href={`mailto:${customer.email}`} className="text-blue-600 hover:underline">
-                            {customer.email}
-                          </a>
-                        </div>
-                      )}
-                      {customer.phone && (
-                        <div className="flex items-center gap-2">
-                          <Phone className="h-4 w-4 text-gray-400" />
-                          <a href={`tel:${customer.phone}`} className="text-blue-600 hover:underline">
-                            {customer.phone}
-                          </a>
-                        </div>
-                      )}
-                      {customer.address && (
-                        <div className="flex items-start gap-2">
-                          <Calendar className="h-4 w-4 text-gray-400 mt-0.5" />
-                          <div>
-                            <p className="text-gray-700">{customer.address}</p>
-                            {(customer.city || customer.state) && (
-                              <p className="text-gray-600">
-                                {[customer.city, customer.state].filter(Boolean).join(", ")}
-                                {customer.zip_code && ` ${customer.zip_code}`}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
 
           {/* QR Code and Tracking */}
           <div className="grid md:grid-cols-2 gap-6">
