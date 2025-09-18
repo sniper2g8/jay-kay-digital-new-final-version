@@ -122,7 +122,7 @@ export default function JobTrackingPage() {
   const params = useParams();
   const jobId = params.jobId as string;
 
-  const [job, setJob] = useState<Job | null>(null);
+  const [job] = useState<Job | null>(null);
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
