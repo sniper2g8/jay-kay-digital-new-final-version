@@ -114,7 +114,7 @@ export default function SubmitJobPage() {
         return <SpecificationsStep {...formHook} />;
       case 3:
         return (
-          <FilesStep {...fileHook} isUploading={() => fileHook.isUploading} />
+          <FilesStep {...fileHook} />
         );
       case 4:
         return (

@@ -34,21 +34,45 @@ export default function NotificationBadge() {
   const router = useRouter();
 
   const fetchUnreadCount = useCallback(async () => {
-    if (!user) return;
+    if (!user?.id) {
+      setUnreadCount(0);
+      return;
+    }
     
-    const count = await getUnreadCount(user.id);
-    setUnreadCount(count);
-  }, [user, getUnreadCount]);
+    try {
+      const count = await getUnreadCount(user.id);
+      setUnreadCount(count);
+    } catch (error) {
+      console.error('Error fetching unread count:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        userId: user?.id,
+        error: error
+      });
+      setUnreadCount(0);
+    }
+  }, [user?.id]);
 
   const fetchRecentNotifications = useCallback(async () => {
-    if (!user) return;
+    if (!user?.id) {
+      setRecentNotifications([]);
+      return;
+    }
     
-    const notifications = await getNotifications(user.id, { limit: 5 });
-    setRecentNotifications(notifications as Notification[]);
-  }, [user, getNotifications]);
+    try {
+      const notifications = await getNotifications(user.id, { limit: 5 });
+      setRecentNotifications(notifications as Notification[]);
+    } catch (error) {
+      console.error('Error fetching notifications:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        userId: user?.id,
+        error: error
+      });
+      setRecentNotifications([]);
+    }
+  }, [user?.id]);
 
   useEffect(() => {
-    if (user) {
+    if (user?.id) {
       fetchUnreadCount();
       fetchRecentNotifications();
       
@@ -73,6 +97,10 @@ export default function NotificationBadge() {
       return () => {
         supabase.removeChannel(channel);
       };
+    } else {
+      // Reset state when user is not available
+      setUnreadCount(0);
+      setRecentNotifications([]);
     }
   }, [user, fetchUnreadCount, fetchRecentNotifications]);
 

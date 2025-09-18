@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 
 export interface CreateNotificationData {
@@ -21,7 +21,7 @@ export function useNotifications() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const createNotification = async (data: CreateNotificationData) => {
+  const createNotification = useCallback(async (data: CreateNotificationData) => {
     try {
       setIsLoading(true);
       setError(null);
@@ -54,12 +54,18 @@ export function useNotifications() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const getNotifications = async (userId: string, filters: NotificationFilters = {}) => {
+  const getNotifications = useCallback(async (userId: string, filters: NotificationFilters = {}) => {
     try {
       setIsLoading(true);
       setError(null);
+
+      // Validate userId
+      if (!userId) {
+        console.warn('getNotifications called without valid userId');
+        return [];
+      }
 
       let query = supabase
         .from('notifications')
@@ -103,9 +109,9 @@ export function useNotifications() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const markAsRead = async (notificationId: string) => {
+  const markAsRead = useCallback(async (notificationId: string) => {
     try {
       setIsLoading(true);
       setError(null);
@@ -129,7 +135,7 @@ export function useNotifications() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   const markAllAsRead = async (userId: string) => {
     try {
@@ -184,8 +190,14 @@ export function useNotifications() {
     }
   };
 
-  const getUnreadCount = async (userId: string) => {
+  const getUnreadCount = useCallback(async (userId: string) => {
     try {
+      // Validate userId
+      if (!userId) {
+        console.warn('getUnreadCount called without valid userId');
+        return 0;
+      }
+
       const { count, error: countError } = await supabase
         .from('notifications')
         .select('*', { count: 'exact', head: true })
@@ -202,7 +214,7 @@ export function useNotifications() {
       console.error('Error getting unread count:', err);
       return 0;
     }
-  };
+  }, []);
 
   // Helper functions for common notification types
   const notifyJobUpdate = async (userId: string, jobId: string, status: string, jobTitle: string) => {

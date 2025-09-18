@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,10 +18,12 @@ import {
   Settings,
   Eye,
   Trash2,
-  RefreshCw
+  RefreshCw,
+  TestTube
 } from "lucide-react";
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserRole } from '@/lib/hooks/useUserRole';
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { 
   DropdownMenu,
@@ -65,6 +68,10 @@ function NotificationsContent() {
   const [filterType, setFilterType] = useState<string>('all');
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
+  const { data: userData } = useUserRole();
+
+  // Check if user is admin or above
+  const isAdminOrAbove = userData?.primary_role === 'admin' || userData?.primary_role === 'super_admin';
 
   const filteredNotifications = notifications.filter(notification => {
     const matchesSearch = 
@@ -78,7 +85,11 @@ function NotificationsContent() {
   });
 
   const fetchNotifications = async () => {
-    if (!user) return;
+    if (!user?.id) {
+      setNotifications([]);
+      setStats({ total: 0, unread: 0, email_sent: 0, sms_sent: 0 });
+      return;
+    }
     
     try {
       setIsLoading(true);
@@ -235,6 +246,14 @@ function NotificationsContent() {
               <RefreshCw className="h-4 w-4" />
               Refresh
             </Button>
+            {isAdminOrAbove && (
+              <Button asChild variant="outline" className="flex items-center gap-2">
+                <Link href="/dashboard/notifications/test">
+                  <TestTube className="h-4 w-4" />
+                  Test Notifications
+                </Link>
+              </Button>
+            )}
             <Button 
               onClick={markAllAsRead}
               disabled={stats.unread === 0}
@@ -243,9 +262,11 @@ function NotificationsContent() {
               <CheckCircle2 className="h-4 w-4" />
               Mark All Read
             </Button>
-            <Button className="flex items-center gap-2">
-              <Settings className="h-4 w-4" />
-              Settings
+            <Button asChild className="flex items-center gap-2">
+              <Link href="/dashboard/notifications/settings">
+                <Settings className="h-4 w-4" />
+                Settings
+              </Link>
             </Button>
           </div>
         </div>

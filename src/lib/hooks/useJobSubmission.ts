@@ -39,7 +39,7 @@ export const useJobSubmission = () => {
 
       if (counterError) {
         console.error("Error fetching next job counter:", counterError);
-        throw new Error("Failed to generate job number");
+        throw new Error("Failed to generate job number. Please try again.");
       }
 
       // Generate formatted job number with human-readable format

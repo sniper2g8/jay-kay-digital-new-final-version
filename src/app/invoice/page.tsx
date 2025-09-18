@@ -33,7 +33,7 @@ export default function InvoicePage() {
             <div className="border border-gray-200 rounded-lg p-6">
               <h3 className="text-xl font-semibold mb-2">Getting Started</h3>
               <p className="text-gray-600 mb-4">
-                To create a new invoice, click on the "Invoice Management" button above.
+                To create a new invoice, click on the &quot;Invoice Management&quot; button above.
               </p>
               <p className="text-gray-600">
                 You can preview the invoice template or view a demo to see how it works.

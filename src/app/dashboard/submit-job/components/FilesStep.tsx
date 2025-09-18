@@ -28,7 +28,7 @@ interface FilesStepProps {
   getUploadProgress: () => number;
   hasFailedUploads: () => boolean;
   hasCompletedUploads: () => boolean;
-  isUploading: () => boolean;
+  isUploading: boolean; // Changed from () => boolean to boolean
   addFiles: (files: File[]) => void;
 }
 
@@ -130,7 +130,7 @@ export default function FilesStep({
         </div>
 
         {/* Upload Progress */}
-        {isUploading() && (
+        {isUploading && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <div className="flex items-center gap-3 mb-3">
               <Upload className="h-5 w-5 text-blue-600 animate-pulse" />
@@ -301,7 +301,7 @@ export default function FilesStep({
           </div>
         )}
 
-        {hasCompletedUploads() && !isUploading() && !hasFailedUploads() && (
+        {hasCompletedUploads() && !isUploading && !hasFailedUploads() && (
           <div className="bg-green-50 border border-green-200 rounded-lg p-4">
             <div className="flex items-center gap-2">
               <CheckCircle className="h-5 w-5 text-green-500" />
