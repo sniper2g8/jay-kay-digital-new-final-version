@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,9 +13,9 @@ import { Mail, Send, Users, FileText, Palette } from 'lucide-react';
 interface Customer {
   id: string;
   email: string;
-  first_name: string;
-  last_name: string;
-  company_name?: string;
+  // Fix the field names to match the actual database schema
+  name: string;
+  business_name?: string;
 }
 
 interface EmailTemplate {
@@ -45,11 +47,12 @@ export default function AdminEmailSystem() {
     try {
       const { data, error } = await supabase
         .from('customers')
-        .select('id, email, first_name, last_name, company_name')
-        .order('last_name, first_name');
+        .select('id, email, name, business_name')
+        .order('name');
 
       if (error) throw error;
-      setCustomers(data || []);
+      // Cast the data to the correct type
+      setCustomers(data as Customer[] || []);
     } catch (err) {
       console.error('Error loading customers:', err);
       setError('Failed to load customers');

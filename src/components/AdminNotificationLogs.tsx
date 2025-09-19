@@ -1,38 +1,51 @@
+"use client";
+
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/lib/supabase';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from '@/components/ui/table';
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   Mail, 
-  Search, 
-  Filter, 
-  Calendar, 
+  RefreshCw, 
   Download, 
-  Eye, 
-  RefreshCw,
-  TrendingUp,
+  CheckCircle, 
+  XCircle, 
+  Clock,
   Users,
-  CheckCircle,
-  XCircle,
-  Clock
+  Calendar,
+  TrendingUp,
+  Filter,
+  Search,
+  Eye
 } from 'lucide-react';
+import { Database } from '@/lib/database.types';
 
-interface EmailNotification {
-  id: string;
-  type: string;
-  recipient_email: string;
-  recipient_name: string;
-  subject: string;
-  sent_at: string;
-  resend_id: string;
-  status: string;
-  metadata: any;
-  created_at: string;
-}
+type EmailNotification = Database['public']['Tables']['email_notifications']['Row'];
 
 interface NotificationStats {
   total: number;
@@ -60,10 +73,6 @@ export default function AdminNotificationLogs() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [dateRange, setDateRange] = useState('all');
   const [selectedNotification, setSelectedNotification] = useState<EmailNotification | null>(null);
-
-  useEffect(() => {
-    loadNotifications();
-  }, []);
 
   const loadNotifications = async () => {
     setIsLoading(true);
@@ -110,7 +119,7 @@ export default function AdminNotificationLogs() {
       const filteredData = data?.filter(notification => 
         searchTerm === '' || 
         notification.recipient_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        notification.recipient_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (notification.recipient_name && notification.recipient_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
         notification.subject.toLowerCase().includes(searchTerm.toLowerCase())
       ) || [];
 
@@ -124,6 +133,10 @@ export default function AdminNotificationLogs() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadNotifications();
+  }, []);
 
   const calculateStats = (data: EmailNotification[]) => {
     const now = new Date();
@@ -159,7 +172,12 @@ export default function AdminNotificationLogs() {
     return labels[type] || type;
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string | null) => {
+    // Handle null status
+    if (!status) {
+      return <Badge variant="outline">Unknown</Badge>;
+    }
+    
     switch (status) {
       case 'sent':
         return <Badge variant="default" className="bg-green-100 text-green-800"><CheckCircle className="h-3 w-3 mr-1" />Sent</Badge>;

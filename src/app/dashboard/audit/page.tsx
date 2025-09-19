@@ -45,7 +45,7 @@ interface AuditLogEntry {
   user_id: string;
   user_email: string;
   timestamp: string;
-  details: Record<string, any>;
+  details: Record<string, string | number | boolean | string[] | number[] | undefined>;
   ip_address?: string;
   user_agent?: string;
   severity: "low" | "medium" | "high" | "critical";

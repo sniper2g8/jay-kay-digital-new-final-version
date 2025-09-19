@@ -25,6 +25,20 @@ export interface NotificationResponse {
   error?: string;
 }
 
+export interface JobNotificationData {
+  id: string;
+  jobNo: string;
+  title: string;
+  status: string;
+  estimated_delivery?: string;
+}
+
+export interface CustomerNotificationData {
+  email: string;
+  business_name: string;
+  contact_person?: string;
+}
+
 export function useJobNotifications() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -84,18 +98,8 @@ export function useJobNotifications() {
 
   // Helper function to send notifications for common status changes
   const notifyJobStatusChange = useCallback(async (
-    job: {
-      id: string;
-      jobNo: string;
-      title: string;
-      status: string;
-      estimated_delivery?: string;
-    },
-    customer: {
-      email: string;
-      business_name: string;
-      contact_person?: string;
-    },
+    job: JobNotificationData,
+    customer: CustomerNotificationData,
     oldStatus: string,
     notes?: string
   ) => {
@@ -120,8 +124,8 @@ export function useJobNotifications() {
 
   // Specific notification functions for different status changes
   const notifyJobStarted = useCallback(async (
-    job: any,
-    customer: any,
+    job: JobNotificationData,
+    customer: CustomerNotificationData,
     oldStatus: string
   ) => {
     return await notifyJobStatusChange(
@@ -133,8 +137,8 @@ export function useJobNotifications() {
   }, [notifyJobStatusChange]);
 
   const notifyJobCompleted = useCallback(async (
-    job: any,
-    customer: any,
+    job: JobNotificationData,
+    customer: CustomerNotificationData,
     oldStatus: string
   ) => {
     return await notifyJobStatusChange(
@@ -146,8 +150,8 @@ export function useJobNotifications() {
   }, [notifyJobStatusChange]);
 
   const notifyJobOnHold = useCallback(async (
-    job: any,
-    customer: any,
+    job: JobNotificationData,
+    customer: CustomerNotificationData,
     oldStatus: string,
     reason?: string
   ) => {
@@ -159,8 +163,8 @@ export function useJobNotifications() {
   }, [notifyJobStatusChange]);
 
   const notifyJobCancelled = useCallback(async (
-    job: any,
-    customer: any,
+    job: JobNotificationData,
+    customer: CustomerNotificationData,
     oldStatus: string,
     reason?: string
   ) => {
@@ -172,8 +176,8 @@ export function useJobNotifications() {
   }, [notifyJobStatusChange]);
 
   const notifyQuoteSent = useCallback(async (
-    job: any,
-    customer: any,
+    job: JobNotificationData,
+    customer: CustomerNotificationData,
     oldStatus: string
   ) => {
     return await notifyJobStatusChange(

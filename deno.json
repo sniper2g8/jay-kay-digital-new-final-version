@@ -1,0 +1,14 @@
+{
+  "imports": {
+    "@/lib/supabase": "./src/lib/supabase.ts",
+    "@/contexts/AuthContext": "./src/contexts/AuthContext.tsx",
+    "@/lib/database.types": "./src/lib/database.types.ts",
+    "@/lib/": "./src/lib/",
+    "@/contexts/": "./src/contexts/",
+    "@/components/": "./src/components/",
+    "@/app/": "./src/app/",
+    "@/*": "./src/*",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.57.4",
+    "std/": "https://deno.land/std@0.168.0/"
+  }
+}
