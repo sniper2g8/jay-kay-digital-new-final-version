@@ -60,12 +60,17 @@ export function InvoiceTemplate({
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
-  const subtotal = invoice.subtotal || items.reduce((sum, item) => sum + item.total_price, 0);
-  const taxRate = invoice.tax_rate || 0;
+  // Ensure numeric calculations with proper type conversion
+  const subtotal = invoice.subtotal || items.reduce((sum, item) => {
+    const totalPrice = typeof item.total_price === 'string' ? parseFloat(item.total_price) || 0 : item.total_price || 0;
+    return sum + totalPrice;
+  }, 0);
+  
+  const taxRate = typeof invoice.tax_rate === 'string' ? parseFloat(invoice.tax_rate) || 0 : invoice.tax_rate || 0;
   const tax = invoice.tax || (subtotal * taxRate / 100);
-  const discount = invoice.discount || 0;
+  const discount = typeof invoice.discount === 'string' ? parseFloat(invoice.discount) || 0 : invoice.discount || 0;
   const total = invoice.total || subtotal + tax - discount;
-  const amountPaid = invoice.amountPaid || 0;
+  const amountPaid = typeof invoice.amountPaid === 'string' ? parseFloat(invoice.amountPaid) || 0 : invoice.amountPaid || 0;
   const amountDue = total - amountPaid;
   const currency = invoice.currency || 'SLL';
 
@@ -204,24 +209,46 @@ export function InvoiceTemplate({
       </div>
 
       {/* Bill To */}
-      <div className="mb-8">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Bill To:</h3>
-        {customer ? (
-          <div className="text-gray-700">
-            <p className="font-medium">{customer.business_name}</p>
-            {customer.contact_person && <p>{customer.contact_person}</p>}
-            {customer.address && <p>{customer.address}</p>}
-            {customer.city && (
-              <p>
-                {[customer.city, customer.state, customer.zip_code].filter(Boolean).join(", ")}
-              </p>
-            )}
-            {customer.country && <p>{customer.country}</p>}
-            {customer.phone && <p>Phone: {customer.phone}</p>}
-            {customer.email && <p>Email: {customer.email}</p>}
+      <div className="mb-8 flex justify-between items-start">
+        <div className="flex-1">
+          <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+            <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium mr-3">Bill To</span>
+          </h3>
+          {customer ? (
+            <div className="text-gray-700 space-y-1">
+              <p className="font-semibold text-lg text-gray-900">{customer.business_name}</p>
+              {customer.contact_person && <p className="text-gray-600">👤 {customer.contact_person}</p>}
+              {customer.address && <p className="text-gray-600">📍 {customer.address}</p>}
+              {customer.city && (
+                <p className="text-gray-600">
+                  🏙️ {[customer.city, customer.state, customer.zip_code].filter(Boolean).join(", ")}
+                </p>
+              )}
+              {customer.country && <p className="text-gray-600">🌍 {customer.country}</p>}
+              {customer.phone && <p className="text-gray-600">📞 {customer.phone}</p>}
+              {customer.email && <p className="text-gray-600">✉️ {customer.email}</p>}
+            </div>
+          ) : (
+            <p className="text-gray-500 italic">Customer information not available</p>
+          )}
+        </div>
+        
+        {/* QR Code */}
+        {qrCodeDataUrl && (
+          <div className="bg-white p-4 rounded-xl shadow-lg border border-gray-200 ml-8">
+            <div className="text-center mb-2">
+              <QrCode className="w-5 h-5 text-gray-600 mx-auto mb-1" />
+              <p className="text-xs text-gray-600 font-medium">Invoice Details</p>
+            </div>
+            <img 
+              src={qrCodeDataUrl} 
+              alt="Invoice QR Code" 
+              className="w-24 h-24 mx-auto"
+            />
+            <p className="text-xs text-gray-500 text-center mt-2">
+              Invoice #{invoice.invoiceNo || `JKDP-INV-${invoice.id.slice(0, 8)}`}
+            </p>
           </div>
-        ) : (
-          <p className="text-gray-500 italic">Customer information not available</p>
         )}
       </div>
 

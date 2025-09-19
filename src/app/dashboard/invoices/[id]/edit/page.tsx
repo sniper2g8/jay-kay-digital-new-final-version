@@ -31,6 +31,7 @@ import {
   DollarSign,
   Calendar,
   Eye,
+  QrCode,
 } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
@@ -40,6 +41,7 @@ import {
   transformFirebaseTimestamp,
   formatCurrency,
 } from "@/lib/invoice-utils";
+import QRCodeLib from "qrcode";
 
 interface InvoiceLineItem {
   id?: string;
@@ -74,6 +76,7 @@ function InvoiceEditContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
 
   // Form state
   const [formData, setFormData] = useState({
@@ -224,10 +227,17 @@ function InvoiceEditContent() {
       [field]: value,
     };
 
-    // Recalculate total for this item
+    // Recalculate total for this item with proper type conversion
     if (field === "quantity" || field === "unitPrice") {
-      updatedItems[index].total =
-        updatedItems[index].quantity * updatedItems[index].unitPrice;
+      const quantity = field === "quantity" 
+        ? (typeof value === 'string' ? parseInt(value) || 0 : value || 0)
+        : (typeof updatedItems[index].quantity === 'string' ? parseInt(updatedItems[index].quantity as string) || 0 : updatedItems[index].quantity || 0);
+        
+      const unitPrice = field === "unitPrice" 
+        ? (typeof value === 'string' ? parseFloat(value) || 0 : value || 0)
+        : (typeof updatedItems[index].unitPrice === 'string' ? parseFloat(updatedItems[index].unitPrice as string) || 0 : updatedItems[index].unitPrice || 0);
+        
+      updatedItems[index].total = quantity * unitPrice;
     }
 
     setFormData((prev) => ({
@@ -259,12 +269,51 @@ function InvoiceEditContent() {
   };
 
   const calculateTotals = () => {
-    const subtotal = formData.items.reduce((sum, item) => sum + item.total, 0);
-    const taxAmount = subtotal * (formData.tax / 100);
+    const subtotal = formData.items.reduce((sum, item) => {
+      // Ensure proper numeric conversion
+      const itemTotal = typeof item.total === 'string' ? parseFloat(item.total) || 0 : item.total || 0;
+      return sum + itemTotal;
+    }, 0);
+    
+    const taxRate = typeof formData.tax === 'string' ? parseFloat(formData.tax) || 0 : formData.tax || 0;
+    const taxAmount = subtotal * (taxRate / 100);
     const total = subtotal + taxAmount;
 
     return { subtotal, taxAmount, total };
   };
+
+  // Generate QR Code when invoice data changes
+  useEffect(() => {
+    const generateQRCode = async () => {
+      if (invoice) {
+        try {
+          const { total } = calculateTotals();
+          const invoiceInfo = {
+            invoice_id: invoice.id,
+            invoice_no: invoice.invoiceNo,
+            total: formatCurrency(total),
+            due_date: new Date(formData.dueDate).toLocaleDateString(),
+            company: "Jay Kay Digital Press"
+          };
+          
+          const qrData = `Invoice: ${invoiceInfo.invoice_no}\nTotal: ${invoiceInfo.total}\nDue: ${invoiceInfo.due_date}\nCompany: ${invoiceInfo.company}`;
+          const qrCodeUrl = await QRCodeLib.toDataURL(qrData, {
+            width: 120,
+            margin: 1,
+            color: {
+              dark: '#1f2937',
+              light: '#ffffff'
+            }
+          });
+          setQrCodeDataUrl(qrCodeUrl);
+        } catch (error) {
+          console.error('Error generating QR code:', error);
+        }
+      }
+    };
+
+    generateQRCode();
+  }, [invoice, formData.items, formData.tax, formData.dueDate]);
 
   const handleSave = async () => {
     try {
@@ -690,6 +739,24 @@ function InvoiceEditContent() {
                       formData.status.slice(1)}
                   </Badge>
                 </div>
+
+                {/* QR Code */}
+                {qrCodeDataUrl && (
+                  <div className="pt-4 border-t">
+                    <div className="text-center">
+                      <div className="flex items-center justify-center gap-2 mb-2">
+                        <QrCode className="h-4 w-4 text-gray-600" />
+                        <span className="text-sm font-medium text-gray-600">Invoice QR Code</span>
+                      </div>
+                      <img 
+                        src={qrCodeDataUrl} 
+                        alt="Invoice QR Code" 
+                        className="w-24 h-24 mx-auto border rounded-lg"
+                      />
+                      <p className="text-xs text-gray-500 mt-2">Scan for invoice details</p>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
 

@@ -53,13 +53,17 @@ export function SimplifiedInvoiceTemplate({
   customer, 
   items
 }: SimplifiedInvoiceTemplateProps) {
-  // Calculate totals
-  const subtotal = invoice.subtotal || items.reduce((sum, item) => sum + item.total_price, 0);
-  const taxRate = invoice.tax_rate || 0;
+  // Calculate totals with proper type conversion
+  const subtotal = invoice.subtotal || items.reduce((sum, item) => {
+    const totalPrice = typeof item.total_price === 'string' ? parseFloat(item.total_price) || 0 : item.total_price || 0;
+    return sum + totalPrice;
+  }, 0);
+  
+  const taxRate = typeof invoice.tax_rate === 'string' ? parseFloat(invoice.tax_rate) || 0 : invoice.tax_rate || 0;
   const tax = invoice.tax || (subtotal * taxRate / 100);
-  const discount = invoice.discount || 0;
+  const discount = typeof invoice.discount === 'string' ? parseFloat(invoice.discount) || 0 : invoice.discount || 0;
   const total = invoice.total || subtotal + tax - discount;
-  const amountPaid = invoice.amountPaid || 0;
+  const amountPaid = typeof invoice.amountPaid === 'string' ? parseFloat(invoice.amountPaid) || 0 : invoice.amountPaid || 0;
   const amountDue = total - amountPaid;
   const currency = invoice.currency || 'SLL';
 
