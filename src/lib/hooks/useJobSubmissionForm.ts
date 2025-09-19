@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
-import { usePaperSpecifications, useFinishOptions } from "./usePaperSpecifications.ts";
-import type { Database } from "@/lib/database-generated.types";
+import { usePaperSpecifications } from "./usePaperSpecifications.ts";
+import { Database } from "@/lib/database-generated.types";
 
 type FinishOption = Database["public"]["Tables"]["finish_options"]["Row"];
 

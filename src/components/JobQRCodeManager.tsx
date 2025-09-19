@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { QRCodeData } from "@/lib/hooks/useQRCode";
 import {
   Card,
   CardContent,
@@ -19,7 +20,7 @@ import {
   Share2,
 } from "lucide-react";
 import QRCodeGenerator from "@/components/QRCodeGenerator";
-import { useQRCodeGenerator, type QRCodeData } from "@/lib/hooks/useQRCode";
+import { useQRCodeGenerator } from "@/lib/hooks/useQRCode";
 import { toast } from "sonner";
 
 interface JobQRCodeManagerProps {

@@ -87,21 +87,43 @@ export function InvoiceTemplate({
       `}</style>
 
       {/* Header */}
-      <div className="border-b-2 border-gray-300 pb-6 mb-6">
-        <div className="flex justify-between items-start">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">JAY KAY DIGITAL PRESS</h1>
-            <p className="text-gray-600">Professional Printing & Digital Services</p>
-            <p className="text-gray-600 mt-1">Freetown, Sierra Leone</p>
-            <p className="text-gray-600">+232 34 788711 | +232 30 741062</p>
-            <p className="text-gray-600">jaykaydigitalpress@gmail.com</p>
+      <div className="border-b border-gray-200 pb-8 mb-8">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-6">
+            {/* Logo */}
+            <div className="flex-shrink-0">
+              <img 
+                src="/JK_Logo.jpg" 
+                alt="Jay Kay Digital Press Logo" 
+                className="w-20 h-20 object-contain"
+              />
+            </div>
+            {/* Company Info */}
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-1">JAY KAY DIGITAL PRESS</h1>
+              <p className="text-sm text-gray-600 mb-1">Professional Printing & Digital Services</p>
+              <p className="text-sm text-gray-600 mb-1">Freetown, Sierra Leone</p>
+              <p className="text-sm text-gray-600 mb-1">Tel: +232 34 788711 | +232 30 741062</p>
+              <p className="text-sm text-gray-600">Email: jaykaydigitalpress@gmail.com</p>
+            </div>
           </div>
           <div className="text-right">
-            <h2 className="text-2xl font-bold text-gray-900">INVOICE</h2>
-            <p className="text-gray-600 mt-1">#{invoice.invoiceNo || `JKDP-INV-${invoice.id.slice(0, 8)}`}</p>
-            <div className="mt-4 text-sm">
-              <p className="text-gray-600">Issue Date: {formatDate(invoiceDate.toISOString())}</p>
-              <p className="text-gray-600">Due Date: {formatDate(dueDate.toISOString())}</p>
+            <div className="bg-gray-50 p-6 rounded-lg">
+              <h2 className="text-2xl font-bold text-gray-900 mb-3">INVOICE</h2>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Invoice No:</span>
+                  <span className="font-medium">#{invoice.invoiceNo || `JKDP-INV-${invoice.id.slice(0, 8)}`}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Issue Date:</span>
+                  <span className="font-medium">{formatDate(invoiceDate.toISOString())}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Due Date:</span>
+                  <span className="font-medium">{formatDate(dueDate.toISOString())}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

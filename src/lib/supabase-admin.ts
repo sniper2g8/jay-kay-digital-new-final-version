@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import type { Database } from "./database-generated.types";
+import { Database } from "./database-generated.types";
 
 // Create a Supabase client with service role key for server-side admin operations
 export const createServiceRoleClient = () => {

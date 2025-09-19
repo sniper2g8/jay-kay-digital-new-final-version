@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import { useUserRole, type UserRole } from "@/lib/hooks/useUserRole";
+import { useUserRole, UserRole } from "@/lib/hooks/useUserRole";
 import RoleBasedNav from "@/components/RoleBasedNav";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { Loader2 } from "lucide-react";

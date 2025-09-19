@@ -1,0 +1,28 @@
+<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <!-- Red oval background -->
+  <ellipse cx="60" cy="35" rx="45" ry="30" fill="#DC2626" opacity="0.9"/>
+  <ellipse cx="60" cy="35" rx="35" ry="22" fill="#EF4444" opacity="0.6"/>
+  <ellipse cx="60" cy="35" rx="25" ry="15" fill="#FCA5A5" opacity="0.4"/>
+  
+  <!-- JK Letters -->
+  <g transform="translate(20, 65)">
+    <!-- J -->
+    <path d="M 5 5 L 5 35 Q 5 45 15 45 Q 25 45 25 35 L 25 25" 
+          stroke="#2D3748" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <path d="M 5 5 L 15 5" 
+          stroke="#2D3748" stroke-width="8" fill="none" stroke-linecap="round"/>
+    
+    <!-- K -->
+    <path d="M 40 5 L 40 45" 
+          stroke="#2D3748" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <path d="M 40 25 L 65 5" 
+          stroke="#2D3748" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <path d="M 40 25 L 65 45" 
+          stroke="#2D3748" stroke-width="8" fill="none" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Decorative elements -->
+  <circle cx="30" cy="20" r="3" fill="#FCA5A5" opacity="0.6"/>
+  <circle cx="90" cy="25" r="2" fill="#FCA5A5" opacity="0.6"/>
+  <circle cx="85" cy="45" r="2.5" fill="#EF4444" opacity="0.5"/>
+</svg>

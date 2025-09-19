@@ -14,7 +14,7 @@ import {
   Service 
 } from "@/lib/hooks/useJobSubmissionForm";
 import { FileUpload } from "@/lib/hooks/useFileUploadFixed";
-import type { Database } from "@/lib/database-generated.types";
+import { Database } from "@/lib/database-generated.types";
 
 type FinishOption = Database["public"]["Tables"]["finish_options"]["Row"];
 

@@ -1,6 +1,6 @@
 "use client";
 
-import {  useState, useEffect  } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,7 +15,6 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { ProfessionalInvoicePDF } from "@/components/ProfessionalInvoicePDF";
-import { InvoiceTemplate } from "@/components/InvoiceTemplate";
 import { formatCurrency, formatDate } from "@/lib/constants";
 import { 
   ArrowLeft,

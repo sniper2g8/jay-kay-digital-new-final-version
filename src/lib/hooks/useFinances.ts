@@ -1,7 +1,7 @@
 import useSWR from "swr";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
-import type { Database } from "@/lib/database-generated.types";
+import { Database } from "@/lib/database-generated.types";
 
 type Json = Database["public"]["Tables"]["invoices"]["Row"]["items"];
 

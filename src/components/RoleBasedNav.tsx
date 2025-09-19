@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { UserRole } from "@/lib/hooks/useUserRole";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -27,7 +28,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { useUserRole, type UserRole } from "@/lib/hooks/useUserRole";
+import { useUserRole } from "@/lib/hooks/useUserRole";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface NavigationItem {

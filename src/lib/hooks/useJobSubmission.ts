@@ -112,27 +112,11 @@ export const useJobSubmission = () => {
         throw new Error(userMessage);
       }
 
-      // Attach files if any were uploaded
+      // NOTE: File attachments are already handled by the upload process
+      // The uploadedFileRecords contain files that have already been inserted into the database
+      // by the useFileUploadFixed hook, so we don't need to insert them again here.
       if (uploadedFileRecords.length > 0) {
-        // Fix the file attachment structure to match the actual database schema
-        const fileAttachments = uploadedFileRecords.map(file => ({
-          ...file,
-          entity_id: job.id,     // Use entity_id instead of job_id
-          entity_type: "job",    // Specify the entity type
-          // Don't set uploaded_by to avoid foreign key constraint issues
-          // The database will handle this or it can be null
-          created_at: new Date().toISOString(),
-        }));
-        
-        const { error: filesError } = await supabase
-          .from("file_attachments")
-          .insert(fileAttachments);
-
-        if (filesError) {
-          const errorMessage = filesError.message || String(filesError);
-          console.error("File attachment error:", errorMessage);
-          throw new Error(`Failed to attach files: ${errorMessage}`);
-        }
+        console.log("Files already attached during upload process:", uploadedFileRecords.length, "files");
       }
 
       toast.success("Job submitted successfully!");

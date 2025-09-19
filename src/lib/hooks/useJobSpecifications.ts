@@ -1,6 +1,6 @@
 import useSWR from "swr";
 import { supabase } from "@/lib/supabase";
-import type { Database } from "@/lib/database-generated.types";
+import { Database } from "@/lib/database-generated.types";
 
 type JobSpecification = Database["public"]["Tables"]["job_specifications"]["Row"];
 type PaperSize = Database["public"]["Tables"]["paper_sizes"]["Row"];

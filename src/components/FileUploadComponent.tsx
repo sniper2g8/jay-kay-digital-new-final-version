@@ -189,7 +189,7 @@ export const FileUploadComponent: React.FC<FileUploadComponentProps> = ({
                 variant="outline"
                 className="mt-3"
                 disabled={disabled || isUploading}
-                onClick={(e) => {
+                onClick={(e: React.MouseEvent) => {
                   e.stopPropagation(); // Prevent card click from firing
                   handleChooseFiles();
                 }}

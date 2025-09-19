@@ -1,6 +1,6 @@
 "use client";
 
-import {  useState, useEffect  } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,8 +21,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { formatCurrency, formatDate } from "@/lib/constants";
+import { formatCurrency } from "@/lib/constants";
 import { 
   Plus, 
   Trash2, 
@@ -34,7 +33,6 @@ import {
   CreditCard
 } from "lucide-react";
 import { ProfessionalInvoicePDF } from "@/components/ProfessionalInvoicePDF";
-import { SimplifiedInvoiceTemplate } from "@/components/SimplifiedInvoiceTemplate";
 
 interface InvoiceItem {
   id: number;

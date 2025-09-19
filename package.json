@@ -14,7 +14,8 @@
     "fix:db-permissions": "node scripts/fix-database-permissions.mjs",
     "format:check": "prettier --check .",
     "format:fix": "prettier --write .",
-    "fix-imports": "node fix-imports.js"
+    "fix-imports": "node fix-imports.js",
+    "clean:imports": "node scripts/remove-unused-imports.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
