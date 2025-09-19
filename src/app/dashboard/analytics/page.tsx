@@ -18,23 +18,26 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  TrendingUp,
-  DollarSign,
-  Users,
-  Package,
-  Activity,
-  PieChart,
-  LineChart,
-  Target,
-  AlertTriangle,
-  CheckCircle,
-  Download,
-  RefreshCw,
+import { 
+  BarChart3, 
+  TrendingUp, 
+  Users, 
+  Package, 
+  DollarSign, 
+  Calendar,
+  Filter,
   ArrowLeft,
+  RefreshCw,
+  Download,
+  CheckCircle,
+  AlertTriangle,
+  LineChart,
+  PieChart,
+  Target,
+  Activity
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { Database } from "@/lib/database-generated.types";
+import { Database } from "@/lib/database.types";
 
 type Job = Database["public"]["Tables"]["jobs"]["Row"];
 type Customer = Database["public"]["Tables"]["customers"]["Row"];
