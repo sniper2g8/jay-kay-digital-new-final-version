@@ -1,12 +1,13 @@
 "use client";
 
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { formatCurrency, formatDate } from "@/lib/constants";
-import { Download, FileText } from "lucide-react";
+import { Download, FileText, QrCode } from "lucide-react";
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { useReactToPrint } from 'react-to-print';
+import QRCode from "qrcode";
 
 interface InvoiceItem {
   id: number;
@@ -62,6 +63,7 @@ export function ProfessionalInvoicePDF({
   showActions = true
 }: ProfessionalInvoicePDFProps) {
   const invoiceRef = useRef<HTMLDivElement>(null);
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
 
   // Calculate totals with proper type conversion
   const subtotal = invoice.subtotal || items.reduce((sum, item) => {
@@ -81,6 +83,36 @@ export function ProfessionalInvoicePDF({
   const invoiceDate = invoice.invoice_date ? new Date(invoice.invoice_date) : new Date(invoice.created_at);
   const dueDate = new Date(invoiceDate);
   dueDate.setDate(dueDate.getDate() + (invoice.terms_days || 30));
+
+  // Generate QR Code
+  useEffect(() => {
+    const generateQRCode = async () => {
+      try {
+        const invoiceInfo = {
+          invoice_id: invoice.id,
+          invoice_no: invoice.invoiceNo || `JKDP-INV-${invoice.id.slice(0, 8)}`,
+          total: formatCurrency(total),
+          due_date: formatDate(dueDate.toISOString()),
+          company: "Jay Kay Digital Press"
+        };
+        
+        const qrData = `Invoice: ${invoiceInfo.invoice_no}\nTotal: ${invoiceInfo.total}\nDue: ${invoiceInfo.due_date}\nCompany: ${invoiceInfo.company}`;
+        const qrCodeUrl = await QRCode.toDataURL(qrData, {
+          width: 120,
+          margin: 1,
+          color: {
+            dark: '#1f2937',
+            light: '#ffffff'
+          }
+        });
+        setQrCodeDataUrl(qrCodeUrl);
+      } catch (error) {
+        console.error('Error generating QR code:', error);
+      }
+    };
+
+    generateQRCode();
+  }, [invoice, total, dueDate]);
 
   // PDF generation using jsPDF + html2canvas
   const generatePDF = async () => {
@@ -221,24 +253,46 @@ export function ProfessionalInvoicePDF({
           </div>
 
           {/* Bill To */}
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Bill To:</h3>
-            {customer ? (
-              <div className="text-gray-700">
-                <p className="font-medium">{customer.business_name}</p>
-                {customer.contact_person && <p>{customer.contact_person}</p>}
-                {customer.address && <p>{customer.address}</p>}
-                {customer.city && (
-                  <p>
-                    {[customer.city, customer.state, customer.zip_code].filter(Boolean).join(", ")}
-                  </p>
-                )}
-                {customer.country && <p>{customer.country}</p>}
-                {customer.phone && <p>Phone: {customer.phone}</p>}
-                {customer.email && <p>Email: {customer.email}</p>}
+          <div className="mb-8 flex justify-between items-start">
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium mr-3">Bill To</span>
+              </h3>
+              {customer ? (
+                <div className="text-gray-700 space-y-1">
+                  <p className="font-semibold text-lg text-gray-900">{customer.business_name}</p>
+                  {customer.contact_person && <p className="text-gray-600">👤 {customer.contact_person}</p>}
+                  {customer.address && <p className="text-gray-600">📍 {customer.address}</p>}
+                  {customer.city && (
+                    <p className="text-gray-600">
+                      🏙️ {[customer.city, customer.state, customer.zip_code].filter(Boolean).join(", ")}
+                    </p>
+                  )}
+                  {customer.country && <p className="text-gray-600">🌍 {customer.country}</p>}
+                  {customer.phone && <p className="text-gray-600">📞 {customer.phone}</p>}
+                  {customer.email && <p className="text-gray-600">✉️ {customer.email}</p>}
+                </div>
+              ) : (
+                <p className="text-gray-500 italic">Customer information not available</p>
+              )}
+            </div>
+            
+            {/* QR Code */}
+            {qrCodeDataUrl && (
+              <div className="bg-white p-4 rounded-xl shadow-lg border border-gray-200 ml-8">
+                <div className="text-center mb-2">
+                  <QrCode className="w-5 h-5 text-gray-600 mx-auto mb-1" />
+                  <p className="text-xs text-gray-600 font-medium">Invoice Details</p>
+                </div>
+                <img 
+                  src={qrCodeDataUrl} 
+                  alt="Invoice QR Code" 
+                  className="w-24 h-24 mx-auto"
+                />
+                <p className="text-xs text-gray-500 text-center mt-2">
+                  Invoice #{invoice.invoiceNo || `JKDP-INV-${invoice.id.slice(0, 8)}`}
+                </p>
               </div>
-            ) : (
-              <p className="text-gray-500 italic">Customer information not available</p>
             )}
           </div>
 

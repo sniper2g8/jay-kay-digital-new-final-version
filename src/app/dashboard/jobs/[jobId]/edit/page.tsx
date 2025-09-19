@@ -27,7 +27,7 @@ import {
   Download,
   Trash2,
 } from "lucide-react";
-import { useJob } from "@/lib/hooks/useJobs";
+import { useJob, useJobByNumber } from "@/lib/hooks/useJobs";
 import { useFileUploadFixed } from "@/lib/hooks/useFileUploadFixed";
 import DashboardLayout from "@/components/DashboardLayout";
 import { supabase } from "@/lib/supabase";
@@ -45,12 +45,53 @@ interface JobFile {
   uploaded_by: string | null;
 }
 
+// Function to check if a string is a valid UUID
+const isUUID = (str: string): boolean => {
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(str);
+};
+
+// Function to check if a string is a job number format
+const isJobNumber = (str: string): boolean => {
+  // Job numbers follow the pattern JKDP-JOB-XXXX where XXXX is digits
+  const jobNoRegex = /^JKDP-JOB-\d{4}$/i;
+  return jobNoRegex.test(str);
+};
+
 export default function EditJobPage() {
   const params = useParams();
   const router = useRouter();
   const jobId = params.jobId as string;
 
-  const { data: job, error: jobError, isLoading: jobLoading } = useJob(jobId);
+  // Determine if we're using UUID or jobNo
+  const isUUIDParam = isUUID(jobId);
+  const isJobNoParam = isJobNumber(jobId);
+
+  // Use appropriate hook based on parameter type
+  const {
+    data: jobByUUID,
+    error: jobUUIDError,
+    isLoading: jobUUIDLoading,
+  } = useJob(isUUIDParam ? jobId : null);
+  const {
+    data: jobByNumber,
+    error: jobNumberError,
+    isLoading: jobNumberLoading,
+  } = useJobByNumber(isJobNoParam ? jobId : null);
+
+  // Use the appropriate job data
+  const job = isUUIDParam ? jobByUUID : isJobNoParam ? jobByNumber : null;
+  const jobError = isUUIDParam
+    ? jobUUIDError
+    : isJobNoParam
+      ? jobNumberError
+      : null;
+  const jobLoading = isUUIDParam
+    ? jobUUIDLoading
+    : isJobNoParam
+      ? jobNumberLoading
+      : false;
   const { fileUploads, handleFileSelect, removeFile, uploadFiles } =
     useFileUploadFixed();
   const [isSubmitting, setIsSubmitting] = useState(false);

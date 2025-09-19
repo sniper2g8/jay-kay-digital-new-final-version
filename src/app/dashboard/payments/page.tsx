@@ -87,7 +87,13 @@ export default function PaymentsPage() {
       if (error) throw error;
       setPayments(data || []);
     } catch (error) {
-      console.error('Error fetching payments:', error);
+      console.error('Error fetching payments:', {
+        message: error instanceof Error ? error.message : 'Unknown payments fetch error',
+        error: error,
+        stack: error instanceof Error ? error.stack : undefined,
+        errorType: typeof error,
+        context: 'fetchPayments'
+      });
     } finally {
       setLoading(false);
     }

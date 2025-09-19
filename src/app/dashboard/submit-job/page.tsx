@@ -100,7 +100,13 @@ export default function SubmitJobPage() {
       // Clear files after successful submission
       fileHook.clearFiles();
     } catch (error) {
-      console.error("Submission failed:", error);
+      console.error("Submission failed:", {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        error: error,
+        stack: error instanceof Error ? error.stack : undefined,
+        type: typeof error,
+        errorString: String(error)
+      });
     }
   };
 

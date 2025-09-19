@@ -373,7 +373,16 @@ function InvoiceDetailContent() {
       // Show success message
       alert("Payment recorded successfully");
     } catch (err) {
-      console.error("Error processing payment:", err);
+      console.error("Error processing payment:", {
+        message: err instanceof Error ? err.message : 'Unknown payment error',
+        error: err,
+        stack: err instanceof Error ? err.stack : undefined,
+        errorType: typeof err,
+        errorString: String(err),
+        paymentForm: paymentForm,
+        invoiceId: invoice?.id,
+        context: 'handlePayment'
+      });
       alert("Failed to process payment");
     } finally {
       setIsProcessingPayment(false);

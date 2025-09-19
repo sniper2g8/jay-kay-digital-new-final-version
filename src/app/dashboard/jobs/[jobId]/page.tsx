@@ -330,7 +330,16 @@ export default function JobDetailPage() {
                         .eq(isUUIDParam ? "id" : "jobNo", jobId);
 
                       if (error) {
-                        console.error("Status update error:", error);
+                        console.error("Status update error:", {
+                          message: error instanceof Error ? error.message : (error?.message || 'Unknown database error'),
+                          error: error,
+                          code: error?.code,
+                          details: error?.details,
+                          hint: error?.hint,
+                          errorType: typeof error,
+                          errorString: String(error),
+                          context: 'statusUpdate_onValueChange'
+                        });
                         toast.error("Failed to update status");
                       } else {
                         toast.success("Status updated successfully");
@@ -342,7 +351,13 @@ export default function JobDetailPage() {
                         }
                       }
                     } catch (error) {
-                      console.error("Status update error:", error);
+                      console.error("Status update error:", {
+                        message: error instanceof Error ? error.message : 'Unknown error',
+                        error: error,
+                        stack: error instanceof Error ? error.stack : undefined,
+                        errorType: typeof error,
+                        errorString: String(error)
+                      });
                       toast.error("Failed to update status");
                     }
                   }}

@@ -101,7 +101,13 @@ class NotificationService {
       // Send receipt confirmation to customer
       await this.sendCustomerPaymentConfirmation(data);
     } catch (error) {
-      console.error('Error sending payment notification:', error);
+      console.error('Error sending payment notification:', {
+        message: error instanceof Error ? error.message : 'Unknown payment notification error',
+        error: error,
+        stack: error instanceof Error ? error.stack : undefined,
+        errorType: typeof error,
+        context: 'sendPaymentNotification'
+      });
       throw error;
     }
   }

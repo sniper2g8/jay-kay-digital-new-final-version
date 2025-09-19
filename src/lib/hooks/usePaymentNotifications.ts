@@ -58,7 +58,13 @@ export async function notifyPaymentRecorded(paymentData: {
     await notificationService.sendPaymentRecordNotification(notificationData);
     
   } catch (error) {
-    console.error('Error sending payment notifications:', error);
+    console.error('Error sending payment notifications:', {
+      message: error instanceof Error ? error.message : 'Unknown payment notification error',
+      error: error,
+      stack: error instanceof Error ? error.stack : undefined,
+      errorType: typeof error,
+      context: 'sendPaymentNotifications'
+    });
   }
 }
 
@@ -163,7 +169,14 @@ export async function recordPaymentWithNotification(paymentData: {
 
     return { success: true, payment_id: payment.id };
   } catch (error) {
-    console.error('Error recording payment with notification:', error);
+    console.error('Error recording payment with notification:', {
+      message: error instanceof Error ? error.message : 'Unknown payment recording error',
+      error: error,
+      stack: error instanceof Error ? error.stack : undefined,
+      errorType: typeof error,
+      errorString: String(error),
+      context: 'recordPaymentWithNotification'
+    });
     return { success: false, error: 'Internal server error' };
   }
 }
@@ -263,7 +276,12 @@ async function generatePaymentNumber(): Promise<string> {
       .single();
 
     if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
-      console.error('Error fetching latest payment:', error);
+      console.error('Error fetching latest payment:', {
+        message: error instanceof Error ? error.message : 'Unknown payment fetch error',
+        error: error,
+        code: error.code,
+        context: 'generatePaymentNumber'
+      });
     }
 
     let nextNumber = 1;
@@ -276,7 +294,13 @@ async function generatePaymentNumber(): Promise<string> {
 
     return `${prefix}-${nextNumber.toString().padStart(4, '0')}`;
   } catch (error) {
-    console.error('Error generating payment number:', error);
+    console.error('Error generating payment number:', {
+      message: error instanceof Error ? error.message : 'Unknown payment number generation error',
+      error: error,
+      stack: error instanceof Error ? error.stack : undefined,
+      errorType: typeof error,
+      context: 'generatePaymentNumber'
+    });
     // Fallback to timestamp-based number
     return `${prefix}-${Date.now().toString().slice(-4)}`;
   }
