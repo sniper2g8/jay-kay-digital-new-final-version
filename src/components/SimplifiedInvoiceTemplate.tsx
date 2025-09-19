@@ -107,7 +107,7 @@ export function SimplifiedInvoiceTemplate({
               <p className="text-sm text-gray-600 mb-1">Professional Printing & Digital Services</p>
               <p className="text-sm text-gray-600 mb-1">Freetown, Sierra Leone</p>
               <p className="text-sm text-gray-600 mb-1">Tel: +232 34 788711 | +232 30 741062</p>
-              <p className="text-sm text-gray-600">Email: jaykaydigitalpress@gmail.com</p>
+              <p className="text-sm text-gray-600">Email: info@jaykaydigitalpress.com</p>
             </div>
           </div>
           <div className="text-right">
@@ -179,7 +179,7 @@ export function SimplifiedInvoiceTemplate({
             ))}
             {items.length === 0 && (
               <tr>
-                <td colSpan={4} className="border border-gray-300 px-4 py-8 text-center text-gray-500">
+                <td colSpan={5} className="border border-gray-300 px-4 py-8 text-center text-gray-500">
                   No items found on this invoice
                 </td>
               </tr>

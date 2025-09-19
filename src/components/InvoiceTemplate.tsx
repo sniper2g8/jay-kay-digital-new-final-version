@@ -1,6 +1,11 @@
 "use client";
 
 import { formatCurrency, formatDate } from "@/lib/constants";
+import QRCode from "qrcode";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import { useRef, useState, useEffect } from "react";
+import { Download, QrCode } from "lucide-react";
 
 interface InvoiceItem {
   id: number;
@@ -51,6 +56,10 @@ export function InvoiceTemplate({
   customer, 
   items
 }: InvoiceTemplateProps) {
+  const invoiceRef = useRef<HTMLDivElement>(null);
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
   const subtotal = invoice.subtotal || items.reduce((sum, item) => sum + item.total_price, 0);
   const taxRate = invoice.tax_rate || 0;
   const tax = invoice.tax || (subtotal * taxRate / 100);
@@ -64,6 +73,71 @@ export function InvoiceTemplate({
   const invoiceDate = invoice.invoice_date ? new Date(invoice.invoice_date) : new Date(invoice.created_at);
   const dueDate = new Date(invoiceDate);
   dueDate.setDate(dueDate.getDate() + (invoice.terms_days || 30));
+
+  // Generate QR Code
+  useEffect(() => {
+    const generateQRCode = async () => {
+      try {
+        const invoiceInfo = {
+          invoice_id: invoice.id,
+          invoice_no: invoice.invoiceNo || `JKDP-INV-${invoice.id.slice(0, 8)}`,
+          total: formatCurrency(total),
+          due_date: formatDate(dueDate.toISOString()),
+          company: "Jay Kay Digital Press"
+        };
+        
+        const qrData = `Invoice: ${invoiceInfo.invoice_no}\nTotal: ${invoiceInfo.total}\nDue: ${invoiceInfo.due_date}\nCompany: ${invoiceInfo.company}`;
+        const qrCodeUrl = await QRCode.toDataURL(qrData, {
+          width: 120,
+          margin: 1,
+          color: {
+            dark: '#1f2937',
+            light: '#ffffff'
+          }
+        });
+        setQrCodeDataUrl(qrCodeUrl);
+      } catch (error) {
+        console.error('Error generating QR code:', error);
+      }
+    };
+
+    generateQRCode();
+  }, [invoice, total, dueDate]);
+
+  // Generate PDF
+  const generatePDF = async () => {
+    if (!invoiceRef.current) return;
+    
+    setIsGeneratingPdf(true);
+    try {
+      const canvas = await html2canvas(invoiceRef.current, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff'
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+      const imgY = 0;
+      
+      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+      
+      const fileName = `Invoice_${invoice.invoiceNo || `JKDP-INV-${invoice.id.slice(0, 8)}`}.pdf`;
+      pdf.save(fileName);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
 
   return (
     <div className="bg-white p-8 max-w-4xl mx-auto font-sans">
@@ -104,7 +178,7 @@ export function InvoiceTemplate({
               <p className="text-sm text-gray-600 mb-1">Professional Printing & Digital Services</p>
               <p className="text-sm text-gray-600 mb-1">Freetown, Sierra Leone</p>
               <p className="text-sm text-gray-600 mb-1">Tel: +232 34 788711 | +232 30 741062</p>
-              <p className="text-sm text-gray-600">Email: jaykaydigitalpress@gmail.com</p>
+              <p className="text-sm text-gray-600">Email: info@jaykaydigitalpress.com</p>
             </div>
           </div>
           <div className="text-right">
@@ -156,6 +230,7 @@ export function InvoiceTemplate({
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-gray-100">
+              <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold text-gray-700">Job No</th>
               <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold text-gray-700">Description</th>
               <th className="border border-gray-300 px-4 py-2 text-right text-sm font-semibold text-gray-700">Qty</th>
               <th className="border border-gray-300 px-4 py-2 text-right text-sm font-semibold text-gray-700">Unit Price</th>
@@ -165,6 +240,9 @@ export function InvoiceTemplate({
           <tbody>
             {items.map((item, index) => (
               <tr key={item.id || index}>
+                <td className="border border-gray-300 px-4 py-2 text-sm">
+                  {item.job_no || '-'}
+                </td>
                 <td className="border border-gray-300 px-4 py-2 text-sm">
                   <div>{item.description}</div>
                   {item.notes && <div className="text-gray-500 text-xs mt-1">{item.notes}</div>}
@@ -176,7 +254,7 @@ export function InvoiceTemplate({
             ))}
             {items.length === 0 && (
               <tr>
-                <td colSpan={4} className="border border-gray-300 px-4 py-8 text-center text-gray-500">
+                <td colSpan={5} className="border border-gray-300 px-4 py-8 text-center text-gray-500">
                   No items found on this invoice
                 </td>
               </tr>

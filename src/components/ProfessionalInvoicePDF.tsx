@@ -191,7 +191,7 @@ export function ProfessionalInvoicePDF({
                   <p className="text-sm text-gray-600 mb-1">Professional Printing & Digital Services</p>
                   <p className="text-sm text-gray-600 mb-1">Freetown, Sierra Leone</p>
                   <p className="text-sm text-gray-600 mb-1">Tel: +232 34 788711 | +232 30 741062</p>
-                  <p className="text-sm text-gray-600">Email: jaykaydigitalpress@gmail.com</p>
+                  <p className="text-sm text-gray-600">Email: info@jaykaydigitalpress.com</p>
                 </div>
               </div>
               <div className="text-right">
@@ -243,6 +243,7 @@ export function ProfessionalInvoicePDF({
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-gray-100">
+                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold text-gray-700">Job No</th>
                   <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold text-gray-700">Description</th>
                   <th className="border border-gray-300 px-4 py-2 text-right text-sm font-semibold text-gray-700">Qty</th>
                   <th className="border border-gray-300 px-4 py-2 text-right text-sm font-semibold text-gray-700">Unit Price</th>
@@ -252,6 +253,9 @@ export function ProfessionalInvoicePDF({
               <tbody>
                 {items.map((item, index) => (
                   <tr key={item.id || index}>
+                    <td className="border border-gray-300 px-4 py-2 text-sm">
+                      {item.job_no || '-'}
+                    </td>
                     <td className="border border-gray-300 px-4 py-2 text-sm">
                       <div>{item.description}</div>
                       {item.notes && <div className="text-gray-500 text-xs mt-1">{item.notes}</div>}
@@ -263,7 +267,7 @@ export function ProfessionalInvoicePDF({
                 ))}
                 {items.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="border border-gray-300 px-4 py-8 text-center text-gray-500">
+                    <td colSpan={5} className="border border-gray-300 px-4 py-8 text-center text-gray-500">
                       No items found on this invoice
                     </td>
                   </tr>
