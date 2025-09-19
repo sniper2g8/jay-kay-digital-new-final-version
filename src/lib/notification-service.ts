@@ -4,7 +4,7 @@
  */
 
 import { supabase } from './supabase.ts';
-import { Database } from './database-generated.types.ts';
+import { Database } from './database.types.ts';
 
 type NotificationType = Database['public']['Enums']['notification_type'];
 

@@ -2,7 +2,7 @@ import useSWR, { mutate } from "swr";
 import { useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
-import { Database } from "@/lib/database-generated.types";
+import { Database } from "@/lib/database.types";
 
 // Job interface - updated to match new consolidated schema
 export interface Job {

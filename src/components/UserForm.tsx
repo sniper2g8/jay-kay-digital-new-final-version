@@ -17,11 +17,11 @@ import {
   createUser, 
   updateUser, 
   getUserById, 
+  checkEmailExists, 
   validateUserData, 
-  checkEmailExists,
-  type UserFormData 
+  UserFormData 
 } from '@/lib/hooks/useUserManagement';
-import { Database } from '@/lib/database-generated.types';
+import { Database } from '@/lib/database.types';
 
 type UserRole = Database['public']['Enums']['user_role'];
 type UserStatus = Database['public']['Enums']['user_status'];

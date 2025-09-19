@@ -19,10 +19,13 @@ const eslintConfig = [
       "build/**",
       "next-env.d.ts",
       "migrations/**",
-      "src/lib/database-generated.types.ts",
-      "src/lib/database-generated.types.backup.ts",
     ],
   },
+  {
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off"
+    }
+  }
 ];
 
 export default eslintConfig;

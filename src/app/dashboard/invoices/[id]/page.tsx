@@ -80,7 +80,7 @@ import { formatCurrency, formatDate } from "@/lib/constants";
 import DashboardLayout from "@/components/DashboardLayout";
 import ProtectedDashboard from "@/components/ProtectedDashboard";
 import { InvoiceTemplate } from "@/components/InvoiceTemplate";
-import { Database } from "@/lib/database-generated.types";
+import { Database } from "@/lib/database.types";
 
 type Invoice = Database["public"]["Tables"]["invoices"]["Row"];
 

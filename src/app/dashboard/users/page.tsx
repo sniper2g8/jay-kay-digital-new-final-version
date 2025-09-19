@@ -48,7 +48,7 @@ import UserForm from '@/components/UserForm';
 import PasswordResetModal from '@/components/PasswordResetModal';
 import DeleteUserModal from '@/components/DeleteUserModal';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import { Database } from '@/lib/database-generated.types';
+import { Database } from '@/lib/database.types';
 
 type User = Database['public']['Tables']['appUsers']['Row'];
 type UserRole = Database['public']['Enums']['user_role'];

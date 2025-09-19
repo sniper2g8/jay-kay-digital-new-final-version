@@ -23,7 +23,7 @@ import {
   Palette
 } from "lucide-react";
 import { JobFormData } from "@/lib/hooks/useJobSubmissionForm";
-import { Database } from "@/lib/database-generated.types";
+import { Database } from "@/lib/database.types";
 
 type FinishOption = Database["public"]["Tables"]["finish_options"]["Row"];
 

@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Database } from '@/lib/database-generated.types';
+import { Database } from '@/lib/database.types';
 
 type User = Database['public']['Tables']['appUsers']['Row'];
 type UserRole = Database['public']['Enums']['user_role'];

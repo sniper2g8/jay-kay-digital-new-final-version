@@ -27,7 +27,7 @@ import {
   Shield
 } from 'lucide-react';
 import { deleteUser } from '@/lib/hooks/useUserManagement';
-import { Database } from '@/lib/database-generated.types';
+import { Database } from '@/lib/database.types';
 
 type UserRole = Database['public']['Enums']['user_role'];
 

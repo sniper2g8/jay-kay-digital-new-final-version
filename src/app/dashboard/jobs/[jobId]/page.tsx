@@ -331,11 +331,11 @@ export default function JobDetailPage() {
 
                       if (error) {
                         console.error("Status update error:", {
-                          message: error instanceof Error ? error.message : (error?.message || 'Unknown database error'),
+                          message: error instanceof Error ? error.message : (typeof error === 'object' && error !== null && 'message' in error ? (error as unknown as Record<string, unknown>).message : 'Unknown database error'),
                           error: error,
-                          code: error?.code,
-                          details: error?.details,
-                          hint: error?.hint,
+                          code: typeof error === 'object' && error !== null && 'code' in error ? (error as unknown as Record<string, unknown>).code : undefined,
+                          details: typeof error === 'object' && error !== null && 'details' in error ? (error as unknown as Record<string, unknown>).details : undefined,
+                          hint: typeof error === 'object' && error !== null && 'hint' in error ? (error as unknown as Record<string, unknown>).hint : undefined,
                           errorType: typeof error,
                           errorString: String(error),
                           context: 'statusUpdate_onValueChange'
