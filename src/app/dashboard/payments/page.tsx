@@ -25,7 +25,7 @@ import {
   ArrowLeft
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { Database } from "@/lib/database-generated.types";
+import { Database } from "@/lib/database.types";
 
 type PaymentRow = Database['public']['Tables']['payments']['Row'];
 type PaymentMethod = Database['public']['Enums']['payment_method'];

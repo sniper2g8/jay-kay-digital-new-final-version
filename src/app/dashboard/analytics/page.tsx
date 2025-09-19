@@ -335,7 +335,7 @@ export default function AnalyticsPage() {
       const jobStatusData = Object.entries(statusCounts).map(
         ([status, count]) => ({
           status: status.charAt(0).toUpperCase() + status.slice(1),
-          count,
+          count: count as number,
         }),
       );
 
@@ -419,7 +419,7 @@ export default function AnalyticsPage() {
       );
 
       const topCustomers = Object.entries(customerSpending)
-        .sort(([, a], [, b]) => b - a)
+        .sort(([, a], [, b]) => (b as number) - (a as number))
         .slice(0, 5)
         .map(([customerId, totalSpent]) => {
           const customer = (customersData || []).find(
@@ -433,7 +433,7 @@ export default function AnalyticsPage() {
               customer?.business_name ||
               customer?.contact_person ||
               "Unknown Customer",
-            totalSpent,
+            totalSpent: totalSpent as number,
             jobCount,
           };
         });
