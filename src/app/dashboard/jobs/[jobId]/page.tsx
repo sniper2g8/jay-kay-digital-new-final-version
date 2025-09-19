@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import {  useEffect, useState  } from 'react';
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -50,7 +50,7 @@ interface JobWithSpecifications {
   title: string | null;
   description: string | null;
   status: string | null;
-  priority: any | null;
+  priority: string | null;
   quantity: number | null;
   unit_price: number | null;
   final_price: number | null;
@@ -58,7 +58,7 @@ interface JobWithSpecifications {
   estimated_delivery: string | null;
   actual_delivery: string | null;
   assigned_to: string | null;
-  job_type: any | null;
+  job_type: string | null;
   service_id: string | null;
   serviceName: string | null;
   invoice_id: string | null;
@@ -80,14 +80,18 @@ interface JobWithSpecifications {
   size_unit?: string;
   paper_type?: string;
   paper_weight?: number;
-  finishing_options?: any;
+  finishing_options?:
+    | string[]
+    | { selected_options?: string[] }
+    | Record<string, unknown>;
   special_instructions?: string;
   requirements?: string;
 }
 
 // Function to check if a string is a valid UUID
 const isUUID = (str: string): boolean => {
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   return uuidRegex.test(str);
 };
 
@@ -106,27 +110,45 @@ export default function JobDetailPage() {
   // Determine if we're using UUID or jobNo
   const isUUIDParam = isUUID(jobId);
   const isJobNoParam = isJobNumber(jobId);
-  
+
   // Use appropriate hook based on parameter type
-  const { data: jobByUUID, error: jobUUIDError, isLoading: jobUUIDLoading } = useJob(isUUIDParam ? jobId : null);
-  const { data: jobByNumber, error: jobNumberError, isLoading: jobNumberLoading } = useJobByNumber(isJobNoParam ? jobId : null);
-  
+  const {
+    data: jobByUUID,
+    error: jobUUIDError,
+    isLoading: jobUUIDLoading,
+  } = useJob(isUUIDParam ? jobId : null);
+  const {
+    data: jobByNumber,
+    error: jobNumberError,
+    isLoading: jobNumberLoading,
+  } = useJobByNumber(isJobNoParam ? jobId : null);
+
   // Use the appropriate job data
   const job = isUUIDParam ? jobByUUID : isJobNoParam ? jobByNumber : null;
-  const jobError = isUUIDParam ? jobUUIDError : isJobNoParam ? jobNumberError : null;
-  const jobLoading = isUUIDParam ? jobUUIDLoading : isJobNoParam ? jobNumberLoading : false;
-  
+  const jobError = isUUIDParam
+    ? jobUUIDError
+    : isJobNoParam
+      ? jobNumberError
+      : null;
+  const jobLoading = isUUIDParam
+    ? jobUUIDLoading
+    : isJobNoParam
+      ? jobNumberLoading
+      : false;
+
   // Enhanced job with specifications
-  const [enhancedJob, setEnhancedJob] = useState<JobWithSpecifications | null>(null);
+  const [enhancedJob, setEnhancedJob] = useState<JobWithSpecifications | null>(
+    null,
+  );
   const [specsLoading, setSpecsLoading] = useState(false);
 
   // Fetch job specifications from the jobs table
   useEffect(() => {
     if (!jobId || !job) return;
-    
+
     const fetchJobSpecs = async () => {
       setSpecsLoading(true);
-      
+
       try {
         // Since we've migrated the data to the jobs table, we can get it directly
         // But we need to refresh the job data to get the new columns
@@ -135,7 +157,7 @@ export default function JobDetailPage() {
           .select("*")
           .eq(isUUIDParam ? "id" : "jobNo", jobId)
           .single();
-        
+
         if (error) {
           console.error("Error fetching job specs:", error);
         } else {
@@ -147,7 +169,7 @@ export default function JobDetailPage() {
         setSpecsLoading(false);
       }
     };
-    
+
     fetchJobSpecs();
   }, [jobId, job, isUUIDParam]);
 
@@ -182,10 +204,10 @@ export default function JobDetailPage() {
   // Get selected finish options names
   const getSelectedFinishOptions = () => {
     if (!enhancedJob?.finishing_options) return [];
-    
+
     // Parse the finishing options if it's a string
     let finishingOptions = enhancedJob.finishing_options;
-    if (typeof finishingOptions === 'string') {
+    if (typeof finishingOptions === "string") {
       try {
         finishingOptions = JSON.parse(finishingOptions);
       } catch (e) {
@@ -193,22 +215,30 @@ export default function JobDetailPage() {
         return [];
       }
     }
-    
+
     // If it's an object with selected_options property
-    if (finishingOptions.selected_options && Array.isArray(finishingOptions.selected_options)) {
-      return finishingOptions.selected_options;
+    if (
+      typeof finishingOptions === "object" &&
+      finishingOptions !== null &&
+      "selected_options" in finishingOptions
+    ) {
+      const options = (finishingOptions as { selected_options?: string[] })
+        .selected_options;
+      if (Array.isArray(options)) {
+        return options;
+      }
     }
-    
+
     // If it's a simple array
     if (Array.isArray(finishingOptions)) {
       return finishingOptions;
     }
-    
+
     // If it's an object with keys as option IDs
-    if (typeof finishingOptions === 'object' && finishingOptions !== null) {
+    if (typeof finishingOptions === "object" && finishingOptions !== null) {
       return Object.keys(finishingOptions);
     }
-    
+
     return [];
   };
 
@@ -419,7 +449,9 @@ export default function JobDetailPage() {
               </Card>
 
               {/* Job Specifications */}
-              {(enhancedJob?.size_type || enhancedJob?.paper_type || enhancedJob?.finishing_options) && (
+              {(enhancedJob?.size_type ||
+                enhancedJob?.paper_type ||
+                enhancedJob?.finishing_options) && (
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center">
@@ -437,31 +469,42 @@ export default function JobDetailPage() {
                         </h3>
                         <div className="grid grid-cols-2 gap-4 pl-6">
                           <div>
-                            <label className="text-xs text-gray-500">Type</label>
+                            <label className="text-xs text-gray-500">
+                              Type
+                            </label>
                             <p className="text-gray-900 font-medium capitalize">
                               {enhancedJob.size_type || "N/A"}
                             </p>
                           </div>
-                          {enhancedJob.size_type === "standard" && enhancedJob.size_preset && (
-                            <div>
-                              <label className="text-xs text-gray-500">Preset</label>
-                              <p className="text-gray-900 font-medium">
-                                {enhancedJob.size_preset || "N/A"}
-                              </p>
-                            </div>
-                          )}
+                          {enhancedJob.size_type === "standard" &&
+                            enhancedJob.size_preset && (
+                              <div>
+                                <label className="text-xs text-gray-500">
+                                  Preset
+                                </label>
+                                <p className="text-gray-900 font-medium">
+                                  {enhancedJob.size_preset || "N/A"}
+                                </p>
+                              </div>
+                            )}
                           {enhancedJob.size_type === "custom" && (
                             <>
                               <div>
-                                <label className="text-xs text-gray-500">Width</label>
+                                <label className="text-xs text-gray-500">
+                                  Width
+                                </label>
                                 <p className="text-gray-900 font-medium">
-                                  {enhancedJob.custom_width} {enhancedJob.size_unit}
+                                  {enhancedJob.custom_width}{" "}
+                                  {enhancedJob.size_unit}
                                 </p>
                               </div>
                               <div>
-                                <label className="text-xs text-gray-500">Height</label>
+                                <label className="text-xs text-gray-500">
+                                  Height
+                                </label>
                                 <p className="text-gray-900 font-medium">
-                                  {enhancedJob.custom_height} {enhancedJob.size_unit}
+                                  {enhancedJob.custom_height}{" "}
+                                  {enhancedJob.size_unit}
                                 </p>
                               </div>
                             </>
@@ -479,15 +522,21 @@ export default function JobDetailPage() {
                         </h3>
                         <div className="grid grid-cols-2 gap-4 pl-6">
                           <div>
-                            <label className="text-xs text-gray-500">Type</label>
+                            <label className="text-xs text-gray-500">
+                              Type
+                            </label>
                             <p className="text-gray-900 font-medium">
                               {enhancedJob.paper_type || "N/A"}
                             </p>
                           </div>
                           <div>
-                            <label className="text-xs text-gray-500">Weight</label>
+                            <label className="text-xs text-gray-500">
+                              Weight
+                            </label>
                             <p className="text-gray-900 font-medium">
-                              {enhancedJob.paper_weight ? `${enhancedJob.paper_weight} GSM` : "N/A"}
+                              {enhancedJob.paper_weight
+                                ? `${enhancedJob.paper_weight} GSM`
+                                : "N/A"}
                             </p>
                           </div>
                         </div>
@@ -502,11 +551,13 @@ export default function JobDetailPage() {
                           Finishing Options
                         </h3>
                         <div className="flex flex-wrap gap-2 pl-6">
-                          {getSelectedFinishOptions().map((option: string, index: number) => (
-                            <Badge key={index} variant="secondary">
-                              {option}
-                            </Badge>
-                          ))}
+                          {getSelectedFinishOptions().map(
+                            (option: string, index: number) => (
+                              <Badge key={index} variant="secondary">
+                                {option}
+                              </Badge>
+                            ),
+                          )}
                         </div>
                       </div>
                     )}
@@ -517,7 +568,9 @@ export default function JobDetailPage() {
                         <label className="text-sm font-medium text-gray-700">
                           Special Instructions
                         </label>
-                        <p className="text-gray-900 mt-1">{enhancedJob.special_instructions}</p>
+                        <p className="text-gray-900 mt-1">
+                          {enhancedJob.special_instructions}
+                        </p>
                       </div>
                     )}
 
@@ -527,7 +580,9 @@ export default function JobDetailPage() {
                         <label className="text-sm font-medium text-gray-700">
                           Requirements
                         </label>
-                        <p className="text-gray-900 mt-1">{enhancedJob.requirements}</p>
+                        <p className="text-gray-900 mt-1">
+                          {enhancedJob.requirements}
+                        </p>
                       </div>
                     )}
                   </CardContent>

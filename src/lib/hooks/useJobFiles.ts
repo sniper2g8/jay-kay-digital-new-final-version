@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/lib/supabase";
-import { FileRecord } from "./useFileUploadFixed";
+import { FileRecord } from "./useFileUploadFixed.ts";
 
 interface FileCache {
   [jobId: string]: {

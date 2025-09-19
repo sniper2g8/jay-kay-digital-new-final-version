@@ -1,7 +1,6 @@
-import React from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ProtectedRoute } from '@/components/ProtectedRoute';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import { 
   Settings, 
   Mail, 
@@ -171,7 +170,7 @@ export default function AdminDashboard() {
                 <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                   <FileText className="h-5 w-5 text-orange-500" />
                   <div className="flex-1">
-                    <p className="text-sm font-medium">Job #1234 moved to "Printing" status</p>
+                    <p className="text-sm font-medium">Job #1234 moved to &quot;Printing&quot; status</p>
                     <p className="text-xs text-gray-500">1 hour ago</p>
                   </div>
                 </div>

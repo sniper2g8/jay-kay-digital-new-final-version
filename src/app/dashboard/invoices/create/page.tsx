@@ -208,11 +208,14 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
         // Priority: final_price -> unit_price * quantity -> estimate_price -> fallback to 0
         let unitPrice = 0;
         let totalPrice = 0;
-        
+
         if (job.final_price && job.final_price > 0) {
           // If final_price exists, use it as total and calculate unit price
           totalPrice = job.final_price;
-          unitPrice = job.quantity && job.quantity > 0 ? job.final_price / job.quantity : job.final_price;
+          unitPrice =
+            job.quantity && job.quantity > 0
+              ? job.final_price / job.quantity
+              : job.final_price;
         } else if (job.unit_price && job.unit_price > 0) {
           // Use unit_price and calculate total
           unitPrice = job.unit_price;
@@ -326,7 +329,6 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
 
       if (action === "send") {
         // TODO: Implement send functionality
-        
       }
 
       router.push(`/dashboard/invoices/${invoice.id}`);
@@ -484,10 +486,12 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
                                 </p>
                                 <span className="text-sm font-medium text-right">
                                   {formatCurrency(
-                                    job.final_price || 
-                                    (job.unit_price ? job.unit_price * (job.quantity || 1) : 0) ||
-                                    job.estimate_price || 
-                                    0,
+                                    job.final_price ||
+                                      (job.unit_price
+                                        ? job.unit_price * (job.quantity || 1)
+                                        : 0) ||
+                                      job.estimate_price ||
+                                      0,
                                   )}
                                 </span>
                               </div>

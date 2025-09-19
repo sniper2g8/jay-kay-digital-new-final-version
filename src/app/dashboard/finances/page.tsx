@@ -325,7 +325,7 @@ function FinancesContent() {
                           </div>
 
                           <Badge className="bg-green-100 text-green-800">
-                            {payment.status}
+                            {payment.payment_status}
                           </Badge>
 
                           <Button variant="ghost" size="sm">

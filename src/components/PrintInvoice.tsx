@@ -1,7 +1,6 @@
 "use client";
 
-import React from "react";
-import { InvoiceTemplate } from "./InvoiceTemplate";
+import { InvoiceTemplate } from "./InvoiceTemplate.tsx";
 
 interface InvoiceData {
   id: string;

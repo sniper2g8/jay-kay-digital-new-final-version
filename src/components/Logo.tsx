@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import Image from "next/image";
 import { BRAND_ASSETS, COMPANY_INFO } from "@/lib/brand";
 

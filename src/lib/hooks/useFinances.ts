@@ -17,7 +17,7 @@ export interface Payment {
   reference_number?: string;
   notes?: string;
   received_by?: string;
-  status: string;
+  payment_status: string | null;
   created_at: string;
   updated_at: string;
 }

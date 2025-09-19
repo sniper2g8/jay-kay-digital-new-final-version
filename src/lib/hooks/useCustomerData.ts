@@ -18,10 +18,10 @@ export interface CustomerJob {
   description: string | null;
   status: string | null;
   priority: string | null;
-  dueDate: Json;
+  estimated_delivery: string | null;
   created_at: string | null;
-  estimated_cost: number | null;
-  final_cost: number | null;
+  estimate_price: number | null;
+  final_price: number | null;
 }
 
 export interface CustomerInvoice {
@@ -102,10 +102,10 @@ export const useCustomerData = () => {
           description,
           status,
           priority,
-          dueDate,
+          estimated_delivery,
           created_at,
-          estimated_cost,
-          final_cost
+          estimate_price,
+          final_price
         `,
         )
         .eq("customer_id", customerId)

@@ -3,7 +3,6 @@
  * Page for testing and managing notification system
  */
 
-import React from 'react';
 import { Metadata } from 'next';
 import NotificationManager from '@/components/NotificationManager';
 

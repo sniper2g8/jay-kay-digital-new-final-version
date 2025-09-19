@@ -1,4 +1,4 @@
-const { Client } = require("pg");
+import { Client } from 'pg';;
 require("dotenv").config({ path: ".env.local" });
 
 // Use direct PostgreSQL connection from DATABASE_URL
@@ -426,4 +426,4 @@ if (require.main === module) {
     });
 }
 
-module.exports = { consolidateJobEstimates };
+export default { consolidateJobEstimates };

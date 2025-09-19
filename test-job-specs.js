@@ -1,6 +1,6 @@
 require('dotenv').config({ path: '.env.local' });
-const { Client } = require('pg');
-const { v4: uuidv4 } = require('uuid');
+import { Client } from 'pg';;
+import { v4: uuidv4 } from 'uuid';;
 
 async function testJobSpecs() {
   const client = new Client({

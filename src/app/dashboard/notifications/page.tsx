@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { 
-  Bell, 
-  Search, 
+import {
+  Bell,
+  Search,
   Filter,
   CheckCircle2,
   Clock,
@@ -19,13 +19,13 @@ import {
   Eye,
   Trash2,
   RefreshCw,
-  TestTube
+  TestTube,
 } from "lucide-react";
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/contexts/AuthContext';
-import { useUserRole } from '@/lib/hooks/useUserRole';
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/lib/hooks/useUserRole";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import { 
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -36,7 +36,13 @@ interface Notification {
   id: string;
   title: string;
   message: string;
-  type: 'job_update' | 'payment_due' | 'delivery_ready' | 'system_alert' | 'promotion' | 'reminder';
+  type:
+    | "job_update"
+    | "payment_due"
+    | "delivery_ready"
+    | "system_alert"
+    | "promotion"
+    | "reminder";
   recipient_id: string | null;
   related_entity_id: string | null;
   related_entity_type: string | null;
@@ -63,24 +69,32 @@ export default function NotificationsPage() {
 
 function NotificationsContent() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [stats, setStats] = useState<NotificationStats>({ total: 0, unread: 0, email_sent: 0, sms_sent: 0 });
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState<string>('all');
+  const [stats, setStats] = useState<NotificationStats>({
+    total: 0,
+    unread: 0,
+    email_sent: 0,
+    sms_sent: 0,
+  });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState<string>("all");
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
   const { data: userData } = useUserRole();
 
   // Check if user is admin or above
-  const isAdminOrAbove = userData?.primary_role === 'admin' || userData?.primary_role === 'super_admin';
+  const isAdminOrAbove =
+    userData?.primary_role === "admin" ||
+    userData?.primary_role === "super_admin";
 
-  const filteredNotifications = notifications.filter(notification => {
-    const matchesSearch = 
+  const filteredNotifications = notifications.filter((notification) => {
+    const matchesSearch =
       notification.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       notification.message.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesType = filterType === 'all' || notification.type === filterType;
-    const matchesRead = filterType === 'unread' ? !notification.read_at : true;
-    
+
+    const matchesType =
+      filterType === "all" || notification.type === filterType;
+    const matchesRead = filterType === "unread" ? !notification.read_at : true;
+
     return matchesSearch && matchesType && matchesRead;
   });
 
@@ -90,32 +104,33 @@ function NotificationsContent() {
       setStats({ total: 0, unread: 0, email_sent: 0, sms_sent: 0 });
       return;
     }
-    
+
     try {
       setIsLoading(true);
-      
+
       const { data: notificationsData, error } = await supabase
-        .from('notifications')
-        .select('*')
-        .eq('recipient_id', user.id)
-        .order('created_at', { ascending: false });
+        .from("notifications")
+        .select("*")
+        .eq("recipient_id", user.id)
+        .order("created_at", { ascending: false });
 
       if (error) {
-        console.error('Error fetching notifications:', error);
+        console.error("Error fetching notifications:", error);
         return;
       }
 
       setNotifications(notificationsData || []);
-      
+
       // Calculate stats
       const total = notificationsData?.length || 0;
-      const unread = notificationsData?.filter(n => !n.read_at).length || 0;
-      const email_sent = notificationsData?.filter(n => n.email_sent).length || 0;
-      const sms_sent = notificationsData?.filter(n => n.sms_sent).length || 0;
-      
+      const unread = notificationsData?.filter((n) => !n.read_at).length || 0;
+      const email_sent =
+        notificationsData?.filter((n) => n.email_sent).length || 0;
+      const sms_sent = notificationsData?.filter((n) => n.sms_sent).length || 0;
+
       setStats({ total, unread, email_sent, sms_sent });
     } catch (error) {
-      console.error('Error fetching notifications:', error);
+      console.error("Error fetching notifications:", error);
     } finally {
       setIsLoading(false);
     }
@@ -127,90 +142,104 @@ function NotificationsContent() {
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'job_update': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'payment_due': return 'bg-red-100 text-red-800 border-red-200';
-      case 'delivery_ready': return 'bg-green-100 text-green-800 border-green-200';
-      case 'system_alert': return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'promotion': return 'bg-purple-100 text-purple-800 border-purple-200';
-      case 'reminder': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case "job_update":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "payment_due":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "delivery_ready":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "system_alert":
+        return "bg-orange-100 text-orange-800 border-orange-200";
+      case "promotion":
+        return "bg-purple-100 text-purple-800 border-purple-200";
+      case "reminder":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'job_update': return <CheckCircle2 className="h-4 w-4" />;
-      case 'payment_due': return <AlertCircle className="h-4 w-4" />;
-      case 'delivery_ready': return <CheckCircle2 className="h-4 w-4" />;
-      case 'system_alert': return <AlertCircle className="h-4 w-4" />;
-      case 'promotion': return <MessageSquare className="h-4 w-4" />;
-      case 'reminder': return <Clock className="h-4 w-4" />;
-      default: return <Bell className="h-4 w-4" />;
+      case "job_update":
+        return <CheckCircle2 className="h-4 w-4" />;
+      case "payment_due":
+        return <AlertCircle className="h-4 w-4" />;
+      case "delivery_ready":
+        return <CheckCircle2 className="h-4 w-4" />;
+      case "system_alert":
+        return <AlertCircle className="h-4 w-4" />;
+      case "promotion":
+        return <MessageSquare className="h-4 w-4" />;
+      case "reminder":
+        return <Clock className="h-4 w-4" />;
+      default:
+        return <Bell className="h-4 w-4" />;
     }
   };
 
   const formatType = (type: string) => {
-    return type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+    return type.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase());
   };
 
   const markAsRead = async (notificationId: string) => {
     try {
       const { error } = await supabase
-        .from('notifications')
+        .from("notifications")
         .update({ read_at: new Date().toISOString() })
-        .eq('id', notificationId);
+        .eq("id", notificationId);
 
       if (error) {
-        console.error('Error marking notification as read:', error);
+        console.error("Error marking notification as read:", error);
         return;
       }
 
       await fetchNotifications(); // Refresh the list
     } catch (error) {
-      console.error('Error marking notification as read:', error);
+      console.error("Error marking notification as read:", error);
     }
   };
 
   const deleteNotification = async (notificationId: string) => {
-    if (!confirm('Are you sure you want to delete this notification?')) return;
-    
+    if (!confirm("Are you sure you want to delete this notification?")) return;
+
     try {
       const { error } = await supabase
-        .from('notifications')
+        .from("notifications")
         .delete()
-        .eq('id', notificationId);
+        .eq("id", notificationId);
 
       if (error) {
-        console.error('Error deleting notification:', error);
-        alert('Error deleting notification');
+        console.error("Error deleting notification:", error);
+        alert("Error deleting notification");
         return;
       }
 
       await fetchNotifications(); // Refresh the list
     } catch (error) {
-      console.error('Error deleting notification:', error);
-      alert('Error deleting notification');
+      console.error("Error deleting notification:", error);
+      alert("Error deleting notification");
     }
   };
 
   const markAllAsRead = async () => {
     if (!user) return;
-    
+
     try {
       const { error } = await supabase
-        .from('notifications')
+        .from("notifications")
         .update({ read_at: new Date().toISOString() })
-        .eq('recipient_id', user.id)
-        .is('read_at', null);
+        .eq("recipient_id", user.id)
+        .is("read_at", null);
 
       if (error) {
-        console.error('Error marking all notifications as read:', error);
+        console.error("Error marking all notifications as read:", error);
         return;
       }
 
       await fetchNotifications(); // Refresh the list
     } catch (error) {
-      console.error('Error marking all notifications as read:', error);
+      console.error("Error marking all notifications as read:", error);
     }
   };
 
@@ -235,11 +264,13 @@ function NotificationsContent() {
               <Bell className="h-8 w-8 text-blue-600" />
               Notifications
             </h1>
-            <p className="text-gray-600 mt-1">Stay updated with job status, payments, and system alerts</p>
+            <p className="text-gray-600 mt-1">
+              Stay updated with job status, payments, and system alerts
+            </p>
           </div>
           <div className="flex gap-2">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={fetchNotifications}
               className="flex items-center gap-2"
             >
@@ -247,14 +278,18 @@ function NotificationsContent() {
               Refresh
             </Button>
             {isAdminOrAbove && (
-              <Button asChild variant="outline" className="flex items-center gap-2">
+              <Button
+                asChild
+                variant="outline"
+                className="flex items-center gap-2"
+              >
                 <Link href="/dashboard/notifications/test">
                   <TestTube className="h-4 w-4" />
                   Test Notifications
                 </Link>
               </Button>
             )}
-            <Button 
+            <Button
               onClick={markAllAsRead}
               disabled={stats.unread === 0}
               className="flex items-center gap-2"
@@ -290,7 +325,9 @@ function NotificationsContent() {
               <AlertCircle className="h-4 w-4 text-orange-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-orange-600">{stats.unread}</div>
+              <div className="text-2xl font-bold text-orange-600">
+                {stats.unread}
+              </div>
               <p className="text-xs text-muted-foreground">Need attention</p>
             </CardContent>
           </Card>
@@ -301,7 +338,9 @@ function NotificationsContent() {
               <Mail className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{stats.email_sent}</div>
+              <div className="text-2xl font-bold text-blue-600">
+                {stats.email_sent}
+              </div>
               <p className="text-xs text-muted-foreground">Via email</p>
             </CardContent>
           </Card>
@@ -312,7 +351,9 @@ function NotificationsContent() {
               <MessageSquare className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{stats.sms_sent}</div>
+              <div className="text-2xl font-bold text-green-600">
+                {stats.sms_sent}
+              </div>
               <p className="text-xs text-muted-foreground">Via SMS</p>
             </CardContent>
           </Card>
@@ -333,18 +374,34 @@ function NotificationsContent() {
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="flex items-center gap-2">
                 <Filter className="h-4 w-4" />
-                {filterType === 'all' ? 'All Types' : formatType(filterType)}
+                {filterType === "all" ? "All Types" : formatType(filterType)}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem onClick={() => setFilterType('all')}>All Types</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setFilterType('unread')}>Unread Only</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setFilterType('job_update')}>Job Updates</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setFilterType('payment_due')}>Payment Due</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setFilterType('delivery_ready')}>Delivery Ready</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setFilterType('system_alert')}>System Alerts</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setFilterType('promotion')}>Promotions</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setFilterType('reminder')}>Reminders</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFilterType("all")}>
+                All Types
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFilterType("unread")}>
+                Unread Only
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFilterType("job_update")}>
+                Job Updates
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFilterType("payment_due")}>
+                Payment Due
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFilterType("delivery_ready")}>
+                Delivery Ready
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFilterType("system_alert")}>
+                System Alerts
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFilterType("promotion")}>
+                Promotions
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFilterType("reminder")}>
+                Reminders
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -353,34 +410,47 @@ function NotificationsContent() {
       {/* Notifications List */}
       <div className="space-y-4">
         {filteredNotifications.map((notification) => (
-          <Card key={notification.id} className={`${!notification.read_at ? 'border-l-4 border-l-blue-500' : ''}`}>
+          <Card
+            key={notification.id}
+            className={`${!notification.read_at ? "border-l-4 border-l-blue-500" : ""}`}
+          >
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="flex items-center gap-1">
                       {getTypeIcon(notification.type)}
-                      <Badge className={getTypeColor(notification.type)} variant="outline">
+                      <Badge
+                        className={getTypeColor(notification.type)}
+                        variant="outline"
+                      >
                         {formatType(notification.type)}
                       </Badge>
                     </div>
                     {!notification.read_at && (
-                      <Badge variant="destructive" className="text-xs">New</Badge>
+                      <Badge variant="destructive" className="text-xs">
+                        New
+                      </Badge>
                     )}
                     <div className="flex items-center gap-2 text-sm text-gray-500">
                       {notification.email_sent && <Mail className="h-3 w-3" />}
-                      {notification.sms_sent && <MessageSquare className="h-3 w-3" />}
+                      {notification.sms_sent && (
+                        <MessageSquare className="h-3 w-3" />
+                      )}
                     </div>
                   </div>
-                  
-                  <h3 className="font-semibold text-gray-900 mb-1">{notification.title}</h3>
+
+                  <h3 className="font-semibold text-gray-900 mb-1">
+                    {notification.title}
+                  </h3>
                   <p className="text-gray-600 mb-3">{notification.message}</p>
-                  
+
                   <div className="text-xs text-gray-500">
-                    {notification.created_at && new Date(notification.created_at).toLocaleString()}
+                    {notification.created_at &&
+                      new Date(notification.created_at).toLocaleString()}
                   </div>
                 </div>
-                
+
                 <div className="flex items-center gap-2 ml-4">
                   {!notification.read_at && (
                     <Button

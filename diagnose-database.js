@@ -1,4 +1,4 @@
-const { Client } = require('pg');
+import { Client } from 'pg';;
 require('dotenv').config({ path: '.env.local' });
 
 console.log('Environment variables loaded:');

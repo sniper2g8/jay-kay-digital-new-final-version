@@ -20,11 +20,11 @@ import {
 } from "lucide-react";
 
 // Import step components
-import CustomerStep from "./components/CustomerStep";
-import JobDetailsStep from "./components/JobDetailsStep";
-import SpecificationsStep from "./components/SpecificationsStep";
-import FilesStep from "./components/FilesStep";
-import ReviewStep from "./components/ReviewStep";
+import CustomerStep from "./components/CustomerStep.tsx";
+import JobDetailsStep from "./components/JobDetailsStep.tsx";
+import SpecificationsStep from "./components/SpecificationsStep.tsx";
+import FilesStep from "./components/FilesStep.tsx";
+import ReviewStep from "./components/ReviewStep.tsx";
 
 const formSteps = [
   {

@@ -4,7 +4,7 @@ import type {
   BackupJobConfig, 
   BackupStatistics 
 } from './backup-audit.types';
-import { AuditLogger } from './audit-logger';
+import { AuditLogger } from './audit-logger.ts';
 
 export class BackupService {
   // Create a new backup

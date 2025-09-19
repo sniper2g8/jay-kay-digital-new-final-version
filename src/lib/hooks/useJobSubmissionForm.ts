@@ -1,7 +1,10 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
-import { usePaperSpecifications, FinishOption } from "./usePaperSpecifications";
+import { usePaperSpecifications, useFinishOptions } from "./usePaperSpecifications.ts";
+import type { Database } from "@/lib/database-generated.types";
+
+type FinishOption = Database["public"]["Tables"]["finish_options"]["Row"];
 
 export interface JobFormData {
   customer_id: string;
@@ -264,7 +267,7 @@ export const useJobSubmissionForm = () => {
     if (!selectedService) {
       // Use all available options from database
       setAvailablePaperTypes(paperTypes.data.map((p) => p.name));
-      setAvailablePaperWeights(paperWeights.data.map((p) => p.weight_gsm));
+      setAvailablePaperWeights(paperWeights.data.map((p) => p.gsm));
       setAvailableFinishingOptions(finishOptions.data);
       return;
     }
@@ -292,7 +295,7 @@ export const useJobSubmissionForm = () => {
       setAvailablePaperWeights(
         filteredPaperWeights.length > 0
           ? filteredPaperWeights
-          : paperWeights.data?.map((p) => p.weight_gsm) || [],
+          : paperWeights.data?.map((p) => p.gsm) || [],
       );
       setAvailableFinishingOptions(
         filteredFinishing.length > 0 ? filteredFinishing : finishOptions.data || [],
@@ -330,7 +333,7 @@ export const useJobSubmissionForm = () => {
     } else {
       // Use all available options if service has no specific constraints
       setAvailablePaperTypes(paperTypes.data?.map((p) => p.name) || []);
-      setAvailablePaperWeights(paperWeights.data?.map((p) => p.weight_gsm) || []);
+      setAvailablePaperWeights(paperWeights.data?.map((p) => p.gsm) || []);
       setAvailableFinishingOptions(finishOptions.data || []);
     }
   }, [

@@ -395,7 +395,7 @@ export default function CustomerDashboard() {
                       {job.status || "Unknown"}
                     </Badge>
                     <p className="text-xs text-gray-500 mt-1">
-                      Due: {formatDate(job.dueDate as string)}
+                      Due: {formatDate(job.estimated_delivery)}
                     </p>
                   </div>
                 </div>

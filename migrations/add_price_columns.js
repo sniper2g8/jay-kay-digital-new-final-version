@@ -1,4 +1,4 @@
-const { Client } = require("pg");
+import { Client } from 'pg';;
 require("dotenv").config({ path: ".env.local" });
 
 const client = new Client({
@@ -163,4 +163,4 @@ if (require.main === module) {
     });
 }
 
-module.exports = { addPriceColumns };
+export default { addPriceColumns };

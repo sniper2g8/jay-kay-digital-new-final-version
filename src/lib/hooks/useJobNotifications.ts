@@ -5,7 +5,7 @@
 
 import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
-import { supabase } from '../supabase';
+import { supabase } from '../supabase.ts';
 
 export interface JobStatusNotificationData {
   customerEmail: string;
@@ -87,7 +87,7 @@ export function useJobNotifications() {
 
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Unknown error occurred';
-      console.error('Error sending job status notification:', err);
+      console.error('Error sending job status notification:', errorMsg);
       setError(errorMsg);
       toast.error(`Notification error: ${errorMsg}`);
       return null;
@@ -274,14 +274,16 @@ export async function updateJobStatusWithNotification(
           console.error('Failed to send notification email');
         }
       } catch (notificationError) {
-        console.error('Error sending notification:', notificationError);
+        const errorMessage = notificationError instanceof Error ? notificationError.message : String(notificationError);
+        console.error('Error sending notification:', errorMessage);
         // Don't fail the status update if notification fails
       }
     }
 
     return { success: true };
   } catch (error) {
-    console.error('Error updating job status with notification:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error updating job status with notification:', errorMessage);
     return { success: false, error: 'Internal server error' };
   }
 }

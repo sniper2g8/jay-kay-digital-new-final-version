@@ -1,6 +1,5 @@
-import React from 'react';
 import AdminEmailSystem from '@/components/AdminEmailSystem';
-import { ProtectedRoute } from '@/components/ProtectedRoute';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 export default function AdminEmailPage() {
   return (

@@ -3,8 +3,8 @@
  * Handles email and SMS notifications for job status changes and payment records
  */
 
-import { supabase } from './supabase';
-import { Database } from './database-generated.types';
+import { supabase } from './supabase.ts';
+import { Database } from './database-generated.types.ts';
 
 type NotificationType = Database['public']['Enums']['notification_type'];
 

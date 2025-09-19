@@ -13,7 +13,8 @@
     "verify:auth-fix": "node scripts/verify-auth-fix.js",
     "fix:db-permissions": "node scripts/fix-database-permissions.mjs",
     "format:check": "prettier --check .",
-    "format:fix": "prettier --write ."
+    "format:fix": "prettier --write .",
+    "fix-imports": "node fix-imports.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -69,10 +70,16 @@
     "dotenv": "^17.2.2",
     "eslint": "^9",
     "eslint-config-next": "15.5.3",
+    "eslint-plugin-prettier": "^5.5.4",
     "glob": "^11.0.3",
     "prettier": "^3.6.2",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.3.8",
     "typescript": "^5"
+  },
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js"
   }
 }

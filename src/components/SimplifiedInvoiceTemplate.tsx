@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { formatCurrency, formatDate } from "@/lib/constants";
 
 interface InvoiceItem {

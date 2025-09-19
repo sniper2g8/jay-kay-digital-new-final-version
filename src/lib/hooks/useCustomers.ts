@@ -144,7 +144,7 @@ const fetchCustomerWithStats = async (
   // Get job count and total spent
   const { data: jobs, error: jobsError } = await supabase
     .from("jobs")
-    .select("final_cost")
+    .select("final_price")
     .eq("customer_human_id", customerHumanId);
 
   if (jobsError) throw jobsError;
@@ -162,8 +162,8 @@ const fetchCustomerWithStats = async (
   const totalJobs = jobs?.length || 0;
   const totalSpent =
     jobs?.reduce(
-      (sum: number, job: { final_cost?: number | null }) =>
-        sum + (job.final_cost || 0),
+      (sum: number, job: { final_price?: number | null }) =>
+        sum + (job.final_price || 0),
       0,
     ) || 0;
   const lastPayment =

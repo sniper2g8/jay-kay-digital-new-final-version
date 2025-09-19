@@ -11,19 +11,21 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import {
-  Settings,
-  Package,
-  Palette,
-  Sparkles,
-  Scissors,
-  Layers,
-  Zap,
-  Grip,
+import { 
+  Settings, 
+  Package, 
+  Scissors, 
+  Layers, 
+  Sparkles, 
+  Zap, 
+  Grip, 
   LucideIcon,
+  Palette
 } from "lucide-react";
 import { JobFormData } from "@/lib/hooks/useJobSubmissionForm";
-import { FinishOption } from "@/lib/hooks/usePaperSpecifications";
+import type { Database } from "@/lib/database-generated.types";
+
+type FinishOption = Database["public"]["Tables"]["finish_options"]["Row"];
 
 interface SpecificationsStepProps {
   formData: JobFormData;
@@ -450,9 +452,9 @@ export default function SpecificationsStep({
                         );
                         const customPrice = finishingOptionPrices[option.id];
                         const defaultPrice =
-                          typeof option.pricing?.base === "number"
-                            ? option.pricing.base
-                            : Number(option.pricing?.base) || 0;
+                          typeof option.pricing === 'object' && option.pricing !== null && 'base' in option.pricing && typeof (option.pricing as Record<string, unknown>).base === "number"
+                            ? (option.pricing as Record<string, number>).base
+                            : Number(typeof option.pricing === 'object' && option.pricing !== null && 'base' in option.pricing ? (option.pricing as Record<string, unknown>).base : 0) || 0;
                         const finalPrice = customPrice || defaultPrice;
 
                         return (
@@ -677,9 +679,9 @@ export default function SpecificationsStep({
                     );
                     const price =
                       finishingOptionPrices[optionId] ||
-                      (typeof option?.pricing?.base === "number"
-                        ? option.pricing.base
-                        : Number(option?.pricing?.base) || 0);
+                      (typeof option?.pricing === 'object' && option?.pricing !== null && 'base' in option?.pricing && typeof (option?.pricing as Record<string, unknown>).base === "number"
+                        ? (option?.pricing as Record<string, number>).base
+                        : Number(typeof option?.pricing === 'object' && option?.pricing !== null && 'base' in option?.pricing ? (option?.pricing as Record<string, unknown>).base : 0) || 0);
                     const categoryLabel =
                       categoryInfo[option?.category || "other"]?.label ||
                       option?.category;

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import {  useState, useEffect  } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,10 +12,15 @@ import { Mail, Send, Users, FileText, Palette } from 'lucide-react';
 
 interface Customer {
   id: string;
-  email: string;
-  // Fix the field names to match the actual database schema
-  name: string;
-  business_name?: string;
+  email: string | null;
+  name: string | null;
+  business_name: string;
+  contact_person?: string | null;
+  phone?: string | null;
+  address?: string | null;
+  city?: string | null;
+  state?: string | null;
+  zip_code?: string | null;
 }
 
 interface EmailTemplate {
@@ -23,7 +28,7 @@ interface EmailTemplate {
   name: string;
   subject: string;
   content: string;
-  type: 'custom';
+  type: string | null;
 }
 
 export default function AdminEmailSystem() {
@@ -68,7 +73,7 @@ export default function AdminEmailSystem() {
         .order('name');
 
       if (error) throw error;
-      setTemplates(data || []);
+      setTemplates((data || []).filter(template => template.type === 'custom'));
     } catch (err) {
       console.error('Error loading templates:', err);
       // Templates table might not exist yet, that's okay
@@ -104,8 +109,8 @@ export default function AdminEmailSystem() {
           const { data, error } = await supabase.functions.invoke('email-notifications', {
             body: {
               type: 'custom_email',
-              recipientEmail: customer.email,
-              recipientName: `${customer.first_name} ${customer.last_name}`,
+              recipientEmail: customer.email || '',
+              recipientName: customer.name || customer.business_name || 'Valued Customer',
               data: {
                 customSubject: customSubject,
                 customMessage: customMessage,
@@ -258,11 +263,11 @@ export default function AdminEmailSystem() {
                     />
                     <div className="flex-1">
                       <div className="font-medium">
-                        {customer.first_name} {customer.last_name}
+                        {customer.name || customer.business_name}
                       </div>
                       <div className="text-sm text-gray-600">{customer.email}</div>
-                      {customer.company_name && (
-                        <div className="text-sm text-gray-500">{customer.company_name}</div>
+                      {customer.business_name && customer.name && (
+                        <div className="text-sm text-gray-500">{customer.business_name}</div>
                       )}
                     </div>
                   </div>

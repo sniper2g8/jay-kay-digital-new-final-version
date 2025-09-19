@@ -1,5 +1,5 @@
 require('dotenv').config({ path: '.env.local' });
-const { Client } = require('pg');
+import { Client } from 'pg';;
 
 const dbConfig = {
   host: process.env.PGHOST,

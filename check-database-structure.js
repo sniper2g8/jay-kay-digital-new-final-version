@@ -1,5 +1,5 @@
 require('dotenv').config({ path: '.env.local' });
-const { Client } = require('pg');
+import { Client } from 'pg';;
 
 // Get database connection details from environment
 const dbUrl = process.env.DATABASE_URL;

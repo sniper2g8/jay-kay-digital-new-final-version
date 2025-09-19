@@ -3,8 +3,8 @@
  * Integrates with payment management to send notifications
  */
 
-import { notificationService, PaymentNotificationData, InvoiceNotificationData } from '../notification-service';
-import { supabase } from '../supabase';
+import { notificationService, PaymentNotificationData, InvoiceNotificationData } from '../notification-service.ts';
+import { supabase } from '../supabase.ts';
 
 /**
  * Hook to send notifications when a payment is recorded

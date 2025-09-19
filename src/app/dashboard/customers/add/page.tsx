@@ -66,7 +66,6 @@ export default function AddCustomerPage() {
         customer_status: formData.status,
         customer_type: "business",
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
       };
 
       const { data, error } = await supabase
@@ -96,6 +95,7 @@ export default function AddCustomerPage() {
         throw new Error(userMessage);
       }
 
+      console.log("Customer created:", data);
       toast.success("Customer created successfully!");
       router.push("/dashboard/customers");
     } catch (err) {

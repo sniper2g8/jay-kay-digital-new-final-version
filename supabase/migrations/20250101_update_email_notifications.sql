@@ -50,7 +50,7 @@ BEGIN
   -- Get customer email and name from the customers table
   -- Adjust this query based on your actual table structure
   SELECT 
-    c.contact_email, 
+    c.email, 
     c.business_name,
     NEW.title
   INTO customer_email, customer_name, job_title
@@ -116,7 +116,7 @@ DECLARE
 BEGIN
   -- Get customer email and name
   SELECT 
-    c.contact_email, 
+    c.email, 
     c.business_name
   INTO customer_email, customer_name
   FROM customers c

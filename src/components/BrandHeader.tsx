@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { LogoVariants } from "@/components/Logo";
 import { COMPANY_INFO } from "@/lib/brand";
 

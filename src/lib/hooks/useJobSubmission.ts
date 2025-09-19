@@ -4,8 +4,8 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { mutate } from "swr";
-import { JobFormData } from "./useJobSubmissionForm";
-import { FileRecord } from "./useFileUploadFixed";
+import { JobFormData } from "./useJobSubmissionForm.ts";
+import { FileRecord } from "./useFileUploadFixed.ts";
 
 export const useJobSubmission = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -38,7 +38,8 @@ export const useJobSubmission = () => {
       );
 
       if (counterError) {
-        console.error("Error fetching next job counter:", counterError);
+        const errorMessage = counterError.message || String(counterError);
+        console.error("Error fetching next job counter:", errorMessage);
         throw new Error("Failed to generate job number. Please try again.");
       }
 
@@ -59,7 +60,7 @@ export const useJobSubmission = () => {
         .single();
 
       // Create job record matching the ACTUAL database schema
-      const jobData: any = {
+      const jobData = {
         id: jobId || crypto.randomUUID(),
         jobNo: jobNumber,
         customer_id: formData.customer_id,
@@ -68,13 +69,13 @@ export const useJobSubmission = () => {
         serviceName: service?.title || null,
         title: formData.title,
         description: formData.description || null,
-        status: "pending",
+        status: "pending" as const,
         priority: formData.priority,
         quantity: formData.quantity,
         estimate_price: estimatedPrice, // Use correct column name
         estimated_delivery: formData.due_date || null,
         unit_price: formData.unit_price || null,
-        job_type: "other", // Default value
+        job_type: "other" as const, // Default value
         submittedDate: new Date().toISOString(),
         createdBy: user?.id || null,
         // Note: specifications column doesn't exist in the actual schema
@@ -128,8 +129,9 @@ export const useJobSubmission = () => {
           .insert(fileAttachments);
 
         if (filesError) {
-          console.error("File attachment error:", filesError);
-          throw new Error(`Failed to attach files: ${filesError.message}`);
+          const errorMessage = filesError.message || String(filesError);
+          console.error("File attachment error:", errorMessage);
+          throw new Error(`Failed to attach files: ${errorMessage}`);
         }
       }
 
@@ -144,27 +146,28 @@ export const useJobSubmission = () => {
 
       return job;
     } catch (err) {
-      console.error("Error submitting job:", err);
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      console.error("Error submitting job:", errorMessage);
 
       // Enhanced error handling with specific messages
-      let errorMessage = "Failed to submit job. Please try again.";
+      let userFriendlyMessage = "Failed to submit job. Please try again.";
 
       if (err instanceof Error) {
         if (err.message.includes("permission denied")) {
-          errorMessage =
+          userFriendlyMessage =
             "Database permissions need to be configured. Please contact support.";
         } else if (err.message.includes("Network request failed")) {
-          errorMessage = "Network error. Please check your connection.";
+          userFriendlyMessage = "Network error. Please check your connection.";
         } else if (err.message.includes("duplicate")) {
-          errorMessage = "A job with this information already exists.";
+          userFriendlyMessage = "A job with this information already exists.";
         } else if (err.message.includes("foreign key")) {
-          errorMessage = "Please select valid customer and service options.";
+          userFriendlyMessage = "Please select valid customer and service options.";
         } else {
-          errorMessage = err.message;
+          userFriendlyMessage = err.message;
         }
       }
 
-      toast.error(errorMessage);
+      toast.error(userFriendlyMessage);
       throw err;
     } finally {
       setIsSubmitting(false);

@@ -21,22 +21,25 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { 
-  ArrowLeft, 
-  Save, 
-  Plus, 
+import {
+  ArrowLeft,
+  Save,
+  Plus,
   Trash2,
   Loader2,
   AlertCircle,
   DollarSign,
   Calendar,
-  Eye
+  Eye,
 } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import DashboardLayout from "@/components/DashboardLayout";
 import ProtectedDashboard from "@/components/ProtectedDashboard";
-import { transformFirebaseTimestamp, formatCurrency } from "@/lib/invoice-utils";
+import {
+  transformFirebaseTimestamp,
+  formatCurrency,
+} from "@/lib/invoice-utils";
 
 interface InvoiceLineItem {
   id?: string;
@@ -82,7 +85,7 @@ function InvoiceEditContent() {
     status: "draft",
     notes: "",
     items: [] as InvoiceLineItem[],
-    tax: 0
+    tax: 0,
   });
 
   // Load invoice data
@@ -93,8 +96,9 @@ function InvoiceEditContent() {
 
       // Fetch invoice data
       const { data, error } = await supabase
-        .from('invoices')
-        .select(`
+        .from("invoices")
+        .select(
+          `
           *,
           customers (
             id,
@@ -107,8 +111,9 @@ function InvoiceEditContent() {
             state,
             zip_code
           )
-        `)
-        .eq('id', invoiceId)
+        `,
+        )
+        .eq("id", invoiceId)
         .single();
 
       if (error) throw error;
@@ -116,68 +121,79 @@ function InvoiceEditContent() {
       // Fetch invoice items separately using the API endpoint
       const itemsResponse = await fetch("/api/invoice-items/" + invoiceId);
       const itemsData = itemsResponse.ok ? await itemsResponse.json() : [];
-      
+
       if (!itemsResponse.ok) {
-        console.warn("Failed to fetch invoice items:", itemsResponse.statusText);
+        console.warn(
+          "Failed to fetch invoice items:",
+          itemsResponse.statusText,
+        );
       }
 
       if (data) {
         // Parse Firebase timestamps
-        const issueDateString = transformFirebaseTimestamp(data.issueDate as never);
+        const issueDateString = transformFirebaseTimestamp(
+          data.issueDate as never,
+        );
         const dueDateString = transformFirebaseTimestamp(data.dueDate as never);
-        
-        const issueDate = issueDateString ? new Date(issueDateString) : new Date();
+
+        const issueDate = issueDateString
+          ? new Date(issueDateString)
+          : new Date();
         const dueDate = dueDateString ? new Date(dueDateString) : new Date();
 
         // Transform items from API to match our interface
-        const items: InvoiceLineItem[] = itemsData.map((item: {
-          id: string;
-          description?: string;
-          quantity?: number;
-          unit_price?: number;
-          total_price?: number;
-        }) => ({
-          id: item.id,
-          description: item.description || '',
-          quantity: item.quantity || 1,
-          unitPrice: item.unit_price || 0,
-          total: item.total_price || ((item.quantity || 1) * (item.unit_price || 0))
-        }));
+        const items: InvoiceLineItem[] = itemsData.map(
+          (item: {
+            id: string;
+            description?: string;
+            quantity?: number;
+            unit_price?: number;
+            total_price?: number;
+          }) => ({
+            id: item.id,
+            description: item.description || "",
+            quantity: item.quantity || 1,
+            unitPrice: item.unit_price || 0,
+            total:
+              item.total_price || (item.quantity || 1) * (item.unit_price || 0),
+          }),
+        );
 
         const invoiceData: InvoiceData = {
           id: data.id,
-          invoiceNo: data.invoiceNo || 'INV-000',
-          customerName: data.customers?.business_name || data.customerName || '',
-          customerEmail: data.customers?.email || '',
-          customerPhone: data.customers?.phone || '',
+          invoiceNo: data.invoiceNo || "INV-000",
+          customerName:
+            data.customers?.business_name || data.customerName || "",
+          customerEmail: data.customers?.email || "",
+          customerPhone: data.customers?.phone || "",
           issueDate: issueDate,
           dueDate: dueDate,
-          status: data.payment_status || data.status || 'draft',
-          notes: data.notes || '',
+          status: data.payment_status || data.status || "draft",
+          notes: data.notes || "",
           items: items,
           subtotal: data.subtotal || 0,
           tax: data.tax || 0,
-          total: data.total || data.amountDue || 0
+          total: data.total || data.amountDue || 0,
         };
 
         setInvoice(invoiceData);
-        
+
         // Set form data
         setFormData({
           customerName: invoiceData.customerName,
-          customerEmail: invoiceData.customerEmail || '',
-          customerPhone: invoiceData.customerPhone || '',
-          issueDate: invoiceData.issueDate.toISOString().split('T')[0],
-          dueDate: invoiceData.dueDate.toISOString().split('T')[0],
+          customerEmail: invoiceData.customerEmail || "",
+          customerPhone: invoiceData.customerPhone || "",
+          issueDate: invoiceData.issueDate.toISOString().split("T")[0],
+          dueDate: invoiceData.dueDate.toISOString().split("T")[0],
           status: invoiceData.status,
-          notes: invoiceData.notes || '',
+          notes: invoiceData.notes || "",
           items: invoiceData.items,
-          tax: invoiceData.tax
+          tax: invoiceData.tax,
         });
       }
     } catch (error) {
-      console.error('Error fetching invoice:', error);
-      setError('Failed to load invoice. Please try again.');
+      console.error("Error fetching invoice:", error);
+      setError("Failed to load invoice. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -191,46 +207,54 @@ function InvoiceEditContent() {
   }, [invoiceId]);
 
   const handleInputChange = (field: string, value: string | number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
-  const handleItemChange = (index: number, field: keyof InvoiceLineItem, value: string | number) => {
+  const handleItemChange = (
+    index: number,
+    field: keyof InvoiceLineItem,
+    value: string | number,
+  ) => {
     const updatedItems = [...formData.items];
     updatedItems[index] = {
       ...updatedItems[index],
-      [field]: value
+      [field]: value,
     };
 
     // Recalculate total for this item
-    if (field === 'quantity' || field === 'unitPrice') {
-      updatedItems[index].total = updatedItems[index].quantity * updatedItems[index].unitPrice;
+    if (field === "quantity" || field === "unitPrice") {
+      updatedItems[index].total =
+        updatedItems[index].quantity * updatedItems[index].unitPrice;
     }
 
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      items: updatedItems
+      items: updatedItems,
     }));
   };
 
   const addItem = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      items: [...prev.items, {
-        description: '',
-        quantity: 1,
-        unitPrice: 0,
-        total: 0
-      }]
+      items: [
+        ...prev.items,
+        {
+          description: "",
+          quantity: 1,
+          unitPrice: 0,
+          total: 0,
+        },
+      ],
     }));
   };
 
   const removeItem = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      items: prev.items.filter((_, i) => i !== index)
+      items: prev.items.filter((_, i) => i !== index),
     }));
   };
 
@@ -254,38 +278,43 @@ function InvoiceEditContent() {
         customerName: formData.customerName,
         issueDate: new Date(formData.issueDate).toISOString(),
         dueDate: new Date(formData.dueDate).toISOString(),
-        payment_status: formData.status as "pending" | "partial" | "paid" | "overdue" | "cancelled",
+        payment_status: formData.status as
+          | "pending"
+          | "partial"
+          | "paid"
+          | "overdue"
+          | "cancelled",
         notes: formData.notes || null,
         subtotal: subtotal,
         tax: taxAmount,
         total: total,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       };
 
       const { error: invoiceError } = await supabase
-        .from('invoices')
+        .from("invoices")
         .update(updateData)
-        .eq('id', invoiceId);
+        .eq("id", invoiceId);
 
       if (invoiceError) throw invoiceError;
 
       // Update invoice items using the API endpoint
       try {
-        const itemsToSave = formData.items.map(item => ({
+        const itemsToSave = formData.items.map((item) => ({
           invoice_id: invoiceId,
           description: item.description,
           quantity: item.quantity,
           unit_price: item.unitPrice,
           total_price: item.total,
-          job_no: null // Can be linked to jobs later if needed
+          job_no: null, // Can be linked to jobs later if needed
         }));
 
         const itemsResponse = await fetch(`/api/invoice-items/${invoiceId}`, {
-          method: 'PUT', // Update all items
+          method: "PUT", // Update all items
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify(itemsToSave)
+          body: JSON.stringify(itemsToSave),
         });
 
         if (!itemsResponse.ok) {
@@ -293,15 +322,15 @@ function InvoiceEditContent() {
           throw new Error(`Failed to save invoice items: ${errorText}`);
         }
       } catch (itemsError) {
-        console.error('Error saving invoice items:', itemsError);
+        console.error("Error saving invoice items:", itemsError);
         // Continue even if items fail - at least the invoice is saved
       }
 
       // Redirect back to invoice detail page
       router.push(`/dashboard/invoices/${invoiceId}`);
     } catch (error) {
-      console.error('Error saving invoice:', error);
-      setError('Failed to save invoice. Please try again.');
+      console.error("Error saving invoice:", error);
+      setError("Failed to save invoice. Please try again.");
     } finally {
       setIsSaving(false);
     }
@@ -402,7 +431,9 @@ function InvoiceEditContent() {
                   <Input
                     id="customerName"
                     value={formData.customerName}
-                    onChange={(e) => handleInputChange('customerName', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("customerName", e.target.value)
+                    }
                     placeholder="Enter customer name"
                     required
                   />
@@ -449,7 +480,9 @@ function InvoiceEditContent() {
                       id="issueDate"
                       type="date"
                       value={formData.issueDate}
-                      onChange={(e) => handleInputChange('issueDate', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("issueDate", e.target.value)
+                      }
                     />
                   </div>
                   <div>
@@ -458,13 +491,20 @@ function InvoiceEditContent() {
                       id="dueDate"
                       type="date"
                       value={formData.dueDate}
-                      onChange={(e) => handleInputChange('dueDate', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("dueDate", e.target.value)
+                      }
                     />
                   </div>
                 </div>
                 <div>
                   <Label htmlFor="status">Payment Status</Label>
-                  <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
+                  <Select
+                    value={formData.status}
+                    onValueChange={(value) =>
+                      handleInputChange("status", value)
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
@@ -483,7 +523,7 @@ function InvoiceEditContent() {
                   <Textarea
                     id="notes"
                     value={formData.notes}
-                    onChange={(e) => handleInputChange('notes', e.target.value)}
+                    onChange={(e) => handleInputChange("notes", e.target.value)}
                     placeholder="Add any additional notes..."
                     rows={3}
                   />
@@ -513,11 +553,19 @@ function InvoiceEditContent() {
                     <div key={index} className="border rounded-lg p-4">
                       <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
                         <div className="md:col-span-5">
-                          <Label htmlFor={`item-desc-${index}`}>Description</Label>
+                          <Label htmlFor={`item-desc-${index}`}>
+                            Description
+                          </Label>
                           <Input
                             id={`item-desc-${index}`}
                             value={item.description}
-                            onChange={(e) => handleItemChange(index, 'description', e.target.value)}
+                            onChange={(e) =>
+                              handleItemChange(
+                                index,
+                                "description",
+                                e.target.value,
+                              )
+                            }
                             placeholder="Item description"
                           />
                         </div>
@@ -528,18 +576,32 @@ function InvoiceEditContent() {
                             type="number"
                             min="1"
                             value={item.quantity}
-                            onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value) || 1)}
+                            onChange={(e) =>
+                              handleItemChange(
+                                index,
+                                "quantity",
+                                parseInt(e.target.value) || 1,
+                              )
+                            }
                           />
                         </div>
                         <div className="md:col-span-2">
-                          <Label htmlFor={`item-price-${index}`}>Unit Price</Label>
+                          <Label htmlFor={`item-price-${index}`}>
+                            Unit Price
+                          </Label>
                           <Input
                             id={`item-price-${index}`}
                             type="number"
                             min="0"
                             step="0.01"
                             value={item.unitPrice}
-                            onChange={(e) => handleItemChange(index, 'unitPrice', parseFloat(e.target.value) || 0)}
+                            onChange={(e) =>
+                              handleItemChange(
+                                index,
+                                "unitPrice",
+                                parseFloat(e.target.value) || 0,
+                              )
+                            }
                           />
                         </div>
                         <div className="md:col-span-2">
@@ -564,7 +626,10 @@ function InvoiceEditContent() {
 
                   {formData.items.length === 0 && (
                     <div className="text-center py-8 text-gray-500">
-                      <p>No items added yet. Click &quot;Add Item&quot; to get started.</p>
+                      <p>
+                        No items added yet. Click &quot;Add Item&quot; to get
+                        started.
+                      </p>
                     </div>
                   )}
                 </div>
@@ -585,9 +650,11 @@ function InvoiceEditContent() {
               <CardContent className="space-y-4">
                 <div className="flex justify-between">
                   <span>Subtotal:</span>
-                  <span className="font-semibold">{formatCurrency(subtotal)}</span>
+                  <span className="font-semibold">
+                    {formatCurrency(subtotal)}
+                  </span>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="tax">Tax (%)</Label>
                   <Input
@@ -597,17 +664,21 @@ function InvoiceEditContent() {
                     max="100"
                     step="0.1"
                     value={formData.tax}
-                    onChange={(e) => handleInputChange('tax', parseFloat(e.target.value) || 0)}
+                    onChange={(e) =>
+                      handleInputChange("tax", parseFloat(e.target.value) || 0)
+                    }
                   />
                 </div>
-                
+
                 <div className="flex justify-between">
                   <span>Tax Amount:</span>
-                  <span className="font-semibold">{formatCurrency(taxAmount)}</span>
+                  <span className="font-semibold">
+                    {formatCurrency(taxAmount)}
+                  </span>
                 </div>
-                
+
                 <hr />
-                
+
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total:</span>
                   <span>{formatCurrency(total)}</span>
@@ -615,7 +686,8 @@ function InvoiceEditContent() {
 
                 <div className="pt-4">
                   <Badge variant="outline" className="w-full justify-center">
-                    {formData.status.charAt(0).toUpperCase() + formData.status.slice(1)}
+                    {formData.status.charAt(0).toUpperCase() +
+                      formData.status.slice(1)}
                   </Badge>
                 </div>
               </CardContent>
@@ -627,8 +699,8 @@ function InvoiceEditContent() {
                 <CardTitle>Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button 
-                  onClick={handleSave} 
+                <Button
+                  onClick={handleSave}
                   disabled={isSaving || !formData.customerName}
                   className="w-full"
                 >
@@ -644,18 +716,16 @@ function InvoiceEditContent() {
                     </>
                   )}
                 </Button>
-                
+
                 <Button variant="outline" asChild className="w-full">
                   <Link href={`/dashboard/invoices/${invoiceId}`}>
                     <Eye className="h-4 w-4 mr-2" />
                     View Invoice
                   </Link>
                 </Button>
-                
+
                 <Button variant="outline" asChild className="w-full">
-                  <Link href="/dashboard/invoices">
-                    Cancel
-                  </Link>
+                  <Link href="/dashboard/invoices">Cancel</Link>
                 </Button>
               </CardContent>
             </Card>

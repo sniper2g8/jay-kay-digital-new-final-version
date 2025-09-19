@@ -1,3 +1,6 @@
 {
-  "deno.enable": true
+  "deno.enable": false,
+  "deno.enablePaths": [],
+  "typescript.preferences.includePackageJsonAutoImports": "auto",
+  "typescript.suggest.autoImports": true
 }

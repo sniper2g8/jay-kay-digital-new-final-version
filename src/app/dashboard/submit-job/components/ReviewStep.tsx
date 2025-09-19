@@ -1,4 +1,3 @@
-import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -9,13 +8,15 @@ import {
   Settings,
   Upload,
 } from "lucide-react";
-import {
-  JobFormData,
-  Customer,
-  Service,
+import { 
+  JobFormData, 
+  Customer, 
+  Service 
 } from "@/lib/hooks/useJobSubmissionForm";
 import { FileUpload } from "@/lib/hooks/useFileUploadFixed";
-import { FinishOption } from "@/lib/hooks/usePaperSpecifications";
+import type { Database } from "@/lib/database-generated.types";
+
+type FinishOption = Database["public"]["Tables"]["finish_options"]["Row"];
 
 interface ReviewStepProps {
   formData: JobFormData;

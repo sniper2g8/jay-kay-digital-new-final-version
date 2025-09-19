@@ -1,6 +1,6 @@
 require('dotenv').config({ path: '.env.local' });
-const { Client } = require('pg');
-const fs = require('fs');
+import { Client } from 'pg';;
+import fs from 'fs';;
 
 async function runMigration() {
   const client = new Client({

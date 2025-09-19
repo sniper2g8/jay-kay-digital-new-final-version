@@ -41,8 +41,8 @@ export interface CustomerStatementPeriod {
 
 export interface CustomerStatementTransaction {
   id: string;
-  statement_period_id: string;
-  customer_id: string;
+  statement_period_id: string | null;
+  customer_id: string | null;
   transaction_date: string;
   transaction_type: string;
   description: string;

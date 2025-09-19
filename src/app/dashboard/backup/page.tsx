@@ -273,7 +273,7 @@ function BackupContent() {
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <Label>Backup Type</Label>
-                      <Select value={newBackupType} onValueChange={(value: any) => setNewBackupType(value)}>
+                      <Select value={newBackupType} onValueChange={(value: "full" | "incremental" | "tables_only") => setNewBackupType(value)}>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>

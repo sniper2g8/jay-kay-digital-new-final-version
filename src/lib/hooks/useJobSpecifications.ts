@@ -1,12 +1,12 @@
 import useSWR from "swr";
 import { supabase } from "@/lib/supabase";
-import type { 
-  JobSpecification, 
-  PaperSize, 
-  PaperWeight, 
-  PaperType, 
-  FinishOption 
-} from "@/lib/database.types";
+import type { Database } from "@/lib/database-generated.types";
+
+type JobSpecification = Database["public"]["Tables"]["job_specifications"]["Row"];
+type PaperSize = Database["public"]["Tables"]["paper_sizes"]["Row"];
+type PaperWeight = Database["public"]["Tables"]["paper_weights"]["Row"];
+type PaperType = Database["public"]["Tables"]["paper_types"]["Row"];
+type FinishOption = Database["public"]["Tables"]["finish_options"]["Row"];
 
 export function useJobSpecifications(jobId: string) {
   return useSWR<JobSpecification | null>(
@@ -95,7 +95,7 @@ export function useFinishOptions() {
         }
         
         return data || [];
-      } catch (error: any) {
+      } catch (error) {
         // If there's any other error, return empty array
         console.warn("Error fetching finish options:", error);
         return [];
