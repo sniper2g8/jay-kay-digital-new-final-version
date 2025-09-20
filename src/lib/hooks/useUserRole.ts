@@ -20,30 +20,53 @@ export interface UserWithRole {
 
 // Fetcher function to get current user's role information
 const fetchUserRole = async (userId: string): Promise<UserWithRole | null> => {
-  if (!userId) return null;
+  if (!userId) {
+    console.log("fetchUserRole: No userId provided");
+    return null;
+  }
 
   // Don't execute during build/SSG
   if (typeof window === "undefined") {
-    return null;
-  }
-
-  // Check current session status first
-  const {
-    data: { session },
-    error: sessionError,
-  } = await supabase.auth.getSession();
-
-  if (sessionError) {
-    console.error("Session error in fetchUserRole:", sessionError);
-    return null;
-  }
-
-  if (!session) {
-    
+    console.log("fetchUserRole: Running in build/SSG context");
     return null;
   }
 
   try {
+    // Check current session status first
+    const {
+      data: { session },
+      error: sessionError,
+    } = await supabase.auth.getSession();
+
+    if (sessionError) {
+      console.error("Session error in fetchUserRole:", {
+        message: sessionError.message,
+        code: sessionError.code
+      });
+      return null;
+    }
+
+    if (!session) {
+      console.log("fetchUserRole: No session available");
+      return null;
+    }
+
+    if (!session.user) {
+      console.log("fetchUserRole: No user in session");
+      return null;
+    }
+
+    if (session.user.id !== userId) {
+      console.log("fetchUserRole: Session user ID doesn't match requested user ID", {
+        sessionUserId: session.user.id,
+        requestedUserId: userId
+      });
+      return null;
+    }
+
+    // Add a small delay to ensure session is fully initialized
+    await new Promise(resolve => setTimeout(resolve, 100));
+
     // Get user data from appUsers table
     const { data, error } = await supabase
       .from("appUsers")
@@ -54,16 +77,25 @@ const fetchUserRole = async (userId: string): Promise<UserWithRole | null> => {
     if (error) {
       // Don't log error if user simply doesn't exist in appUsers table yet
       if (error.code === "PGRST116") {
-        
+        console.log("User not found in appUsers table yet", { userId });
         return null;
       }
-      console.error("Error fetching user role:", error);
+      console.error("Error fetching user role:", {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      });
       return null;
     }
 
+    console.log("Successfully fetched user role data:", data);
     return data as UserWithRole;
   } catch (error) {
-    console.error("Error in fetchUserRole:", error);
+    console.error("Error in fetchUserRole:", {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : 'No stack trace'
+    });
     return null;
   }
 };
@@ -77,9 +109,27 @@ export const useUserRole = () => {
 
   // Only fetch if user is authenticated and session is valid
   const shouldFetch =
-    !loading && !isBuildTime && user && session && session.user?.id === user.id;
+    !loading && 
+    !isBuildTime && 
+    user && 
+    session && 
+    session.user?.id === user.id &&
+    user.id; // Ensure we have a valid user ID
 
-  return useSWR(
+  // Log debugging information
+  if (!isBuildTime) {
+    console.log("useUserRole debug info:", {
+      loading,
+      isBuildTime,
+      hasUser: !!user,
+      hasSession: !!session,
+      userId: user?.id,
+      sessionId: session?.user?.id,
+      shouldFetch
+    });
+  }
+
+  const result = useSWR(
     shouldFetch ? `user-role-${user.id}` : null,
     () => (shouldFetch && user ? fetchUserRole(user.id) : null),
     {
@@ -89,11 +139,30 @@ export const useUserRole = () => {
       onError: (error) => {
         // Only log errors if we actually expected to fetch data
         if (shouldFetch) {
-          console.error("Error in useUserRole:", error);
+          console.error("Error in useUserRole SWR:", {
+            error,
+            userId: user?.id,
+            shouldFetch
+          });
         }
       },
+      // Add a short deduping interval to prevent excessive requests
+      dedupingInterval: 2000,
     },
   );
+
+  // Add better error logging
+  if (result.error) {
+    console.error("useUserRole hook error:", {
+      error: result.error,
+      userId: user?.id,
+      shouldFetch,
+      loading,
+      isBuildTime
+    });
+  }
+
+  return result;
 };
 
 // Helper function to check if user has specific role
