@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,7 +21,9 @@ interface NotificationTestProps {
 type NotificationType = 'job_submission' | 'job_status_change' | 'payment_recorded' | 'invoice_generated';
 type RecipientType = 'admin' | 'customer';
 
-const NotificationManager: React.FC<NotificationTestProps> = ({ className }) => {
+const NotificationManager: React.FC<NotificationTestProps> = ({ className = '' }) => {
+  // Use useEffect to ensure client-side only initialization
+  const [isClient, setIsClient] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
   
@@ -31,7 +33,13 @@ const NotificationManager: React.FC<NotificationTestProps> = ({ className }) => 
   const [testEmail, setTestEmail] = useState('');
   const [testPhone, setTestPhone] = useState('');
 
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const handleSendTestNotification = async () => {
+    if (!isClient) return;
+    
     setIsLoading(true);
     setTestResult(null);
 
@@ -86,6 +94,11 @@ const NotificationManager: React.FC<NotificationTestProps> = ({ className }) => 
     invoice_generated: 'Sent when a new invoice is created',
   };
 
+  // Render nothing on server, only on client
+  if (!isClient) {
+    return <div className={`space-y-6 ${className}`}></div>;
+  }
+
   return (
     <div className={`space-y-6 ${className}`}>
       {/* Notification Test Section */}
@@ -112,7 +125,7 @@ const NotificationManager: React.FC<NotificationTestProps> = ({ className }) => 
                 </SelectTrigger>
                 <SelectContent>
                   {Object.entries(notificationTypeLabels).map(([value, label]) => (
-                    <SelectItem key={value} value={value}>
+                    <SelectItem key={value} value={value as NotificationType}>
                       {label}
                     </SelectItem>
                   ))}

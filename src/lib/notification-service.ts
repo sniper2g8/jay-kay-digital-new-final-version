@@ -4,6 +4,7 @@
  */
 
 import { supabase } from './supabase.ts';
+import { createServiceRoleClient } from './supabase-admin.ts';
 import { Database } from './database.types.ts';
 
 type NotificationType = Database['public']['Enums']['notification_type'];
@@ -333,7 +334,10 @@ class NotificationService {
    */
   private async createNotification(data: NotificationData): Promise<void> {
     try {
-      const { error } = await supabase
+      // Use service role client for server-side operations
+      const adminSupabase = createServiceRoleClient();
+      
+      const { error } = await adminSupabase
         .from('notifications')
         .insert({
           recipient_id: data.recipient_id,
@@ -418,7 +422,10 @@ class NotificationService {
    */
   private async getAdminUsers(): Promise<Array<{ id: string; email?: string; phone?: string }>> {
     try {
-      const { data, error } = await supabase
+      // Use service role client for server-side operations
+      const adminSupabase = createServiceRoleClient();
+      
+      const { data, error } = await adminSupabase
         .from('appUsers')
         .select('id, email, phone')
         .eq('primary_role', 'admin');
@@ -444,7 +451,10 @@ class NotificationService {
    */
   private async shouldSendEmail(userId: string): Promise<boolean> {
     try {
-      const { data, error } = await supabase
+      // Use service role client for server-side operations
+      const adminSupabase = createServiceRoleClient();
+      
+      const { data, error } = await adminSupabase
         .from('notification_preferences')
         .select('email_notifications')
         .eq('user_id', userId)
@@ -466,7 +476,10 @@ class NotificationService {
    */
   private async shouldSendSMS(userId: string): Promise<boolean> {
     try {
-      const { data, error } = await supabase
+      // Use service role client for server-side operations
+      const adminSupabase = createServiceRoleClient();
+      
+      const { data, error } = await adminSupabase
         .from('notification_preferences')
         .select('sms_notifications')
         .eq('user_id', userId)

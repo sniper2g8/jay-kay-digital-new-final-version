@@ -2,8 +2,8 @@
 /// <reference lib="deno.ns" />
 
 // Updated email notification function that aligns with the provided database schema
-import { serve } from "std/http/server.ts";
-import { createClient } from "@supabase/supabase-js";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -230,23 +230,27 @@ serve(async (req: Request) => {
     console.error("Error sending emails:", error);
 
     // Log error in database
-    const { type, job, recipient_email } = await req.json();
-    
-    // Create a new Supabase client instance for error handling
-    const supabaseErrorClient = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-    );
+    try {
+      const { type, job, recipient_email } = await req.json();
+      
+      // Create a new Supabase client instance for error handling
+      const supabaseErrorClient = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      );
 
-    await supabaseErrorClient.from("email_notifications").insert({
-      type: type,
-      job_id: job?.id,
-      recipient_email: recipient_email || job?.customer_email,
-      subject: `Failed: ${type}`,
-      status: "failed",
-      error_message: error instanceof Error ? error.message : String(error),
-      sent_at: new Date().toISOString(),
-    });
+      await supabaseErrorClient.from("email_notifications").insert({
+        type: type,
+        job_id: job?.id,
+        recipient_email: recipient_email || job?.customer_email,
+        subject: `Failed: ${type}`,
+        status: "failed",
+        error_message: error instanceof Error ? error.message : String(error),
+        sent_at: new Date().toISOString(),
+      });
+    } catch (logError) {
+      console.error("Failed to log error:", logError);
+    }
 
     return new Response(
       JSON.stringify({

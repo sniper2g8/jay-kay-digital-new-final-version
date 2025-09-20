@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { notificationService } from '@/lib/notification-service';
+import { v4 as uuidv4 } from 'uuid';
 
 interface TestNotificationRequest {
   type: 'job_submission' | 'job_status_change' | 'payment_recorded' | 'invoice_generated';
@@ -33,9 +34,9 @@ export async function POST(request: NextRequest) {
     switch (type) {
       case 'job_submission':
         notificationData = {
-          job_id: 'test-job-001',
+          job_id: uuidv4(),
           job_number: 'JKDP-2024-TEST-001',
-          customer_id: 'test-customer-001',
+          customer_id: null, // Use null to avoid foreign key constraint
           customer_name: 'Test Customer',
           customer_email: email || 'test@example.com',
           customer_phone: phone || '+23234788711',
@@ -48,9 +49,9 @@ export async function POST(request: NextRequest) {
 
       case 'job_status_change':
         notificationData = {
-          job_id: 'test-job-001',
+          job_id: uuidv4(),
           job_number: 'JKDP-2024-TEST-001',
-          customer_id: 'test-customer-001',
+          customer_id: null, // Use null to avoid foreign key constraint
           customer_name: 'Test Customer',
           customer_email: email || 'test@example.com',
           customer_phone: phone || '+23234788711',
@@ -65,9 +66,9 @@ export async function POST(request: NextRequest) {
 
       case 'payment_recorded':
         notificationData = {
-          payment_id: 'test-payment-001',
+          payment_id: uuidv4(),
           invoice_no: 'JKDP-2024-INV-001',
-          customer_id: 'test-customer-001',
+          customer_id: null, // Use null to avoid foreign key constraint
           customer_name: 'Test Customer',
           customer_email: email || 'test@example.com',
           customer_phone: phone || '+23234788711',
@@ -82,9 +83,9 @@ export async function POST(request: NextRequest) {
 
       case 'invoice_generated':
         notificationData = {
-          invoice_id: 'test-invoice-001',
+          invoice_id: uuidv4(),
           invoice_no: 'JKDP-2024-INV-001',
-          customer_id: 'test-customer-001',
+          customer_id: null, // Use null to avoid foreign key constraint
           customer_name: 'Test Customer',
           customer_email: email || 'test@example.com',
           customer_phone: phone || '+23234788711',
