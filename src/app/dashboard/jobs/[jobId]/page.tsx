@@ -331,16 +331,21 @@ export default function JobDetailPage() {
 
                       if (error) {
                         console.error("Status update error:", {
-                          message: error instanceof Error ? error.message : (typeof error === 'object' && error !== null && 'message' in error ? (error as unknown as Record<string, unknown>).message : 'Unknown database error'),
-                          error: error,
-                          code: typeof error === 'object' && error !== null && 'code' in error ? (error as unknown as Record<string, unknown>).code : undefined,
-                          details: typeof error === 'object' && error !== null && 'details' in error ? (error as unknown as Record<string, unknown>).details : undefined,
-                          hint: typeof error === 'object' && error !== null && 'hint' in error ? (error as unknown as Record<string, unknown>).hint : undefined,
+                          message: error.message || 'Unknown database error',
+                          code: error.code || 'N/A',
+                          details: error.details || 'N/A',
+                          hint: error.hint || 'N/A',
                           errorType: typeof error,
                           errorString: String(error),
                           context: 'statusUpdate_onValueChange'
                         });
-                        toast.error("Failed to update status");
+                        
+                        // Handle specific permission errors
+                        if (error.code === '42501') {
+                          toast.error("Permission denied: You don't have permission to update job status. Please contact your administrator.");
+                        } else {
+                          toast.error(`Failed to update status: ${error.message || 'Unknown error'}`);
+                        }
                       } else {
                         toast.success("Status updated successfully");
                         // Refresh the job data
@@ -358,7 +363,7 @@ export default function JobDetailPage() {
                         errorType: typeof error,
                         errorString: String(error)
                       });
-                      toast.error("Failed to update status");
+                      toast.error(`Failed to update status: ${error instanceof Error ? error.message : 'Unknown error'}`);
                     }
                   }}
                 >

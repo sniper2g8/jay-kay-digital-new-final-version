@@ -125,7 +125,7 @@ function JobBoardContent() {
         job_number: job.jobNo || 'N/A',
         title: job.title || 'Print Job',
         status: job.status || 'pending',
-        priority: job.priority || 'medium',
+        priority: job.priority || 'normal',
         due_date: null, // Due date not available in this format
         created_at: job.created_at || '',
         updated_at: job.updated_at || '',

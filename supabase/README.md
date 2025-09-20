@@ -75,6 +75,8 @@ Make sure the `http` extension is enabled for database triggers:
 CREATE EXTENSION IF NOT EXISTS http WITH SCHEMA extensions;
 ```
 
+If you encounter the error `schema "net" does not exist`, it means the HTTP extension is not properly enabled. Run the migration `20250102_enable_http_extension.sql` to fix this issue.
+
 ### 6. Configure Row Level Security
 
 The migrations include RLS policies, but ensure your project has the correct policies:
@@ -127,6 +129,12 @@ curl -X POST 'https://YOUR_PROJECT_REF.supabase.co/functions/v1/email-notificati
    - Verify Resend API key is correct and active
    - Check function logs in Supabase dashboard
    - Verify email addresses are valid
+
+5. **"schema 'net' does not exist" error**
+   - This occurs when the HTTP extension is not enabled
+   - Run the `20250102_enable_http_extension.sql` migration
+   - Or execute: `CREATE EXTENSION IF NOT EXISTS http WITH SCHEMA extensions;`
+   - Make sure functions use `extensions.http_post` instead of `net.http_post`
 
 ### Logs and Monitoring
 

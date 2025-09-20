@@ -101,7 +101,7 @@ export default function EditJobPage() {
     title: "",
     description: "",
     status: "pending",
-    priority: "medium",
+    priority: "normal",
     quantity: 0,
     unit_price: 0,
     final_price: 0,
@@ -119,7 +119,7 @@ export default function EditJobPage() {
         title: job.title || "",
         description: job.description || "",
         status: job.status || "pending",
-        priority: job.priority || "medium",
+        priority: job.priority || "normal",
         quantity: job.quantity || 0,
         unit_price: job.unit_price || 0,
         final_price: job.final_price || 0,
@@ -337,8 +337,10 @@ export default function EditJobPage() {
       let errorMessage = "Failed to update job. Please try again.";
 
       if (error instanceof Error) {
-        if (error.message.includes("permission denied")) {
-          errorMessage = "Permission denied. Please check your access rights.";
+        // Handle specific permission errors
+        if (error.message.includes("permission denied") || 
+            (typeof error === "object" && "code" in error && (error as { code: unknown }).code === "42501")) {
+          errorMessage = "Permission denied: You don't have permission to update job details. Please contact your administrator.";
         } else if (error.message.includes("unique constraint")) {
           errorMessage = "A job with this information already exists.";
         } else if (error.message.includes("foreign key")) {
@@ -563,7 +565,7 @@ export default function EditJobPage() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="low">Low</SelectItem>
-                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="normal">Normal</SelectItem>
                           <SelectItem value="high">High</SelectItem>
                           <SelectItem value="urgent">Urgent</SelectItem>
                         </SelectContent>

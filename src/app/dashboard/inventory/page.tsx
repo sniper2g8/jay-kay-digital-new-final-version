@@ -96,16 +96,16 @@ const mockInventoryItems = [
 
 function InventoryContent() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [isLoading] = useState(false);
 
   // Filter items based on search and filters
   const filteredItems = mockInventoryItems.filter(item => {
     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          item.supplier.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = !categoryFilter || item.category === categoryFilter;
-    const matchesStatus = !statusFilter || item.status === statusFilter;
+    const matchesCategory = categoryFilter === "all" || item.category === categoryFilter;
+    const matchesStatus = statusFilter === "all" || item.status === statusFilter;
     
     return matchesSearch && matchesCategory && matchesStatus;
   });
@@ -284,7 +284,7 @@ function InventoryContent() {
                       <SelectValue placeholder="All Categories" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Categories</SelectItem>
+                      <SelectItem value="all">All Categories</SelectItem>
                       {categories.map(category => (
                         <SelectItem key={category} value={category}>
                           {category}
@@ -301,7 +301,7 @@ function InventoryContent() {
                       <SelectValue placeholder="All Status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Status</SelectItem>
+                      <SelectItem value="all">All Status</SelectItem>
                       <SelectItem value="in_stock">In Stock</SelectItem>
                       <SelectItem value="low_stock">Low Stock</SelectItem>
                       <SelectItem value="out_of_stock">Out of Stock</SelectItem>
@@ -314,8 +314,8 @@ function InventoryContent() {
                     variant="outline" 
                     onClick={() => {
                       setSearchTerm("");
-                      setCategoryFilter("");
-                      setStatusFilter("");
+                      setCategoryFilter("all");
+                      setStatusFilter("all");
                     }}
                     className="w-full"
                   >

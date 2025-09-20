@@ -56,12 +56,12 @@ function JobsContent() {
   // Filter states
   const [filters, setFilters] = useState<JobFilters>({
     search: '',
-    status: '',
-    priority: '',
-    customer: '',
+    status: 'all',
+    priority: 'all',
+    customer: 'all',
     dateFrom: '',
     dateTo: '',
-    assignedTo: ''
+    assignedTo: 'all'
   });
 
   const [showFilters, setShowFilters] = useState(false);
@@ -100,22 +100,22 @@ function JobsContent() {
       }
 
       // Status filter
-      if (filters.status && job.status !== filters.status) {
+      if (filters.status !== 'all' && job.status !== filters.status) {
         return false;
       }
 
       // Priority filter
-      if (filters.priority && job.priority !== filters.priority) {
+      if (filters.priority !== 'all' && job.priority !== filters.priority) {
         return false;
       }
 
       // Customer filter
-      if (filters.customer && job.customer_name !== filters.customer) {
+      if (filters.customer !== 'all' && job.customer_name !== filters.customer) {
         return false;
       }
 
       // Assigned to filter
-      if (filters.assignedTo && job.assigned_to !== filters.assignedTo) {
+      if (filters.assignedTo !== 'all' && job.assigned_to !== filters.assignedTo) {
         return false;
       }
 
@@ -138,17 +138,17 @@ function JobsContent() {
   const clearFilters = () => {
     setFilters({
       search: '',
-      status: '',
-      priority: '',
-      customer: '',
+      status: 'all',
+      priority: 'all',
+      customer: 'all',
       dateFrom: '',
       dateTo: '',
-      assignedTo: ''
+      assignedTo: 'all'
     });
   };
 
   // Check if any filters are active
-  const hasActiveFilters = Object.values(filters).some(value => value !== '');
+  const hasActiveFilters = Object.values(filters).some(value => value !== '' && value !== 'all');
 
   if (jobsLoading) {
     return (
@@ -252,7 +252,7 @@ function JobsContent() {
                         <SelectValue placeholder="All Statuses" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All Statuses</SelectItem>
+                        <SelectItem value="all">All Statuses</SelectItem>
                         <SelectItem value="pending">Pending</SelectItem>
                         <SelectItem value="in_progress">In Progress</SelectItem>
                         <SelectItem value="completed">Completed</SelectItem>
@@ -270,9 +270,9 @@ function JobsContent() {
                         <SelectValue placeholder="All Priorities" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All Priorities</SelectItem>
+                        <SelectItem value="all">All Priorities</SelectItem>
                         <SelectItem value="low">Low</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="normal">Normal</SelectItem>
                         <SelectItem value="high">High</SelectItem>
                         <SelectItem value="urgent">Urgent</SelectItem>
                       </SelectContent>
@@ -287,7 +287,7 @@ function JobsContent() {
                         <SelectValue placeholder="All Customers" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All Customers</SelectItem>
+                        <SelectItem value="all">All Customers</SelectItem>
                         {uniqueCustomers.map(customer => (
                           <SelectItem key={customer} value={customer || ''}>{customer}</SelectItem>
                         ))}
@@ -323,7 +323,7 @@ function JobsContent() {
                         <SelectValue placeholder="All Assignees" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All Assignees</SelectItem>
+                        <SelectItem value="all">All Assignees</SelectItem>
                         <SelectItem value="unassigned">Unassigned</SelectItem>
                         {uniqueAssignees.map(assignee => (
                           <SelectItem key={assignee} value={assignee || ''}>{assignee}</SelectItem>
@@ -481,7 +481,7 @@ function JobsContent() {
                           return "border-red-500 text-red-700";
                         case "high":
                           return "border-orange-500 text-orange-700";
-                        case "medium":
+                        case "normal":
                           return "border-blue-500 text-blue-700";
                         case "low":
                           return "border-gray-500 text-gray-700";
@@ -535,10 +535,10 @@ function JobsContent() {
                               <Badge
                                 variant="outline"
                                 className={getPriorityColor(
-                                  job.priority || "medium",
+                                  job.priority || "normal",
                                 )}
                               >
-                                {job.priority || "medium"}
+                                {job.priority || "normal"}
                               </Badge>
                             </div>
                             <p className="text-sm text-gray-600 mb-2">

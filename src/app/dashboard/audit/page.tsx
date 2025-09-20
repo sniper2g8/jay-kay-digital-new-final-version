@@ -161,10 +161,10 @@ function AuditContent() {
   const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>(mockAuditLogs);
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [resourceFilter, setResourceFilter] = useState("");
-  const [severityFilter, setSeverityFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-  const [dateRange, setDateRange] = useState("");
+  const [resourceFilter, setResourceFilter] = useState("all");
+  const [severityFilter, setSeverityFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [dateRange, setDateRange] = useState("all");
 
   const refreshAuditLogs = async () => {
     setIsLoading(true);
@@ -181,13 +181,13 @@ function AuditContent() {
       log.user_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       log.resource_type.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesResource = !resourceFilter || log.resource_type === resourceFilter;
-    const matchesSeverity = !severityFilter || log.severity === severityFilter;
-    const matchesStatus = !statusFilter || log.status === statusFilter;
+    const matchesResource = resourceFilter === "all" || log.resource_type === resourceFilter;
+    const matchesSeverity = severityFilter === "all" || log.severity === severityFilter;
+    const matchesStatus = statusFilter === "all" || log.status === statusFilter;
     
     // Basic date filtering (last 24h, 7d, 30d)
     let matchesDate = true;
-    if (dateRange) {
+    if (dateRange !== "all") {
       const now = new Date();
       const logDate = new Date(log.timestamp);
       const diffHours = (now.getTime() - logDate.getTime()) / (1000 * 60 * 60);
@@ -420,7 +420,7 @@ function AuditContent() {
                       <SelectValue placeholder="All Resources" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Resources</SelectItem>
+                      <SelectItem value="all">All Resources</SelectItem>
                       <SelectItem value="user">Users</SelectItem>
                       <SelectItem value="job">Jobs</SelectItem>
                       <SelectItem value="customer">Customers</SelectItem>
@@ -439,7 +439,7 @@ function AuditContent() {
                       <SelectValue placeholder="All Levels" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Levels</SelectItem>
+                      <SelectItem value="all">All Levels</SelectItem>
                       <SelectItem value="critical">Critical</SelectItem>
                       <SelectItem value="high">High</SelectItem>
                       <SelectItem value="medium">Medium</SelectItem>
@@ -455,7 +455,7 @@ function AuditContent() {
                       <SelectValue placeholder="All Status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Status</SelectItem>
+                      <SelectItem value="all">All Status</SelectItem>
                       <SelectItem value="success">Success</SelectItem>
                       <SelectItem value="failed">Failed</SelectItem>
                       <SelectItem value="warning">Warning</SelectItem>
@@ -470,7 +470,7 @@ function AuditContent() {
                       <SelectValue placeholder="All Time" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Time</SelectItem>
+                      <SelectItem value="all">All Time</SelectItem>
                       <SelectItem value="24h">Last 24 Hours</SelectItem>
                       <SelectItem value="7d">Last 7 Days</SelectItem>
                       <SelectItem value="30d">Last 30 Days</SelectItem>
@@ -483,10 +483,10 @@ function AuditContent() {
                     variant="outline" 
                     onClick={() => {
                       setSearchTerm("");
-                      setResourceFilter("");
-                      setSeverityFilter("");
-                      setStatusFilter("");
-                      setDateRange("");
+                      setResourceFilter("all");
+                      setSeverityFilter("all");
+                      setStatusFilter("all");
+                      setDateRange("all");
                     }}
                     className="w-full"
                   >

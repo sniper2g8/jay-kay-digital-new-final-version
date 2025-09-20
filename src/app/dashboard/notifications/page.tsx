@@ -21,7 +21,6 @@ import {
   RefreshCw,
   TestTube,
 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/lib/hooks/useUserRole";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -31,6 +30,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { fetchUserNotifications, markNotificationAsRead, deleteNotification, markAllNotificationsAsRead } from "@/app/actions/notificationActions";
 
 interface Notification {
   id: string;
@@ -107,30 +107,24 @@ function NotificationsContent() {
 
     try {
       setIsLoading(true);
-
-      const { data: notificationsData, error } = await supabase
-        .from("notifications")
-        .select("*")
-        .eq("recipient_id", user.id)
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.error("Error fetching notifications:", error);
-        return;
+      
+      // Use server action to fetch notifications
+      const result = await fetchUserNotifications();
+      
+      if (result.success) {
+        setNotifications(result.notifications);
+        setStats(result.stats);
+      } else {
+        console.error("Failed to fetch notifications:", result.error);
+        // Set empty notifications to prevent UI errors
+        setNotifications([]);
+        setStats({ total: 0, unread: 0, email_sent: 0, sms_sent: 0 });
       }
-
-      setNotifications(notificationsData || []);
-
-      // Calculate stats
-      const total = notificationsData?.length || 0;
-      const unread = notificationsData?.filter((n) => !n.read_at).length || 0;
-      const email_sent =
-        notificationsData?.filter((n) => n.email_sent).length || 0;
-      const sms_sent = notificationsData?.filter((n) => n.sms_sent).length || 0;
-
-      setStats({ total, unread, email_sent, sms_sent });
     } catch (error) {
       console.error("Error fetching notifications:", error);
+      // Set empty notifications to prevent UI errors
+      setNotifications([]);
+      setStats({ total: 0, unread: 0, email_sent: 0, sms_sent: 0 });
     } finally {
       setIsLoading(false);
     }
@@ -184,13 +178,10 @@ function NotificationsContent() {
 
   const markAsRead = async (notificationId: string) => {
     try {
-      const { error } = await supabase
-        .from("notifications")
-        .update({ read_at: new Date().toISOString() })
-        .eq("id", notificationId);
-
-      if (error) {
-        console.error("Error marking notification as read:", error);
+      const result = await markNotificationAsRead(notificationId);
+      
+      if (!result.success) {
+        console.error("Error marking notification as read:", result.error);
         return;
       }
 
@@ -200,17 +191,14 @@ function NotificationsContent() {
     }
   };
 
-  const deleteNotification = async (notificationId: string) => {
+  const deleteNotificationHandler = async (notificationId: string) => {
     if (!confirm("Are you sure you want to delete this notification?")) return;
 
     try {
-      const { error } = await supabase
-        .from("notifications")
-        .delete()
-        .eq("id", notificationId);
-
-      if (error) {
-        console.error("Error deleting notification:", error);
+      const result = await deleteNotification(notificationId);
+      
+      if (!result.success) {
+        console.error("Error deleting notification:", result.error);
         alert("Error deleting notification");
         return;
       }
@@ -226,14 +214,10 @@ function NotificationsContent() {
     if (!user) return;
 
     try {
-      const { error } = await supabase
-        .from("notifications")
-        .update({ read_at: new Date().toISOString() })
-        .eq("recipient_id", user.id)
-        .is("read_at", null);
-
-      if (error) {
-        console.error("Error marking all notifications as read:", error);
+      const result = await markAllNotificationsAsRead();
+      
+      if (!result.success) {
+        console.error("Error marking all notifications as read:", result.error);
         return;
       }
 
@@ -465,7 +449,7 @@ function NotificationsContent() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => deleteNotification(notification.id)}
+                    onClick={() => deleteNotificationHandler(notification.id)}
                     className="text-red-600 hover:text-red-700"
                   >
                     <Trash2 className="h-4 w-4" />

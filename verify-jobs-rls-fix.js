@@ -1,0 +1,92 @@
+import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
+
+// Load environment variables from .env.local
+const envPath = path.resolve('.env.local');
+if (fs.existsSync(envPath)) {
+  const envConfig = dotenv.parse(fs.readFileSync(envPath));
+  for (const k in envConfig) {
+    process.env[k] = envConfig[k];
+  }
+}
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('Missing Supabase environment variables');
+  process.exit(1);
+}
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+async function verifyJobsRLSFix() {
+  console.log('=== Verifying Jobs RLS Fix ===');
+  
+  try {
+    // Test 1: Check if we can access the jobs table at all
+    console.log('1. Testing basic jobs table access...');
+    const { data: testData, error: testError } = await supabase
+      .from('jobs')
+      .select('id')
+      .limit(1);
+      
+    if (testError) {
+      console.error('❌ Basic access failed:', testError);
+      return;
+    } else {
+      console.log('✅ Basic access works');
+    }
+    
+    // Test 2: Try to update a job (this was failing before)
+    console.log('2. Testing job update permission...');
+    // First, find a job to test with
+    const { data: jobs, error: fetchError } = await supabase
+      .from('jobs')
+      .select('id')
+      .limit(1);
+      
+    if (fetchError) {
+      console.error('❌ Could not fetch jobs for testing:', fetchError);
+      return;
+    }
+    
+    if (!jobs || jobs.length === 0) {
+      console.log('ℹ️ No jobs found to test with');
+      return;
+    }
+    
+    const testJobId = jobs[0].id;
+    console.log(`   Testing with job ID: ${testJobId}`);
+    
+    // Try to update the job
+    const { error: updateError } = await supabase
+      .from('jobs')
+      .update({
+        status: 'pending',
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', testJobId);
+      
+    if (updateError) {
+      console.error('❌ Job update failed:', updateError);
+      
+      // Check if it's a permission error
+      if (updateError.code === '42501') {
+        console.log('🚨 This is still a PERMISSION DENIED error (RLS issue)');
+        console.log('   Please apply the RLS policies from the SQL files');
+      }
+    } else {
+      console.log('✅ Job update works - RLS policies are correctly configured!');
+    }
+    
+    console.log('\n=== Verification Complete ===');
+    
+  } catch (error) {
+    console.error('Unexpected error:', error);
+  }
+}
+
+verifyJobsRLSFix().catch(console.error);

@@ -35,7 +35,7 @@ export default function AdminEmailSystem() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [templates, setTemplates] = useState<EmailTemplate[]>([]);
   const [selectedCustomers, setSelectedCustomers] = useState<string[]>([]);
-  const [selectedTemplate, setSelectedTemplate] = useState<string>('');
+  const [selectedTemplate, setSelectedTemplate] = useState<string>('none');
   const [customSubject, setCustomSubject] = useState('');
   const [customMessage, setCustomMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -81,10 +81,15 @@ export default function AdminEmailSystem() {
   };
 
   const handleTemplateSelect = (templateId: string) => {
-    const template = templates.find(t => t.id === templateId);
-    if (template) {
-      setCustomSubject(template.subject);
-      setCustomMessage(template.content);
+    if (templateId === 'none') {
+      setCustomSubject('');
+      setCustomMessage('');
+    } else {
+      const template = templates.find(t => t.id === templateId);
+      if (template) {
+        setCustomSubject(template.subject);
+        setCustomMessage(template.content);
+      }
     }
     setSelectedTemplate(templateId);
   };
@@ -133,7 +138,7 @@ export default function AdminEmailSystem() {
         setCustomSubject('');
         setCustomMessage('');
         setSelectedCustomers([]);
-        setSelectedTemplate('');
+        setSelectedTemplate('none');
       } else {
         setError('Failed to send any emails');
       }
@@ -304,7 +309,7 @@ export default function AdminEmailSystem() {
                     <SelectValue placeholder="Choose a template or start fresh" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No template (start fresh)</SelectItem>
+                    <SelectItem value="none">No template (start fresh)</SelectItem>
                     {templates.map((template) => (
                       <SelectItem key={template.id} value={template.id}>
                         {template.name}

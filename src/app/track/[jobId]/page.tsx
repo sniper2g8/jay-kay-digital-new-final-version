@@ -107,17 +107,17 @@ const priorityConfig = {
     label: "Low",
     color: "bg-gray-100 text-gray-800",
   },
-  medium: {
-    label: "Medium", 
-    color: "bg-yellow-100 text-yellow-800",
+  normal: {
+    label: "Normal", 
+    color: "bg-blue-100 text-blue-800",
   },
   high: {
     label: "High",
-    color: "bg-red-100 text-red-800",
+    color: "bg-orange-100 text-orange-800",
   },
   urgent: {
     label: "Urgent",
-    color: "bg-red-500 text-white",
+    color: "bg-red-100 text-red-800",
   },
 };
 

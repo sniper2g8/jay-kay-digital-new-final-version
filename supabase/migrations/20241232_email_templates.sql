@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS email_templates (
 ALTER TABLE email_templates ENABLE ROW LEVEL SECURITY;
 
 -- Allow service role and admins to manage email templates
+DROP POLICY IF EXISTS "Admins can manage email templates" ON email_templates;
 CREATE POLICY "Admins can manage email templates" ON email_templates
   FOR ALL USING (
     auth.role() = 'service_role' OR

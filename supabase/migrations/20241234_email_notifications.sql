@@ -17,10 +17,12 @@ CREATE TABLE IF NOT EXISTS email_notifications (
 ALTER TABLE email_notifications ENABLE ROW LEVEL SECURITY;
 
 -- Allow service role to insert and read all records
+DROP POLICY IF EXISTS "Service role can manage email notifications" ON email_notifications;
 CREATE POLICY "Service role can manage email notifications" ON email_notifications
   FOR ALL USING (auth.role() = 'service_role');
 
 -- Allow authenticated users to read their own email notifications
+DROP POLICY IF EXISTS "Users can view their own email notifications" ON email_notifications;
 CREATE POLICY "Users can view their own email notifications" ON email_notifications
   FOR SELECT USING (
     auth.role() = 'authenticated' AND 
@@ -30,8 +32,11 @@ CREATE POLICY "Users can view their own email notifications" ON email_notificati
   );
 
 -- Create indexes for better performance
+DROP INDEX IF EXISTS idx_email_notifications_recipient;
 CREATE INDEX IF NOT EXISTS idx_email_notifications_recipient ON email_notifications(recipient_email);
+DROP INDEX IF EXISTS idx_email_notifications_type;
 CREATE INDEX IF NOT EXISTS idx_email_notifications_type ON email_notifications(type);
+DROP INDEX IF EXISTS idx_email_notifications_sent_at;
 CREATE INDEX IF NOT EXISTS idx_email_notifications_sent_at ON email_notifications(sent_at);
 
 -- Function to trigger email notifications for job status changes
@@ -43,14 +48,20 @@ DECLARE
   job_title TEXT;
   previous_status TEXT;
 BEGIN
-  -- Get customer email and name
+  -- Get customer email and name from the customers table
+  -- Adjust this query based on your actual table structure
   SELECT 
     c.email, 
-    c.first_name || ' ' || c.last_name,
+    c.business_name,
     NEW.title
   INTO customer_email, customer_name, job_title
   FROM customers c
   WHERE c.id = NEW.customer_id;
+
+  -- If no business name, try to get from contact info
+  IF customer_name IS NULL AND customer_email IS NOT NULL THEN
+    customer_name := split_part(customer_email, '@', 1);
+  END IF;
 
   -- Get previous status if this is an update
   IF TG_OP = 'UPDATE' THEN
@@ -63,8 +74,8 @@ BEGIN
     
     -- Call the Edge Function via HTTP request
     PERFORM
-      net.http_post(
-        url := 'https://your-project.supabase.co/functions/v1/email-notifications',
+      extensions.http_post(
+        url := 'https://pnoxqzlxfuvjvufdjuqh.supabase.co/functions/v1/email-notifications',
         headers := jsonb_build_object(
           'Content-Type', 'application/json',
           'Authorization', 'Bearer ' || current_setting('app.settings.service_role_key', true)
@@ -107,18 +118,23 @@ BEGIN
   -- Get customer email and name
   SELECT 
     c.email, 
-    c.first_name || ' ' || c.last_name
+    c.business_name
   INTO customer_email, customer_name
   FROM customers c
   WHERE c.id = NEW.customer_id;
+
+  -- If no business name, try to get from contact info
+  IF customer_name IS NULL AND customer_email IS NOT NULL THEN
+    customer_name := split_part(customer_email, '@', 1);
+  END IF;
 
   -- Only trigger if we have customer email and payment is confirmed
   IF customer_email IS NOT NULL AND NEW.status = 'paid' THEN
     
     -- Call the Edge Function via HTTP request
     PERFORM
-      net.http_post(
-        url := 'https://your-project.supabase.co/functions/v1/email-notifications',
+      extensions.http_post(
+        url := 'https://pnoxqzlxfuvjvufdjuqh.supabase.co/functions/v1/email-notifications',
         headers := jsonb_build_object(
           'Content-Type', 'application/json',
           'Authorization', 'Bearer ' || current_setting('app.settings.service_role_key', true)
@@ -157,18 +173,23 @@ BEGIN
   -- Get customer email and name
   SELECT 
     c.email, 
-    c.first_name || ' ' || c.last_name
+    c.business_name
   INTO customer_email, customer_name
   FROM customers c
   WHERE c.id = NEW.customer_id;
+
+  -- If no business name, try to get from contact info
+  IF customer_name IS NULL AND customer_email IS NOT NULL THEN
+    customer_name := split_part(customer_email, '@', 1);
+  END IF;
 
   -- Only trigger if we have customer email and invoice is sent
   IF customer_email IS NOT NULL AND NEW.status = 'sent' THEN
     
     -- Call the Edge Function via HTTP request
     PERFORM
-      net.http_post(
-        url := 'https://your-project.supabase.co/functions/v1/email-notifications',
+      extensions.http_post(
+        url := 'https://pnoxqzlxfuvjvufdjuqh.supabase.co/functions/v1/email-notifications',
         headers := jsonb_build_object(
           'Content-Type', 'application/json',
           'Authorization', 'Bearer ' || current_setting('app.settings.service_role_key', true)

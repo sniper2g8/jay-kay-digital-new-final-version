@@ -70,7 +70,7 @@ const statusConfig = {
 
 const priorityConfig = {
   low: { label: 'Low', color: 'bg-gray-100 text-gray-800' },
-  medium: { label: 'Medium', color: 'bg-blue-100 text-blue-800' },
+  normal: { label: 'Normal', color: 'bg-blue-100 text-blue-800' },
   high: { label: 'High', color: 'bg-orange-100 text-orange-800' },
   urgent: { label: 'Urgent', color: 'bg-red-100 text-red-800' }
 };
@@ -148,7 +148,7 @@ export default function TrackJobPage() {
   };
 
   const currentStatus = jobInfo && jobInfo.status ? statusConfig[jobInfo.status.toLowerCase() as keyof typeof statusConfig] || statusConfig.pending : null;
-  const currentPriority = jobInfo && jobInfo.priority ? priorityConfig[jobInfo.priority.toLowerCase() as keyof typeof priorityConfig] || priorityConfig.medium : null;
+  const currentPriority = jobInfo && jobInfo.priority ? priorityConfig[jobInfo.priority.toLowerCase() as keyof typeof priorityConfig] || priorityConfig.normal : null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
