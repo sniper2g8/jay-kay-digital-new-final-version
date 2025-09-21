@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { formatCurrency, formatDate } from "@/lib/constants";
 import { Download, FileText, QrCode } from "lucide-react";
@@ -54,13 +54,15 @@ interface ProfessionalInvoicePDFProps {
   customer?: Customer;
   items: InvoiceItem[];
   showActions?: boolean;
+  triggerDownload?: boolean; // Add this prop
 }
 
 export function ProfessionalInvoicePDF({ 
   invoice, 
   customer, 
   items,
-  showActions = true
+  showActions = true,
+  triggerDownload = false // Add this prop
 }: ProfessionalInvoicePDFProps) {
   const invoiceRef = useRef<HTMLDivElement>(null);
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
@@ -84,38 +86,8 @@ export function ProfessionalInvoicePDF({
   const dueDate = new Date(invoiceDate);
   dueDate.setDate(dueDate.getDate() + (invoice.terms_days || 30));
 
-  // Generate QR Code
-  useEffect(() => {
-    const generateQRCode = async () => {
-      try {
-        const invoiceInfo = {
-          invoice_id: invoice.id,
-          invoice_no: invoice.invoiceNo || `JKDP-INV-${invoice.id.slice(0, 8)}`,
-          total: formatCurrency(total),
-          due_date: formatDate(dueDate.toISOString()),
-          company: "Jay Kay Digital Press"
-        };
-        
-        const qrData = `Invoice: ${invoiceInfo.invoice_no}\nTotal: ${invoiceInfo.total}\nDue: ${invoiceInfo.due_date}\nCompany: ${invoiceInfo.company}`;
-        const qrCodeUrl = await QRCode.toDataURL(qrData, {
-          width: 120,
-          margin: 1,
-          color: {
-            dark: '#1f2937',
-            light: '#ffffff'
-          }
-        });
-        setQrCodeDataUrl(qrCodeUrl);
-      } catch (error) {
-        console.error('Error generating QR code:', error);
-      }
-    };
-
-    generateQRCode();
-  }, [invoice, total, dueDate]);
-
   // PDF generation using jsPDF + html2canvas
-  const generatePDF = async () => {
+  const generatePDF = useCallback(async () => {
     if (!invoiceRef.current) return;
 
     try {
@@ -154,7 +126,44 @@ export function ProfessionalInvoicePDF({
       console.error('Error generating PDF:', error);
       alert('Error generating PDF. Please try again.');
     }
-  };
+  }, [invoice, invoiceDate]);
+
+  // Generate QR Code & Handle Trigger
+  useEffect(() => {
+    const generateQRCode = async () => {
+      try {
+        const invoiceInfo = {
+          invoice_id: invoice.id,
+          invoice_no: invoice.invoiceNo || `JKDP-INV-${invoice.id.slice(0, 8)}`,
+          total: formatCurrency(total),
+          due_date: formatDate(dueDate.toISOString()),
+          company: "Jay Kay Digital Press"
+        };
+        
+        const qrData = `Invoice: ${invoiceInfo.invoice_no}\nTotal: ${invoiceInfo.total}\nDue: ${invoiceInfo.due_date}\nCompany: ${invoiceInfo.company}`;
+        const qrCodeUrl = await QRCode.toDataURL(qrData, {
+          width: 120,
+          margin: 1,
+          color: {
+            dark: '#1f2937',
+            light: '#ffffff'
+          }
+        });
+        setQrCodeDataUrl(qrCodeUrl);
+      } catch (error) {
+        console.error('Error generating QR code:', error);
+      }
+    };
+
+    generateQRCode();
+
+    if (triggerDownload) {
+      // Adding a small delay to ensure the component is fully rendered
+      setTimeout(() => {
+        generatePDF();
+      }, 100);
+    }
+  }, [invoice, total, dueDate, triggerDownload, generatePDF]);
 
   // Print function using react-to-print
   const handlePrint = useReactToPrint({
