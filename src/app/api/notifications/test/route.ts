@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
         notificationData = {
           job_id: uuidv4(),
           job_number: 'JKDP-2024-TEST-001',
-          customer_id: null, // Use null to avoid foreign key constraint
+          customer_id: '', // Use empty string instead of null
           customer_name: 'Test Customer',
           customer_email: email || 'test@example.com',
           customer_phone: phone || '+23234788711',
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
         notificationData = {
           job_id: uuidv4(),
           job_number: 'JKDP-2024-TEST-001',
-          customer_id: null, // Use null to avoid foreign key constraint
+          customer_id: '', // Use empty string instead of null
           customer_name: 'Test Customer',
           customer_email: email || 'test@example.com',
           customer_phone: phone || '+23234788711',
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
         notificationData = {
           payment_id: uuidv4(),
           invoice_no: 'JKDP-2024-INV-001',
-          customer_id: null, // Use null to avoid foreign key constraint
+          customer_id: '', // Use empty string instead of null
           customer_name: 'Test Customer',
           customer_email: email || 'test@example.com',
           customer_phone: phone || '+23234788711',
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
         notificationData = {
           invoice_id: uuidv4(),
           invoice_no: 'JKDP-2024-INV-001',
-          customer_id: null, // Use null to avoid foreign key constraint
+          customer_id: '', // Use empty string instead of null
           customer_name: 'Test Customer',
           customer_email: email || 'test@example.com',
           customer_phone: phone || '+23234788711',

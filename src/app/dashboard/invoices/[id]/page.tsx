@@ -81,6 +81,7 @@ import DashboardLayout from "@/components/DashboardLayout";
 import ProtectedDashboard from "@/components/ProtectedDashboard";
 import { InvoiceTemplate } from "@/components/InvoiceTemplate";
 import { Database } from "@/lib/database.types";
+import { processPayment, updateInvoiceAfterPayment } from "@/app/actions/payment-actions";
 
 type Invoice = Database["public"]["Tables"]["invoices"]["Row"];
 
@@ -212,52 +213,59 @@ function InvoiceDetailContent() {
       }
 
       // Fetch invoice items separately using manual query
-      const itemsResponse = await fetch("/api/invoice-items/" + invoiceId);
-      const itemsData = itemsResponse.ok ? await itemsResponse.json() : [];
-      const itemsError = itemsResponse.ok
-        ? null
-        : new Error("Failed to fetch items");
+      try {
+        const itemsResponse = await fetch("/api/invoice-items/" + invoiceId);
+        const itemsData = await itemsResponse.json();
+        
+        if (!itemsResponse.ok) {
+          console.error("Error fetching invoice items:", {
+            status: itemsResponse.status,
+            statusText: itemsResponse.statusText,
+            data: itemsData
+          });
+          setError("Error loading invoice items: " + (itemsData.error || itemsResponse.statusText));
+          return;
+        }
 
-      if (itemsError) {
-        console.error("Error fetching invoice items:", itemsError);
-        setError("Error loading invoice items");
+        // Combine the data
+        const invoiceWithDetails: InvoiceWithDetails = {
+          ...invoiceData,
+          // Ensure required fields are present, mapping from actual field names
+          invoice_no: invoiceData.invoiceNo || "",
+          human_id: invoiceData.customer_id || "",
+          amount: invoiceData.total || invoiceData.amountDue || 0,
+          issue_date: invoiceData.created_at || "",
+          customer: invoiceData.customers
+            ? {
+                id: invoiceData.customers.id,
+                business_name: invoiceData.customers.business_name,
+                contact_person: invoiceData.customers.contact_person || undefined,
+                email: invoiceData.customers.email || undefined,
+                phone: invoiceData.customers.phone || undefined,
+                address: invoiceData.customers.address || undefined,
+                city: invoiceData.customers.city || undefined,
+                state: invoiceData.customers.state || undefined,
+                zip_code: invoiceData.customers.zip_code || undefined,
+              }
+            : undefined,
+          customerName:
+            invoiceData.customers?.business_name ||
+            invoiceData.customerName ||
+            "",
+          invoiceNo: invoiceData.invoiceNo || "",
+          invoice_items: itemsData || [],
+          payments: [], // Will be loaded separately
+        } as InvoiceWithDetails;
+
+        setInvoice(invoiceWithDetails);
+      } catch (itemsError) {
+        console.error("Network error fetching invoice items:", itemsError);
+        setError("Network error loading invoice items: " + (itemsError instanceof Error ? itemsError.message : String(itemsError)));
         return;
       }
-
-      // Combine the data
-      const invoiceWithDetails: InvoiceWithDetails = {
-        ...invoiceData,
-        // Ensure required fields are present, mapping from actual field names
-        invoice_no: invoiceData.invoiceNo || "",
-        human_id: invoiceData.customer_id || "",
-        amount: invoiceData.total || invoiceData.amountDue || 0,
-        issue_date: invoiceData.created_at || "",
-        customer: invoiceData.customers
-          ? {
-              id: invoiceData.customers.id,
-              business_name: invoiceData.customers.business_name,
-              contact_person: invoiceData.customers.contact_person || undefined,
-              email: invoiceData.customers.email || undefined,
-              phone: invoiceData.customers.phone || undefined,
-              address: invoiceData.customers.address || undefined,
-              city: invoiceData.customers.city || undefined,
-              state: invoiceData.customers.state || undefined,
-              zip_code: invoiceData.customers.zip_code || undefined,
-            }
-          : undefined,
-        customerName:
-          invoiceData.customers?.business_name ||
-          invoiceData.customerName ||
-          "",
-        invoiceNo: invoiceData.invoiceNo || "",
-        invoice_items: itemsData || [],
-        payments: [], // Will be loaded separately
-      } as InvoiceWithDetails;
-
-      setInvoice(invoiceWithDetails);
     } catch (err) {
       console.error("Error in fetchInvoiceDetails:", err);
-      setError("Failed to load invoice details");
+      setError("Failed to load invoice details: " + (err instanceof Error ? err.message : String(err)));
     } finally {
       setIsLoading(false);
     }
@@ -305,49 +313,28 @@ function InvoiceDetailContent() {
       const newAmountPaid = currentPaid + paymentAmount;
       const totalAmount = displayTotal;
 
-      // Create payment record
-      const paymentMethodMapping: Record<string, string> = {
-        cash: "cash",
-        credit_card: "card",
-        bank_transfer: "bank_transfer",
-        check: "cheque",
-        mobile_money: "mobile_money",
-      };
-
-      const { error: paymentError } = await supabase.from("payments").insert({
+      // Process payment using server action
+      const paymentResult = await processPayment({
         customer_human_id: invoice.customer?.id || invoice.customer_id || "",
         invoice_no: invoice.invoiceNo || "",
-        payment_number: `PAY-${Date.now()}`, // Generate payment number
         amount: paymentAmount,
-        payment_method: (paymentMethodMapping[paymentForm.payment_method] ||
-          paymentForm.payment_method) as
-          | "cash"
-          | "bank_transfer"
-          | "mobile_money"
-          | "card"
-          | "cheque"
-          | "credit",
+        payment_method: paymentForm.payment_method,
         payment_date: new Date().toISOString().split("T")[0], // Date only
         reference_number: paymentForm.reference_number || null,
         notes: paymentForm.notes || null,
-        payment_status: "completed",
       });
 
-      if (paymentError) throw paymentError;
+      if (!paymentResult.success) {
+        throw new Error(paymentResult.error);
+      }
 
       // Update invoice amounts and status
       const newStatus = newAmountPaid >= totalAmount ? "paid" : "partial";
-      const { error: invoiceError } = await supabase
-        .from("invoices")
-        .update({
-          amountPaid: newAmountPaid,
-          invoice_status: newStatus,
-          payment_status: newStatus === "paid" ? "paid" : "partial",
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", invoice.id);
+      const updateResult = await updateInvoiceAfterPayment(invoice.id, newAmountPaid, newStatus);
 
-      if (invoiceError) throw invoiceError;
+      if (!updateResult.success) {
+        throw new Error(updateResult.error);
+      }
 
       // Update local state
       setInvoice((prev) =>
@@ -383,7 +370,7 @@ function InvoiceDetailContent() {
         invoiceId: invoice?.id,
         context: 'handlePayment'
       });
-      alert("Failed to process payment");
+      alert("Failed to process payment: " + (err instanceof Error ? err.message : "Unknown error"));
     } finally {
       setIsProcessingPayment(false);
     }

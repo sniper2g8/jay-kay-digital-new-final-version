@@ -13,7 +13,7 @@ if (fs.existsSync(envPath)) {
 }
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.error('Missing Supabase environment variables');
@@ -34,9 +34,9 @@ async function checkRLSWithSupabaseClient() {
       .limit(1);
       
     if (testError) {
-      console.error('❌ Basic access failed:', testError);
+      console.error('??? Basic access failed:', testError);
     } else {
-      console.log('✅ Basic access works');
+      console.log('??? Basic access works');
     }
     
     // Test 2: Try to update a job (this is what's failing)
@@ -48,12 +48,12 @@ async function checkRLSWithSupabaseClient() {
       .limit(1);
       
     if (fetchError) {
-      console.error('❌ Could not fetch jobs for testing:', fetchError);
+      console.error('??? Could not fetch jobs for testing:', fetchError);
       return;
     }
     
     if (!jobs || jobs.length === 0) {
-      console.log('ℹ️ No jobs found to test with');
+      console.log('?????? No jobs found to test with');
       return;
     }
     
@@ -70,16 +70,16 @@ async function checkRLSWithSupabaseClient() {
       .eq('id', testJobId);
       
     if (updateError) {
-      console.error('❌ Job update failed:', updateError);
+      console.error('??? Job update failed:', updateError);
       
       // Check if it's a permission error
       if (updateError.code === '42501') {
-        console.log('🚨 This is a PERMISSION DENIED error (RLS issue)');
+        console.log('???? This is a PERMISSION DENIED error (RLS issue)');
         console.log('   RLS policies may not be configured correctly for the jobs table');
         console.log('   Recommendation: Enable RLS and add appropriate policies');
       }
     } else {
-      console.log('✅ Job update works');
+      console.log('??? Job update works');
     }
     
     // Test 3: Check if we can insert a job (to test INSERT permissions)
@@ -94,15 +94,15 @@ async function checkRLSWithSupabaseClient() {
       });
       
     if (insertError) {
-      console.error('❌ Job insert failed:', insertError);
+      console.error('??? Job insert failed:', insertError);
       
       // Check if it's a permission error
       if (insertError.code === '42501') {
-        console.log('🚨 This is a PERMISSION DENIED error (RLS issue)');
+        console.log('???? This is a PERMISSION DENIED error (RLS issue)');
         console.log('   INSERT RLS policies may not be configured correctly for the jobs table');
       }
     } else {
-      console.log('✅ Job insert works');
+      console.log('??? Job insert works');
       // Clean up the test job
       await supabase
         .from('jobs')
@@ -115,7 +115,7 @@ async function checkRLSWithSupabaseClient() {
   }
   
   console.log('\n=== Supabase Client RLS Check Complete ===');
-  console.log('\n💡 Recommendations:');
+  console.log('\n???? Recommendations:');
   console.log('   Based on the direct database connection check, RLS is not enabled on the jobs table');
   console.log('   You should enable RLS and add appropriate policies for:');
   console.log('   - SELECT (read operations)');

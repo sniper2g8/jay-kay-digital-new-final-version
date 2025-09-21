@@ -12,7 +12,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- This should resolve the permission denied errors
 
 -- Grant permissions on existing tables
-GRANT ALL PRIVILEGES ON TABLE appUsers TO postgres;
+GRANT ALL PRIVILEGES ON TABLE "appUsers" TO postgres;
 GRANT ALL PRIVILEGES ON TABLE customers TO postgres;
 GRANT ALL PRIVILEGES ON TABLE jobs TO postgres;
 GRANT ALL PRIVILEGES ON TABLE invoices TO postgres;
@@ -25,7 +25,7 @@ GRANT ALL PRIVILEGES ON TABLE notifications TO postgres;
 GRANT ALL PRIVILEGES ON TABLE notification_preferences TO postgres;
 
 -- Grant permissions to authenticated role as well
-GRANT ALL PRIVILEGES ON TABLE appUsers TO authenticated;
+GRANT ALL PRIVILEGES ON TABLE "appUsers" TO authenticated;
 GRANT ALL PRIVILEGES ON TABLE customers TO authenticated;
 GRANT ALL PRIVILEGES ON TABLE jobs TO authenticated;
 GRANT ALL PRIVILEGES ON TABLE invoices TO authenticated;
@@ -37,11 +37,21 @@ GRANT ALL PRIVILEGES ON TABLE statement_settings TO authenticated;
 GRANT ALL PRIVILEGES ON TABLE notifications TO authenticated;
 GRANT ALL PRIVILEGES ON TABLE notification_preferences TO authenticated;
 
--- Ensure service role can bypass RLS
-ALTER ROLE service_role SET supabase_admin_bypass_rls = true;
+-- Grant service role full access (this is the correct way to give service role permissions)
+GRANT ALL PRIVILEGES ON TABLE "appUsers" TO service_role;
+GRANT ALL PRIVILEGES ON TABLE customers TO service_role;
+GRANT ALL PRIVILEGES ON TABLE jobs TO service_role;
+GRANT ALL PRIVILEGES ON TABLE invoices TO service_role;
+GRANT ALL PRIVILEGES ON TABLE payments TO service_role;
+GRANT ALL PRIVILEGES ON TABLE customer_statement_periods TO service_role;
+GRANT ALL PRIVILEGES ON TABLE customer_statement_transactions TO service_role;
+GRANT ALL PRIVILEGES ON TABLE customer_account_balances TO service_role;
+GRANT ALL PRIVILEGES ON TABLE statement_settings TO service_role;
+GRANT ALL PRIVILEGES ON TABLE notifications TO service_role;
+GRANT ALL PRIVILEGES ON TABLE notification_preferences TO service_role;
 
 -- Fix ownership if needed (all tables should be owned by postgres)
-ALTER TABLE IF EXISTS appUsers OWNER TO postgres;
+ALTER TABLE IF EXISTS "appUsers" OWNER TO postgres;
 ALTER TABLE IF EXISTS customers OWNER TO postgres;
 ALTER TABLE IF EXISTS jobs OWNER TO postgres;
 ALTER TABLE IF EXISTS invoices OWNER TO postgres;
@@ -54,7 +64,7 @@ ALTER TABLE IF EXISTS notifications OWNER TO postgres;
 ALTER TABLE IF EXISTS notification_preferences OWNER TO postgres;
 
 -- Ensure RLS is enabled on all tables
-ALTER TABLE appUsers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "appUsers" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE customers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE jobs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE invoices ENABLE ROW LEVEL SECURITY;
@@ -67,10 +77,10 @@ ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE notification_preferences ENABLE ROW LEVEL SECURITY;
 
 -- Drop existing policies to avoid conflicts
-DROP POLICY IF EXISTS "Users can read their own profile" ON appUsers;
-DROP POLICY IF EXISTS "Users can update their own profile" ON appUsers;
-DROP POLICY IF EXISTS "Admins and staff can read all profiles" ON appUsers;
-DROP POLICY IF EXISTS "Admins can update all profiles" ON appUsers;
+DROP POLICY IF EXISTS "Users can read their own profile" ON "appUsers";
+DROP POLICY IF EXISTS "Users can update their own profile" ON "appUsers";
+DROP POLICY IF EXISTS "Admins and staff can read all profiles" ON "appUsers";
+DROP POLICY IF EXISTS "Admins can update all profiles" ON "appUsers";
 
 DROP POLICY IF EXISTS "Users can read their own customer info" ON customers;
 DROP POLICY IF EXISTS "Users can insert their own customer info" ON customers;
@@ -120,28 +130,22 @@ DROP POLICY IF EXISTS "Users can delete their own notifications" ON notification
 DROP POLICY IF EXISTS "Users can read their own preferences" ON notification_preferences;
 DROP POLICY IF EXISTS "Users can update their own preferences" ON notification_preferences;
 
--- Create new policies for appUsers
+-- Create new policies for "appUsers"
 CREATE POLICY "Users can read their own profile" 
-ON appUsers FOR SELECT 
+ON "appUsers" FOR SELECT 
 USING (id = auth.uid());
 
 CREATE POLICY "Users can update their own profile" 
-ON appUsers FOR UPDATE 
+ON "appUsers" FOR UPDATE 
 USING (id = auth.uid());
 
 CREATE POLICY "Admins and staff can read all profiles" 
-ON appUsers FOR SELECT 
-USING ( EXISTS (
-  SELECT 1 FROM appUsers a 
-  WHERE a.id = auth.uid() AND a.userRole IN ('admin', 'staff')
-));
+ON "appUsers" FOR SELECT 
+USING (userRole IN ('admin', 'staff'));
 
 CREATE POLICY "Admins can update all profiles" 
-ON appUsers FOR UPDATE 
-USING ( EXISTS (
-  SELECT 1 FROM appUsers a 
-  WHERE a.id = auth.uid() AND a.userRole = 'admin'
-));
+ON "appUsers" FOR UPDATE 
+USING (userRole = 'admin');
 
 -- Create new policies for customers
 CREATE POLICY "Users can read their own customer info" 
@@ -159,15 +163,15 @@ USING (app_user_id = auth.uid()::text);
 CREATE POLICY "Admins and staff can read all customer info" 
 ON customers FOR SELECT 
 USING ( EXISTS (
-  SELECT 1 FROM appUsers a 
-  WHERE a.id = auth.uid() AND a.userRole IN ('admin', 'staff')
+  SELECT 1 FROM "appUsers" 
+  WHERE id = auth.uid() AND userRole IN ('admin', 'staff')
 ));
 
 CREATE POLICY "Admins and staff can update all customer info" 
 ON customers FOR UPDATE 
 USING ( EXISTS (
-  SELECT 1 FROM appUsers a 
-  WHERE a.id = auth.uid() AND a.userRole IN ('admin', 'staff')
+  SELECT 1 FROM "appUsers" 
+  WHERE id = auth.uid() AND userRole IN ('admin', 'staff')
 ));
 
 -- Create new policies for jobs
@@ -186,15 +190,8 @@ USING (customer_id = auth.uid());
 CREATE POLICY "Admins and staff can read all jobs" 
 ON jobs FOR SELECT 
 USING ( EXISTS (
-  SELECT 1 FROM appUsers a 
-  WHERE a.id = auth.uid() AND a.userRole IN ('admin', 'staff')
-));
-
-CREATE POLICY "Admins and staff can update all jobs" 
-ON jobs FOR UPDATE 
-USING ( EXISTS (
-  SELECT 1 FROM appUsers a 
-  WHERE a.id = auth.uid() AND a.userRole IN ('admin', 'staff')
+  SELECT 1 FROM "appUsers" 
+  WHERE id = auth.uid() AND userRole IN ('admin', 'staff')
 ));
 
 -- Create new policies for invoices
@@ -205,8 +202,8 @@ USING (customer_id = auth.uid());
 CREATE POLICY "Admins and staff can read all invoices" 
 ON invoices FOR SELECT 
 USING ( EXISTS (
-  SELECT 1 FROM appUsers a 
-  WHERE a.id = auth.uid() AND a.userRole IN ('admin', 'staff')
+  SELECT 1 FROM "appUsers" 
+  WHERE id = auth.uid() AND userRole IN ('admin', 'staff')
 ));
 
 -- Create new policies for payments
@@ -217,8 +214,8 @@ USING (customer_id = auth.uid());
 CREATE POLICY "Admins and staff can read all payments" 
 ON payments FOR SELECT 
 USING ( EXISTS (
-  SELECT 1 FROM appUsers a 
-  WHERE a.id = auth.uid() AND a.userRole IN ('admin', 'staff')
+  SELECT 1 FROM "appUsers" 
+  WHERE id = auth.uid() AND userRole IN ('admin', 'staff')
 ));
 
 -- Create new policies for statement periods
@@ -237,15 +234,8 @@ USING (customer_id = auth.uid());
 CREATE POLICY "Admins and staff can read all statement periods" 
 ON customer_statement_periods FOR SELECT 
 USING ( EXISTS (
-  SELECT 1 FROM appUsers a 
-  WHERE a.id = auth.uid() AND a.userRole IN ('admin', 'staff')
-));
-
-CREATE POLICY "Admins and staff can update all statement periods" 
-ON customer_statement_periods FOR UPDATE 
-USING ( EXISTS (
-  SELECT 1 FROM appUsers a 
-  WHERE a.id = auth.uid() AND a.userRole IN ('admin', 'staff')
+  SELECT 1 FROM "appUsers" 
+  WHERE id = auth.uid() AND userRole IN ('admin', 'staff')
 ));
 
 -- Create new policies for statement transactions
@@ -264,15 +254,8 @@ USING (customer_id = auth.uid());
 CREATE POLICY "Admins and staff can read all statement transactions" 
 ON customer_statement_transactions FOR SELECT 
 USING ( EXISTS (
-  SELECT 1 FROM appUsers a 
-  WHERE a.id = auth.uid() AND a.userRole IN ('admin', 'staff')
-));
-
-CREATE POLICY "Admins and staff can update all statement transactions" 
-ON customer_statement_transactions FOR UPDATE 
-USING ( EXISTS (
-  SELECT 1 FROM appUsers a 
-  WHERE a.id = auth.uid() AND a.userRole IN ('admin', 'staff')
+  SELECT 1 FROM "appUsers" 
+  WHERE id = auth.uid() AND userRole IN ('admin', 'staff')
 ));
 
 -- Create new policies for account balances
@@ -287,15 +270,8 @@ USING (customer_id = auth.uid());
 CREATE POLICY "Admins and staff can read all account balances" 
 ON customer_account_balances FOR SELECT 
 USING ( EXISTS (
-  SELECT 1 FROM appUsers a 
-  WHERE a.id = auth.uid() AND a.userRole IN ('admin', 'staff')
-));
-
-CREATE POLICY "Admins and staff can update all account balances" 
-ON customer_account_balances FOR UPDATE 
-USING ( EXISTS (
-  SELECT 1 FROM appUsers a 
-  WHERE a.id = auth.uid() AND a.userRole IN ('admin', 'staff')
+  SELECT 1 FROM "appUsers" 
+  WHERE id = auth.uid() AND userRole IN ('admin', 'staff')
 ));
 
 -- Create new policies for statement settings
@@ -310,15 +286,8 @@ USING (customer_id = auth.uid());
 CREATE POLICY "Admins and staff can read all statement settings" 
 ON statement_settings FOR SELECT 
 USING ( EXISTS (
-  SELECT 1 FROM appUsers a 
-  WHERE a.id = auth.uid() AND a.userRole IN ('admin', 'staff')
-));
-
-CREATE POLICY "Admins and staff can update all statement settings" 
-ON statement_settings FOR UPDATE 
-USING ( EXISTS (
-  SELECT 1 FROM appUsers a 
-  WHERE a.id = auth.uid() AND a.userRole IN ('admin', 'staff')
+  SELECT 1 FROM "appUsers" 
+  WHERE id = auth.uid() AND userRole IN ('admin', 'staff')
 ));
 
 -- Create new policies for notifications
@@ -356,7 +325,7 @@ NOTIFY pgrst, 'reload schema';
 
 -- Verify the changes
 SELECT tablename, tableowner FROM pg_tables WHERE tablename IN (
-  'appUsers', 'customers', 'jobs', 'invoices', 'payments',
+  '"appUsers"', 'customers', 'jobs', 'invoices', 'payments',
   'customer_statement_periods', 'customer_statement_transactions', 
   'customer_account_balances', 'statement_settings',
   'notifications', 'notification_preferences'
