@@ -1,9 +1,10 @@
--- Temporarily disable RLS to test if that's the issue
+-- Temporarily disable RLS on problematic tables to isolate the issue
 
--- Disable RLS on all tables
-ALTER TABLE notifications DISABLE ROW LEVEL SECURITY;
-ALTER TABLE "appUsers" DISABLE ROW LEVEL SECURITY;
-ALTER TABLE "notification_preferences" DISABLE ROW LEVEL SECURITY;
+ALTER TABLE customers DISABLE ROW LEVEL SECURITY;
+ALTER TABLE customer_statement_periods DISABLE ROW LEVEL SECURITY;
+ALTER TABLE customer_statement_transactions DISABLE ROW LEVEL SECURITY;
+ALTER TABLE customer_account_balances DISABLE ROW LEVEL SECURITY;
+ALTER TABLE statement_settings DISABLE ROW LEVEL SECURITY;
 
 -- Test access
 SELECT COUNT(*) FROM notifications LIMIT 1;

@@ -131,6 +131,7 @@ export function useStatementPeriods() {
 
   const fetchStatementPeriods = useCallback(async () => {
     try {
+      console.log("useStatementPeriods: Starting fetch...");
       setIsLoading(true);
       setError(null);
 
@@ -150,8 +151,19 @@ export function useStatementPeriods() {
         )
         .order("period_start", { ascending: false });
 
-      if (fetchError) throw fetchError;
+      if (fetchError) {
+        console.error("useStatementPeriods: Error fetching data:", {
+          message: fetchError.message,
+          code: fetchError.code,
+          details: fetchError.details,
+          hint: fetchError.hint
+        });
+        throw fetchError;
+      }
 
+      console.log("useStatementPeriods: Successfully fetched data", {
+        count: periods?.length || 0
+      });
       setData(periods || []);
     } catch (err) {
       // Enhanced error logging for debugging
@@ -162,9 +174,9 @@ export function useStatementPeriods() {
         errorType: typeof err,
         errorDetails: JSON.stringify(err, null, 2)
       });
-      setError(
-        err instanceof Error ? err.message : "Failed to load statement periods",
-      );
+      const errorMessage = 
+        err instanceof Error ? err.message : "Failed to load statement periods";
+      setError(errorMessage);
       toast.error("Failed to load statement periods");
     } finally {
       setIsLoading(false);
@@ -172,6 +184,7 @@ export function useStatementPeriods() {
   }, []);
 
   useEffect(() => {
+    console.log("useStatementPeriods: Initializing...");
     fetchStatementPeriods();
   }, [fetchStatementPeriods]);
 

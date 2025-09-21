@@ -1,67 +1,75 @@
-/**
- * Test direct PostgreSQL connection with proper error handling
- */
-
+import pg from 'pg';
 import dotenv from 'dotenv';
+
 dotenv.config({ path: '.env.local' });
 
-import { Client } from 'pg';
+// Supabase PostgreSQL connection details
+// Format: postgresql://[user[:password]@][host][:port][/database]
+const SUPABASE_PROJECT_ID = 'pnoxqzlxfuvjvufdjuqh';
+const DB_USER = 'postgres.${SUPABASE_PROJECT_ID}';
+const DB_HOST = 'aws-0-us-west-1.pooler.supabase.com';
+const DB_PORT = '6543';
+const DB_NAME = 'postgres';
+const DB_PASSWORD = process.env.SUPABASE_DB_PASSWORD || '';
 
-async function testDirectPostgres() {
-  console.log('Testing direct PostgreSQL connection...\n');
-  
-  // Extract connection details from the Supabase URL
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  
+if (!DB_PASSWORD) {
+  console.error('❌ Missing database password. Please set SUPABASE_DB_PASSWORD in your .env.local file');
+  process.exit(1);
+}
+
+const connectionString = `postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
+
+console.log('🔗 Attempting to connect to PostgreSQL...');
+console.log('Host:', DB_HOST);
+console.log('User:', DB_USER);
+console.log('Database:', DB_NAME);
+
+const { Client } = pg;
+
+const client = new Client({
+  connectionString: connectionString,
+});
+
+async function testConnection() {
   try {
-    // Parse the URL to get connection details
-    const url = new URL(supabaseUrl);
-    const host = url.hostname;
-    const port = url.port || 5432;
-    
-    // Extract database name from the path
-    const database = url.pathname.substring(1) || 'postgres';
-    
-    // The service role key is used as the password
-    const password = serviceKey;
-    const user = 'postgres.' + host.split('.')[0]; // Extract project ID from hostname
-    
-    console.log(`Connection details:`);
-    console.log(`  Host: ${host}`);
-    console.log(`  Port: ${port}`);
-    console.log(`  Database: ${database}`);
-    console.log(`  User: ${user}`);
-    console.log(`  Password length: ${password?.length || 0}`);
-    
-    const client = new Client({
-      host,
-      port,
-      database,
-      user,
-      password,
-      ssl: {
-        rejectUnauthorized: false
-      }
-    });
-    
-    console.log('\nConnecting to PostgreSQL...');
     await client.connect();
-    console.log('  ✅ Connected successfully');
+    console.log('✅ Connected to PostgreSQL database!');
     
-    console.log('\nTesting query on notifications table...');
-    const result = await client.query('SELECT COUNT(*) FROM notifications LIMIT 1');
-    console.log('  ✅ Query successful');
-    console.log(`  Result: ${result.rows[0].count}`);
+    // Test queries
+    console.log('\\n📋 Testing table access...');
+    
+    // Test appUsers access
+    try {
+      const appUsersResult = await client.query('SELECT COUNT(*) FROM appUsers');
+      console.log(`✅ appUsers table accessible: ${appUsersResult.rows[0].count} records`);
+    } catch (error) {
+      console.log(`❌ appUsers table access failed: ${error.message}`);
+    }
+    
+    // Test customers access
+    try {
+      const customersResult = await client.query('SELECT COUNT(*) FROM customers');
+      console.log(`✅ customers table accessible: ${customersResult.rows[0].count} records`);
+    } catch (error) {
+      console.log(`❌ customers table access failed: ${error.message}`);
+    }
+    
+    // Test statement periods access
+    try {
+      const statementResult = await client.query('SELECT COUNT(*) FROM customer_statement_periods');
+      console.log(`✅ customer_statement_periods table accessible: ${statementResult.rows[0].count} records`);
+    } catch (error) {
+      console.log(`❌ customer_statement_periods table access failed: ${error.message}`);
+    }
     
     await client.end();
-    console.log('\n🎉 Direct PostgreSQL connection test completed successfully!');
-    
+    console.log('\\n🔌 Disconnected from database');
   } catch (error) {
     console.error('❌ PostgreSQL connection failed:', error.message);
-    console.error('Error code:', error.code);
-    console.error('Error detail:', error.detail);
+    if (error.code === 'ENOTFOUND') {
+      console.log('💡 DNS resolution failed. This might be due to network issues or incorrect host.');
+    }
   }
 }
 
-testDirectPostgres().catch(console.error);
+testConnection();
