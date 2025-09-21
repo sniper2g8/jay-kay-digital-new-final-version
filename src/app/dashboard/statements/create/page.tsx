@@ -116,16 +116,19 @@ function CreateStatementContent() {
     }
 
     try {
-      
       const newStatement = await createStatementPeriod(formData);
-      
       router.push(`/dashboard/statements/${newStatement.id}`);
     } catch (error) {
-      console.error("Error creating statement:", {
+      // Enhanced error logging with structured details
+      const errorDetails = {
         message: error instanceof Error ? error.message : "Unknown error",
-        details: error,
-        formData: formData,
-      });
+        code: error instanceof Error && 'code' in error ? (error as any).code : undefined,
+        details: error instanceof Error && 'details' in error ? (error as any).details : undefined,
+        formData,
+        stack: error instanceof Error ? error.stack : undefined,
+      };
+      
+      console.error("Error creating statement:", errorDetails);
     }
   };
 

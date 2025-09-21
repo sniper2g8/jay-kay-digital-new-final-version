@@ -210,17 +210,22 @@ export function useStatementPeriod(id: string | null) {
 
   const fetchStatementPeriod = useCallback(async () => {
     if (!id) {
+      console.log("useStatementPeriod: No ID provided");
       setData(null);
       setTransactions([]);
       setIsLoading(false);
       return;
     }
 
+    console.log("useStatementPeriod: Fetching statement", { id });
+
     try {
       setIsLoading(true);
       setError(null);
 
-      // Fetch statement period
+      console.log("useStatementPeriod: Starting fetch for ID", id);
+
+      // Fetch statement period with better error handling
       const { data: period, error: periodError } = await supabase
         .from("customer_statement_periods")
         .select(
@@ -237,9 +242,40 @@ export function useStatementPeriod(id: string | null) {
         `,
         )
         .eq("id", id)
-        .single();
+        .maybeSingle(); // Use maybeSingle() instead of single() to avoid 404 errors
 
-      if (periodError) throw periodError;
+      console.log("useStatementPeriod: Statement fetch result", { 
+        error: periodError, 
+        data: period,
+        errorCode: periodError?.code,
+        errorMessage: periodError?.message,
+        errorDetails: periodError?.details
+      });
+
+      // Log the request details from Supabase for debugging
+      if (periodError) {
+        // Log error details
+        console.log("useStatementPeriod: Error details", periodError);
+
+        // Handle specific error cases
+        if (!period) {
+          throw new Error("Statement not found");
+        }
+
+        // Just throw a generic error since TypeScript is being difficult
+        throw new Error("Error fetching statement");
+      }
+
+      if (!period) {
+        console.log("useStatementPeriod: No statement found for ID", id);
+        throw new Error("Statement not found");
+      }
+
+      console.log("useStatementPeriod: Successfully found statement", {
+        statementNumber: period.statement_number,
+        customerId: period.customer_id,
+        status: period.status
+      });
 
       // Fetch transactions for this period
       const { data: transactionData, error: transactionError } = await supabase
@@ -248,16 +284,36 @@ export function useStatementPeriod(id: string | null) {
         .eq("statement_period_id", id)
         .order("transaction_date", { ascending: true });
 
-      if (transactionError) throw transactionError;
+      if (transactionError) {
+        console.error("Error fetching transactions:", {
+          error: transactionError,
+          code: transactionError.code,
+          details: transactionError.details,
+          message: transactionError.message
+        });
+        // Don't throw transaction errors, just log them
+        setTransactions([]);
+      } else {
+        setTransactions(transactionData || []);
+      }
 
       setData(period);
-      setTransactions(transactionData || []);
     } catch (err) {
-      console.error("Error fetching statement period:", err);
-      setError(
-        err instanceof Error ? err.message : "Failed to load statement period",
-      );
-      toast.error("Failed to load statement period");
+      console.error("Error fetching statement period:", {
+        error: err,
+        message: err instanceof Error ? err.message : "Unknown error",
+        code: err instanceof Error && 'code' in err ? (err as any).code : undefined,
+        details: err instanceof Error && 'details' in err ? (err as any).details : undefined,
+        stack: err instanceof Error ? err.stack : undefined,
+      });
+
+      const errorMessage = err instanceof Error 
+        ? err.message 
+        : "Failed to load statement period";
+
+      setError(errorMessage);
+      toast.error(errorMessage);
+      setData(null);
     } finally {
       setIsLoading(false);
     }
@@ -425,17 +481,24 @@ export function useStatementActions() {
       toast.success("Statement period created successfully");
       return data;
     } catch (error) {
-      console.error("Error creating statement period:", {
+      // Enhanced error logging with structured details
+      const errorDetails = {
         message: error instanceof Error ? error.message : "Unknown error",
-        details: error,
+        code: error instanceof Error && 'code' in error ? (error as any).code : undefined,
+        details: error instanceof Error && 'details' in error ? (error as any).details : undefined,
+        hint: error instanceof Error && 'hint' in error ? (error as any).hint : undefined,
         stack: error instanceof Error ? error.stack : undefined,
-      });
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to create statement period";
+      };
+      
+      console.error("Error creating statement period:", errorDetails);
+      
+      // Show a more specific error message based on the error type
+      const errorMessage = error instanceof Error && 'message' in error 
+        ? error.message
+        : "Failed to create statement period. Please check the form and try again.";
+      
       toast.error(errorMessage);
-      throw error;
+      throw new Error(errorMessage, { cause: error });
     } finally {
       setIsLoading(false);
     }

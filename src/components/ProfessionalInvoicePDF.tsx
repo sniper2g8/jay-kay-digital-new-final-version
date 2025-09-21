@@ -179,6 +179,7 @@ export function ProfessionalInvoicePDF({
           </Button>
           <Button 
             onClick={generatePDF}
+            data-pdf-download
             className="flex items-center space-x-2 bg-red-600 hover:bg-red-700"
           >
             <Download className="h-4 w-4" />

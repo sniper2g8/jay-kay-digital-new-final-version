@@ -175,6 +175,11 @@ function InvoiceDetailContent() {
     reference_number: "",
     notes: "",
   });
+  
+  const { MAX_VARCHAR_LENGTH, getRemainingCharacters } = useMemo(() => ({
+    MAX_VARCHAR_LENGTH: 20,
+    getRemainingCharacters: (value: string) => Math.max(0, 20 - value.length),
+  }), []);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [showMoreActions, setShowMoreActions] = useState(false);
   const [showTemplateView, setShowTemplateView] = useState(false);
@@ -383,6 +388,18 @@ function InvoiceDetailContent() {
     window.print();
   };
 
+  const handleDownloadPDF = () => {
+    setShowMoreActions(false);
+    setShowTemplateView(true);
+    // Need to give time for the template to render
+    setTimeout(() => {
+      const downloadButton = document.querySelector('[data-pdf-download]') as HTMLButtonElement;
+      if (downloadButton) {
+        downloadButton.click();
+      }
+    }, 100);
+  };
+
   if (isLoading) {
     return (
       <DashboardLayout>
@@ -566,10 +583,11 @@ function InvoiceDetailContent() {
                               id="reference"
                               placeholder="Transaction ID, Check #, etc."
                               value={paymentForm.reference_number}
+                              maxLength={20}
                               onChange={(e) =>
                                 setPaymentForm((prev) => ({
                                   ...prev,
-                                  reference_number: e.target.value,
+                                  reference_number: e.target.value.substring(0, 20),
                                 }))
                               }
                             />
@@ -679,6 +697,7 @@ function InvoiceDetailContent() {
                   <Button
                     variant="ghost"
                     size="sm"
+                    onClick={handleDownloadPDF}
                     className="w-full justify-start"
                   >
                     <Download className="h-4 w-4 mr-2" />
