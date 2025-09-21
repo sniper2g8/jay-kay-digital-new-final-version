@@ -42,6 +42,7 @@ import {
   formatCurrency,
 } from "@/lib/invoice-utils";
 import QRCodeLib from "qrcode";
+import { processPayment, updateInvoiceAfterPayment, updateInvoiceStatus, updateInvoice } from "@/app/actions/payment-actions";
 
 interface InvoiceLineItem {
   id?: string;
@@ -322,7 +323,7 @@ function InvoiceEditContent() {
 
       const { subtotal, taxAmount, total } = calculateTotals();
 
-      // Update the main invoice data
+      // Update the main invoice data using server action
       const updateData = {
         customerName: formData.customerName,
         issueDate: new Date(formData.issueDate).toISOString(),
@@ -337,15 +338,13 @@ function InvoiceEditContent() {
         subtotal: subtotal,
         tax: taxAmount,
         total: total,
-        updated_at: new Date().toISOString(),
       };
 
-      const { error: invoiceError } = await supabase
-        .from("invoices")
-        .update(updateData)
-        .eq("id", invoiceId);
+      const result = await updateInvoice(invoiceId, updateData);
 
-      if (invoiceError) throw invoiceError;
+      if (!result.success) {
+        throw new Error(result.error);
+      }
 
       // Update invoice items using the API endpoint
       try {

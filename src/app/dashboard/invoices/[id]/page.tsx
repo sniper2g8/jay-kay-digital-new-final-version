@@ -81,7 +81,7 @@ import DashboardLayout from "@/components/DashboardLayout";
 import ProtectedDashboard from "@/components/ProtectedDashboard";
 import { InvoiceTemplate } from "@/components/InvoiceTemplate";
 import { Database } from "@/lib/database.types";
-import { processPayment, updateInvoiceAfterPayment } from "@/app/actions/payment-actions";
+import { processPayment, updateInvoiceAfterPayment, updateInvoiceStatus } from "@/app/actions/payment-actions";
 
 type Invoice = Database["public"]["Tables"]["invoices"]["Row"];
 
@@ -281,15 +281,12 @@ function InvoiceDetailContent() {
     if (!invoice) return;
 
     try {
-      const { error } = await supabase
-        .from("invoices")
-        .update({
-          invoice_status: newStatus,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", invoice.id);
+      // Use server action to update invoice status
+      const result = await updateInvoiceStatus(invoice.id, newStatus);
 
-      if (error) throw error;
+      if (!result.success) {
+        throw new Error(result.error);
+      }
 
       setInvoice((prev) =>
         prev ? { ...prev, invoice_status: newStatus } : null,
