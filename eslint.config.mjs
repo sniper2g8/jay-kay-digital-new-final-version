@@ -9,9 +9,22 @@ const compat = new FlatCompat({
   baseDirectory: __dirname,
 });
 
+import simpleImportSort from "eslint-plugin-simple-import-sort";
+
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
+    plugins: {
+      "simple-import-sort": simpleImportSort,
+    },
+    rules: {
+      "simple-import-sort/imports": "error",
+      "simple-import-sort/exports": "error",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": "warn",
+      "react-hooks/exhaustive-deps": "warn",
+      "@next/next/no-img-element": "warn"
+    },
     ignores: [
       "node_modules/**",
       ".next/**",
@@ -20,14 +33,6 @@ const eslintConfig = [
       "next-env.d.ts",
       "migrations/**",
     ],
-  },
-  {
-    rules: {
-      "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/no-unused-vars": "warn",
-      "react-hooks/exhaustive-deps": "warn",
-      "@next/next/no-img-element": "warn"
-    }
   }
 ];
 

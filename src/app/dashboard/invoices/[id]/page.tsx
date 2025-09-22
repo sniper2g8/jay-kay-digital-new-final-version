@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -79,7 +79,7 @@ import { supabase } from "@/lib/supabase";
 import { formatCurrency, formatDate } from "@/lib/constants";
 import DashboardLayout from "@/components/DashboardLayout";
 import ProtectedDashboard from "@/components/ProtectedDashboard";
-import { ProfessionalInvoicePDF } from "@/components/ProfessionalInvoicePDF";
+import { ProfessionalInvoicePDF, ProfessionalInvoicePDFRef } from "@/components/ProfessionalInvoicePDF";
 import { Database } from "@/lib/database.types";
 import { processPayment, updateInvoiceAfterPayment, updateInvoiceStatus } from "@/app/actions/payment-actions";
 
@@ -183,7 +183,7 @@ function InvoiceDetailContent() {
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [showMoreActions, setShowMoreActions] = useState(false);
   const [showTemplateView, setShowTemplateView] = useState(false);
-  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+  const professionalInvoiceRef = useRef<ProfessionalInvoicePDFRef>(null);
 
   const fetchInvoiceDetails = useCallback(async () => {
     try {
@@ -381,9 +381,10 @@ function InvoiceDetailContent() {
 
   const handleDownloadClick = () => {
     setShowTemplateView(true);
-    setIsDownloadingPdf(true);
-    // Reset after a short delay to allow re-triggering
-    setTimeout(() => setIsDownloadingPdf(false), 500);
+    // Use a timeout to ensure the component is rendered before calling generatePDF
+    setTimeout(() => {
+      professionalInvoiceRef.current?.generatePDF();
+    }, 100);
   };
 
   const handleCopyInvoiceLink = () => {
@@ -758,6 +759,7 @@ function InvoiceDetailContent() {
         {showTemplateView ? (
           <div className="mt-8">
             <ProfessionalInvoicePDF
+              ref={professionalInvoiceRef}
               invoice={{
                 id: invoice.id,
                 invoiceNo: invoice.invoiceNo ?? undefined,
@@ -784,7 +786,6 @@ function InvoiceDetailContent() {
               } : undefined}
               items={invoice.invoice_items || []}
               showActions={false}
-              triggerDownload={isDownloadingPdf}
             />
           </div>
         ) : (

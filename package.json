@@ -73,6 +73,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.5.3",
     "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
     "glob": "^11.0.3",
     "prettier": "^3.6.2",
     "tailwindcss": "^4",

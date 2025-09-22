@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { getInvoiceLineItems_SA } from '@/app/actions/getInvoiceLineItems_SA';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,11 +51,11 @@ interface Invoice {
 }
 
 interface InvoiceItem {
-  id: string;
+  id: number;
   description: string;
-  quantity: number | null;
-  unit_price: number | null;
-  total_price: number | null;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
   job_no?: string;
   notes?: string;
 }
@@ -68,7 +69,6 @@ interface Customer {
   city?: string | null;
   state?: string | null;
   zip_code?: string | null;
-  country?: string | null;
 }
 
 export default function InvoiceManagementPage() {
@@ -153,41 +153,61 @@ export default function InvoiceManagementPage() {
 
   const fetchInvoiceDetails = async (invoiceId: string) => {
     try {
-      // Fetch invoice items
-      const { data: itemsData, error: itemsError } = await supabase
-        .from('invoice_line_items')
-        .select('*')
-        .eq('invoice_id', invoiceId);
+      console.log('Fetching invoice items for invoice:', invoiceId);
+      
+      const { data: itemsData, error: itemsError } = await getInvoiceLineItems_SA(invoiceId);
 
-      if (itemsError) throw itemsError;
+      console.log('Fetched items data:', itemsData);
+      if (itemsError) {
+        console.error('Error fetching items:', itemsError);
+        throw itemsError;
+      }
 
-      const processedItems = itemsData?.map(item => ({
+      const processedItems = (itemsData || []).map((item: any) => ({
         id: item.id,
-        description: item.description,
-        quantity: item.quantity || 1,
-        unit_price: item.unit_price || 0,
-        total_price: item.total_price || 0,
-        job_no: undefined,
-        notes: undefined
-      })) || [];
+        description: item.description || 'No description',
+        quantity: Number(item.quantity) || 1,
+        unit_price: Number(item.unit_price) || 0,
+        total_price: Number(item.total_price) || 0,
+        job_no: item.job_no || undefined,
+        notes: item.notes || undefined
+      }));
 
+      console.log('Processed items:', processedItems);
       setInvoiceItems(processedItems);
 
       // Fetch customer details for selected invoice
       const invoice = invoices.find(inv => inv.id === invoiceId);
+      console.log('Found invoice:', invoice);
+      
       if (invoice?.customer_id) {
+        console.log('Fetching customer details for:', invoice.customer_id);
         const { data: customerData, error: customerError } = await supabase
           .from('customers')
-          .select('*')
+          .select(`
+            id,
+            business_name,
+            contact_person,
+            email,
+            phone,
+            address,
+            city,
+            state,
+            zip_code
+          `)
           .eq('id', invoice.customer_id)
           .single();
 
-        if (!customerError && customerData) {
+        if (customerError) {
+          console.error('Error fetching customer:', customerError);
+        } else {
+          console.log('Fetched customer data:', customerData);
           setCustomer(customerData);
         }
       }
     } catch (error) {
       console.error('Error fetching invoice details:', error);
+      alert('Failed to load invoice details. Please try again.');
     }
   };
 
@@ -301,18 +321,9 @@ export default function InvoiceManagementPage() {
             address: customer.address || undefined,
             city: customer.city || undefined,
             state: customer.state || undefined,
-            zip_code: customer.zip_code || undefined,
-            country: customer.country || undefined
+            zip_code: customer.zip_code || undefined
           } : undefined}
-          items={invoiceItems.map(item => ({
-            id: parseInt(item.id) || 0,
-            description: item.description,
-            quantity: item.quantity || 1,
-            unit_price: item.unit_price || 0,
-            total_price: item.total_price || 0,
-            job_no: item.job_no,
-            notes: item.notes
-          }))}
+          items={invoiceItems}
           showActions={true}
         />
       </div>

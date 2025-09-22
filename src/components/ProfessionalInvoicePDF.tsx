@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect, forwardRef, useImperativeHandle, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { formatCurrency, formatDate } from "@/lib/constants";
 import { Download, FileText, QrCode } from "lucide-react";
@@ -54,16 +54,18 @@ interface ProfessionalInvoicePDFProps {
   customer?: Customer;
   items: InvoiceItem[];
   showActions?: boolean;
-  triggerDownload?: boolean; // Add this prop
 }
 
-export function ProfessionalInvoicePDF({ 
+export interface ProfessionalInvoicePDFRef {
+  generatePDF: () => void;
+}
+
+export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, ProfessionalInvoicePDFProps>(({ 
   invoice, 
   customer, 
   items,
-  showActions = true,
-  triggerDownload = false // Add this prop
-}: ProfessionalInvoicePDFProps) {
+  showActions = true
+}, ref) => {
   const invoiceRef = useRef<HTMLDivElement>(null);
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
 
@@ -88,7 +90,11 @@ export function ProfessionalInvoicePDF({
 
   // PDF generation using jsPDF + html2canvas
   const generatePDF = useCallback(async () => {
-    if (!invoiceRef.current) return;
+    if (!invoiceRef.current) {
+      console.error("Invoice ref not available for PDF generation.");
+      alert('Could not generate PDF. The invoice content is not ready.');
+      return;
+    }
 
     try {
       // Hide action buttons during PDF generation
@@ -128,7 +134,11 @@ export function ProfessionalInvoicePDF({
     }
   }, [invoice, invoiceDate]);
 
-  // Generate QR Code & Handle Trigger
+  useImperativeHandle(ref, () => ({
+    generatePDF,
+  }));
+
+  // Generate QR Code
   useEffect(() => {
     const generateQRCode = async () => {
       try {
@@ -156,14 +166,7 @@ export function ProfessionalInvoicePDF({
     };
 
     generateQRCode();
-
-    if (triggerDownload) {
-      // Adding a small delay to ensure the component is fully rendered
-      setTimeout(() => {
-        generatePDF();
-      }, 100);
-    }
-  }, [invoice, total, dueDate, triggerDownload, generatePDF]);
+  }, [invoice, total, dueDate]);
 
   // Print function using react-to-print
   const handlePrint = useReactToPrint({
@@ -407,4 +410,6 @@ export function ProfessionalInvoicePDF({
       </div>
     </div>
   );
-}
+});
+
+ProfessionalInvoicePDF.displayName = "ProfessionalInvoicePDF";
