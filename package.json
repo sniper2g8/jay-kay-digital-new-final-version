@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build --turbopack --no-lint",
+    "build": "next build --no-lint",
     "start": "next start",
     "lint": "eslint",
     "fix:auth-tokens": "node scripts/fix-null-token-issue-corrected.js",

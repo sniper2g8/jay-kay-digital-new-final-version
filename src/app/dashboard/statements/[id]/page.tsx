@@ -21,14 +21,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useParams } from "next/navigation";
 
-interface StatementPageProps {
-  params: {
-    id: string;
-  };
-}
-
-export default function StatementPage({ params }: StatementPageProps) {
+export default function StatementPage() {
+  const params = useParams<{ id: string }>();
   console.log("StatementPage: Rendering with params", { params });
 
   if (!params.id) {

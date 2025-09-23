@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -49,14 +49,9 @@ interface InvoiceLineItemForm
   tempId: string;
 }
 
-interface CreateInvoicePageProps {
-  params?: {
-    jobId?: string;
-  };
-}
-
-function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
+function CreateInvoiceContent() {
   const router = useRouter();
+  const { jobId } = useParams<{ jobId?: string }>(); // Get jobId from params using hook
   const { data: customers, isLoading: customersLoading } = useCustomers();
   // const { data: templates, isLoading: templatesLoading } = useInvoiceTemplates(); // Commented out - table doesn't exist
   const { createInvoice, createInvoiceFromJob } = useInvoiceActions();
@@ -321,8 +316,8 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
       };
 
       let invoice;
-      if (params?.jobId) {
-        invoice = await createInvoiceFromJob(params.jobId, invoiceData);
+      if (jobId) { // Changed from params?.jobId to jobId
+        invoice = await createInvoiceFromJob(jobId, invoiceData); // Changed from params.jobId to jobId
       } else {
         invoice = await createInvoice(invoiceData);
       }
@@ -372,7 +367,7 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
-              {params?.jobId ? "Create Invoice from Job" : "Create New Invoice"}
+              {jobId ? "Create Invoice from Job" : "Create New Invoice"} {/* Changed from params?.jobId to jobId */}
             </h1>
             <p className="text-muted-foreground mt-1">
               Generate a new invoice for services or products
@@ -875,12 +870,12 @@ function CreateInvoiceContent({ params }: CreateInvoicePageProps) {
   );
 }
 
-export default function CreateInvoicePage({ params }: CreateInvoicePageProps) {
+export default function CreateInvoicePage() {
   return (
     <ProtectedDashboard
       allowedRoles={["staff", "manager", "admin", "super_admin"]}
     >
-      <CreateInvoiceContent params={params} />
+      <CreateInvoiceContent />
     </ProtectedDashboard>
   );
 }
