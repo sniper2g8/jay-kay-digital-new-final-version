@@ -19,10 +19,8 @@ export async function middleware(req: NextRequest) {
       data: { session },
     } = await supabase.auth.getSession();
 
-    // If accessing statement pages and no session, redirect to login
-    if (req.nextUrl.pathname.startsWith('/dashboard/statements') && !session) {
-      return NextResponse.redirect(new URL('/login', req.url));
-    }
+    // Allow statements to handle access gracefully client-side without forced redirect
+    // If you want to protect the entire dashboard, move this check to the matcher-wide scope.
   }
 
   return res;
