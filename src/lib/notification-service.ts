@@ -55,6 +55,19 @@ interface InvoiceNotificationData {
   due_date: string;
 }
 
+interface StatementNotificationData {
+  statement_id: string;
+  statement_number: string;
+  customer_id: string;
+  customer_name: string;
+  customer_email?: string;
+  customer_phone?: string;
+  period_start: string;
+  period_end: string;
+  opening_balance: number;
+  closing_balance: number;
+}
+
 class NotificationService {
   private readonly EMAIL_API_URL = process.env.NEXT_PUBLIC_EMAIL_API_URL || '/api/send-email';
   private readonly SMS_API_URL = process.env.NEXT_PUBLIC_SMS_API_URL || '/api/send-sms';
@@ -125,6 +138,67 @@ class NotificationService {
       await this.sendAdminInvoiceNotification(data);
     } catch (error) {
       console.error('Error sending invoice notification:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Send statement notification (account statement available)
+   */
+  async sendStatementNotification(data: StatementNotificationData): Promise<void> {
+    try {
+      // Notify customer with statement summary
+      const notification: NotificationData = {
+        recipient_id: data.customer_id,
+        title: `Your Account Statement: ${data.statement_number}`,
+        message: `Statement ${data.statement_number} is available for ${new Date(data.period_start).toLocaleDateString()} to ${new Date(data.period_end).toLocaleDateString()}. Closing balance: SLL ${data.closing_balance.toLocaleString()}.`,
+        type: 'payment_due',
+        related_entity_id: data.statement_id,
+        related_entity_type: 'statement',
+        email_content: this.generateStatementEmailContent(data, 'customer'),
+        sms_content: this.generateStatementSMSContent(data, 'customer')
+      };
+
+      await this.createNotification(notification);
+
+      if (data.customer_email && await this.shouldSendEmail(data.customer_id)) {
+        await this.sendEmail(
+          data.customer_email,
+          notification.title,
+          notification.email_content || notification.message,
+        );
+      }
+
+      if (data.customer_phone && await this.shouldSendSMS(data.customer_id)) {
+        await this.sendSMS(
+          data.customer_phone,
+          notification.sms_content || notification.message,
+        );
+      }
+
+      // Notify admins a statement was generated
+      const admins = await this.getAdminUsers();
+      for (const admin of admins) {
+        const adminNotif: NotificationData = {
+          recipient_id: admin.id,
+          title: `Statement Generated: ${data.statement_number}`,
+          message: `Statement ${data.statement_number} generated for ${data.customer_name}. Closing balance: SLL ${data.closing_balance.toLocaleString()}.`,
+          type: 'payment_due',
+          related_entity_id: data.statement_id,
+          related_entity_type: 'statement',
+          email_content: this.generateStatementEmailContent(data, 'admin'),
+          sms_content: this.generateStatementSMSContent(data, 'admin'),
+        };
+        await this.createNotification(adminNotif);
+        if (admin.email && await this.shouldSendEmail(admin.id)) {
+          await this.sendEmail(admin.email, adminNotif.title, adminNotif.email_content || adminNotif.message);
+        }
+        if (admin.phone && await this.shouldSendSMS(admin.id)) {
+          await this.sendSMS(admin.phone, adminNotif.sms_content || adminNotif.message);
+        }
+      }
+    } catch (error) {
+      console.error('Error sending statement notification:', error);
       throw error;
     }
   }
@@ -784,6 +858,55 @@ class NotificationService {
           </body>
         </html>
       `;
+    }
+  }
+
+  /**
+   * Generate statement email content (professional template)
+   */
+  private generateStatementEmailContent(data: StatementNotificationData, recipient: 'admin' | 'customer'): string {
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://jaykaydigitalpress.com';
+    const period = `${new Date(data.period_start).toLocaleDateString()} - ${new Date(data.period_end).toLocaleDateString()}`;
+    const header = recipient === 'admin' ? 'Statement Generated' : 'Your Account Statement';
+    const ctaHref = recipient === 'admin'
+      ? `${baseUrl}/dashboard/statements/${data.statement_id}`
+      : `${baseUrl}/dashboard/statements/${data.statement_id}`;
+    return `
+      <html>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #111827;">
+          <div style="max-width: 640px; margin: 0 auto; padding: 24px;">
+            <div style="text-align:center; margin-bottom: 16px;">
+              <img src="${baseUrl}/JK_Logo.jpg" alt="Jay Kay Digital Press" style="height:64px; object-fit:contain;"/>
+            </div>
+            <h2 style="color: #dc2626; margin: 0 0 8px 0;">${header}</h2>
+            <p style="margin: 0 0 16px 0;">Statement <strong>${data.statement_number}</strong> for <strong>${data.customer_name}</strong></p>
+            <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:8px; padding:16px; margin-bottom:16px;">
+              <p style="margin:6px 0;"><strong>Period:</strong> ${period}</p>
+              <p style="margin:6px 0;"><strong>Opening Balance:</strong> SLL ${data.opening_balance.toLocaleString()}</p>
+              <p style="margin:6px 0;"><strong>Closing Balance:</strong> SLL ${data.closing_balance.toLocaleString()}</p>
+            </div>
+            <div style="text-align: center; margin: 24px 0;">
+              <a href="${ctaHref}" style="background-color: #dc2626; color: #fff; padding: 12px 20px; text-decoration: none; border-radius: 6px; display: inline-block;">View Statement</a>
+            </div>
+            <hr style="margin: 24px 0; border:none; border-top:1px solid #e5e7eb;"/>
+            <p style="font-size: 12px; color: #6b7280;">
+              Jay Kay Digital Press · St. Edward School Avenue, By Caritas, Freetown, Sierra Leone · +232 34 788711 | +232 30 741062
+            </p>
+          </div>
+        </body>
+      </html>
+    `;
+  }
+
+  /**
+   * Generate statement SMS content
+   */
+  private generateStatementSMSContent(data: StatementNotificationData, recipient: 'admin' | 'customer'): string {
+    const period = `${new Date(data.period_start).toLocaleDateString()}-${new Date(data.period_end).toLocaleDateString()}`;
+    if (recipient === 'admin') {
+      return `JKDP: Statement ${data.statement_number} generated for ${data.customer_name}. Closing: SLL ${data.closing_balance.toLocaleString()} (${period}).`;
+    } else {
+      return `JKDP: Your statement ${data.statement_number} is ready (${period}). Closing balance: SLL ${data.closing_balance.toLocaleString()}.`;
     }
   }
 
