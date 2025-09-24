@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { getInvoiceLineItems_SA } from '@/app/actions/getInvoiceLineItems_SA';
+// import { getInvoiceLineItems_SA } from '@/app/actions/getInvoiceLineItems_SA';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -154,16 +154,15 @@ export default function InvoiceManagementPage() {
   const fetchInvoiceDetails = async (invoiceId: string) => {
     try {
       console.log('Fetching invoice items for invoice:', invoiceId);
-      
-      const { data: itemsData, error: itemsError } = await getInvoiceLineItems_SA(invoiceId);
-
-      console.log('Fetched items data:', itemsData);
-      if (itemsError) {
-        console.error('Error fetching items:', itemsError);
-        throw itemsError;
+      // Prefer API route to ensure stable server environment and consistent response shape
+      const res = await fetch(`/api/invoice-items/${invoiceId}`);
+      const itemsPayload = await res.json();
+      if (!res.ok) {
+        console.error('Error fetching items:', itemsPayload);
+        throw itemsPayload;
       }
 
-      const processedItems = (itemsData || []).map((item: any) => ({
+      const processedItems = (itemsPayload || []).map((item: any) => ({
         id: item.id,
         description: item.description || 'No description',
         quantity: Number(item.quantity) || 1,

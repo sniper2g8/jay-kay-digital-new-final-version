@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useParams } from 'next/navigation'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 interface InvoiceItem {
@@ -12,20 +12,26 @@ interface InvoiceItem {
   total: number
 }
 
-export default function InvoiceDetails({ params }: { params: { id: string } }) {
+export default function InvoiceDetails() {
   const [items, setItems] = useState<InvoiceItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const searchParams = useSearchParams()
   const supabase = createClientComponentClient()
+  const params = useParams<{ id: string }>()
+  const invoiceId = params?.id as string | undefined
   
   const invoiceNumber = searchParams.get('number') || 'Unknown'
 
   useEffect(() => {
     const fetchInvoiceItems = async () => {
       try {
-        console.log(`Fetching invoice items for invoice ID: ${params.id}`);
-        const itemsResponse = await fetch(`/api/invoice-items/${params.id}`)
+        if (!invoiceId) {
+          setError('Missing invoice ID')
+          return
+        }
+        console.log(`Fetching invoice items for invoice ID: ${invoiceId}`);
+        const itemsResponse = await fetch(`/api/invoice-items/${invoiceId}`)
         
         console.log("API response status:", itemsResponse.status);
         const itemsData = await itemsResponse.json()
@@ -56,7 +62,7 @@ export default function InvoiceDetails({ params }: { params: { id: string } }) {
     }
 
     fetchInvoiceItems()
-  }, [params.id])
+  }, [invoiceId])
 
   if (loading) return <div>Loading...</div>
   if (error) return <div className="text-red-500">Error: {error}</div>
