@@ -1,0 +1,48 @@
+import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { createServiceRoleClient } from '@/lib/supabase-admin';
+
+export const dynamic = 'force-dynamic';
+
+export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
+  try {
+    const supabase = createRouteHandlerClient({ cookies });
+
+    // Authenticate user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Check role from appUsers
+    const { data: appUser, error: roleError } = await supabase
+      .from('appUsers')
+      .select('primary_role')
+      .eq('id', user.id)
+      .single();
+
+    if (roleError || !appUser || !['admin', 'super_admin'].includes(appUser.primary_role)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    // Use service role to perform deletion
+    const admin = createServiceRoleClient();
+    const { error: deleteError } = await admin
+      .from('statements')
+      .delete()
+      .eq('id', params.id);
+
+    if (deleteError) {
+      console.error('Failed to delete statement:', deleteError);
+      return NextResponse.json({ error: 'Failed to delete' }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error('Unexpected error deleting statement:', err);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+

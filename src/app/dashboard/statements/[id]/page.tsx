@@ -126,15 +126,13 @@ export default function StatementPage() {
                 if (!statement?.id) return;
                 const confirmed = window.confirm("Are you sure you want to delete this statement?");
                 if (!confirmed) return;
-                const { error } = await supabase
-                  .from('statements')
-                  .delete()
-                  .eq('id', statement.id);
-                if (error) {
-                  alert('Failed to delete statement: ' + (error.message || 'Unknown error'));
-                } else {
-                  window.location.href = '/dashboard/statements';
+                const res = await fetch(`/api/statements/${statement.id}`, { method: 'DELETE' });
+                if (!res.ok) {
+                  const payload = await res.json().catch(() => ({}));
+                  alert('Failed to delete statement: ' + (payload.error || res.statusText));
+                  return;
                 }
+                window.location.href = '/dashboard/statements';
               }}
             >
               Delete

@@ -225,79 +225,14 @@ export function useStatementPeriod(id: string | null) {
 
       console.log("useStatementPeriod: Starting fetch for ID", id);
 
-      // Fetch statement period with better error handling
-      const { data: period, error: periodError } = await supabase
-        .from("customer_statement_periods")
-        .select(
-          `
-          *,
-          customer:customers(
-            id,
-            business_name,
-            contact_person,
-            email,
-            phone,
-            address
-          )
-        `,
-        )
-        .eq("id", id)
-        .maybeSingle(); // Use maybeSingle() instead of single() to avoid 404 errors
-
-      console.log("useStatementPeriod: Statement fetch result", { 
-        error: periodError, 
-        data: period,
-        errorCode: periodError?.code,
-        errorMessage: periodError?.message,
-        errorDetails: periodError?.details
-      });
-
-      // Log the request details from Supabase for debugging
-      if (periodError) {
-        // Log error details
-        console.log("useStatementPeriod: Error details", periodError);
-
-        // Handle specific error cases
-        if (!period) {
-          throw new Error("Statement not found");
-        }
-
-        // Just throw a generic error since TypeScript is being difficult
-        throw new Error("Error fetching statement");
+      // Use computed endpoint that aggregates invoices and payments
+      const res = await fetch(`/api/statements/${id}/computed`);
+      if (!res.ok) {
+        throw new Error(`Failed to load statement (${res.status})`);
       }
-
-      if (!period) {
-        console.log("useStatementPeriod: No statement found for ID", id);
-        throw new Error("Statement not found");
-      }
-
-      console.log("useStatementPeriod: Successfully found statement", {
-        statementNumber: period.statement_number,
-        customerId: period.customer_id,
-        status: period.status
-      });
-
-      // Fetch transactions for this period
-      const { data: transactionData, error: transactionError } = await supabase
-        .from("customer_statement_transactions")
-        .select("*")
-        .eq("statement_period_id", id)
-        .order("transaction_date", { ascending: true });
-
-      if (transactionError) {
-        console.error("Error fetching transactions:", {
-          error: transactionError,
-          code: transactionError.code,
-          details: transactionError.details,
-          message: transactionError.message
-        });
-        // Don't throw transaction errors, just log them
-        setTransactions([]);
-      } else {
-        setTransactions(transactionData || []);
-      }
-
-      setData(period);
+      const payload = await res.json();
+      setData(payload.period || null);
+      setTransactions(payload.transactions || []);
     } catch (err) {
       console.error("Error fetching statement period:", {
         error: err,
