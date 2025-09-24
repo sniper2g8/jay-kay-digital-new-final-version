@@ -1,5 +1,4 @@
 
-\restrict SvGXYdNgMQNndfuAWmazQMQS6qnqReaZVvwgCnFNy0IITmzYOATpR6CKaOd5XXY
 
 
 SET statement_timeout = 0;
@@ -4368,6 +4367,5 @@ GRANT ALL ON TABLE "public"."statement_settings" TO "authenticated";
 
 
 
-\unrestrict SvGXYdNgMQNndfuAWmazQMQS6qnqReaZVvwgCnFNy0IITmzYOATpR6CKaOd5XXY
 
 RESET ALL;
