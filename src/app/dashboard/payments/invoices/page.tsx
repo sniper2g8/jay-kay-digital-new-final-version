@@ -16,7 +16,6 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { ProfessionalInvoicePDF } from "@/components/ProfessionalInvoicePDF";
-import { downloadInvoicePDF } from "@/components/ProfessionalInvoicePDFDocument";
 import { formatCurrency, formatDate } from "@/lib/constants";
 import { 
   ArrowLeft,
@@ -337,7 +336,7 @@ export default function InvoiceManagementPage() {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Button
-            onClick={() => router.push("/dashboard/payments")}
+            onClick={() => router.push("/dashboard")}
             variant="outline"
             size="sm"
             className="flex items-center space-x-2"
