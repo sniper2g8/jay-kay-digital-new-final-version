@@ -14,7 +14,6 @@
 **/.toolstarget
 **/.vs
 **/.vscode
-**/.next
 **/.cache
 **/*.*proj.user
 **/*.dbmdl
@@ -22,7 +21,7 @@
 **/charts
 **/docker-compose*
 **/compose.y*ml
-**/Dockerfile*
+# **/Dockerfile*  # Commented out to include Dockerfile
 **/node_modules
 **/npm-debug.log
 **/obj
@@ -32,3 +31,8 @@
 **/dist
 LICENSE
 README.md
+
+# Exclude .next directory except for standalone build
+**/.next/*
+!**/.next/standalone
+!**/.next/static

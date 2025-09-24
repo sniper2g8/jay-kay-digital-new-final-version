@@ -15,7 +15,8 @@
     "format:check": "prettier --check .",
     "format:fix": "prettier --write .",
     "fix-imports": "node fix-imports.js",
-    "clean:imports": "node scripts/remove-unused-imports.js"
+    "clean:imports": "node scripts/remove-unused-imports.js",
+    "fix:invoice-rls": "node scripts/fix-invoice-rls.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

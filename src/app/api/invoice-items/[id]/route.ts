@@ -1,126 +1,102 @@
-import { NextRequest, NextResponse } from "next/server";
-import { createClient } from '@supabase/supabase-js';
-import { Database } from "@/lib/database.types";
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
+import { NextResponse } from 'next/server'
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  try {
-    // Await the params Promise in Next.js 15
-    const resolvedParams = await params;
-
-    // Create Supabase client with service role key for full access
-    const supabase = createClient<Database>(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY!
+export async function GET(request: Request, { params }: { params: { id: string } }) {
+  const { id } = params
+  
+  // Log environment variables for debugging
+  console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
+  console.log("Supabase Secret Key exists:", !!process.env.SUPABASE_SECRET_KEY);
+  console.log("Supabase Service Role Key exists:", !!process.env.SUPABASE_SERVICE_ROLE_KEY);
+  
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+  
+  if (!supabaseUrl || !supabaseKey) {
+    console.error("Missing Supabase environment variables");
+    return NextResponse.json(
+      { 
+        error: "Server configuration error",
+        details: "Missing Supabase environment variables"
+      },
+      { status: 500 },
     );
-
-    // Fetch invoice items using Supabase client
-    const { data, error } = await supabase
+  }
+  
+  // Create a service role client to bypass RLS
+  const supabase = createRouteHandlerClient({ cookies }, {
+    supabaseUrl,
+    supabaseKey
+  });
+  
+  try {
+    console.log(`Fetching invoice items for invoice ID: ${id}`);
+    
+    // First, check if the invoice exists
+    const { data: invoiceData, error: invoiceError } = await supabase
+      .from('invoices')
+      .select('id')
+      .eq('id', id)
+      .single();
+      
+    if (invoiceError) {
+      console.error("Error fetching invoice:", invoiceError);
+      return NextResponse.json(
+        { 
+          error: "Invoice not found",
+          details: invoiceError.message
+        },
+        { status: 404 },
+      );
+    }
+    
+    if (!invoiceData) {
+      console.error("Invoice not found");
+      return NextResponse.json(
+        { 
+          error: "Invoice not found",
+          details: "No invoice found with the provided ID"
+        },
+        { status: 404 },
+      );
+    }
+    
+    // Now fetch the invoice items
+    console.log("Fetching invoice items...");
+    const { data, error, count } = await supabase
       .from('invoice_items')
-      .select('*')
-      .eq('invoice_id', resolvedParams.id)
-      .order('id');
-
+      .select('*', { count: 'exact' })
+      .eq('invoice_id', id);
+      
+    console.log("Query result:", { data, error, count });
+    
     if (error) {
-      console.error("Error fetching invoice items:", {
+      console.error("Database error:", error);
+      console.error("Error details:", {
         message: error.message,
         code: error.code,
-        details: error.details,
-        hint: error.hint
+        hint: error.hint,
+        details: error.details
       });
       return NextResponse.json(
         { 
-          error: "Failed to fetch invoice items", 
+          error: "Database error",
           details: error.message,
           code: error.code
         },
         { status: 500 },
       );
     }
-
-    return NextResponse.json(data || []);
-  } catch (error) {
-    console.error("Error fetching invoice items:", {
-      message: error instanceof Error ? error.message : 'Unknown error',
-      error: error,
-      stack: error instanceof Error ? error.stack : undefined,
-      params: await params.catch(e => `Error resolving params: ${e}`)
-    });
+    
+    console.log(`Found ${count} invoice items`);
+    return NextResponse.json(data);
+  } catch (error: any) {
+    console.error("Unexpected error:", error);
     return NextResponse.json(
       { 
-        error: "Failed to fetch invoice items",
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 },
-    );
-  }
-}
-
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  try {
-    // Await the params Promise in Next.js 15
-    const resolvedParams = await params;
-    const invoiceId = resolvedParams.id;
-
-    // Create Supabase client with service role key for full access
-    const supabase = createClient<Database>(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
-
-    // Parse the request body
-    const items = await request.json();
-
-    // Start a transaction by using Supabase operations
-    // Delete existing items for this invoice
-    const { error: deleteError } = await supabase
-      .from('invoice_items')
-      .delete()
-      .eq('invoice_id', invoiceId);
-
-    if (deleteError) {
-      console.error("Error deleting invoice items:", deleteError);
-      throw deleteError;
-    }
-
-    // Insert new items
-    if (items && items.length > 0) {
-      const itemsToInsert = items.map((item: any) => ({
-        invoice_id: invoiceId,
-        description: item.description || '',
-        quantity: item.quantity || 1,
-        unit_price: item.unit_price || 0,
-        total_price: item.total_price || 0,
-        job_no: item.job_no || null
-      }));
-
-      const { error: insertError } = await supabase
-        .from('invoice_items')
-        .insert(itemsToInsert);
-
-      if (insertError) {
-        console.error("Error inserting invoice items:", insertError);
-        throw insertError;
-      }
-    }
-
-    return NextResponse.json({ success: true, message: 'Invoice items updated successfully' });
-
-  } catch (error) {
-    console.error("Error updating invoice items:", {
-      message: error instanceof Error ? error.message : 'Unknown error',
-      error: error,
-      stack: error instanceof Error ? error.stack : undefined
-    });
-    return NextResponse.json(
-      { 
-        error: "Failed to update invoice items", 
-        details: error instanceof Error ? error.message : 'Unknown error' 
+        error: "Internal server error",
+        details: error.message || "An unexpected error occurred"
       },
       { status: 500 },
     );

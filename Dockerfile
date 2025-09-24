@@ -21,18 +21,23 @@ RUN pnpm build
 
 # ---- Runner Stage ----
 FROM base AS runner
+# Create app directory and set permissions
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nextjs -u 1001
+
+# Copy necessary files
 COPY --from=build /usr/src/app/next.config.ts ./
 COPY --from=build /usr/src/app/public ./public
 COPY --from=build /usr/src/app/package.json ./
-COPY --from=build /usr/src/app/.next/standalone ./
-COPY --from=build /usr/src/app/.next/static ./.next/static
+COPY --from=build --chown=nextjs:nodejs /usr/src/app/.next ./.next
+COPY --from=build --chown=nextjs:nodejs /usr/src/app/node_modules ./node_modules
 
-# Install node_modules for runtime dependencies
-COPY --from=build /usr/src/app/node_modules ./node_modules
+# Set ownership for all files
+RUN chown -R nextjs:nodejs ./
 
-USER node
+USER nextjs
 EXPOSE 3000
 ENV PORT 3000
 
-# Run the application.
-CMD ["pnpm", "start"]
+# Run the application using next start
+CMD ["npx", "next", "start"]
