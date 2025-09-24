@@ -101,6 +101,17 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
       const actionButtons = invoiceRef.current.querySelectorAll('.no-print');
       actionButtons.forEach(el => (el as HTMLElement).style.display = 'none');
 
+      // Ensure images inside the invoice are fully loaded
+      const images = Array.from(invoiceRef.current.querySelectorAll('img')) as HTMLImageElement[];
+      await Promise.all(images.map(img => {
+        return new Promise<void>((resolve) => {
+          if (img.complete) return resolve();
+          const onLoad = () => { img.removeEventListener('load', onLoad); img.removeEventListener('error', onLoad); resolve(); };
+          img.addEventListener('load', onLoad);
+          img.addEventListener('error', onLoad);
+        });
+      }));
+
       const canvas = await html2canvas(invoiceRef.current, {
         scale: 2,
         useCORS: true,
@@ -108,6 +119,30 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
         backgroundColor: '#ffffff',
         width: invoiceRef.current.scrollWidth,
         height: invoiceRef.current.scrollHeight,
+        onclone: (clonedDoc) => {
+          try {
+            const style = clonedDoc.createElement('style');
+            style.setAttribute('data-export-fallback', '');
+            style.textContent = `
+              [data-export-root], [data-export-root] * {
+                color: #111827 !important; /* text-gray-900 */
+                border-color: #e5e7eb !important; /* gray-200 */
+                box-shadow: none !important;
+              }
+              [data-export-root] {
+                background-color: #ffffff !important;
+              }
+              [data-export-root] .bg-white { background-color: #ffffff !important; }
+              [data-export-root] .bg-gray-50 { background-color: #f9fafb !important; }
+              [data-export-root] .text-gray-900 { color: #111827 !important; }
+              [data-export-root] .text-gray-700 { color: #374151 !important; }
+              [data-export-root] .text-gray-600 { color: #4b5563 !important; }
+              [data-export-root] .text-gray-500 { color: #6b7280 !important; }
+              [data-export-root] .border-gray-200 { border-color: #e5e7eb !important; }
+            `;
+            clonedDoc.head.appendChild(style);
+          } catch {}
+        }
       });
 
       const imgData = canvas.toDataURL('image/png');
@@ -131,6 +166,12 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
     } catch (error) {
       console.error('Error generating PDF:', error);
       alert('Error generating PDF. Please try again.');
+    } finally {
+      // Ensure action buttons are restored on error
+      if (invoiceRef.current) {
+        const actionButtons = invoiceRef.current.querySelectorAll('.no-print');
+        actionButtons.forEach(el => (el as HTMLElement).style.display = '');
+      }
     }
   }, [invoice, invoiceDate]);
 
@@ -201,7 +242,7 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
       )}
 
       {/* Simplified Invoice Template */}
-      <div ref={invoiceRef} className="bg-white">
+      <div ref={invoiceRef} className="bg-white" data-export-root>
         <div className="bg-white p-8 max-w-4xl mx-auto font-sans">
           {/* Print Styles */}
           <style jsx>{`
@@ -232,6 +273,7 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
                     src="/JK_Logo.jpg" 
                     alt="Jay Kay Digital Press Logo" 
                     className="w-20 h-20 object-contain"
+                    crossOrigin="anonymous"
                   />
                 </div>
                 {/* Company Info */}
