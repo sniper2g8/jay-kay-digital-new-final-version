@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { ArrowLeft, Download, FileText, Send, Eye } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/constants";
@@ -117,6 +118,26 @@ export default function StatementPage() {
             <Button size="sm" variant="outline">
               <Send className="h-4 w-4 mr-2" />
               Email to Customer
+            </Button>
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={async () => {
+                if (!statement?.id) return;
+                const confirmed = window.confirm("Are you sure you want to delete this statement?");
+                if (!confirmed) return;
+                const { error } = await supabase
+                  .from('statements')
+                  .delete()
+                  .eq('id', statement.id);
+                if (error) {
+                  alert('Failed to delete statement: ' + (error.message || 'Unknown error'));
+                } else {
+                  window.location.href = '/dashboard/statements';
+                }
+              }}
+            >
+              Delete
             </Button>
           </div>
         </div>
