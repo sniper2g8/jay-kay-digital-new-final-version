@@ -156,10 +156,20 @@ export default function InvoiceManagementPage() {
       console.log('Fetching invoice items for invoice:', invoiceId);
       // Prefer API route to ensure stable server environment and consistent response shape
       const res = await fetch(`/api/invoice-items/${invoiceId}`);
-      const itemsPayload = await res.json();
+      const rawText = await res.text();
+      let itemsPayload: any = undefined;
+      try {
+        itemsPayload = rawText ? JSON.parse(rawText) : null;
+      } catch (e) {
+        console.warn('Items response is not valid JSON, raw:', rawText);
+      }
       if (!res.ok) {
-        console.error('Error fetching items:', itemsPayload);
-        throw itemsPayload;
+        console.error('Error fetching items:', {
+          status: res.status,
+          statusText: res.statusText,
+          body: itemsPayload ?? rawText
+        });
+        throw new Error(`Items request failed: ${res.status}`);
       }
 
       const processedItems = (itemsPayload || []).map((item: any) => ({

@@ -223,10 +223,12 @@ function CreateInvoiceContent() {
 
         return {
           tempId: `job-${job.id}`,
-          description: job.description || `Job: ${job.jobNo || job.id}`,
+          description: job.title || job.description || (job.jobNo ? `Job: ${job.jobNo}` : 'Job item'),
           quantity: job.quantity || 1,
           unit_price: unitPrice,
           total_price: totalPrice,
+          job_id: job.id,
+          job_no: job.jobNo || undefined,
           line_order: lineItems.length + index + 1,
           discount_amount: 0,
           tax_rate: 0,

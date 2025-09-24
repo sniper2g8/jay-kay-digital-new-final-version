@@ -16,6 +16,7 @@ export default function InvoiceDetails() {
   const [items, setItems] = useState<InvoiceItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [headerInvoiceNo, setHeaderInvoiceNo] = useState<string | null>(null)
   const searchParams = useSearchParams()
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -33,6 +34,17 @@ export default function InvoiceDetails() {
           setError('Missing invoice ID')
           return
         }
+        // Fetch invoice header to show correct invoice number in header
+        try {
+          const { data: inv, error: invErr } = await supabase
+            .from('invoices')
+            .select('invoiceNo')
+            .eq('id', invoiceId)
+            .single()
+          if (!invErr) {
+            setHeaderInvoiceNo(inv?.invoiceNo ?? null)
+          }
+        } catch {}
         console.log(`Fetching invoice items for invoice ID: ${invoiceId}`);
         const itemsResponse = await fetch(`/api/invoice-items/${invoiceId}`)
         
@@ -72,7 +84,7 @@ export default function InvoiceDetails() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Invoice Details - {invoiceNumber}</h1>
+      <h1 className="text-3xl font-bold mb-6">Invoice Details - {headerInvoiceNo || (invoiceNumber !== 'Unknown' ? invoiceNumber : (invoiceId ? `JKDP-INV-${String(invoiceId).slice(0,8)}` : ''))}</h1>
       
       {items.length === 0 ? (
         <p>No items found for this invoice.</p>

@@ -216,6 +216,7 @@ export async function generateInvoiceWithNotification(invoiceData: {
       `Thank you for your business! We appreciate your trust in Jay Kay Digital Press.`;
 
     // Create invoice in database
+    const todayIso = new Date().toISOString().slice(0,10);
     const { data: invoice, error: insertError } = await supabase
       .from('invoices')
       .insert({
@@ -224,7 +225,7 @@ export async function generateInvoiceWithNotification(invoiceData: {
         customer_id: invoiceData.customer_id,
         amountDue: invoiceData.amountDue,
         amountPaid: 0,
-        due_date: invoiceData.due_date,
+        due_date: invoiceData.due_date || todayIso,
         currency: invoiceData.currency || 'SLL',
         items: invoiceData.items,
         status: 'pending',

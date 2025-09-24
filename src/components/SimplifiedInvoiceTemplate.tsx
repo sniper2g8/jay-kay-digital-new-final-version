@@ -220,6 +220,7 @@ export function SimplifiedInvoiceTemplate({
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-gray-100">
+              <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold text-gray-700">Job No</th>
               <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold text-gray-700">Description</th>
               <th className="border border-gray-300 px-4 py-2 text-right text-sm font-semibold text-gray-700">Qty</th>
               <th className="border border-gray-300 px-4 py-2 text-right text-sm font-semibold text-gray-700">Unit Price</th>
@@ -229,6 +230,9 @@ export function SimplifiedInvoiceTemplate({
           <tbody>
             {items.map((item, index) => (
               <tr key={item.id || index}>
+                <td className="border border-gray-300 px-4 py-2 text-sm">
+                  {item.job_no || '-'}
+                </td>
                 <td className="border border-gray-300 px-4 py-2 text-sm">
                   <div>{item.description}</div>
                   {item.notes && <div className="text-gray-500 text-xs mt-1">{item.notes}</div>}
