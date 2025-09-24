@@ -128,6 +128,11 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
                 color: #111827 !important; /* text-gray-900 */
                 border-color: #e5e7eb !important; /* gray-200 */
                 box-shadow: none !important;
+                background-image: none !important;
+                /* Replace unsupported color functions */
+                --tw-gradient-from: #ffffff !important;
+                --tw-gradient-to: #ffffff !important;
+                --tw-gradient-stops: #ffffff !important;
               }
               [data-export-root] {
                 background-color: #ffffff !important;
@@ -139,6 +144,11 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
               [data-export-root] .text-gray-600 { color: #4b5563 !important; }
               [data-export-root] .text-gray-500 { color: #6b7280 !important; }
               [data-export-root] .border-gray-200 { border-color: #e5e7eb !important; }
+              /* Force any lab()/oklch()/color() to fallback via filter */
+              [data-export-root] * {
+                -webkit-filter: none !important;
+                        filter: none !important;
+              }
             `;
             clonedDoc.head.appendChild(style);
           } catch {}

@@ -563,6 +563,7 @@ export default function InvoiceManagementPage() {
                           <Button
                             size="sm"
                             variant="outline"
+                            onClick={() => router.push(`/dashboard/invoices/${invoice.id}/edit?number=${encodeURIComponent(invoice.invoiceNo)}`)}
                             className="flex items-center space-x-1"
                           >
                             <Edit className="h-4 w-4" />
