@@ -16,6 +16,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { ProfessionalInvoicePDF } from "@/components/ProfessionalInvoicePDF";
+import { downloadInvoicePDF } from "@/components/ProfessionalInvoicePDFDocument";
 import { formatCurrency, formatDate } from "@/lib/constants";
 import { 
   ArrowLeft,
@@ -325,6 +326,7 @@ export default function InvoiceManagementPage() {
           items={invoiceItems}
           showActions={true}
         />
+        {/* Removed extra PDF download buttons as requested */}
       </div>
     );
   }

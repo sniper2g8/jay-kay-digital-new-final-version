@@ -3,7 +3,7 @@
 import { useRef, useState, useEffect, forwardRef, useImperativeHandle, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { formatCurrency, formatDate } from "@/lib/constants";
-import { Download, FileText, QrCode } from "lucide-react";
+import { Download, FileText, QrCode, Building2, User, MapPin, Phone, Mail } from "lucide-react";
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { useReactToPrint } from 'react-to-print';
@@ -253,7 +253,15 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
 
       {/* Simplified Invoice Template */}
       <div ref={invoiceRef} className="bg-white" data-export-root>
-        <div className="bg-white p-8 max-w-4xl mx-auto font-sans">
+        <div className="bg-white p-8 max-w-4xl mx-auto font-sans relative">
+          {/* Watermark */}
+          <img
+            src="/jaykay_logo.png"
+            alt=""
+            className="pointer-events-none select-none opacity-5 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-2/3 h-auto"
+            crossOrigin="anonymous"
+            aria-hidden="true"
+          />
           {/* Print Styles */}
           <style jsx>{`
             @media print {
@@ -274,7 +282,7 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
           `}</style>
 
           {/* Header */}
-          <div className="border-b border-gray-200 pb-8 mb-8">
+          <div className="border-b border-gray-200 pb-8 mb-8 relative z-10">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-6">
                 {/* Logo */}
@@ -318,24 +326,46 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
           </div>
 
           {/* Bill To */}
-          <div className="mb-8 flex justify-between items-start">
+          <div className="mb-8 flex justify-between items-start relative z-10">
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium mr-3">Bill To</span>
+                <span className="bg-red-300 text-white-100 px-3 py-1 rounded-full text-sm font-medium mr-3">Bill To</span>
               </h3>
               {customer ? (
                 <div className="text-gray-700 space-y-1">
-                  <p className="font-semibold text-lg text-gray-900">{customer.business_name}</p>
-                  {customer.contact_person && <p className="text-gray-600">👤 {customer.contact_person}</p>}
-                  {customer.address && <p className="text-gray-600">📍 {customer.address}</p>}
-                  {customer.city && (
-                    <p className="text-gray-600">
-                      🏙️ {[customer.city, customer.state, customer.zip_code].filter(Boolean).join(", ")}
+                  <p className="font-semibold text-lg text-gray-900 flex items-center gap-2">
+                    <Building2 className="w-4 h-4 text-gray-500" /> {customer.business_name}
+                  </p>
+                  {customer.contact_person && (
+                    <p className="text-gray-600 flex items-center gap-2">
+                      <User className="w-4 h-4" /> {customer.contact_person}
                     </p>
                   )}
-                  {customer.country && <p className="text-gray-600">🌍 {customer.country}</p>}
-                  {customer.phone && <p className="text-gray-600">📞 {customer.phone}</p>}
-                  {customer.email && <p className="text-gray-600">✉️ {customer.email}</p>}
+                  {customer.address && (
+                    <p className="text-gray-600 flex items-center gap-2">
+                      <MapPin className="w-4 h-4" /> {customer.address}
+                    </p>
+                  )}
+                  {customer.city && (
+                    <p className="text-gray-600 flex items-center gap-2">
+                      <MapPin className="w-4 h-4" /> {[customer.city, customer.state, customer.zip_code].filter(Boolean).join(", ")}
+                    </p>
+                  )}
+                  {customer.country && (
+                    <p className="text-gray-600 flex items-center gap-2">
+                      <MapPin className="w-4 h-4" /> {customer.country}
+                    </p>
+                  )}
+                  {customer.phone && (
+                    <p className="text-gray-600 flex items-center gap-2">
+                      <Phone className="w-4 h-4" /> {customer.phone}
+                    </p>
+                  )}
+                  {customer.email && (
+                    <p className="text-gray-600 flex items-center gap-2">
+                      <Mail className="w-4 h-4" /> {customer.email}
+                    </p>
+                  )}
                 </div>
               ) : (
                 <p className="text-gray-500 italic">Customer information not available</p>
@@ -344,7 +374,7 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
             
             {/* QR Code */}
             {qrCodeDataUrl && (
-              <div className="bg-white p-4 rounded-xl shadow-lg border border-gray-200 ml-8">
+              <div className="bg-white p-4 rounded-xl border border-gray-200 ml-8">
                 <div className="text-center mb-2">
                   <QrCode className="w-5 h-5 text-gray-600 mx-auto mb-1" />
                   <p className="text-xs text-gray-600 font-medium">Invoice Details</p>
@@ -362,7 +392,7 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
           </div>
 
           {/* Items Table */}
-          <div className="mb-8">
+          <div className="mb-8 relative z-10">
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-gray-100">
@@ -400,7 +430,7 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
           </div>
 
           {/* Totals */}
-          <div className="ml-auto w-full max-w-xs">
+          <div className="ml-auto w-full max-w-xs relative z-10">
             <table className="w-full border-collapse">
               <tbody>
                 <tr>
@@ -447,14 +477,14 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
 
           {/* Notes */}
           {invoice.notes && (
-            <div className="mt-8 pt-6 border-t border-gray-300">
+            <div className="mt-8 pt-6 border-t border-gray-300 relative z-10">
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Notes:</h3>
               <p className="text-gray-700 whitespace-pre-wrap">{invoice.notes}</p>
             </div>
           )}
 
           {/* Footer */}
-          <div className="mt-12 pt-6 border-t border-gray-300 text-center text-sm text-gray-500">
+          <div className="mt-12 pt-6 border-t border-gray-300 text-center text-sm text-gray-500 relative z-10">
             <p>Thank you for your business!</p>
             <p className="mt-1">Payment is due within {invoice.terms_days || 30} days</p>
           </div>
