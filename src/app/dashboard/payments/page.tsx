@@ -9,7 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { 
   CreditCard, 
   DollarSign, 
@@ -53,6 +54,10 @@ export default function PaymentsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [methodFilter, setMethodFilter] = useState<string>("all");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // New payment form state
   const [newPayment, setNewPayment] = useState({
@@ -177,6 +182,13 @@ export default function PaymentsPage() {
     }
   };
 
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-SL', {
+      style: 'currency',
+      currency: 'SLL'
+    }).format(amount);
+  };
+
   const getMethodBadge = (method: PaymentMethod) => {
     const variants = {
       cash: "bg-green-100 text-green-800 border-green-200",
@@ -206,11 +218,118 @@ export default function PaymentsPage() {
     return matchesSearch && matchesMethod;
   });
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-SL', {
-      style: 'currency',
-      currency: 'SLL'
-    }).format(amount);
+  // Handle view payment
+  const handleViewPayment = (payment: Payment) => {
+    setSelectedPayment(payment);
+    setIsViewDialogOpen(true);
+  };
+
+  // Handle edit payment
+  const handleEditPayment = (payment: Payment) => {
+    setSelectedPayment(payment);
+    setNewPayment({
+      amount: payment.amount.toString(),
+      payment_method: payment.payment_method,
+      payment_date: payment.payment_date,
+      reference_number: payment.reference_number || "",
+      notes: payment.notes || "",
+      invoice_no: payment.invoice_no,
+      customer_human_id: payment.customer_human_id,
+      payment_number: payment.payment_number,
+      received_by: payment.received_by || ""
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  // Handle delete payment
+  const handleDeletePayment = async (paymentId: string) => {
+    if (!confirm("Are you sure you want to delete this payment? This action cannot be undone.")) {
+      return;
+    }
+
+    try {
+      setIsDeleting(true);
+      const { error } = await supabase
+        .from('payments')
+        .delete()
+        .eq('id', paymentId);
+
+      if (error) throw error;
+
+      // Refresh the payments list
+      await fetchPayments();
+      await fetchPaymentStats();
+      
+      console.log('Payment deleted successfully');
+    } catch (error) {
+      console.error('Error deleting payment:', error);
+      alert('Failed to delete payment. Please try again.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  // Handle save payment (for both add and edit)
+  const handleSavePayment = async () => {
+    try {
+      // Validate required fields
+      if (!newPayment.amount || !newPayment.payment_method || !newPayment.invoice_no) {
+        alert('Please fill in all required fields');
+        return;
+      }
+
+      const paymentData = {
+        amount: parseFloat(newPayment.amount),
+        payment_method: newPayment.payment_method,
+        payment_date: newPayment.payment_date,
+        reference_number: newPayment.reference_number || null,
+        notes: newPayment.notes || null,
+        invoice_no: newPayment.invoice_no,
+        customer_human_id: newPayment.customer_human_id,
+        payment_number: newPayment.payment_number
+      };
+
+      let result;
+      if (isEditDialogOpen && selectedPayment) {
+        // Update existing payment
+        result = await supabase
+          .from('payments')
+          .update(paymentData)
+          .eq('id', selectedPayment.id);
+      } else {
+        // Add new payment
+        result = await supabase
+          .from('payments')
+          .insert(paymentData);
+      }
+
+      if (result.error) throw result.error;
+
+      // Reset form and close dialogs
+      setNewPayment({
+        amount: "",
+        payment_method: "" as PaymentMethod | "",
+        payment_date: new Date().toISOString().split('T')[0],
+        reference_number: "",
+        notes: "",
+        invoice_no: "",
+        customer_human_id: "",
+        payment_number: "",
+        received_by: ""
+      });
+      setIsAddDialogOpen(false);
+      setIsEditDialogOpen(false);
+      setSelectedPayment(null);
+
+      // Refresh the payments list
+      await fetchPayments();
+      await fetchPaymentStats();
+      
+      console.log(isEditDialogOpen ? 'Payment updated successfully' : 'Payment added successfully');
+    } catch (error) {
+      console.error('Error saving payment:', error);
+      alert('Failed to save payment. Please try again.');
+    }
   };
 
   return (
@@ -498,13 +617,30 @@ export default function PaymentsPage() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Button variant="ghost" size="sm">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleViewPayment(payment)}
+                            title="View Payment Details"
+                          >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="sm">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleEditPayment(payment)}
+                            title="Edit Payment"
+                          >
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-red-600 hover:text-red-700"
+                            onClick={() => handleDeletePayment(payment.id)}
+                            disabled={isDeleting}
+                            title="Delete Payment"
+                          >
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
@@ -517,6 +653,257 @@ export default function PaymentsPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* View Payment Dialog */}
+      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Payment Details</DialogTitle>
+          </DialogHeader>
+          {selectedPayment && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-medium text-gray-500">Payment Number</Label>
+                  <p className="text-lg font-semibold">{selectedPayment.payment_number}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-500">Amount</Label>
+                  <p className="text-lg font-semibold">{formatCurrency(selectedPayment.amount)}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-500">Payment Method</Label>
+                  <p>{getMethodBadge(selectedPayment.payment_method)}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-500">Payment Date</Label>
+                  <p>{new Date(selectedPayment.payment_date).toLocaleDateString()}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-500">Invoice Number</Label>
+                  <p>{selectedPayment.invoice_no}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-500">Customer</Label>
+                  <p>{selectedPayment.customers?.business_name || selectedPayment.customer_human_id}</p>
+                </div>
+              </div>
+              {selectedPayment.reference_number && (
+                <div>
+                  <Label className="text-sm font-medium text-gray-500">Reference Number</Label>
+                  <p>{selectedPayment.reference_number}</p>
+                </div>
+              )}
+              {selectedPayment.notes && (
+                <div>
+                  <Label className="text-sm font-medium text-gray-500">Notes</Label>
+                  <p className="bg-gray-50 p-3 rounded-md">{selectedPayment.notes}</p>
+                </div>
+              )}
+              <div>
+                <Label className="text-sm font-medium text-gray-500">Created</Label>
+                <p>{selectedPayment.created_at ? new Date(selectedPayment.created_at).toLocaleString() : 'N/A'}</p>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Payment Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Edit Payment</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="edit_amount">Amount *</Label>
+                <Input
+                  id="edit_amount"
+                  type="number"
+                  step="0.01"
+                  placeholder="0.00"
+                  value={newPayment.amount}
+                  onChange={(e) => setNewPayment(prev => ({ ...prev, amount: e.target.value }))}
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit_payment_method">Payment Method *</Label>
+                <Select
+                  value={newPayment.payment_method}
+                  onValueChange={(value: PaymentMethod) => setNewPayment(prev => ({ ...prev, payment_method: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select payment method" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="cash">Cash</SelectItem>
+                    <SelectItem value="card">Card</SelectItem>
+                    <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                    <SelectItem value="mobile_money">Mobile Money</SelectItem>
+                    <SelectItem value="cheque">Cheque</SelectItem>
+                    <SelectItem value="credit">Credit</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="edit_payment_date">Payment Date</Label>
+              <Input
+                id="edit_payment_date"
+                type="date"
+                value={newPayment.payment_date}
+                onChange={(e) => setNewPayment(prev => ({ ...prev, payment_date: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit_reference_number">Reference Number</Label>
+              <Input
+                id="edit_reference_number"
+                placeholder="Transaction ID, Check #, etc."
+                value={newPayment.reference_number}
+                onChange={(e) => setNewPayment(prev => ({ ...prev, reference_number: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit_notes">Notes</Label>
+              <Textarea
+                id="edit_notes"
+                placeholder="Payment notes..."
+                value={newPayment.notes}
+                onChange={(e) => setNewPayment(prev => ({ ...prev, notes: e.target.value }))}
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsEditDialogOpen(false);
+                setSelectedPayment(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleSavePayment}>
+              Update Payment
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Payment Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Add New Payment</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="add_amount">Amount *</Label>
+                <Input
+                  id="add_amount"
+                  type="number"
+                  step="0.01"
+                  placeholder="0.00"
+                  value={newPayment.amount}
+                  onChange={(e) => setNewPayment(prev => ({ ...prev, amount: e.target.value }))}
+                />
+              </div>
+              <div>
+                <Label htmlFor="add_invoice_no">Invoice Number *</Label>
+                <Input
+                  id="add_invoice_no"
+                  placeholder="INV-001"
+                  value={newPayment.invoice_no}
+                  onChange={(e) => setNewPayment(prev => ({ ...prev, invoice_no: e.target.value }))}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="add_customer_human_id">Customer ID *</Label>
+                <Input
+                  id="add_customer_human_id"
+                  placeholder="CUST-001"
+                  value={newPayment.customer_human_id}
+                  onChange={(e) => setNewPayment(prev => ({ ...prev, customer_human_id: e.target.value }))}
+                />
+              </div>
+              <div>
+                <Label htmlFor="add_payment_number">Payment Number *</Label>
+                <Input
+                  id="add_payment_number"
+                  placeholder="PAY-001"
+                  value={newPayment.payment_number}
+                  onChange={(e) => setNewPayment(prev => ({ ...prev, payment_number: e.target.value }))}
+                />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="add_payment_method">Payment Method *</Label>
+              <Select
+                value={newPayment.payment_method}
+                onValueChange={(value: PaymentMethod) => setNewPayment(prev => ({ ...prev, payment_method: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select payment method" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cash">Cash</SelectItem>
+                  <SelectItem value="card">Card</SelectItem>
+                  <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                  <SelectItem value="mobile_money">Mobile Money</SelectItem>
+                  <SelectItem value="cheque">Cheque</SelectItem>
+                  <SelectItem value="credit">Credit</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="add_payment_date">Payment Date</Label>
+              <Input
+                id="add_payment_date"
+                type="date"
+                value={newPayment.payment_date}
+                onChange={(e) => setNewPayment(prev => ({ ...prev, payment_date: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="add_reference_number">Reference Number</Label>
+              <Input
+                id="add_reference_number"
+                placeholder="Transaction ID, Check #, etc."
+                value={newPayment.reference_number}
+                onChange={(e) => setNewPayment(prev => ({ ...prev, reference_number: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="add_notes">Notes</Label>
+              <Textarea
+                id="add_notes"
+                placeholder="Payment notes..."
+                value={newPayment.notes}
+                onChange={(e) => setNewPayment(prev => ({ ...prev, notes: e.target.value }))}
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsAddDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleSavePayment}>
+              Add Payment
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -6,7 +6,7 @@
  * Available notification types: delivery_ready, job_update, payment_due, promotion, reminder, system_alert
  */
 
-import { supabase } from './supabase.ts';
+// import { supabase } from './supabase.ts'; // Remove unused import
 import { createServiceRoleClient } from './supabase-admin.ts';
 import { Database } from './database.types.ts';
 
@@ -489,6 +489,12 @@ class NotificationService {
     try {
       // Use service role client for server-side operations
       const adminSupabase = createServiceRoleClient();
+      
+      // Validate recipient_id is a valid UUID or skip if empty
+      if (!data.recipient_id || data.recipient_id.trim() === '') {
+        console.warn('Skipping notification creation: Invalid recipient_id');
+        return 'skipped';
+      }
       
       const { data: notificationData, error } = await adminSupabase
         .from('notifications')
