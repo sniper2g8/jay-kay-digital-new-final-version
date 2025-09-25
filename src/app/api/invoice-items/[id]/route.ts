@@ -39,11 +39,23 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   }
   
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !(process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY)) {
-    console.error("Missing Supabase environment variables");
+    console.error("[PRODUCTION ERROR] Missing Supabase environment variables");
+    console.error("[PRODUCTION ERROR] Available env vars:", {
+      SUPABASE_URL: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+      SUPABASE_SECRET_KEY: !!process.env.SUPABASE_SECRET_KEY,
+      SUPABASE_SERVICE_ROLE_KEY: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+      NODE_ENV: process.env.NODE_ENV
+    });
     return NextResponse.json(
       { 
         error: "Server configuration error",
-        details: "Missing Supabase environment variables"
+        details: "Missing Supabase environment variables",
+        debug_info: {
+          SUPABASE_URL: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+          SUPABASE_SECRET_KEY: !!process.env.SUPABASE_SECRET_KEY,
+          SUPABASE_SERVICE_ROLE_KEY: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+          NODE_ENV: process.env.NODE_ENV
+        }
       },
       { status: 500 },
     );
@@ -53,7 +65,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   const supabase = createServiceRoleClient();
   
   try {
-    console.log(`Fetching invoice items for invoice ID: ${id}`);
+    console.log(`[PRODUCTION DEBUG] Fetching invoice items for invoice ID: ${id}`);
+    console.log('[PRODUCTION DEBUG] Environment check:', {
+      url: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+      publishable: !!process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY,
+      service: !!process.env.SUPABASE_SERVICE_ROLE_KEY || !!process.env.SUPABASE_SECRET_KEY
+    });
     
     // First, check if the invoice exists
     const { data: invoiceData, error: invoiceError } = await supabase

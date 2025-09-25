@@ -116,19 +116,6 @@ export const useUserRole = () => {
     session.user?.id === user.id &&
     user.id; // Ensure we have a valid user ID
 
-  // Log debugging information
-  if (!isBuildTime) {
-    console.log("useUserRole debug info:", {
-      loading,
-      isBuildTime,
-      hasUser: !!user,
-      hasSession: !!session,
-      userId: user?.id,
-      sessionId: session?.user?.id,
-      shouldFetch
-    });
-  }
-
   const result = useSWR(
     shouldFetch ? `user-role-${user.id}` : null,
     () => (shouldFetch && user ? fetchUserRole(user.id) : null),
@@ -137,8 +124,8 @@ export const useUserRole = () => {
       revalidateOnReconnect: true,
       errorRetryCount: 2,
       onError: (error) => {
-        // Only log errors if we actually expected to fetch data
-        if (shouldFetch) {
+        // Only log errors in development environment
+        if (shouldFetch && process.env.NODE_ENV === 'development') {
           console.error("Error in useUserRole SWR:", {
             error,
             userId: user?.id,
@@ -151,8 +138,8 @@ export const useUserRole = () => {
     },
   );
 
-  // Add better error logging
-  if (result.error) {
+  // Add better error logging for development only
+  if (result.error && process.env.NODE_ENV === 'development') {
     console.error("useUserRole hook error:", {
       error: result.error,
       userId: user?.id,

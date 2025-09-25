@@ -9,11 +9,15 @@ import { Analytics } from "@vercel/analytics/next"
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: 'swap', // Improve font loading
+  preload: true,
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: 'swap', // Improve font loading
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -43,8 +47,8 @@ export default function RootLayout({
           </AuthProvider>
         </ErrorBoundary>
         <Toaster position="top-right" richColors />
+        <Analytics />
       </body>
     </html>
   );
-      <Analytics />
 }
