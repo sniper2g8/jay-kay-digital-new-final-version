@@ -42,7 +42,6 @@ import {
   formatCurrency,
 } from "@/lib/invoice-utils";
 import QRCodeLib from "qrcode";
-import { processPayment, updateInvoiceAfterPayment, updateInvoiceStatus, updateInvoice } from "@/app/actions/payment-actions";
 
 interface InvoiceLineItem {
   id?: string;
@@ -78,6 +77,15 @@ function InvoiceEditContent() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
+  const [payments, setPayments] = useState<any[]>([]);
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const [paymentForm, setPaymentForm] = useState({
+    amount: '',
+    payment_method: 'cash',
+    payment_date: new Date().toISOString().split('T')[0],
+    reference_number: '',
+    notes: ''
+  });
 
   // Form state
   const [formData, setFormData] = useState({
@@ -91,6 +99,116 @@ function InvoiceEditContent() {
     items: [] as InvoiceLineItem[],
     tax: 0,
   });
+
+  // Fetch payments for this invoice
+  const fetchPayments = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('payments')
+        .select('*')
+        .eq('applied_to_invoice_id', invoiceId)
+        .order('payment_date', { ascending: false });
+      
+      if (error) {
+        console.error('Error fetching payments:', error);
+      } else {
+        setPayments(data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching payments:', error);
+    }
+  };
+
+  // Record a new payment
+  const recordPayment = async () => {
+    if (!invoice || !paymentForm.amount) return;
+    
+    try {
+      setIsSaving(true);
+      
+      // Generate payment number
+      const paymentNumber = `PAY-${Date.now()}`;
+      
+      // Get customer data for proper customer_id
+      const { data: invoiceData, error: fetchError } = await supabase
+        .from('invoices')
+        .select('customer_id, customerName, invoiceNo')
+        .eq('id', invoiceId)
+        .single();
+      
+      if (fetchError || !invoiceData) {
+        console.error('Error fetching invoice data:', fetchError);
+        setError('Failed to fetch invoice data');
+        return;
+      }
+      
+      const paymentData = {
+        payment_number: paymentNumber,
+        amount: parseFloat(paymentForm.amount),
+        payment_method: paymentForm.payment_method as 'cash' | 'bank_transfer' | 'mobile_money' | 'card' | 'cheque' | 'credit',
+        payment_date: paymentForm.payment_date,
+        reference_number: paymentForm.reference_number || null,
+        notes: paymentForm.notes || null,
+        invoice_no: invoiceData.invoiceNo || `INV-${invoiceId.slice(0, 8)}`,
+        customer_human_id: invoiceData.customerName || 'Unknown',
+        applied_to_invoice_id: invoiceId,
+        customer_id: invoiceData.customer_id,
+        payment_status: 'completed' as const
+      };
+      
+      const { error } = await supabase
+        .from('payments')
+        .insert([paymentData]);
+      
+      if (error) {
+        console.error('Error recording payment:', error);
+        console.error('Payment data:', paymentData);
+        setError(`Failed to record payment: ${error.message || 'Unknown error'}`);
+        return;
+      }
+      
+      // Update invoice amountPaid
+      const totalPaid = payments.reduce((sum, p) => sum + parseFloat(p.amount), 0) + parseFloat(paymentForm.amount);
+      const amountDue = invoice.total - totalPaid;
+      
+      const { error: updateError } = await supabase
+        .from('invoices')
+        .update({
+          amountPaid: totalPaid,
+          amountDue: amountDue,
+          payment_status: amountDue <= 0 ? 'paid' : totalPaid > 0 ? 'partial' : 'pending',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', invoiceId);
+      
+      if (updateError) {
+        console.error('Error updating invoice:', updateError);
+      }
+      
+      // Reset form and refresh data
+      setPaymentForm({
+        amount: '',
+        payment_method: 'cash',
+        payment_date: new Date().toISOString().split('T')[0],
+        reference_number: '',
+        notes: ''
+      });
+      setShowPaymentForm(false);
+      await fetchPayments();
+      await fetchInvoice(); // Refresh invoice data
+      
+    } catch (error) {
+      console.error('Error recording payment:', error);
+      console.error('Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        error: error
+      });
+      setError(`Failed to record payment: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   // Load invoice data
   const fetchInvoice = async () => {
@@ -195,6 +313,9 @@ function InvoiceEditContent() {
           tax: invoiceData.tax,
         });
       }
+
+      // Fetch existing payments for this invoice
+      await fetchPayments();
     } catch (error) {
       console.error("Error fetching invoice:", error);
       setError("Failed to load invoice. Please try again.");
@@ -207,38 +328,45 @@ function InvoiceEditContent() {
     if (invoiceId) {
       fetchInvoice();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [invoiceId]);
 
-  const handleInputChange = (field: string, value: string | number) => {
+  // Generate QR Code
+  useEffect(() => {
+    const generateQR = async () => {
+      if (invoice) {
+        try {
+          const qrData = `Invoice: ${invoice.invoiceNo}\nAmount: ${formatCurrency(invoice.total)}\nCustomer: ${invoice.customerName}`;
+          const qrCode = await QRCodeLib.toDataURL(qrData, {
+            width: 128,
+            margin: 2,
+          });
+          setQrCodeDataUrl(qrCode);
+        } catch (error) {
+          console.error("Error generating QR code:", error);
+        }
+      }
+    };
+
+    generateQR();
+  }, [invoice]);
+
+  // Handle input changes
+  const handleInputChange = (field: string, value: any) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
-  const handleItemChange = (
-    index: number,
-    field: keyof InvoiceLineItem,
-    value: string | number,
-  ) => {
+  // Handle item changes
+  const handleItemChange = (index: number, field: string, value: any) => {
     const updatedItems = [...formData.items];
-    updatedItems[index] = {
-      ...updatedItems[index],
-      [field]: value,
-    };
+    updatedItems[index] = { ...updatedItems[index], [field]: value };
 
-    // Recalculate total for this item with proper type conversion
+    // Auto-calculate total for line items
     if (field === "quantity" || field === "unitPrice") {
-      const quantity = field === "quantity" 
-        ? (typeof value === 'string' ? parseInt(value) || 0 : value || 0)
-        : (typeof updatedItems[index].quantity === 'string' ? parseInt(updatedItems[index].quantity as string) || 0 : updatedItems[index].quantity || 0);
-        
-      const unitPrice = field === "unitPrice" 
-        ? (typeof value === 'string' ? parseFloat(value) || 0 : value || 0)
-        : (typeof updatedItems[index].unitPrice === 'string' ? parseFloat(updatedItems[index].unitPrice as string) || 0 : updatedItems[index].unitPrice || 0);
-        
-      updatedItems[index].total = quantity * unitPrice;
+      updatedItems[index].total =
+        updatedItems[index].quantity * updatedItems[index].unitPrice;
     }
 
     setFormData((prev) => ({
@@ -247,21 +375,21 @@ function InvoiceEditContent() {
     }));
   };
 
+  // Add new item
   const addItem = () => {
+    const newItem: InvoiceLineItem = {
+      description: "",
+      quantity: 1,
+      unitPrice: 0,
+      total: 0,
+    };
     setFormData((prev) => ({
       ...prev,
-      items: [
-        ...prev.items,
-        {
-          description: "",
-          quantity: 1,
-          unitPrice: 0,
-          total: 0,
-        },
-      ],
+      items: [...prev.items, newItem],
     }));
   };
 
+  // Remove item
   const removeItem = (index: number) => {
     setFormData((prev) => ({
       ...prev,
@@ -269,81 +397,40 @@ function InvoiceEditContent() {
     }));
   };
 
-  const calculateTotals = () => {
-    const subtotal = formData.items.reduce((sum, item) => {
-      // Ensure proper numeric conversion
-      const itemTotal = typeof item.total === 'string' ? parseFloat(item.total) || 0 : item.total || 0;
-      return sum + itemTotal;
-    }, 0);
-    
-    const taxRate = typeof formData.tax === 'string' ? parseFloat(formData.tax) || 0 : formData.tax || 0;
-    const taxAmount = subtotal * (taxRate / 100);
-    const total = subtotal + taxAmount;
+  // Calculate totals
+  const subtotal = formData.items.reduce((sum, item) => sum + item.total, 0);
+  const taxAmount = (subtotal * formData.tax) / 100;
+  const total = subtotal + taxAmount;
 
-    return { subtotal, taxAmount, total };
-  };
-
-  // Generate QR Code when invoice data changes
-  useEffect(() => {
-    const generateQRCode = async () => {
-      if (invoice) {
-        try {
-          const { total } = calculateTotals();
-          const invoiceInfo = {
-            invoice_id: invoice.id,
-            invoice_no: invoice.invoiceNo,
-            total: formatCurrency(total),
-            due_date: new Date(formData.dueDate).toLocaleDateString(),
-            company: "Jay Kay Digital Press"
-          };
-          
-          const qrData = `Invoice: ${invoiceInfo.invoice_no}\nTotal: ${invoiceInfo.total}\nDue: ${invoiceInfo.due_date}\nCompany: ${invoiceInfo.company}`;
-          const qrCodeUrl = await QRCodeLib.toDataURL(qrData, {
-            width: 120,
-            margin: 1,
-            color: {
-              dark: '#1f2937',
-              light: '#ffffff'
-            }
-          });
-          setQrCodeDataUrl(qrCodeUrl);
-        } catch (error) {
-          console.error('Error generating QR code:', error);
-        }
-      }
-    };
-
-    generateQRCode();
-  }, [invoice, formData.items, formData.tax, formData.dueDate]);
-
+  // Save invoice
   const handleSave = async () => {
     try {
       setIsSaving(true);
       setError(null);
 
-      const { subtotal, taxAmount, total } = calculateTotals();
-
-      // Update the main invoice data using server action
-      const updateData = {
+      // Prepare invoice data
+      const invoiceData = {
         customerName: formData.customerName,
-        issueDate: new Date(formData.issueDate).toISOString(),
-        dueDate: new Date(formData.dueDate).toISOString(),
-        payment_status: formData.status as
-          | "pending"
-          | "partial"
-          | "paid"
-          | "overdue"
-          | "cancelled",
-        notes: formData.notes || null,
+        issueDate: { _seconds: new Date(formData.issueDate).getTime() / 1000 },
+        dueDate: { _seconds: new Date(formData.dueDate).getTime() / 1000 },
+        status: formData.status,
+        notes: formData.notes,
         subtotal: subtotal,
         tax: taxAmount,
         total: total,
+        amountDue: total,
+        currency: "SLL",
+        updatedAt: { _seconds: Date.now() / 1000 },
       };
 
-      const result = await updateInvoice(invoiceId, updateData);
+      // Update invoice using Supabase
+      const { error: updateError } = await supabase
+        .from('invoices')
+        .update(invoiceData)
+        .eq('id', invoiceId);
 
-      if (!result.success) {
-        throw new Error(result.error);
+      if (updateError) {
+        throw new Error(updateError.message);
       }
 
       // Update invoice items using the API endpoint
@@ -400,130 +487,96 @@ function InvoiceEditContent() {
   if (error && !invoice) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center min-h-screen">
-          <Card className="w-full max-w-md">
-            <CardHeader>
-              <div className="flex items-center space-x-2">
-                <AlertCircle className="h-5 w-5 text-red-600" />
-                <CardTitle>Error Loading Invoice</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 mb-4">{error}</p>
-              <div className="flex space-x-2">
-                <Button onClick={fetchInvoice} variant="outline">
-                  Try Again
-                </Button>
-                <Button asChild>
-                  <Link href="/dashboard/invoices">
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    Back to Invoices
-                  </Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="container mx-auto py-12">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              Error Loading Invoice
+            </h2>
+            <p className="text-gray-600 mb-4">{error}</p>
+            <Button asChild>
+              <Link href="/dashboard/invoices">Back to Invoices</Link>
+            </Button>
+          </div>
         </div>
       </DashboardLayout>
     );
   }
 
-  const { subtotal, taxAmount, total } = calculateTotals();
-
   return (
     <DashboardLayout>
-      <div className="px-4 py-6 sm:px-6 lg:px-8">
+      <div className="container mx-auto py-6 px-4">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center space-x-4 mb-4">
-            <Button variant="outline" asChild>
+          <div className="flex items-center gap-4 mb-4">
+            <Button asChild variant="ghost" size="sm">
               <Link href="/dashboard/invoices">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Invoices
               </Link>
             </Button>
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">
-                Edit Invoice {invoice?.invoiceNo}
-              </h1>
-              <p className="text-muted-foreground">
-                Modify invoice details and line items
-              </p>
+          </div>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+              Edit Invoice
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Update invoice details and line items
+            </p>
+          </div>
+        </div>
+
+        {/* Error Alert */}
+        {error && (
+          <div className="mb-6 p-4 border border-red-200 bg-red-50 rounded-lg">
+            <div className="flex items-center">
+              <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
+              <span className="text-red-700">{error}</span>
             </div>
           </div>
-
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-              <div className="flex items-center space-x-2">
-                <AlertCircle className="h-5 w-5 text-red-600" />
-                <p className="text-red-800">{error}</p>
-              </div>
-            </div>
-          )}
-        </div>
+        )}
 
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Main Form */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Customer Information */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Customer Information</CardTitle>
-                <CardDescription>
-                  Update customer details for this invoice
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="customerName">Customer Name *</Label>
-                  <Input
-                    id="customerName"
-                    value={formData.customerName}
-                    onChange={(e) =>
-                      handleInputChange("customerName", e.target.value)
-                    }
-                    placeholder="Enter customer name"
-                    required
-                  />
-                </div>
-                {/* Customer email and phone not available in current schema
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="customerEmail">Email</Label>
-                    <Input
-                      id="customerEmail"
-                      type="email"
-                      value={formData.customerEmail}
-                      onChange={(e) => handleInputChange('customerEmail', e.target.value)}
-                      placeholder="customer@example.com"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="customerPhone">Phone</Label>
-                    <Input
-                      id="customerPhone"
-                      value={formData.customerPhone}
-                      onChange={(e) => handleInputChange('customerPhone', e.target.value)}
-                      placeholder="+232 XX XXX XXXX"
-                    />
-                  </div>
-                </div>
-                */}
-              </CardContent>
-            </Card>
-
-            {/* Invoice Details */}
+            {/* Basic Information */}
             <Card>
               <CardHeader>
                 <CardTitle>Invoice Details</CardTitle>
                 <CardDescription>
-                  Configure invoice dates and status
+                  Basic invoice information and customer details
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="issueDate">Issue Date</Label>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="customerName">Customer Name *</Label>
+                    <Input
+                      id="customerName"
+                      value={formData.customerName}
+                      onChange={(e) =>
+                        handleInputChange("customerName", e.target.value)
+                      }
+                      placeholder="Enter customer name"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="customerEmail">Customer Email</Label>
+                    <Input
+                      id="customerEmail"
+                      type="email"
+                      value={formData.customerEmail}
+                      onChange={(e) =>
+                        handleInputChange("customerEmail", e.target.value)
+                      }
+                      placeholder="customer@example.com"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="issueDate">Issue Date *</Label>
                     <Input
                       id="issueDate"
                       type="date"
@@ -533,8 +586,8 @@ function InvoiceEditContent() {
                       }
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="dueDate">Due Date</Label>
+                  <div className="space-y-2">
+                    <Label htmlFor="dueDate">Due Date *</Label>
                     <Input
                       id="dueDate"
                       type="date"
@@ -544,35 +597,35 @@ function InvoiceEditContent() {
                       }
                     />
                   </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="status">Status</Label>
+                    <Select
+                      value={formData.status}
+                      onValueChange={(value) =>
+                        handleInputChange("status", value)
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="draft">Draft</SelectItem>
+                        <SelectItem value="sent">Sent</SelectItem>
+                        <SelectItem value="paid">Paid</SelectItem>
+                        <SelectItem value="overdue">Overdue</SelectItem>
+                        <SelectItem value="cancelled">Cancelled</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-                <div>
-                  <Label htmlFor="status">Payment Status</Label>
-                  <Select
-                    value={formData.status}
-                    onValueChange={(value) =>
-                      handleInputChange("status", value)
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="draft">Draft</SelectItem>
-                      <SelectItem value="sent">Sent</SelectItem>
-                      <SelectItem value="partial">Partially Paid</SelectItem>
-                      <SelectItem value="paid">Paid</SelectItem>
-                      <SelectItem value="overdue">Overdue</SelectItem>
-                      <SelectItem value="cancelled">Cancelled</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
+
+                <div className="space-y-2">
                   <Label htmlFor="notes">Notes</Label>
                   <Textarea
                     id="notes"
                     value={formData.notes}
                     onChange={(e) => handleInputChange("notes", e.target.value)}
-                    placeholder="Add any additional notes..."
+                    placeholder="Additional notes or instructions..."
                     rows={3}
                   />
                 </div>
@@ -582,30 +635,25 @@ function InvoiceEditContent() {
             {/* Line Items */}
             <Card>
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>Line Items</CardTitle>
-                    <CardDescription>
-                      Add or modify invoice line items
-                    </CardDescription>
-                  </div>
-                  <Button onClick={addItem} size="sm">
+                <CardTitle className="flex items-center justify-between">
+                  Line Items
+                  <Button onClick={addItem} size="sm" variant="outline">
                     <Plus className="h-4 w-4 mr-2" />
                     Add Item
                   </Button>
-                </div>
+                </CardTitle>
+                <CardDescription>
+                  Add products or services to this invoice
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {formData.items.map((item, index) => (
                     <div key={index} className="border rounded-lg p-4">
-                      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-                        <div className="md:col-span-5">
-                          <Label htmlFor={`item-desc-${index}`}>
-                            Description
-                          </Label>
+                      <div className="grid md:grid-cols-6 gap-4 items-end">
+                        <div className="md:col-span-2">
+                          <Label>Description</Label>
                           <Input
-                            id={`item-desc-${index}`}
                             value={item.description}
                             onChange={(e) =>
                               handleItemChange(
@@ -617,28 +665,25 @@ function InvoiceEditContent() {
                             placeholder="Item description"
                           />
                         </div>
-                        <div className="md:col-span-2">
-                          <Label htmlFor={`item-qty-${index}`}>Quantity</Label>
+                        <div className="md:col-span-1">
+                          <Label>Quantity</Label>
                           <Input
-                            id={`item-qty-${index}`}
                             type="number"
-                            min="1"
+                            min="0"
+                            step="1"
                             value={item.quantity}
                             onChange={(e) =>
                               handleItemChange(
                                 index,
                                 "quantity",
-                                parseInt(e.target.value) || 1,
+                                parseInt(e.target.value) || 0,
                               )
                             }
                           />
                         </div>
-                        <div className="md:col-span-2">
-                          <Label htmlFor={`item-price-${index}`}>
-                            Unit Price
-                          </Label>
+                        <div className="md:col-span-1">
+                          <Label>Unit Price</Label>
                           <Input
-                            id={`item-price-${index}`}
                             type="number"
                             min="0"
                             step="0.01"
@@ -753,6 +798,160 @@ function InvoiceEditContent() {
                         className="w-24 h-24 mx-auto border rounded-lg"
                       />
                       <p className="text-xs text-gray-500 mt-2">Scan for invoice details</p>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Payments Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <DollarSign className="h-5 w-5" />
+                    <span>Payments</span>
+                  </div>
+                  <Button
+                    onClick={() => setShowPaymentForm(!showPaymentForm)}
+                    size="sm"
+                    variant="outline"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Record Payment
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Payment Summary */}
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Total Amount:</span>
+                    <span className="font-medium">{formatCurrency(invoice?.total || 0)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Amount Paid:</span>
+                    <span className="font-medium text-green-600">
+                      {formatCurrency(payments.reduce((sum, p) => sum + parseFloat(p.amount), 0))}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm font-bold border-t pt-2">
+                    <span>Amount Due:</span>
+                    <span className="text-red-600">
+                      {formatCurrency(
+                        (invoice?.total || 0) - payments.reduce((sum, p) => sum + parseFloat(p.amount), 0)
+                      )}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Payment Form */}
+                {showPaymentForm && (
+                  <div className="space-y-3 border-t pt-4">
+                    <div>
+                      <Label htmlFor="payment_amount">Amount *</Label>
+                      <Input
+                        id="payment_amount"
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        value={paymentForm.amount}
+                        onChange={(e) => setPaymentForm(prev => ({ ...prev, amount: e.target.value }))}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="payment_method">Payment Method</Label>
+                      <Select
+                        value={paymentForm.payment_method}
+                        onValueChange={(value) => setPaymentForm(prev => ({ ...prev, payment_method: value }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="cash">Cash</SelectItem>
+                          <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                          <SelectItem value="mobile_money">Mobile Money</SelectItem>
+                          <SelectItem value="card">Card</SelectItem>
+                          <SelectItem value="cheque">Cheque</SelectItem>
+                          <SelectItem value="credit">Credit</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="payment_date">Payment Date</Label>
+                      <Input
+                        id="payment_date"
+                        type="date"
+                        value={paymentForm.payment_date}
+                        onChange={(e) => setPaymentForm(prev => ({ ...prev, payment_date: e.target.value }))}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="reference_number">Reference Number</Label>
+                      <Input
+                        id="reference_number"
+                        placeholder="Transaction ID, Check #, etc."
+                        value={paymentForm.reference_number}
+                        onChange={(e) => setPaymentForm(prev => ({ ...prev, reference_number: e.target.value }))}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="payment_notes">Notes</Label>
+                      <Textarea
+                        id="payment_notes"
+                        placeholder="Payment notes..."
+                        value={paymentForm.notes}
+                        onChange={(e) => setPaymentForm(prev => ({ ...prev, notes: e.target.value }))}
+                        rows={2}
+                      />
+                    </div>
+                    <div className="flex space-x-2">
+                      <Button
+                        onClick={recordPayment}
+                        disabled={!paymentForm.amount || isSaving}
+                        size="sm"
+                        className="flex-1"
+                      >
+                        {isSaving ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                          <Plus className="h-4 w-4 mr-2" />
+                        )}
+                        Record Payment
+                      </Button>
+                      <Button
+                        onClick={() => setShowPaymentForm(false)}
+                        variant="outline"
+                        size="sm"
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Payment History */}
+                {payments.length > 0 && (
+                  <div className="space-y-2 border-t pt-4">
+                    <h4 className="font-medium text-sm">Payment History</h4>
+                    <div className="space-y-2 max-h-40 overflow-y-auto">
+                      {payments.map((payment) => (
+                        <div key={payment.id} className="flex justify-between items-start text-xs p-2 bg-gray-50 rounded">
+                          <div>
+                            <div className="font-medium">{formatCurrency(payment.amount)}</div>
+                            <div className="text-muted-foreground">
+                              {payment.payment_method} • {new Date(payment.payment_date).toLocaleDateString()}
+                            </div>
+                            {payment.reference_number && (
+                              <div className="text-muted-foreground">Ref: {payment.reference_number}</div>
+                            )}
+                          </div>
+                          <Badge variant="outline" className="text-xs">
+                            {payment.payment_status}
+                          </Badge>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}

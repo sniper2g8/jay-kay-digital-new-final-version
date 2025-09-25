@@ -125,23 +125,39 @@ export const useInvoiceActions = () => {
 
       // Create invoice
       const todayIsoDate = new Date().toISOString().slice(0,10);
+      const invoiceDate = formData.invoice_date || todayIsoDate;
+      const dueDate = formData.due_date || (
+        formData.terms_days ? 
+        new Date(Date.now() + formData.terms_days * 24 * 60 * 60 * 1000).toISOString().slice(0,10) :
+        new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0,10)
+      );
+      
       const invoiceData = {
         id: crypto.randomUUID(),
         invoiceNo: invoiceNumber,
         customer_id: formData.customer_id,
         customerName: customerName || 'Unknown Customer',
-        status: "draft",
+        invoice_status: "draft" as const,
         payment_status: "pending" as const,
+        invoice_date: invoiceDate,
+        due_date: dueDate,
+        terms_days: formData.terms_days || 30,
         created_at: new Date().toISOString(),
-        due_date: formData.due_date || formData.invoice_date || todayIsoDate,
+        updated_at: new Date().toISOString(),
         subtotal: subtotal,
         tax: taxTotal,
+        taxRate: taxTotal > 0 ? (taxTotal / subtotal) * 100 : 0,
         discount: discountTotal,
+        discount_percentage: discountTotal > 0 ? (discountTotal / subtotal) * 100 : 0,
         total: total,
         amountDue: total,
         amountPaid: 0,
         currency: 'SLL',
         notes: finalNotes,
+        generated_by: user?.id || null,
+        template_id: formData.template_id || null,
+        pdf_generated: false,
+        late_fee_percentage: 0,
       };
 
       const { error: invoiceError } = await supabase
