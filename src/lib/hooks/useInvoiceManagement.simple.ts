@@ -15,6 +15,8 @@ export interface InvoiceLineItem {
   tax_rate?: number;
   tax_amount?: number;
   job_id?: string;
+  job_no?: string;
+  notes?: string;
   service_id?: string;
   created_at?: string;
   updated_at?: string;
@@ -153,16 +155,36 @@ export const useInvoiceActions = () => {
 
       // Create line items
       if (formData.line_items.length > 0) {
+        // First, fetch job numbers for any items that have job_id but missing job_no
+        const itemsWithJobIds = formData.line_items.filter(item => item.job_id && !(item as any).job_no);
+        let jobNumberMap = new Map<string, string>();
+        
+        if (itemsWithJobIds.length > 0) {
+          const jobIds = itemsWithJobIds.map(item => item.job_id).filter(Boolean) as string[];
+          const { data: jobs, error: jobsError } = await supabase
+            .from('jobs')
+            .select('id, jobNo')
+            .in('id', jobIds);
+          
+          if (!jobsError && jobs) {
+            jobs.forEach(job => {
+              if (job.id && job.jobNo) {
+                jobNumberMap.set(job.id, job.jobNo);
+              }
+            });
+          }
+        }
+        
         const lineItemsData = formData.line_items.map((item) => ({
           invoice_id: invoiceData.id,
           description: item.description,
           quantity: item.quantity,
           unit_price: item.unit_price,
           total_price: item.total_price,
-          // invoice_items does not have service_id; omit it
-          job_id: item.job_id ?? null,
-          job_no: (item as any).job_no ?? null,
-          notes: (item as any).notes ?? null,
+          // Ensure job_id is properly set as string (invoice_items uses text type)
+          job_id: item.job_id ? String(item.job_id) : null,
+          job_no: item.job_no || (item.job_id ? jobNumberMap.get(item.job_id) || null : null),
+          notes: item.notes ?? null,
           created_at: new Date().toISOString(),
         }));
 

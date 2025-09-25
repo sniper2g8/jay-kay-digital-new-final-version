@@ -115,30 +115,75 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     let enriched = data || [];
     try {
       const missingJobNoIds = (enriched || [])
-        .filter((row: any) => !row.job_no && row.job_id)
-        .map((row: any) => row.job_id);
+        .filter((row: any) => (!row.job_no || String(row.job_no).trim() === '') && row.job_id)
+        .map((row: any) => String(row.job_id));
       const uniqueJobIds = Array.from(new Set(missingJobNoIds));
       if (uniqueJobIds.length > 0) {
+        console.log(`Enriching job_no for ${uniqueJobIds.length} invoice items missing job numbers`);
+        console.log('Job IDs to look up:', uniqueJobIds);
+        
+        // Convert text job_ids to UUIDs for the lookup
         const { data: jobs, error: jobsErr } = await supabase
           .from('jobs')
           .select('id, jobNo')
           .in('id', uniqueJobIds);
-        if (!jobsErr && jobs) {
+          
+        if (jobsErr) {
+          console.error('Error fetching jobs:', jobsErr);
+        } else if (jobs) {
           const jobMap = new Map<string, string>();
           for (const j of jobs as any[]) {
-            if (j?.id) jobMap.set(j.id, j.jobNo || null);
+            if (j?.id && j?.jobNo) {
+              jobMap.set(String(j.id), j.jobNo);
+            }
           }
+          console.log(`Found ${jobMap.size} job numbers to enrich:`, Array.from(jobMap.entries()));
           enriched = enriched.map((row: any) => ({
             ...row,
-            job_no: row.job_no || (row.job_id ? jobMap.get(row.job_id) || null : null),
+            job_no: (row.job_no && String(row.job_no).trim() !== '') ? row.job_no : (row.job_id ? jobMap.get(String(row.job_id)) || null : null),
           }));
+        }
+      }
+      
+      // Also try to enrich based on description matching if job_id is missing
+      // This is a fallback for cases where job_id wasn't stored properly
+      const itemsStillMissingJobNo = enriched.filter((row: any) => !row.job_no);
+      if (itemsStillMissingJobNo.length > 0) {
+        console.log(`${itemsStillMissingJobNo.length} items still missing job numbers, attempting description-based matching`);
+        
+        // Try to extract job numbers from descriptions like "Job: JKDP-JOB-0001" or "JKDP-JOB-0001"
+        for (const item of itemsStillMissingJobNo) {
+          if (item.description) {
+            const jobNoMatch = item.description.match(/JKDP-JOB-\d+/);
+            if (jobNoMatch) {
+              const potentialJobNo = jobNoMatch[0];
+              // Verify this job number exists in the jobs table
+              const { data: matchingJob } = await supabase
+                .from('jobs')
+                .select('id, jobNo')
+                .eq('jobNo', potentialJobNo)
+                .single();
+              
+              if (matchingJob) {
+                item.job_no = matchingJob.jobNo;
+                item.job_id = matchingJob.id;
+                console.log(`Enriched item ${item.id} with job number ${matchingJob.jobNo} from description`);
+              }
+            }
+          }
         }
       }
     } catch (e) {
       console.warn('Failed to enrich job_no for invoice items:', (e as Error).message);
     }
     
-    console.log(`Found ${count} invoice items`);
+    console.log(`Found ${count} invoice items`);    
+    console.log('Sample enriched items:', enriched.slice(0, 3).map(item => ({
+      id: item.id,
+      job_id: item.job_id,
+      job_no: item.job_no,
+      description: item.description?.substring(0, 50)
+    })));
     return NextResponse.json(enriched);
   } catch (error: any) {
     console.error("Unexpected error:", error);
