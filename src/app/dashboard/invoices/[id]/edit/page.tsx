@@ -121,55 +121,244 @@ function InvoiceEditContent() {
 
   // Record a new payment
   const recordPayment = async () => {
-    if (!invoice || !paymentForm.amount) return;
+    if (!invoice || !paymentForm.amount) {
+      setError('Please fill in the payment amount');
+      return;
+    }
     
     try {
       setIsSaving(true);
+      setError(null); // Clear any previous errors
+      
+      // Validate payment amount
+      const paymentAmount = parseFloat(paymentForm.amount);
+      if (isNaN(paymentAmount) || paymentAmount <= 0) {
+        setError('Please enter a valid payment amount');
+        return;
+      }
       
       // Generate payment number
       const paymentNumber = `PAY-${Date.now()}`;
       
-      // Get customer data for proper customer_id
+      // Get customer data for proper customer_id and ensure foreign key constraints
       const { data: invoiceData, error: fetchError } = await supabase
         .from('invoices')
-        .select('customer_id, customerName, invoiceNo')
+        .select(`
+          customer_id, 
+          customerName, 
+          invoiceNo,
+          customers!inner (
+            id,
+            human_id,
+            business_name
+          )
+        `)
         .eq('id', invoiceId)
         .single();
       
-      if (fetchError || !invoiceData) {
-        console.error('Error fetching invoice data:', fetchError);
-        setError('Failed to fetch invoice data');
+      if (fetchError) {
+        console.error('Error fetching invoice data:', {
+          error: fetchError,
+          message: fetchError.message,
+          details: fetchError.details,
+          hint: fetchError.hint,
+          code: fetchError.code
+        });
+        setError(`Failed to fetch invoice data: ${fetchError.message}`);
         return;
       }
       
+      if (!invoiceData) {
+        console.error('No invoice data found for ID:', invoiceId);
+        setError('Invoice not found');
+        return;
+      }
+      
+      // Validate that we have the required foreign key references
+      if (!invoiceData.invoiceNo) {
+        console.error('Invoice has no invoiceNo for foreign key constraint');
+        setError('Invoice number is missing - cannot record payment');
+        return;
+      }
+      
+      if (!invoiceData.customers?.human_id) {
+        console.error('Customer has no human_id for foreign key constraint');
+        setError('Customer ID is missing - cannot record payment');
+        return;
+      }
+      
+      // Validate payment method
+      const validPaymentMethods = ['cash', 'bank_transfer', 'mobile_money', 'card', 'cheque', 'credit'];
+      if (!validPaymentMethods.includes(paymentForm.payment_method)) {
+        setError('Please select a valid payment method');
+        return;
+      }
+      
+      // Prepare payment data matching the exact table structure
       const paymentData = {
         payment_number: paymentNumber,
-        amount: parseFloat(paymentForm.amount),
+        amount: paymentAmount, // numeric(10,2) - already validated as number
         payment_method: paymentForm.payment_method as 'cash' | 'bank_transfer' | 'mobile_money' | 'card' | 'cheque' | 'credit',
-        payment_date: paymentForm.payment_date,
-        reference_number: paymentForm.reference_number || null,
-        notes: paymentForm.notes || null,
-        invoice_no: invoiceData.invoiceNo || `INV-${invoiceId.slice(0, 8)}`,
-        customer_human_id: invoiceData.customerName || 'Unknown',
-        applied_to_invoice_id: invoiceId,
-        customer_id: invoiceData.customer_id,
-        payment_status: 'completed' as const
+        payment_date: paymentForm.payment_date, // date - should be in YYYY-MM-DD format
+        reference_number: paymentForm.reference_number?.trim() || null, // varchar(100) nullable
+        notes: paymentForm.notes?.trim() || null, // text nullable
+        received_by: null, // uuid nullable - we don't have user context here
+        // created_at and updated_at will be set by database defaults
+        invoice_no: invoiceData.invoiceNo, // varchar(50) NOT NULL - foreign key to invoices.invoiceNo
+        customer_human_id: invoiceData.customers.human_id, // varchar(20) NOT NULL - foreign key to customers.human_id
+        payment_status: 'completed' as const, // varchar(20) with constraint check
+        transaction_id: null, // varchar(100) nullable
+        payment_gateway: null, // varchar(50) nullable
+        customer_id: invoiceData.customer_id, // uuid nullable - foreign key to customers.id
+        applied_to_invoice_id: invoiceId, // uuid nullable - foreign key to invoices.id
+        overpayment_amount: 0, // numeric(10,2) default 0
+        refund_amount: 0, // numeric(10,2) default 0
+        fees: 0 // numeric(10,2) default 0
       };
       
-      const { error } = await supabase
-        .from('payments')
-        .insert([paymentData]);
+      // Validate each required field against table constraints
+      const validationErrors = [];
+      if (!paymentData.payment_number) validationErrors.push('payment_number is required (varchar(20))');
+      if (!paymentData.amount || paymentData.amount <= 0) validationErrors.push('amount must be positive (numeric(10,2))');
+      if (!paymentData.payment_method) validationErrors.push('payment_method is required (enum)');
+      if (!paymentData.payment_date) validationErrors.push('payment_date is required (date)');
+      if (!paymentData.invoice_no) validationErrors.push('invoice_no is required (varchar(50)) - foreign key constraint');
+      if (!paymentData.customer_human_id) validationErrors.push('customer_human_id is required (varchar(20)) - foreign key constraint');
       
-      if (error) {
-        console.error('Error recording payment:', error);
-        console.error('Payment data:', paymentData);
-        setError(`Failed to record payment: ${error.message || 'Unknown error'}`);
+      // Validate data types and formats
+      if (paymentData.payment_date && !/^\d{4}-\d{2}-\d{2}$/.test(paymentData.payment_date)) {
+        validationErrors.push('payment_date must be in YYYY-MM-DD format');
+      }
+      
+      if (validationErrors.length > 0) {
+        console.error('Payment data validation failed:', validationErrors);
+        setError(`Payment validation failed: ${validationErrors.join(', ')}`);
         return;
       }
       
+      console.log('Payment data validation passed. Data structure matches table definition:', {
+        ...paymentData,
+        amount_type: typeof paymentData.amount,
+        date_format: paymentData.payment_date,
+        foreign_keys: {
+          invoice_no: paymentData.invoice_no,
+          customer_human_id: paymentData.customer_human_id,
+          customer_id: paymentData.customer_id,
+          applied_to_invoice_id: paymentData.applied_to_invoice_id
+        }
+      });
+      
+      // First test if we can access the payments table
+      console.log('Testing payments table access...');
+      try {
+        const { data: testData, error: testError } = await supabase
+          .from('payments')
+          .select('id')
+          .limit(1);
+        
+        console.log('Payments table test result:', {
+          canRead: !testError,
+          error: testError,
+          dataCount: testData?.length || 0
+        });
+        
+        if (testError) {
+          console.error('Cannot access payments table:', testError);
+          setError(`Database access error: ${(testError as any)?.message || 'Unknown error'}`);
+          return;
+        }
+      } catch (accessException) {
+        console.error('Exception testing table access:', accessException);
+        setError('Cannot access payments table');
+        return;
+      }
+      
+      // Try the insert with additional debugging
+      console.log('About to attempt Supabase insert...');
+      
+      let insertResult;
+      try {
+        insertResult = await supabase
+          .from('payments')
+          .insert([paymentData])
+          .select()
+          .single();
+      } catch (insertException: any) {
+        console.error('Exception during insert:', {
+          exception: insertException,
+          exceptionType: typeof insertException,
+          exceptionMessage: insertException?.message,
+          exceptionStack: insertException?.stack
+        });
+        setError(`Insert operation failed: ${insertException?.message || 'Unknown exception'}`);
+        return;
+      }
+      
+      const { data: insertedPayment, error: insertError } = insertResult;
+      
+      console.log('Insert result received:', {
+        hasData: !!insertedPayment,
+        hasError: !!insertError,
+        dataType: typeof insertedPayment,
+        errorType: typeof insertError
+      });
+      
+      if (insertError) {
+        // Try multiple approaches to extract error information
+        const errorInfo = {
+          hasError: !!insertError,
+          errorType: typeof insertError,
+          errorConstructor: insertError?.constructor?.name,
+          errorToString: String(insertError),
+          errorMessage: insertError?.message || 'No message property',
+          errorDetails: insertError?.details || 'No details property',
+          errorHint: insertError?.hint || 'No hint property',
+          errorCode: insertError?.code || 'No code property',
+          errorJson: (() => {
+            try {
+              return JSON.stringify(insertError, Object.getOwnPropertyNames(insertError));
+            } catch {
+              return 'JSON stringify failed';
+            }
+          })()
+        };
+        
+        console.error('Supabase insert error detailed:', errorInfo);
+        console.error('Raw error object:', insertError);
+        console.error('Payment data that failed:', paymentData);
+        
+        // Extract the actual error message
+        let errorMessage = 'Database error';
+        if (insertError?.message) {
+          errorMessage = insertError.message;
+        } else if (typeof insertError === 'string') {
+          errorMessage = insertError;
+        } else if (insertError?.toString && insertError.toString() !== '[object Object]') {
+          errorMessage = insertError.toString();
+        }
+        
+        setError(`Failed to record payment: ${errorMessage}`);
+        return;
+      }
+      
+      if (!insertedPayment) {
+        console.error('Payment insert succeeded but no data returned');
+        setError('Payment recorded but confirmation failed');
+        return;
+      }
+      
+      console.log('Payment successfully recorded:', insertedPayment);
+      
       // Update invoice amountPaid
-      const totalPaid = payments.reduce((sum, p) => sum + parseFloat(p.amount), 0) + parseFloat(paymentForm.amount);
+      const totalPaid = payments.reduce((sum, p) => sum + parseFloat(p.amount), 0) + paymentAmount;
       const amountDue = invoice.total - totalPaid;
+      
+      console.log('Updating invoice with payment totals:', {
+        invoiceId,
+        totalPaid,
+        amountDue,
+        newStatus: amountDue <= 0 ? 'paid' : totalPaid > 0 ? 'partial' : 'pending'
+      });
       
       const { error: updateError } = await supabase
         .from('invoices')
@@ -182,7 +371,15 @@ function InvoiceEditContent() {
         .eq('id', invoiceId);
       
       if (updateError) {
-        console.error('Error updating invoice:', updateError);
+        console.error('Error updating invoice after payment:', {
+          error: updateError,
+          message: updateError.message,
+          details: updateError.details,
+          hint: updateError.hint,
+          code: updateError.code
+        });
+        // Don't return here as payment was successful, just log the warning
+        console.warn('Payment recorded successfully but invoice update failed');
       }
       
       // Reset form and refresh data
@@ -194,17 +391,30 @@ function InvoiceEditContent() {
         notes: ''
       });
       setShowPaymentForm(false);
-      await fetchPayments();
-      await fetchInvoice(); // Refresh invoice data
+      
+      // Refresh data
+      await Promise.all([
+        fetchPayments(),
+        fetchInvoice()
+      ]);
+      
+      console.log('Payment recording completed successfully');
       
     } catch (error) {
-      console.error('Error recording payment:', error);
-      console.error('Error details:', {
-        message: error instanceof Error ? error.message : 'Unknown error',
+      console.error('Unexpected error in recordPayment:', {
+        error: error,
+        errorType: typeof error,
+        errorConstructor: error?.constructor?.name,
+        message: error instanceof Error ? error.message : 'Non-Error object thrown',
         stack: error instanceof Error ? error.stack : undefined,
-        error: error
+        stringified: JSON.stringify(error, Object.getOwnPropertyNames(error))
       });
-      setError(`Failed to record payment: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : (typeof error === 'string' ? error : 'An unexpected error occurred while recording the payment');
+      
+      setError(`Failed to record payment: ${errorMessage}`);
     } finally {
       setIsSaving(false);
     }
