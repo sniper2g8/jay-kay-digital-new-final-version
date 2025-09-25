@@ -4,12 +4,12 @@ import { ProfessionalInvoicePDF } from '@/components/ProfessionalInvoicePDF';
 export const dynamic = 'force-dynamic';
 
 interface Params {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function PrintableInvoicePage({ params }: Params) {
   const admin = createServiceRoleClient();
-  const id = params.id;
+  const { id } = await params;
 
   const { data: invoice } = await admin
     .from('invoices')

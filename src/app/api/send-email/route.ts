@@ -6,9 +6,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-// Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 interface EmailRequest {
   to: string;
   subject: string;
@@ -19,6 +16,9 @@ interface EmailRequest {
 
 export async function POST(request: NextRequest) {
   try {
+    // Initialize Resend client inside the function to avoid build-time errors
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    
     // Parse request body
     const body: EmailRequest = await request.json();
     const { to, subject, html, from = 'noreply@jaykaydigitalpress.com', fromName = 'Jay Kay Digital Press' } = body;

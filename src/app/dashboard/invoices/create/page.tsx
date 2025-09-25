@@ -328,7 +328,24 @@ function CreateInvoiceContent() {
 
       router.push(`/dashboard/invoices/${invoice.id}`);
     } catch (error) {
-      console.error("Error creating invoice:", error);
+      const formatSupabaseError = (err: unknown) => {
+        if (!err) return "Unknown error";
+        if (typeof err === "string") return err;
+        if (err instanceof Error) {
+          const anyErr = err as any;
+          return {
+            name: err.name,
+            message: err.message,
+            code: anyErr?.code,
+            details: anyErr?.details,
+            hint: anyErr?.hint,
+            status: anyErr?.status,
+          };
+        }
+        if (typeof err === "object") return err;
+        return String(err);
+      };
+      console.error("Error creating invoice:", formatSupabaseError(error), error);
     } finally {
       setIsLoading(false);
     }

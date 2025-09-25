@@ -1,9 +1,9 @@
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-  const { id } = params
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   
   // Log environment variables for debugging
   console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
@@ -25,10 +25,23 @@ export async function GET(request: Request, { params }: { params: { id: string }
   }
   
   // Create a service role client to bypass RLS
-  const supabase = createRouteHandlerClient({ cookies }, {
+  const cookieStore = await cookies();
+  const supabase = createServerClient(
     supabaseUrl,
-    supabaseKey
-  });
+    supabaseKey,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options)
+          )
+        },
+      },
+    }
+  );
   
   try {
     console.log(`Fetching invoice items for invoice ID: ${id}`);

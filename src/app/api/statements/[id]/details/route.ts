@@ -1,13 +1,29 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { createServerClient } from '@supabase/ssr';
 import { createServiceRoleClient } from '@/lib/supabase-admin';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(_req: Request, { params }: { params: { id: string } }) {
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            )
+          },
+        },
+      }
+    );
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -28,7 +44,7 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
           address
         )
       `)
-      .eq('id', params.id)
+      .eq('id', (await params).id)
       .maybeSingle();
 
     if (periodError || !period) {
@@ -38,7 +54,7 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
     const { data: transactions, error: txError } = await admin
       .from('customer_statement_transactions')
       .select('*')
-      .eq('statement_period_id', params.id)
+      .eq('statement_period_id', (await params).id)
       .order('transaction_date', { ascending: true });
 
     if (txError) {

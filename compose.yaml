@@ -14,12 +14,6 @@ services:
       context: .
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_SUPABASE_URL=https://pnoxqzlxfuvjvufdjuqh.supabase.co
-      - NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=sb_publishable_aHCVwZ2OAJSAgW7Y447X6Q_vb5mG2xw
-      - NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_aHCVwZ2OAJSAgW7Y447X6Q_vb5mG2xw
-      - SUPABASE_SECRET_KEY=sb_secret_N7UND0UgjKTVK-Uodkm0Hg_xSvEMPvz
-      - SUPABASE_SERVICE_ROLE_KEY=sb_secret_N7UND0UgjKTVK-Uodkm0Hg_xSvEMPvz
-      - NEXT_PUBLIC_SITE_URL=http://localhost:3000
     env_file:
       - .env.production
     ports:

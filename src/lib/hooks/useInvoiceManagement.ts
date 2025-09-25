@@ -46,6 +46,24 @@ export interface CreateInvoiceFromJobData
 export const useInvoiceActions = () => {
   const { user } = useAuth();
 
+  const formatSupabaseError = (err: unknown) => {
+    if (!err) return "Unknown error";
+    if (typeof err === "string") return err;
+    if (err instanceof Error) {
+      const anyErr = err as any;
+      return {
+        name: err.name,
+        message: err.message,
+        code: anyErr?.code,
+        details: anyErr?.details,
+        hint: anyErr?.hint,
+        status: anyErr?.status,
+      };
+    }
+    if (typeof err === "object") return err;
+    return String(err);
+  };
+
   const createInvoice = async (formData: InvoiceFormData) => {
     if (!user) throw new Error("User not authenticated");
 
@@ -86,18 +104,16 @@ export const useInvoiceActions = () => {
         notes: formData.notes,
       };
 
-      const { data: invoice, error: invoiceError } = await supabase
+      const { error: invoiceError } = await supabase
         .from("invoices")
-        .insert([invoiceData])
-        .select()
-        .single();
+        .insert([invoiceData]);
 
       if (invoiceError) throw invoiceError;
 
       // Create line items
       if (formData.line_items.length > 0) {
         const lineItemsData = formData.line_items.map((item) => ({
-          invoice_id: invoice.id,
+          invoice_id: invoiceData.id,
           description: item.description,
           quantity: item.quantity,
           unit_price: item.unit_price,
@@ -114,9 +130,9 @@ export const useInvoiceActions = () => {
       }
 
       toast.success("Invoice created successfully");
-      return invoice;
+      return invoiceData;
     } catch (error) {
-      console.error("Error creating invoice:", error);
+      console.error("Error creating invoice:", formatSupabaseError(error), error);
       toast.error("Failed to create invoice");
       throw error;
     }

@@ -150,6 +150,9 @@ const generateEmailTemplate = (data: JobNotificationData): string => {
 
 export async function POST(request: NextRequest) {
   try {
+    // Initialize Resend client inside the function to avoid build-time errors
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    
     const body = await request.json();
     const {
       customerEmail,

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { createServerClient } from '@supabase/ssr';
 import { createServiceRoleClient } from '@/lib/supabase-admin';
 
 export const dynamic = 'force-dynamic';
@@ -15,9 +15,25 @@ type StatementTransaction = {
   running_balance?: number;
 };
 
-export async function GET(_req: Request, { params }: { params: { id: string } }) {
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            )
+          },
+        },
+      }
+    );
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -27,16 +43,16 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
     const { data: period, error: periodError } = await admin
       .from('customer_statement_periods')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', (await params).id)
       .maybeSingle();
 
     if (periodError || !period) {
       return NextResponse.json({ error: 'Statement not found' }, { status: 404 });
     }
 
-    const customerId: string = period.customer_id;
-    const start: string = period.period_start;
-    const end: string = period.period_end;
+    const customerId: string = period.customer_id!;
+    const start: string = period.period_start!;
+    const end: string = period.period_end!;
 
     // Invoices before period (for opening balance)
     const { data: invBefore } = await admin
@@ -80,7 +96,7 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
       txs.push({
         id: i.id,
         type: 'invoice',
-        transaction_date: i.created_at,
+        transaction_date: i.created_at!,
         description: `Invoice ${i.invoiceNo || i.id.slice(0,8)}`,
         reference_number: i.invoiceNo || i.id,
         amount: Number(i.total || 0),
@@ -90,7 +106,7 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
       txs.push({
         id: p.id,
         type: 'payment',
-        transaction_date: p.payment_date,
+        transaction_date: p.payment_date!,
         description: `Payment ${p.reference_number || p.id.slice(0,8)}`,
         reference_number: p.reference_number || p.id,
         amount: -Math.abs(Number(p.amount || 0)),
