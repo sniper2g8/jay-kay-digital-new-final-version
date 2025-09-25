@@ -345,10 +345,7 @@ export function InvoiceTemplate({
       )}
 
       {/* Footer */}
-      <div className="mt-12 pt-6 border-t border-gray-300 text-center text-sm text-gray-500">
-        <p>Thank you for your business!</p>
-        <p className="mt-1">Payment is due within {invoice.terms_days || 30} days</p>
-      </div>
+    
     </div>
   );
 }

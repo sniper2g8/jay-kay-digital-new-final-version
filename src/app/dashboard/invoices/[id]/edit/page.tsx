@@ -22,6 +22,13 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   ArrowLeft,
   Save,
   Plus,
@@ -42,6 +49,7 @@ import {
   formatCurrency,
 } from "@/lib/invoice-utils";
 import QRCodeLib from "qrcode";
+import PaymentReceiptPDF from "@/components/PaymentReceiptPDF";
 
 interface InvoiceLineItem {
   id?: string;
@@ -79,6 +87,8 @@ function InvoiceEditContent() {
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
   const [payments, setPayments] = useState<any[]>([]);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const [showPaymentReceipt, setShowPaymentReceipt] = useState(false);
+  const [lastPaymentData, setLastPaymentData] = useState<any>(null);
   const [paymentForm, setPaymentForm] = useState({
     amount: '',
     payment_method: 'cash',
@@ -349,6 +359,20 @@ function InvoiceEditContent() {
       
       console.log('Payment successfully recorded:', insertedPayment);
       
+      // Store payment data for receipt generation
+      const receiptData = {
+        ...insertedPayment,
+        customer: invoiceData.customers,
+        invoice: {
+          id: invoiceId,
+          invoiceNo: invoiceData.invoiceNo,
+          total: invoice.total,
+          amountPaid: payments.reduce((sum, p) => sum + parseFloat(p.amount), 0) + paymentAmount,
+          amountDue: invoice.total - (payments.reduce((sum, p) => sum + parseFloat(p.amount), 0) + paymentAmount)
+        }
+      };
+      setLastPaymentData(receiptData);
+      
       // Update invoice amountPaid
       const totalPaid = payments.reduce((sum, p) => sum + parseFloat(p.amount), 0) + paymentAmount;
       const amountDue = invoice.total - totalPaid;
@@ -397,6 +421,9 @@ function InvoiceEditContent() {
         fetchPayments(),
         fetchInvoice()
       ]);
+      
+      // Show payment receipt
+      setShowPaymentReceipt(true);
       
       console.log('Payment recording completed successfully');
       
@@ -1230,6 +1257,36 @@ function InvoiceEditContent() {
             </Card>
           </div>
         </div>
+        
+        {/* Payment Receipt Dialog */}
+        <Dialog open={showPaymentReceipt} onOpenChange={setShowPaymentReceipt}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Payment Receipt</DialogTitle>
+              <DialogDescription>
+                Payment has been successfully recorded. You can download or print the receipt below.
+              </DialogDescription>
+            </DialogHeader>
+            
+            {lastPaymentData && (
+              <PaymentReceiptPDF
+                payment={lastPaymentData}
+                customer={lastPaymentData.customer}
+                invoice={lastPaymentData.invoice}
+                showActions={true}
+              />
+            )}
+            
+            <div className="flex justify-end space-x-3 pt-4 border-t">
+              <Button
+                variant="outline"
+                onClick={() => setShowPaymentReceipt(false)}
+              >
+                Close
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
   );

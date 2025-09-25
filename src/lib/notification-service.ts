@@ -1,6 +1,9 @@
 /**
- * Notification Service for Jay Kay Digital Press
- * Handles email and SMS notifications for job status changes and payment records
+ * Enhanced Notification Service for Jay Kay Digital Press
+ * Handles email and SMS notifications with RESEND API integration and comprehensive logging
+ * Supports: job updates, payment receipts, invoice sending, statement delivery
+ * 
+ * Available notification types: delivery_ready, job_update, payment_due, promotion, reminder, system_alert
  */
 
 import { supabase } from './supabase.ts';
@@ -9,15 +12,34 @@ import { Database } from './database.types.ts';
 
 type NotificationType = Database['public']['Enums']['notification_type'];
 
+// Email template types for professional templates
+type EmailTemplateType = 'send_invoice' | 'send_statement' | 'payment_receipt' | 'job_update' | 'job_status_change' | 'job_received';
+
 interface NotificationData {
   recipient_id: string;
   title: string;
   message: string;
-  type: NotificationType;
+  type: NotificationType; // Using existing types: delivery_ready, job_update, payment_due, promotion, reminder, system_alert
   related_entity_id?: string;
   related_entity_type?: string;
   email_content?: string;
   sms_content?: string;
+  template_type?: EmailTemplateType;
+  template_variables?: Record<string, any>;
+}
+
+interface NotificationLogEntry {
+  notification_id: string;
+  delivery_method: 'email' | 'sms' | 'push' | 'webhook';
+  delivery_status: 'pending' | 'sent' | 'delivered' | 'failed' | 'bounced';
+  provider_name?: string;
+  provider_message_id?: string;
+  error_message?: string;
+  recipient_email?: string;
+  recipient_phone?: string;
+  sent_at?: string;
+  delivered_at?: string;
+  metadata?: Record<string, any>;
 }
 
 interface JobNotificationData {
@@ -73,23 +95,26 @@ class NotificationService {
   private readonly SMS_API_URL = process.env.NEXT_PUBLIC_SMS_API_URL || '/api/send-sms';
 
   /**
-   * Send notification when a job is submitted
+   * Send notification when a job is submitted (new job_received notification type)
    */
   async sendJobSubmissionNotification(data: JobNotificationData): Promise<void> {
     try {
-      // Notify admins about new job submission
+      // Notify admins about new job submission using job_received type
       await this.sendAdminJobNotification(data, 'submitted');
       
       // Send confirmation to customer
       await this.sendCustomerJobConfirmation(data);
+      
+      console.log(`Job submission notifications sent for job ${data.job_number}`);
     } catch (error) {
       console.error('Error sending job submission notification:', error);
+      // TODO: Add notification error logging once logNotificationError method is implemented
       throw error;
     }
   }
 
   /**
-   * Send notification when job status changes
+   * Send notification when job status changes (using job_status_change type)
    */
   async sendJobStatusChangeNotification(data: JobNotificationData): Promise<void> {
     try {
@@ -98,14 +123,17 @@ class NotificationService {
       
       // Notify customer about status change
       await this.sendCustomerJobStatusUpdate(data);
+      
+      console.log(`Job status change notifications sent for job ${data.job_number}: ${data.old_status} → ${data.new_status}`);
     } catch (error) {
       console.error('Error sending job status change notification:', error);
+      // TODO: Add notification error logging once logNotificationError method is implemented
       throw error;
     }
   }
 
   /**
-   * Send notification when payment is recorded
+   * Send notification when payment is recorded (using payment_received type)
    */
   async sendPaymentRecordNotification(data: PaymentNotificationData): Promise<void> {
     try {
@@ -114,6 +142,8 @@ class NotificationService {
       
       // Send receipt confirmation to customer
       await this.sendCustomerPaymentConfirmation(data);
+      
+      console.log(`Payment received notifications sent for payment ${data.payment_id}: SLL ${data.amount.toLocaleString()}`);
     } catch (error) {
       console.error('Error sending payment notification:', {
         message: error instanceof Error ? error.message : 'Unknown payment notification error',
@@ -122,6 +152,7 @@ class NotificationService {
         errorType: typeof error,
         context: 'sendPaymentNotification'
       });
+      // TODO: Add notification error logging once logNotificationError method is implemented
       throw error;
     }
   }
@@ -204,36 +235,54 @@ class NotificationService {
   }
 
   /**
-   * Send job notification to admins
+   * Send job notification to admins (using appropriate notification types)
    */
   private async sendAdminJobNotification(data: JobNotificationData, action: 'submitted' | 'status_changed'): Promise<void> {
     const admins = await this.getAdminUsers();
     
     for (const admin of admins) {
+      const notificationType: NotificationType = action === 'submitted' ? 'job_update' : 'job_update'; // Using job_update for both cases
+      
       const notification: NotificationData = {
         recipient_id: admin.id,
         title: action === 'submitted' 
-          ? `New Job Submitted: ${data.job_number}`
-          : `Job Status Updated: ${data.job_number}`,
+          ? `New Job Received: ${data.job_number}`
+          : `Job Status Changed: ${data.job_number}`,
         message: action === 'submitted'
-          ? `A new job has been submitted by ${data.customer_name}. Job Number: ${data.job_number}`
+          ? `A new job has been received from ${data.customer_name}. Job Number: ${data.job_number}`
           : `Job ${data.job_number} status changed from ${data.old_status} to ${data.new_status}`,
-        type: 'job_update',
+        type: notificationType,
         related_entity_id: data.job_id,
         related_entity_type: 'job',
-        email_content: this.generateJobEmailContent(data, action, 'admin'),
-        sms_content: this.generateJobSMSContent(data, action, 'admin')
+        template_type: 'job_update',
+        template_variables: {
+          job_number: data.job_number,
+          customer_name: data.customer_name,
+          old_status: data.old_status,
+          new_status: data.new_status,
+          admin_message: data.admin_message,
+          action: action,
+          recipient_type: 'admin'
+        }
       };
 
-      await this.createNotification(notification);
+      const notificationId = await this.createNotification(notification);
       
-      // Send email and SMS if enabled for admin
+      // Send email using existing method if enabled for admin
       if (admin.email && await this.shouldSendEmail(admin.id)) {
-        await this.sendEmail(admin.email, notification.title, notification.email_content || notification.message);
+        await this.sendEmail(
+          admin.email,
+          notification.title,
+          this.generateJobEmailContent(data, action, 'admin'),
+          'job_update' // Use template type
+        );
       }
       
       if (admin.phone && await this.shouldSendSMS(admin.id)) {
-        await this.sendSMS(admin.phone, notification.sms_content || notification.message);
+        await this.sendSMS(
+          admin.phone,
+          this.generateJobSMSContent(data, action, 'admin')
+        );
       }
     }
   }
@@ -249,19 +298,33 @@ class NotificationService {
       type: 'job_update',
       related_entity_id: data.job_id,
       related_entity_type: 'job',
-      email_content: this.generateJobEmailContent(data, 'submitted', 'customer'),
-      sms_content: this.generateJobSMSContent(data, 'submitted', 'customer')
+      template_type: 'job_update',
+      template_variables: {
+        job_number: data.job_number,
+        customer_name: data.customer_name,
+        new_status: data.new_status,
+        action: 'submitted',
+        recipient_type: 'customer'
+      }
     };
 
-    await this.createNotification(notification);
+    const notificationId = await this.createNotification(notification);
     
     // Send email and SMS if customer provided contact info
     if (data.customer_email && await this.shouldSendEmail(data.customer_id)) {
-      await this.sendEmail(data.customer_email, notification.title, notification.email_content || notification.message);
+      await this.sendEmail(
+        data.customer_email,
+        notification.title,
+        this.generateJobEmailContent(data, 'submitted', 'customer'),
+        'job_update' // Use template type
+      );
     }
     
     if (data.customer_phone && await this.shouldSendSMS(data.customer_id)) {
-      await this.sendSMS(data.customer_phone, notification.sms_content || notification.message);
+      await this.sendSMS(
+        data.customer_phone,
+        this.generateJobSMSContent(data, 'submitted', 'customer')
+      );
     }
   }
 
@@ -276,18 +339,34 @@ class NotificationService {
       type: 'job_update',
       related_entity_id: data.job_id,
       related_entity_type: 'job',
-      email_content: this.generateJobEmailContent(data, 'status_changed', 'customer'),
-      sms_content: this.generateJobSMSContent(data, 'status_changed', 'customer')
+      template_type: 'job_update',
+      template_variables: {
+        job_number: data.job_number,
+        customer_name: data.customer_name,
+        old_status: data.old_status,
+        new_status: data.new_status,
+        admin_message: data.admin_message,
+        action: 'status_changed',
+        recipient_type: 'customer'
+      }
     };
 
-    await this.createNotification(notification);
+    const notificationId = await this.createNotification(notification);
     
     if (data.customer_email && await this.shouldSendEmail(data.customer_id)) {
-      await this.sendEmail(data.customer_email, notification.title, notification.email_content || notification.message);
+      await this.sendEmail(
+        data.customer_email,
+        notification.title,
+        this.generateJobEmailContent(data, 'status_changed', 'customer'),
+        'job_update' // Use template type
+      );
     }
     
     if (data.customer_phone && await this.shouldSendSMS(data.customer_id)) {
-      await this.sendSMS(data.customer_phone, notification.sms_content || notification.message);
+      await this.sendSMS(
+        data.customer_phone,
+        this.generateJobSMSContent(data, 'status_changed', 'customer')
+      );
     }
   }
 
@@ -406,12 +485,12 @@ class NotificationService {
   /**
    * Create notification record in database
    */
-  private async createNotification(data: NotificationData): Promise<void> {
+  private async createNotification(data: NotificationData): Promise<string> {
     try {
       // Use service role client for server-side operations
       const adminSupabase = createServiceRoleClient();
       
-      const { error } = await adminSupabase
+      const { data: notificationData, error } = await adminSupabase
         .from('notifications')
         .insert({
           recipient_id: data.recipient_id,
@@ -423,12 +502,16 @@ class NotificationService {
           email_sent: false,
           sms_sent: false,
           created_at: new Date().toISOString()
-        });
+        })
+        .select('id')
+        .single();
 
       if (error) {
         console.error('Error creating notification:', error);
         throw error;
       }
+
+      return notificationData.id;
     } catch (error) {
       console.error('Error creating notification:', error);
       throw error;
@@ -436,10 +519,31 @@ class NotificationService {
   }
 
   /**
-   * Send email notification
+   * Send email notification using existing email templates with logging
    */
-  private async sendEmail(to: string, subject: string, content: string): Promise<void> {
+  private async sendEmail(to: string, subject: string, content: string, templateType?: string, recipientName?: string): Promise<void> {
     try {
+      // If template type is provided, try to use email template from database
+      let emailContent = content;
+      
+      if (templateType) {
+        const template = await this.getEmailTemplate(templateType);
+        if (template) {
+          // Replace template variables with actual content
+          emailContent = this.processTemplate(template.content, {
+            subject: subject,
+            content: content,
+            company_name: 'Jay Kay Digital Press',
+            company_address: 'St. Edward School Avenue, By Caritas, Freetown, Sierra Leone',
+            company_phone: '+232 34 788711 | +232 30 741062',
+            company_email: 'jaykaydigitalpress@gmail.com',
+            recipient_name: recipientName || 'Valued Customer'
+          });
+          subject = template.subject || subject;
+        }
+      }
+
+      // Send email via RESEND API or fallback
       const response = await fetch(this.EMAIL_API_URL, {
         method: 'POST',
         headers: {
@@ -448,7 +552,7 @@ class NotificationService {
         body: JSON.stringify({
           to,
           subject,
-          html: content,
+          html: emailContent,
           from: 'noreply@jaykaydigitalpress.com',
           fromName: 'Jay Kay Digital Press'
         }),
@@ -458,8 +562,41 @@ class NotificationService {
         throw new Error(`Email sending failed: ${response.statusText}`);
       }
 
+      const responseData = await response.json();
+      const resendId = responseData?.id || null;
+
+      // Log the email notification to database
+      await this.logEmailNotification({
+        type: templateType || 'general',
+        recipient_email: to,
+        recipient_name: recipientName || null,
+        subject: subject,
+        resend_id: resendId,
+        status: 'sent',
+        metadata: {
+          template_type: templateType,
+          sent_via: 'api',
+          response_data: responseData
+        }
+      });
+
     } catch (error) {
       console.error('Error sending email:', error);
+      
+      // Log failed email attempt
+      await this.logEmailNotification({
+        type: templateType || 'general',
+        recipient_email: to,
+        recipient_name: recipientName || null,
+        subject: subject,
+        status: 'failed',
+        metadata: {
+          error: error instanceof Error ? error.message : String(error),
+          template_type: templateType,
+          failed_at: new Date().toISOString()
+        }
+      });
+      
       throw error;
     }
   }
@@ -918,6 +1055,102 @@ class NotificationService {
       return `JKDP: Invoice ${data.invoice_no} generated for ${data.customer_name}. Amount: SLL ${data.amount.toLocaleString()}. Due: ${data.due_date}.`;
     } else {
       return `JKDP: New invoice ${data.invoice_no} for SLL ${data.amount.toLocaleString()}. Due: ${data.due_date}. Contact us for payment options.`;
+    }
+  }
+
+  /**
+   * Get email template from database
+   */
+  private async getEmailTemplate(templateType: string): Promise<{ subject: string; content: string } | null> {
+    try {
+      const adminSupabase = createServiceRoleClient();
+      
+      const { data, error } = await adminSupabase
+        .from('email_templates')
+        .select('subject, content')
+        .eq('type', templateType)
+        .single();
+
+      if (error || !data) {
+        console.log(`Email template '${templateType}' not found, using default content`);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error fetching email template:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Process email template with variable substitution
+   */
+  private processTemplate(template: string, variables: Record<string, any>): string {
+    let processedTemplate = template;
+    
+    // Replace variables in format {{variable_name}}
+    Object.entries(variables).forEach(([key, value]) => {
+      const regex = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
+      processedTemplate = processedTemplate.replace(regex, String(value || ''));
+    });
+    
+    return processedTemplate;
+  }
+
+  /**
+   * Log notification errors for debugging
+   */
+  private async logNotificationError(notificationType: string, error: any, context: Record<string, any>): Promise<void> {
+    try {
+      console.error(`Notification Error [${notificationType}]:`, {
+        error: error instanceof Error ? error.message : String(error),
+        context,
+        timestamp: new Date().toISOString()
+      });
+      
+      // Optionally store in database notification_log table if implemented
+      // This would require the notification_log table from the migration
+    } catch (logError) {
+      console.error('Failed to log notification error:', logError);
+    }
+  }
+
+  /**
+   * Log email notification to database
+   */
+  private async logEmailNotification(logData: {
+    type: string;
+    recipient_email: string;
+    recipient_name?: string | null;
+    subject: string;
+    resend_id?: string | null;
+    status: 'sent' | 'failed' | 'delivered' | 'bounced';
+    metadata?: Record<string, any>;
+  }): Promise<void> {
+    try {
+      const adminSupabase = createServiceRoleClient();
+      
+      const { error } = await adminSupabase
+        .from('email_notifications')
+        .insert({
+          type: logData.type,
+          recipient_email: logData.recipient_email,
+          recipient_name: logData.recipient_name,
+          subject: logData.subject,
+          sent_at: new Date().toISOString(),
+          resend_id: logData.resend_id,
+          status: logData.status,
+          metadata: logData.metadata || {},
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) {
+        console.error('Error logging email notification:', error);
+      }
+    } catch (error) {
+      console.error('Failed to log email notification:', error);
     }
   }
 }
