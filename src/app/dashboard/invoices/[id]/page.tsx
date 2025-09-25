@@ -46,7 +46,20 @@ export default function InvoiceDetails() {
           }
         } catch {}
         console.log(`Fetching invoice items for invoice ID: ${invoiceId}`);
-        const itemsResponse = await fetch(`/api/invoice-items/${invoiceId}`)
+        
+        // Add more detailed debugging
+        console.log('Environment check:', {
+          url: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+          key: !!process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
+        });
+        
+        const itemsResponse = await fetch(`/api/invoice-items/${invoiceId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include'
+        })
         
         console.log("API response status:", itemsResponse.status);
         const itemsData = await itemsResponse.json()
@@ -58,7 +71,28 @@ export default function InvoiceDetails() {
             statusText: itemsResponse.statusText,
             data: itemsData
           });
-          // Let's add more detailed error information
+          
+          // Try fallback: Direct database query
+          console.log('Attempting fallback direct database query...');
+          try {
+            const { data: fallbackItems, error: fallbackError } = await supabase
+              .from('invoice_items')
+              .select('*')
+              .eq('invoice_id', invoiceId);
+              
+            if (fallbackError) {
+              throw fallbackError;
+            }
+            
+            console.log('Fallback query successful:', fallbackItems);
+            setItems(fallbackItems || []);
+            setError(null);
+            return;
+          } catch (fallbackErr) {
+            console.error('Fallback query also failed:', fallbackErr);
+          }
+          
+          // If both approaches fail, show detailed error
           const errorMessage = itemsData?.error || itemsData?.message || itemsResponse.statusText || "Unknown error";
           const errorDetails = itemsData?.details || "";
           const errorCode = itemsData?.code || "";
