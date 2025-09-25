@@ -1,6 +1,5 @@
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
+import { createServiceRoleClient } from '@/lib/supabase-admin'
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -8,12 +7,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   // Log environment variables for debugging
   console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
   console.log("Supabase Secret Key exists:", !!process.env.SUPABASE_SECRET_KEY);
-  console.log("Supabase Service Role Key exists:", !!process.env.SUPABASE_SERVICE_ROLE_KEY);
   
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
-  
-  if (!supabaseUrl || !supabaseKey) {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SECRET_KEY) {
     console.error("Missing Supabase environment variables");
     return NextResponse.json(
       { 
@@ -24,24 +19,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     );
   }
   
-  // Create a service role client to bypass RLS
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
-    supabaseUrl,
-    supabaseKey,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
-          )
-        },
-      },
-    }
-  );
+  // Create a service role client using the new API key system
+  const supabase = createServiceRoleClient();
   
   try {
     console.log(`Fetching invoice items for invoice ID: ${id}`);

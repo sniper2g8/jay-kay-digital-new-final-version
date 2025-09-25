@@ -68,8 +68,18 @@ export const useInvoiceActions = () => {
     if (!user) throw new Error("User not authenticated");
 
     try {
-      // Generate invoice number
-      const invoiceNumber = `INV-${Date.now()}`;
+      // Generate invoice number using counter system
+      const { data: nextNumber, error: counterError } = await supabase.rpc(
+        "get_next_counter",
+        { counter_name: "invoices" }
+      );
+
+      if (counterError) {
+        console.error("Error fetching next invoice counter:", counterError);
+        throw new Error("Failed to generate invoice number. Please try again.");
+      }
+
+      const invoiceNumber = `JKDP-INV-${String(nextNumber).padStart(4, '0')}`;
 
       // Calculate totals
       const subtotal = formData.line_items.reduce(
@@ -86,6 +96,12 @@ export const useInvoiceActions = () => {
       );
       const total = subtotal + taxTotal - discountTotal;
 
+      // Add thank you statement to notes if not already present
+      const thankYouStatement = "\n\nThank you for your business! We appreciate your trust in Jay Kay Digital Press.";
+      const finalNotes = formData.notes ? 
+        `${formData.notes}${thankYouStatement}` : 
+        `Thank you for your business! We appreciate your trust in Jay Kay Digital Press.`;
+
       // Create invoice
       const invoiceData = {
         id: crypto.randomUUID(),
@@ -101,7 +117,7 @@ export const useInvoiceActions = () => {
         total: total,
         amountDue: total,
         amountPaid: 0,
-        notes: formData.notes,
+        notes: finalNotes,
       };
 
       const { error: invoiceError } = await supabase

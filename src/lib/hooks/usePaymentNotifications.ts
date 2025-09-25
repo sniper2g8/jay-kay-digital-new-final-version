@@ -209,6 +209,12 @@ export async function generateInvoiceWithNotification(invoiceData: {
     const tax = invoiceData.tax || 0;
     const grandTotal = subtotal - discount + tax;
 
+    // Add thank you statement to notes if not already present
+    const thankYouStatement = "\n\nThank you for your business! We appreciate your trust in Jay Kay Digital Press.";
+    const finalNotes = invoiceData.notes ? 
+      `${invoiceData.notes}${thankYouStatement}` : 
+      `Thank you for your business! We appreciate your trust in Jay Kay Digital Press.`;
+
     // Create invoice in database
     const { data: invoice, error: insertError } = await supabase
       .from('invoices')
@@ -227,7 +233,7 @@ export async function generateInvoiceWithNotification(invoiceData: {
         discount: discount,
         tax: tax,
         grandTotal: grandTotal,
-        notes: invoiceData.notes,
+        notes: finalNotes,
         created_at: new Date().toISOString()
       })
       .select('id, invoiceNo')
@@ -307,38 +313,27 @@ async function generatePaymentNumber(): Promise<string> {
 }
 
 /**
- * Generate unique invoice number
+ * Generate unique invoice number using counter system
  */
 async function generateInvoiceNumber(): Promise<string> {
-  const currentYear = new Date().getFullYear();
-  const prefix = `JKDP-${currentYear}`;
-  
   try {
-    // Get the latest invoice number for this year
-    const { data: latestInvoice, error } = await supabase
-      .from('invoices')
-      .select('invoiceNo')
-      .like('invoiceNo', `${prefix}%`)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .single();
+    // Use the database counter system to generate invoice number
+    const { data: nextNumber, error } = await supabase.rpc(
+      "get_next_counter",
+      { counter_name: "invoices" }
+    );
 
-    if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
-      console.error('Error fetching latest invoice:', error);
+    if (error) {
+      console.error('Error fetching next invoice counter:', error);
+      // Fallback to timestamp-based number
+      return `JKDP-INV-${Date.now().toString().slice(-4)}`;
     }
 
-    let nextNumber = 1;
-    if (latestInvoice?.invoiceNo) {
-      const match = latestInvoice.invoiceNo.match(/-(\d+)$/);
-      if (match) {
-        nextNumber = parseInt(match[1]) + 1;
-      }
-    }
-
-    return `${prefix}-${nextNumber.toString().padStart(4, '0')}`;
+    // Generate formatted invoice number with JKDP-INV-xxxx format
+    return `JKDP-INV-${String(nextNumber).padStart(4, '0')}`;
   } catch (error) {
     console.error('Error generating invoice number:', error);
     // Fallback to timestamp-based number
-    return `${prefix}-${Date.now().toString().slice(-4)}`;
+    return `JKDP-INV-${Date.now().toString().slice(-4)}`;
   }
 }
