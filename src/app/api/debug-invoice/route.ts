@@ -1,6 +1,16 @@
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase-admin';
 
+// Helper function to safely extract error message
+function getErrorMessage(error: unknown): string | undefined {
+  if (!error) return undefined;
+  if (typeof error === 'string') return error;
+  if (error && typeof error === 'object' && 'message' in error) {
+    return String((error as any).message);
+  }
+  return String(error);
+}
+
 export async function GET() {
   try {
     // Check environment variables
@@ -46,12 +56,12 @@ export async function GET() {
         invoices: {
           success: !testError,
           count: testQuery?.length || 0,
-          error: testError?.message
+          error: getErrorMessage(testError)
         },
         invoice_items: {
           success: !itemsError,
           count: itemsTest?.length || 0,
-          error: itemsError?.message
+          error: getErrorMessage(itemsError)
         }
       }
     });
