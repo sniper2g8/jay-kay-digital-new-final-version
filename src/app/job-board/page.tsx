@@ -29,11 +29,12 @@ interface JobBoardData {
 }
 
 interface WaitingAreaStats {
-  total_jobs: number;
+  total_jobs_today: number;
   in_progress: number;
   pending: number;
   completed_today: number;
   average_wait_time: string;
+  daily_reset_time: string;
 }
 
 const getStatusColor = (status: string) => {
@@ -75,11 +76,12 @@ export default function JobBoard() {
 function JobBoardContent() {
   const [jobs, setJobs] = useState<JobBoardData[]>([]);
   const [stats, setStats] = useState<WaitingAreaStats>({
-    total_jobs: 0,
+    total_jobs_today: 0,
     in_progress: 0,
     pending: 0,
     completed_today: 0,
-    average_wait_time: '0 hours'
+    average_wait_time: '0 hours',
+    daily_reset_time: new Date().toISOString().split('T')[0]
   });
   const [isLoading, setIsLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
@@ -98,8 +100,51 @@ function JobBoardContent() {
         });
       }
 
-      // Fetch jobs with customer information
+      // Fetch jobs with customer information - Get more comprehensive data
       const { data: jobsData, error: jobsError } = await supabase
+        .from('jobs')
+        .select(`
+          id,
+          jobNo,
+          title,
+          status,
+          priority,
+          created_at,
+          updated_at,
+          estimated_delivery,
+          customers!inner(name)
+        `)
+        .not('status', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(50); // Increased limit to show more jobs
+
+      if (jobsError) {
+        console.error('Supabase query error:', jobsError);
+        throw jobsError;
+      }
+
+      // Transform data for display (no customer information for privacy)
+      const transformedJobs: JobBoardData[] = (jobsData || []).map((job, index) => ({
+        id: job.id,
+        job_number: job.jobNo || `JOB-${String(index + 1).padStart(3, '0')}`,
+        title: job.title || `Print Job #${index + 1}`,
+        status: job.status || 'pending',
+        priority: job.priority || 'normal',
+        due_date: job.estimated_delivery || null,
+        created_at: job.created_at || new Date().toISOString(),
+        updated_at: job.updated_at || new Date().toISOString(),
+        estimated_completion: estimateCompletion(job.status || 'pending', job.created_at || new Date().toISOString())
+      }));
+
+      setJobs(transformedJobs);
+
+      // Calculate statistics from real data - DAILY BASIS
+      const today = new Date().toISOString().split('T')[0];
+      const todayStart = `${today}T00:00:00.000Z`;
+      const todayEnd = `${today}T23:59:59.999Z`;
+      
+      // Get today's jobs only (created today)
+      const { data: todaysJobs, error: todaysJobsError } = await supabase
         .from('jobs')
         .select(`
           id,
@@ -110,49 +155,51 @@ function JobBoardContent() {
           created_at,
           updated_at
         `)
-        .in('status', ['pending', 'completed', 'Completed', 'in_progress'])
-        .order('created_at', { ascending: false })
-        .limit(20);
+        .gte('created_at', todayStart)
+        .lte('created_at', todayEnd)
+        .order('created_at', { ascending: false });
 
-      if (jobsError) {
-        console.error('Supabase query error:', jobsError);
-        throw jobsError;
+      if (todaysJobsError) {
+        console.error('Error fetching today\'s jobs:', todaysJobsError);
       }
 
-      // Transform data for display (no customer information for privacy)
-      const transformedJobs: JobBoardData[] = (jobsData || []).map(job => ({
+      const todaysJobsData = todaysJobs || [];
+      const totalJobsToday = todaysJobsData.length;
+      
+      // For display purposes, still show recent jobs but calculate stats from today's jobs only
+      const allDisplayJobs = transformedJobs; // Keep for display
+      const todayTransformed = todaysJobsData.map((job, index) => ({
         id: job.id,
-        job_number: job.jobNo || 'N/A',
-        title: job.title || 'Print Job',
+        job_number: job.jobNo || `JOB-${String(index + 1).padStart(3, '0')}`,
+        title: job.title || `Print Job #${index + 1}`,
         status: job.status || 'pending',
         priority: job.priority || 'normal',
-        due_date: null, // Due date not available in this format
-        created_at: job.created_at || '',
-        updated_at: job.updated_at || '',
-        estimated_completion: estimateCompletion(job.status || 'pending', job.created_at || '')
+        due_date: null,
+        created_at: job.created_at || new Date().toISOString(),
+        updated_at: job.updated_at || new Date().toISOString(),
+        estimated_completion: estimateCompletion(job.status || 'pending', job.created_at || new Date().toISOString())
       }));
-
-      setJobs(transformedJobs);
-
-      // Calculate statistics
-      const today = new Date().toISOString().split('T')[0];
-      const totalJobs = transformedJobs.length;
-      const inProgress = transformedJobs.filter(j => j.status === 'in_progress').length;
-      const pending = transformedJobs.filter(j => j.status === 'pending').length;
       
-      // Get completed jobs today
-      const { count: completedToday } = await supabase
+      // Calculate today's statistics
+      const inProgressToday = todayTransformed.filter(j => ['in_progress', 'in progress', 'printing', 'processing'].includes(j.status?.toLowerCase())).length;
+      const pendingToday = todayTransformed.filter(j => ['pending', 'submitted', 'received', 'queued'].includes(j.status?.toLowerCase())).length;
+      const completedToday = todayTransformed.filter(j => ['completed', 'finished', 'ready'].includes(j.status?.toLowerCase())).length;
+      
+      // Also get completed jobs that were updated today (not necessarily created today)
+      const { count: completedUpdatedToday } = await supabase
         .from('jobs')
         .select('*', { count: 'exact', head: true })
-        .eq('status', 'completed')
-        .gte('updated_at', today);
+        .ilike('status', 'completed')
+        .gte('updated_at', todayStart)
+        .lte('updated_at', todayEnd);
 
       setStats({
-        total_jobs: totalJobs,
-        in_progress: inProgress,
-        pending: pending,
-        completed_today: completedToday || 0,
-        average_wait_time: calculateAverageWaitTime(transformedJobs)
+        total_jobs_today: totalJobsToday,
+        in_progress: inProgressToday,
+        pending: pendingToday,
+        completed_today: Math.max(completedToday, completedUpdatedToday || 0),
+        average_wait_time: calculateAverageWaitTime(todayTransformed),
+        daily_reset_time: today
       });
 
       setLastUpdated(new Date());
@@ -212,11 +259,12 @@ function JobBoardContent() {
       // Set empty state with user-friendly message
       setJobs([]);
       setStats({
-        total_jobs: 0,
+        total_jobs_today: 0,
         in_progress: 0,
         pending: 0,
         completed_today: 0,
-        average_wait_time: '0 mins'
+        average_wait_time: '0 mins',
+        daily_reset_time: new Date().toISOString().split('T')[0]
       });
     } finally {
       setIsLoading(false);
@@ -243,17 +291,27 @@ function JobBoardContent() {
   };
 
   const calculateAverageWaitTime = (jobs: JobBoardData[]): string => {
-    const activeJobs = jobs.filter(j => ['pending', 'in_progress'].includes(j.status));
-    if (activeJobs.length === 0) return '0 hours';
+    const activeJobs = jobs.filter(j => 
+      ['pending', 'submitted', 'received', 'queued', 'in_progress', 'in progress', 'printing', 'processing'].includes(j.status?.toLowerCase())
+    );
+    
+    if (activeJobs.length === 0) return '0 mins';
 
-    const totalHours = activeJobs.reduce((sum, job) => {
+    const totalMinutes = activeJobs.reduce((sum, job) => {
       const created = new Date(job.created_at);
       const now = new Date();
-      return sum + Math.floor((now.getTime() - created.getTime()) / (1000 * 60 * 60));
+      return sum + Math.floor((now.getTime() - created.getTime()) / (1000 * 60));
     }, 0);
 
-    const averageHours = Math.floor(totalHours / activeJobs.length);
-    return `${averageHours} hours`;
+    const averageMinutes = Math.floor(totalMinutes / activeJobs.length);
+    
+    if (averageMinutes < 60) {
+      return `${averageMinutes} mins`;
+    } else {
+      const hours = Math.floor(averageMinutes / 60);
+      const remainingMins = averageMinutes % 60;
+      return remainingMins > 0 ? `${hours}h ${remainingMins}m` : `${hours} hours`;
+    }
   };
 
   useEffect(() => {
@@ -310,12 +368,12 @@ function JobBoardContent() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Jobs</CardTitle>
+            <CardTitle className="text-sm font-medium">Jobs Created Today</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.total_jobs}</div>
-            <p className="text-xs text-muted-foreground">Active jobs in queue</p>
+            <div className="text-2xl font-bold">{stats.total_jobs_today}</div>
+            <p className="text-xs text-muted-foreground">New jobs since midnight</p>
           </CardContent>
         </Card>
 
@@ -353,13 +411,24 @@ function JobBoardContent() {
         </Card>
       </div>
 
-      {/* Average Wait Time Banner */}
+      {/* Daily Statistics Banner */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-        <div className="flex items-center justify-center space-x-4">
-          <Timer className="h-5 w-5 text-blue-600" />
-          <span className="text-lg font-medium text-blue-900">
-            Average Wait Time: {stats.average_wait_time}
-          </span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Timer className="h-5 w-5 text-blue-600" />
+            <div>
+              <span className="text-lg font-medium text-blue-900">
+                Daily Statistics - {new Date().toLocaleDateString()}
+              </span>
+              <p className="text-sm text-blue-700">
+                Average Wait Time: {stats.average_wait_time} | Created: {stats.total_jobs_today} | Completed: {stats.completed_today}
+              </p>
+            </div>
+          </div>
+          <div className="text-right text-sm text-blue-600">
+            <p>Resets at midnight</p>
+            <p className="text-xs">{new Date().toLocaleTimeString()}</p>
+          </div>
         </div>
       </div>
 
@@ -370,14 +439,21 @@ function JobBoardContent() {
           <CardHeader className="bg-blue-50">
             <CardTitle className="flex items-center space-x-2">
               <Printer className="h-5 w-5 text-blue-600" />
-              <span>In Progress ({jobs.filter(j => j.status === 'in_progress').length})</span>
+              <span>In Progress ({jobs.filter(j => ['in_progress', 'in progress', 'printing', 'processing'].includes(j.status?.toLowerCase())).length})</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 space-y-3">
-            {jobs.filter(j => j.status === 'in_progress').map(job => (
-              <JobCard key={job.id} job={job} showEstimate />
-            ))}
-            {jobs.filter(j => j.status === 'in_progress').length === 0 && (
+            {isLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <RefreshCw className="h-5 w-5 animate-spin mr-2" />
+                <span>Loading active jobs...</span>
+              </div>
+            ) : (
+              jobs.filter(j => ['in_progress', 'in progress', 'printing', 'processing'].includes(j.status?.toLowerCase())).map(job => (
+                <JobCard key={job.id} job={job} showEstimate />
+              ))
+            )}
+            {!isLoading && jobs.filter(j => ['in_progress', 'in progress', 'printing', 'processing'].includes(j.status?.toLowerCase())).length === 0 && (
               <p className="text-center text-gray-500 py-4">No jobs in progress</p>
             )}
           </CardContent>
@@ -388,14 +464,21 @@ function JobBoardContent() {
           <CardHeader className="bg-yellow-50">
             <CardTitle className="flex items-center space-x-2">
               <Clock className="h-5 w-5 text-yellow-600" />
-              <span>Waiting Queue ({jobs.filter(j => j.status === 'pending').length})</span>
+              <span>Waiting Queue ({jobs.filter(j => ['pending', 'submitted', 'received', 'queued'].includes(j.status?.toLowerCase())).length})</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 space-y-3">
-            {jobs.filter(j => j.status === 'pending').map(job => (
-              <JobCard key={job.id} job={job} showEstimate />
-            ))}
-            {jobs.filter(j => j.status === 'pending').length === 0 && (
+            {isLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <RefreshCw className="h-5 w-5 animate-spin mr-2" />
+                <span>Loading pending jobs...</span>
+              </div>
+            ) : (
+              jobs.filter(j => ['pending', 'submitted', 'received', 'queued'].includes(j.status?.toLowerCase())).map(job => (
+                <JobCard key={job.id} job={job} showEstimate />
+              ))
+            )}
+            {!isLoading && jobs.filter(j => ['pending', 'submitted', 'received', 'queued'].includes(j.status?.toLowerCase())).length === 0 && (
               <p className="text-center text-gray-500 py-4">No jobs waiting</p>
             )}
           </CardContent>
@@ -406,14 +489,21 @@ function JobBoardContent() {
           <CardHeader className="bg-green-50">
             <CardTitle className="flex items-center space-x-2">
               <CheckCircle className="h-5 w-5 text-green-600" />
-              <span>Recently Completed</span>
+              <span>Recently Completed ({jobs.filter(j => ['completed', 'finished', 'ready'].includes(j.status?.toLowerCase())).length})</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 space-y-3">
-            {jobs.filter(j => j.status === 'completed').slice(0, 5).map(job => (
-              <JobCard key={job.id} job={job} showPickup />
-            ))}
-            {jobs.filter(j => j.status === 'completed').length === 0 && (
+            {isLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <RefreshCw className="h-5 w-5 animate-spin mr-2" />
+                <span>Loading completed jobs...</span>
+              </div>
+            ) : (
+              jobs.filter(j => ['completed', 'finished', 'ready'].includes(j.status?.toLowerCase())).slice(0, 10).map(job => (
+                <JobCard key={job.id} job={job} showPickup />
+              ))
+            )}
+            {!isLoading && jobs.filter(j => ['completed', 'finished', 'ready'].includes(j.status?.toLowerCase())).length === 0 && (
               <p className="text-center text-gray-500 py-4">No recent completions</p>
             )}
           </CardContent>
@@ -422,8 +512,9 @@ function JobBoardContent() {
 
       {/* Footer */}
       <div className="mt-8 text-center text-gray-500 text-sm">
-        <p>Updates automatically every 30 seconds | For assistance, contact our team</p>
+        <p>Updates automatically every 30 seconds | Daily statistics reset at midnight</p>
         <p className="mt-1 text-xs">Only job numbers are displayed for privacy protection</p>
+        <p className="mt-1 text-xs font-medium">Today's Workload: {stats.total_jobs_today} jobs created | {stats.completed_today} completed</p>
       </div>
     </div>
   );
