@@ -41,13 +41,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     return NextResponse.json(
       { 
         error: "Server configuration error",
-        details: "Missing Supabase environment variables",
-        debug_info: {
-          SUPABASE_URL: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-          SUPABASE_SECRET_KEY: !!process.env.SUPABASE_SECRET_KEY,
-          SUPABASE_SERVICE_ROLE_KEY: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
-          NODE_ENV: process.env.NODE_ENV
-        }
+        details: "Missing required server configuration"
       },
       { status: 500 },
     );
@@ -145,28 +139,37 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       // This is a fallback for cases where job_id wasn't stored properly
       const itemsStillMissingJobNo = enriched.filter((row: any) => !row.job_no);
       if (itemsStillMissingJobNo.length > 0) {
+        // Extract all potential job numbers from descriptions and batch-lookup
+        const jobNoRegex = /JKDP-JOB-\d+/g;
+        const potentialJobNos = Array.from(new Set(
+          itemsStillMissingJobNo.flatMap((item: any) => {
+            if (!item?.description || typeof item.description !== 'string') return [] as string[];
+            const matches = item.description.match(jobNoRegex);
+            return matches ? matches : [];
+          })
+        ));
 
-        
-        // Try to extract job numbers from descriptions like "Job: JKDP-JOB-0001" or "JKDP-JOB-0001"
-        for (const item of itemsStillMissingJobNo) {
-          if (item.description) {
-            const jobNoMatch = item.description.match(/JKDP-JOB-\d+/);
-            if (jobNoMatch) {
-              const potentialJobNo = jobNoMatch[0];
-              // Verify this job number exists in the jobs table
-              const { data: matchingJob } = await supabase
-                .from('jobs')
-                .select('id, jobNo')
-                .eq('jobNo', potentialJobNo)
-                .single();
-              
-              if (matchingJob) {
-                item.job_no = matchingJob.jobNo;
-                item.job_id = matchingJob.id;
+        if (potentialJobNos.length > 0) {
+          const { data: jobsByNo } = await supabase
+            .from('jobs')
+            .select('id, jobNo')
+            .in('jobNo', potentialJobNos);
 
-              }
+          const jobByNoMap = new Map<string, { id: string; jobNo: string }>();
+          (jobsByNo || []).forEach((j: any) => {
+            if (j?.jobNo && j?.id) jobByNoMap.set(j.jobNo, { id: j.id, jobNo: j.jobNo });
+          });
+
+          itemsStillMissingJobNo.forEach((item: any) => {
+            if (!item?.description || typeof item.description !== 'string') return;
+            const match = item.description.match(jobNoRegex)?.[0];
+            if (!match) return;
+            const job = jobByNoMap.get(match);
+            if (job) {
+              item.job_no = job.jobNo;
+              item.job_id = job.id;
             }
-          }
+          });
         }
       }
     } catch (e) {

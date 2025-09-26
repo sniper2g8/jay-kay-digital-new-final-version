@@ -18,8 +18,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     
     if (!envStatus.SUPABASE_URL || !envStatus.SUPABASE_SERVICE_ROLE_KEY) {
       return NextResponse.json({
-        error: 'Missing environment variables',
-        env_status: envStatus
+        error: 'Missing environment variables'
       }, { status: 500 });
     }
     
@@ -37,8 +36,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
       return NextResponse.json({
         error: 'Invoice query failed',
-        details: invoiceError,
-        env_status: envStatus
+        details: invoiceError?.message || 'Unknown error'
       }, { status: 404 });
     }
     
@@ -54,9 +52,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
       return NextResponse.json({
         error: 'Invoice items query failed',
-        details: itemsError,
-        invoice_found: invoice,
-        env_status: envStatus
+        details: itemsError?.message || 'Unknown error'
       }, { status: 500 });
     }
     
@@ -67,7 +63,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       invoice: invoice,
       items_count: count,
       items: items,
-      env_status: envStatus,
       message: 'Test successful'
     });
     
