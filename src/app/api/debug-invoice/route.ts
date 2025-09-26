@@ -22,7 +22,7 @@ export async function GET() {
       SUPABASE_SECRET_KEY: !!process.env.SUPABASE_SECRET_KEY,
     };
 
-    console.log('Environment variables check:', envCheck);
+
 
     // Test service role client creation
     const supabase = createServiceRoleClient();
@@ -67,7 +67,7 @@ export async function GET() {
     });
 
   } catch (error) {
-    console.error('API test error:', error);
+
     return NextResponse.json({
       success: false,
       error: 'API test failed',

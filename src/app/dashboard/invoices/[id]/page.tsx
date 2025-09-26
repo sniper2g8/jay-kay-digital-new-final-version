@@ -45,13 +45,9 @@ export default function InvoiceDetails() {
             setHeaderInvoiceNo(inv?.invoiceNo ?? null)
           }
         } catch {}
-        console.log(`Fetching invoice items for invoice ID: ${invoiceId}`);
+
         
-        // Add more detailed debugging
-        console.log('Environment check:', {
-          url: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-          key: !!process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
-        });
+
         
         const itemsResponse = await fetch(`/api/invoice-items/${invoiceId}`, {
           method: 'GET',
@@ -61,19 +57,12 @@ export default function InvoiceDetails() {
           credentials: 'include'
         })
         
-        console.log("API response status:", itemsResponse.status);
         const itemsData = await itemsResponse.json()
-        console.log("API response data:", itemsData);
         
         if (!itemsResponse.ok) {
-          console.error("Error fetching invoice items:", {
-            status: itemsResponse.status,
-            statusText: itemsResponse.statusText,
-            data: itemsData
-          });
+
           
           // Try fallback: Direct database query
-          console.log('Attempting fallback direct database query...');
           try {
             const { data: fallbackItems, error: fallbackError } = await supabase
               .from('invoice_items')
@@ -84,12 +73,12 @@ export default function InvoiceDetails() {
               throw fallbackError;
             }
             
-            console.log('Fallback query successful:', fallbackItems);
+
             setItems(fallbackItems || []);
             setError(null);
             return;
           } catch (fallbackErr) {
-            console.error('Fallback query also failed:', fallbackErr);
+
           }
           
           // If both approaches fail, show detailed error
@@ -103,7 +92,7 @@ export default function InvoiceDetails() {
         setItems(itemsData)
         setError(null)
       } catch (err) {
-        console.error("Error in fetchInvoiceItems:", err);
+
         setError('Failed to load invoice details')
       } finally {
         setLoading(false)

@@ -5,7 +5,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   const { id } = await params;
   
   try {
-    console.log(`[TEST] Testing invoice items for ID: ${id}`);
+
     
     // Check environment variables
     const envStatus = {
@@ -14,7 +14,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       SUPABASE_SERVICE_ROLE_KEY: !!process.env.SUPABASE_SERVICE_ROLE_KEY || !!process.env.SUPABASE_SECRET_KEY,
     };
     
-    console.log('[TEST] Environment variables:', envStatus);
+
     
     if (!envStatus.SUPABASE_URL || !envStatus.SUPABASE_SERVICE_ROLE_KEY) {
       return NextResponse.json({
@@ -27,7 +27,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     const supabase = createServiceRoleClient();
     
     // First test: Check if invoice exists
-    console.log('[TEST] Checking if invoice exists...');
     const { data: invoice, error: invoiceError } = await supabase
       .from('invoices')
       .select('id, invoiceNo, customerName')
@@ -35,7 +34,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       .single();
       
     if (invoiceError) {
-      console.error('[TEST] Invoice query error:', invoiceError);
+
       return NextResponse.json({
         error: 'Invoice query failed',
         details: invoiceError,
@@ -43,17 +42,16 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       }, { status: 404 });
     }
     
-    console.log('[TEST] Invoice found:', invoice);
+
     
     // Second test: Check invoice_items table
-    console.log('[TEST] Checking invoice_items...');
     const { data: items, error: itemsError, count } = await supabase
       .from('invoice_items')
       .select('*', { count: 'exact' })
       .eq('invoice_id', id);
       
     if (itemsError) {
-      console.error('[TEST] Invoice items query error:', itemsError);
+
       return NextResponse.json({
         error: 'Invoice items query failed',
         details: itemsError,
@@ -62,7 +60,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       }, { status: 500 });
     }
     
-    console.log(`[TEST] Found ${count} invoice items`);
+
     
     return NextResponse.json({
       success: true,
@@ -74,7 +72,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     });
     
   } catch (error) {
-    console.error('[TEST] Unexpected error:', error);
+
     return NextResponse.json({
       error: 'Unexpected error',
       details: error instanceof Error ? error.message : 'Unknown error'
