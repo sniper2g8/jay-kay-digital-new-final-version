@@ -238,7 +238,7 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
             className="flex items-center space-x-2"
           >
             <FileText className="h-4 w-4" />
-            <span>Print</span>
+            <span className="text-xs">Print</span>
           </Button>
           <Button 
             onClick={generatePDF}
@@ -246,19 +246,19 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
             className="flex items-center space-x-2 bg-red-600 hover:bg-red-700"
           >
             <Download className="h-4 w-4" />
-            <span>Download PDF</span>
+            <span className="text-xs">Download PDF</span>
           </Button>
         </div>
       )}
 
       {/* Simplified Invoice Template */}
       <div ref={invoiceRef} className="bg-white" data-export-root>
-        <div className="bg-white p-8 max-w-4xl mx-auto font-sans relative">
+        <div className="bg-white p-6 max-w-4xl mx-auto font-sans relative">
           {/* Watermark */}
           <img
             src="/jaykay_logo.png"
             alt=""
-            className="pointer-events-none select-none opacity-5 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-2/3 h-auto"
+            className="pointer-events-none select-none opacity-3 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-2/3 h-auto"
             crossOrigin="anonymous"
             aria-hidden="true"
           />
@@ -266,7 +266,7 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
           <style jsx>{`
             @media print {
               @page {
-                margin: 0.5in;
+                margin: 0.4in;
                 size: A4;
               }
               .print\\:hidden {
@@ -282,31 +282,31 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
           `}</style>
 
           {/* Header */}
-          <div className="border-b border-gray-200 pb-8 mb-8 relative z-10">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-6">
+          <div className="border-b border-gray-200 pb-6 mb-6 relative z-10">
+            <div className="flex justify-between items-start">
+              <div className="flex items-start gap-4">
                 {/* Logo */}
                 <div className="flex-shrink-0">
                   <img 
-                    src="/JK_Logo.jpg" 
+                    src="/JK_LogoINV.jpg" 
                     alt="Jay Kay Digital Press Logo" 
-                    className="w-20 h-20 object-contain"
+                    className="w-26 h-28 object-contain"
                     crossOrigin="anonymous"
                   />
                 </div>
                 {/* Company Info */}
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-900 mb-1">JAY KAY DIGITAL PRESS</h1>
-                  <p className="text-sm text-gray-600 mb-1">Professional Printing & Digital Services</p>
-                  <p className="text-sm text-gray-600 mb-1">Freetown, Sierra Leone</p>
-                  <p className="text-sm text-gray-600 mb-1">Tel: +232 34 788711 | +232 30 741062</p>
-                  <p className="text-sm text-gray-600">Email: info@jaykaydigitalpress.com</p>
+                  <h1 className="text-xl font-bold text-gray-900 mb-2">JAY KAY DIGITAL PRESS</h1>
+                  <p className="text-xs text-gray-600 mb-1">Professional Printing & Digital Services</p>
+                  <p className="text-xs text-gray-600 mb-1">Freetown, Sierra Leone</p>
+                  <p className="text-xs text-gray-600 mb-1">Tel: +232 34 788711 | +232 30 741062</p>
+                  <p className="text-xs text-gray-600">Email: info@jaykaydigitalpress.com</p>
                 </div>
               </div>
               <div className="text-right">
-                <div className="bg-gray-50 p-6 rounded-lg">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-3">INVOICE</h2>
-                  <div className="space-y-2 text-sm">
+                <div className="bg-gray-50 p-4 rounded-md">
+                  <h2 className="text-lg font-bold text-gray-900 mb-2">INVOICE</h2>
+                  <div className="space-y-1 text-xs">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Invoice No:</span>
                       <span className="font-medium">#{invoice.invoiceNo || `JKDP-INV-${invoice.id.slice(0, 8)}`}</span>
@@ -326,101 +326,85 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
           </div>
 
           {/* Bill To */}
-          <div className="mb-8 flex justify-between items-start relative z-10">
+          <div className="mb-6 flex justify-between items-start relative z-10">
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                <span className="bg-red-300 text-white-100 px-3 py-1 rounded-full text-sm font-medium mr-3">Bill To</span>
-              </h3>
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">Bill To</h3>
               {customer ? (
                 <div className="text-gray-700 space-y-1">
-                  <p className="font-semibold text-lg text-gray-900 flex items-center gap-2">
-                    <Building2 className="w-4 h-4 text-gray-500" /> {customer.business_name}
-                  </p>
+                  <p className="font-semibold text-gray-900">{customer.business_name}</p>
                   {customer.contact_person && (
-                    <p className="text-gray-600 flex items-center gap-2">
-                      <User className="w-4 h-4" /> {customer.contact_person}
-                    </p>
+                    <p className="text-gray-600 text-xs">{customer.contact_person}</p>
                   )}
                   {customer.address && (
-                    <p className="text-gray-600 flex items-center gap-2">
-                      <MapPin className="w-4 h-4" /> {customer.address}
-                    </p>
+                    <p className="text-gray-600 text-xs">{customer.address}</p>
                   )}
                   {customer.city && (
-                    <p className="text-gray-600 flex items-center gap-2">
-                      <MapPin className="w-4 h-4" /> {[customer.city, customer.state, customer.zip_code].filter(Boolean).join(", ")}
-                    </p>
+                    <p className="text-gray-600 text-xs">{[customer.city, customer.state, customer.zip_code].filter(Boolean).join(", ")}</p>
                   )}
                   {customer.country && (
-                    <p className="text-gray-600 flex items-center gap-2">
-                      <MapPin className="w-4 h-4" /> {customer.country}
-                    </p>
+                    <p className="text-gray-600 text-xs">{customer.country}</p>
                   )}
                   {customer.phone && (
-                    <p className="text-gray-600 flex items-center gap-2">
-                      <Phone className="w-4 h-4" /> {customer.phone}
-                    </p>
+                    <p className="text-gray-600 text-xs">Phone: {customer.phone}</p>
                   )}
                   {customer.email && (
-                    <p className="text-gray-600 flex items-center gap-2">
-                      <Mail className="w-4 h-4" /> {customer.email}
-                    </p>
+                    <p className="text-gray-600 text-xs">Email: {customer.email}</p>
                   )}
                 </div>
               ) : (
-                <p className="text-gray-500 italic">Customer information not available</p>
+                <p className="text-gray-500 italic text-sm">Customer information not available</p>
               )}
             </div>
             
             {/* QR Code */}
             {qrCodeDataUrl && (
-              <div className="bg-white p-4 rounded-xl border border-gray-200 ml-8">
-                <div className="text-center mb-2">
-                  <QrCode className="w-5 h-5 text-gray-600 mx-auto mb-1" />
-                  <p className="text-xs text-gray-600 font-medium">Invoice Details</p>
+              <div className="bg-white p-3 rounded-lg border border-gray-200 ml-6">
+                <div className="text-center mb-1">
+                  <QrCode className="w-4 h-4 text-gray-600 mx-auto mb-1" />
+                  <p className="text-[10px] text-gray-600 font-medium">Invoice Details</p>
                 </div>
                 <img 
                   src={qrCodeDataUrl} 
                   alt="Invoice QR Code" 
-                  className="w-24 h-24 mx-auto"
+                  className="w-20 h-20 mx-auto"
                 />
-                <p className="text-xs text-gray-500 text-center mt-2">
-                  Invoice #{invoice.invoiceNo || `JKDP-INV-${invoice.id.slice(0, 8)}`}
+                <p className="text-[10px] text-gray-500 text-center mt-1">
+                  #{invoice.invoiceNo || `JKDP-INV-${invoice.id.slice(0, 8)}`}
                 </p>
               </div>
             )}
           </div>
 
           {/* Items Table */}
-          <div className="mb-8 relative z-10">
+          <div className="mb-6 relative z-10">
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-gray-100">
-                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold text-gray-700">Job No</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold text-gray-700">Description</th>
-                  <th className="border border-gray-300 px-4 py-2 text-right text-sm font-semibold text-gray-700">Qty</th>
-                  <th className="border border-gray-300 px-4 py-2 text-right text-sm font-semibold text-gray-700">Unit Price</th>
-                  <th className="border border-gray-300 px-4 py-2 text-right text-sm font-semibold text-gray-700">Total</th>
+                  <th className="border border-gray-300 px-3 py-2 text-left text-xs font-semibold text-gray-700 w-[18%]">Job No</th>
+                  <th className="border border-gray-300 px-3 py-2 text-left text-xs font-semibold text-gray-700 w-[37%]">Description</th>
+                  <th className="border border-gray-300 px-3 py-2 text-right text-xs font-semibold text-gray-700 w-[15%]">Qty</th>
+                  <th className="border border-gray-300 px-3 py-2 text-right text-xs font-semibold text-gray-700 w-[15%]">Unit Price</th>
+                  <th className="border border-gray-300 px-3 py-2 text-right text-xs font-semibold text-gray-700 w-[15%]">Total</th>
                 </tr>
               </thead>
               <tbody>
                 {items.map((item, index) => (
                   <tr key={item.id || index}>
-                    <td className="border border-gray-300 px-4 py-2 text-sm">
+                    <td className="border border-gray-300 px-3 py-2 text-xs">
                       {item.job_no || '-'}
                     </td>
-                    <td className="border border-gray-300 px-4 py-2 text-sm">
+                    <td className="border border-gray-300 px-3 py-2 text-xs">
                       <div>{item.description}</div>
-                      {item.notes && <div className="text-gray-500 text-xs mt-1">{item.notes}</div>}
+                      {item.notes && <div className="text-gray-500 text-[10px] mt-1">{item.notes}</div>}
                     </td>
-                    <td className="border border-gray-300 px-4 py-2 text-right text-sm">{item.quantity.toLocaleString()}</td>
-                    <td className="border border-gray-300 px-4 py-2 text-right text-sm">{formatCurrency(item.unit_price)}</td>
-                    <td className="border border-gray-300 px-4 py-2 text-right text-sm font-medium">{formatCurrency(item.total_price)}</td>
+                    <td className="border border-gray-300 px-3 py-2 text-right text-xs">{item.quantity.toLocaleString()}</td>
+                    <td className="border border-gray-300 px-3 py-2 text-right text-xs">{formatCurrency(item.unit_price)}</td>
+                    <td className="border border-gray-300 px-3 py-2 text-right text-xs font-medium">{formatCurrency(item.total_price)}</td>
                   </tr>
                 ))}
                 {items.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="border border-gray-300 px-4 py-8 text-center text-gray-500">
+                    <td colSpan={5} className="border border-gray-300 px-3 py-6 text-center text-gray-500 text-xs">
                       No items found on this invoice
                     </td>
                   </tr>
@@ -430,40 +414,40 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
           </div>
 
           {/* Totals */}
-          <div className="ml-auto w-full max-w-xs relative z-10">
+          <div className="ml-auto w-full max-w-[200px] relative z-10">
             <table className="w-full border-collapse">
               <tbody>
                 <tr>
-                  <td className="px-4 py-1 text-sm text-gray-600">Subtotal:</td>
-                  <td className="px-4 py-1 text-right text-sm">{formatCurrency(subtotal)}</td>
+                  <td className="px-3 py-1 text-xs text-gray-600">Subtotal:</td>
+                  <td className="px-3 py-1 text-right text-xs">{formatCurrency(subtotal)}</td>
                 </tr>
                 {tax > 0 && (
                   <tr>
-                    <td className="px-4 py-1 text-sm text-gray-600">
+                    <td className="px-3 py-1 text-xs text-gray-600">
                       Tax {taxRate > 0 ? `(${taxRate}%)` : ''}:
                     </td>
-                    <td className="px-4 py-1 text-right text-sm">{formatCurrency(tax)}</td>
+                    <td className="px-3 py-1 text-right text-xs">{formatCurrency(tax)}</td>
                   </tr>
                 )}
                 {discount > 0 && (
                   <tr>
-                    <td className="px-4 py-1 text-sm text-gray-600">Discount:</td>
-                    <td className="px-4 py-1 text-right text-sm">-{formatCurrency(discount)}</td>
+                    <td className="px-3 py-1 text-xs text-gray-600">Discount:</td>
+                    <td className="px-3 py-1 text-right text-xs">-{formatCurrency(discount)}</td>
                   </tr>
                 )}
                 <tr className="border-t border-gray-300">
-                  <td className="px-4 py-2 font-semibold">Total:</td>
-                  <td className="px-4 py-2 text-right font-bold text-lg">{formatCurrency(total)}</td>
+                  <td className="px-3 py-1 font-semibold text-xs">Total:</td>
+                  <td className="px-3 py-1 text-right font-semibold text-xs">{formatCurrency(total)}</td>
                 </tr>
                 {amountPaid > 0 && (
                   <>
                     <tr>
-                      <td className="px-4 py-1 text-sm text-gray-600">Amount Paid:</td>
-                      <td className="px-4 py-1 text-right text-sm text-green-600">{formatCurrency(amountPaid)}</td>
+                      <td className="px-3 py-1 text-xs text-gray-600">Amount Paid:</td>
+                      <td className="px-3 py-1 text-right text-xs text-green-600">{formatCurrency(amountPaid)}</td>
                     </tr>
                     <tr className="border-t border-gray-300">
-                      <td className="px-4 py-2 font-semibold">Amount Due:</td>
-                      <td className="px-4 py-2 text-right font-bold text-lg">
+                      <td className="px-3 py-1 font-semibold text-xs">Amount Due:</td>
+                      <td className="px-3 py-1 text-right font-semibold text-xs">
                         <span className={amountDue > 0 ? "text-orange-600" : "text-green-600"}>
                           {formatCurrency(amountDue)}
                         </span>
@@ -477,9 +461,9 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
 
           {/* Notes */}
           {invoice.notes && (
-            <div className="mt-8 pt-6 border-t border-gray-300 relative z-10">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Notes:</h3>
-              <p className="text-gray-700 whitespace-pre-wrap">{invoice.notes}</p>
+            <div className="mt-6 pt-4 border-t border-gray-300 relative z-10">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">Notes:</h3>
+              <p className="text-gray-700 text-xs whitespace-pre-wrap">{invoice.notes}</p>
             </div>
           )}
 

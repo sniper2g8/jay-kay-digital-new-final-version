@@ -15,7 +15,7 @@ interface JobDetails {
   id: string;
   title: string;
   description: string;
-  status: "pending" | "in_progress" | "completed" | "cancelled";
+  status: "pending" | "in_progress" | "completed" | "cancelled" | "on_hold";
   customer_email: string;
   customer_name: string;
   amount?: number;

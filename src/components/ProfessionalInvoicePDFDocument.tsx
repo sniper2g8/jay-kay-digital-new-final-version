@@ -49,35 +49,132 @@ export interface InvoicePDFDocumentProps {
 
 const styles = StyleSheet.create({
   page: {
-    padding: 32,
-    fontSize: 11,
-    fontFamily: 'Helvetica'
+    padding: 25,
+    fontSize: 7,
+    fontFamily: 'Helvetica',
+    backgroundColor: '#FFFFFF'
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 16,
+    marginBottom: 10,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB'
   },
   watermark: {
     position: 'absolute',
-    top: '35%',
-    left: '15%',
-    width: '70%','height':'auto',
-    opacity: 0.06,
+    top: '40%',
+    left: '25%',
+    width: '50%',
+    height: 'auto',
+    opacity: 0.02,
   },
-  company: { fontSize: 16, fontWeight: 700 },
-  small: { color: '#4b5563', marginTop: 2 },
-  sectionTitle: { fontSize: 12, fontWeight: 700, marginBottom: 6 },
-  row: { flexDirection: 'row', gap: 8 },
-  cell: { flex: 1 },
-  tableHeader: { flexDirection: 'row', backgroundColor: '#f3f4f6', padding: 6, borderTop: 1, borderColor: '#e5e7eb' },
-  th: { flex: 1, fontWeight: 700 },
-  tableRow: { flexDirection: 'row', padding: 6, borderTop: 1, borderColor: '#e5e7eb' },
-  td: { flex: 1 },
-  right: { textAlign: 'right' },
-  totals: { marginLeft: 'auto', width: 220, marginTop: 8 },
-  totalsRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 2 },
+  logo: {
+    width: 50,
+    height: 50,
+    marginBottom: 6
+  },
+  company: { 
+    fontSize: 10, 
+    fontWeight: 400,
+    color: '#111827',
+    marginBottom: 1
+  },
+  companyInfo: {
+    fontSize: 6,
+    color: '#6B7280',
+    marginBottom: 1
+  },
+  sectionTitle: { 
+    fontSize: 8, 
+    fontWeight: 700, 
+    marginBottom: 4,
+    color: '#111827'
+  },
+  row: { 
+    flexDirection: 'row', 
+    gap: 4 
+  },
+  cell: { 
+    flex: 1 
+  },
+  tableHeader: { 
+    flexDirection: 'row', 
+    backgroundColor: '#F9FAFB', 
+    padding: 4, 
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: '#E5E7EB'
+  },
+  th: { 
+    flex: 1, 
+    fontWeight: 700,
+    fontSize: 7,
+    color: '#374151'
+  },
+  tableRow: { 
+    flexDirection: 'row', 
+    padding: 4, 
+    borderBottomWidth: 1, 
+    borderColor: '#E5E7EB'
+  },
+  td: { 
+    flex: 1,
+    fontSize: 6,
+    color: '#111827'
+  },
+  right: { 
+    textAlign: 'right' 
+  },
+  totalsContainer: {
+    marginLeft: 'auto',
+    width: 160,
+    marginTop: 8
+  },
+  totalsRow: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    paddingVertical: 1 
+  },
+  bold: {
+    fontWeight: 400
+  },
+  billToContainer: {
+    marginBottom: 10
+  },
+  billToContent: {
+    fontSize: 6,
+    color: '#111827'
+  },
+  billToLabel: {
+    fontWeight: 700,
+    marginBottom: 1
+  },
+  notesContainer: {
+    marginTop: 10,
+    paddingTop: 6,
+    borderTopWidth: 1,
+    borderColor: '#E5E7EB'
+  },
+  invoiceDetails: {
+    textAlign: 'right'
+  },
+  invoiceTitle: {
+    fontSize: 12,
+    fontWeight: 700,
+    color: '#111827',
+    marginBottom: 4
+  },
+  invoiceDetail: {
+    fontSize: 6,
+    marginBottom: 1,
+    color: '#111827'
+  },
+  invoiceDetailLabel: {
+    color: '#6B7280'
+  }
 });
 
 export function InvoicePDFDocument({ invoice, customer, items }: InvoicePDFDocumentProps) {
@@ -128,53 +225,55 @@ export function InvoicePDFDocument({ invoice, customer, items }: InvoicePDFDocum
         {/* Header */}
         <View style={styles.header}>
           <View>
+            <Image style={styles.logo} src="/JK_Logo.jpg" />
             <Text style={styles.company}>JAY KAY DIGITAL PRESS</Text>
-            <Text style={styles.small}>Professional Printing & Digital Services</Text>
-            <Text style={styles.small}>Freetown, Sierra Leone</Text>
-            <Text style={styles.small}>Tel: +232 34 788711 | +232 30 741062</Text>
-            <Text style={styles.small}>Email: info@jaykaydigitalpress.com</Text>
+            <Text style={styles.companyInfo}>Professional Printing & Digital Services</Text>
+            <Text style={styles.companyInfo}>Freetown, Sierra Leone</Text>
+            <Text style={styles.companyInfo}>Tel: +232 34 788711 | +232 30 741062</Text>
+            <Text style={styles.companyInfo}>Email: info@jaykaydigitalpress.com</Text>
           </View>
-          <View>
-            <Text style={{ fontSize: 18, fontWeight: 700, textAlign: 'right' }}>INVOICE</Text>
-            <Text style={{ textAlign: 'right', marginTop: 6 }}>Invoice No: #{invoice.invoiceNo || `JKDP-INV-${invoice.id.slice(0, 8)}`}</Text>
-            <Text style={{ textAlign: 'right' }}>Issue Date: {fmtDate(invDate)}</Text>
-            <Text style={{ textAlign: 'right' }}>Due Date: {fmtDate(dueDate)}</Text>
+          <View style={styles.invoiceDetails}>
+            <Text style={styles.invoiceTitle}>INVOICE</Text>
+            <Text style={styles.invoiceDetail}>Invoice No: <Text style={styles.bold}>#{invoice.invoiceNo || `JKDP-INV-${invoice.id.slice(0, 8)}`}</Text></Text>
+            <Text style={styles.invoiceDetail}>Issue Date: <Text style={styles.bold}>{fmtDate(invDate)}</Text></Text>
+            <Text style={styles.invoiceDetail}>Due Date: <Text style={styles.bold}>{fmtDate(dueDate)}</Text></Text>
           </View>
         </View>
 
         {/* Bill To */}
-        <View style={{ marginBottom: 10 }}>
+        <View style={styles.billToContainer}>
           <Text style={styles.sectionTitle}>Bill To</Text>
           {customer ? (
             <View>
-              <Text style={{ fontWeight: 700 }}>{customer.business_name}</Text>
-              {customer.contact_person && <Text>Contact: {customer.contact_person}</Text>}
-              {customer.address && <Text>Address: {customer.address}</Text>}
+              <Text style={[styles.billToContent, styles.billToLabel]}>{customer.business_name}</Text>
+              {customer.contact_person && <Text style={styles.billToContent}>Contact: {customer.contact_person}</Text>}
+              {customer.address && <Text style={styles.billToContent}>Address: {customer.address}</Text>}
               {(customer.city || customer.state || customer.zip_code) && (
-                <Text>{[customer.city, customer.state, customer.zip_code].filter(Boolean).join(', ')}</Text>
+                <Text style={styles.billToContent}>{[customer.city, customer.state, customer.zip_code].filter(Boolean).join(', ')}</Text>
               )}
-              {customer.country && <Text>{customer.country}</Text>}
-              {customer.phone && <Text>Phone: {customer.phone}</Text>}
-              {customer.email && <Text>Email: {customer.email}</Text>}
+              {customer.country && <Text style={styles.billToContent}>{customer.country}</Text>}
+              {customer.phone && <Text style={styles.billToContent}>Phone: {customer.phone}</Text>}
+              {customer.email && <Text style={styles.billToContent}>Email: {customer.email}</Text>
+}
             </View>
           ) : (
-            <Text>No customer information</Text>
+            <Text style={styles.billToContent}>No customer information</Text>
           )}
         </View>
 
         {/* Items Table */}
         <View>
           <View style={styles.tableHeader}>
-            <Text style={[styles.th, { flex: 1.2 }]}>Job No</Text>
-            <Text style={[styles.th, { flex: 3 }]}>Description</Text>
+            <Text style={[styles.th, { flex: 0.8 }]}>Job No</Text>
+            <Text style={[styles.th, { flex: 2.5 }]}>Description</Text>
             <Text style={[styles.th, styles.right]}>Qty</Text>
             <Text style={[styles.th, styles.right]}>Unit Price</Text>
             <Text style={[styles.th, styles.right]}>Total</Text>
           </View>
           {items.map((item) => (
             <View key={item.id} style={styles.tableRow}>
-              <Text style={[styles.td, { flex: 1.2 }]}>{item.job_no || '-'}</Text>
-              <Text style={[styles.td, { flex: 3 }]}>{item.description}{item.notes ? `\n${item.notes}` : ''}</Text>
+              <Text style={[styles.td, { flex: 0.8 }]}>{item.job_no || '-'}</Text>
+              <Text style={[styles.td, { flex: 2.5 }]}>{item.description}{item.notes ? `\n${item.notes}` : ''}</Text>
               <Text style={[styles.td, styles.right]}>{Number(item.quantity).toLocaleString()}</Text>
               <Text style={[styles.td, styles.right]}>{fmt(Number(item.unit_price) || 0)}</Text>
               <Text style={[styles.td, styles.right]}>{fmt(Number(item.total_price) || 0)}</Text>
@@ -182,32 +281,52 @@ export function InvoicePDFDocument({ invoice, customer, items }: InvoicePDFDocum
           ))}
           {items.length === 0 && (
             <View style={styles.tableRow}>
-              <Text>No items found on this invoice.</Text>
+              <Text style={styles.td}>No items found on this invoice.</Text>
             </View>
           )}
         </View>
 
         {/* Totals */}
-        <View style={styles.totals}>
-          <View style={styles.totalsRow}><Text>Subtotal:</Text><Text>{fmt(subtotal)}</Text></View>
-          {tax > 0 && <View style={styles.totalsRow}><Text>Tax {taxRate ? `(${taxRate}%)` : ''}:</Text><Text>{fmt(tax)}</Text></View>}
-          {discount > 0 && <View style={styles.totalsRow}><Text>Discount:</Text><Text>-{fmt(discount)}</Text></View>}
-          <View style={[styles.totalsRow, { borderTopWidth: 1, borderColor: '#e5e7eb', marginTop: 4, paddingTop: 4 }]}>
-            <Text style={{ fontWeight: 700 }}>Total:</Text><Text style={{ fontWeight: 700 }}>{fmt(total)}</Text>
+        <View style={styles.totalsContainer}>
+          <View style={styles.totalsRow}>
+            <Text style={styles.td}>Subtotal:</Text>
+            <Text style={styles.td}>{fmt(subtotal)}</Text>
+          </View>
+          {tax > 0 && (
+            <View style={styles.totalsRow}>
+              <Text style={styles.td}>Tax {taxRate ? `(${taxRate}%)` : ''}:</Text>
+              <Text style={styles.td}>{fmt(tax)}</Text>
+            </View>
+          )}
+          {discount > 0 && (
+            <View style={styles.totalsRow}>
+              <Text style={styles.td}>Discount:</Text>
+              <Text style={styles.td}>-{fmt(discount)}</Text>
+            </View>
+          )}
+          <View style={[styles.totalsRow, { borderTopWidth: 1, borderColor: '#E5E7EB', marginTop: 4, paddingTop: 4 }]}>
+            <Text style={[styles.td, styles.bold]}>Total:</Text>
+            <Text style={[styles.td, styles.bold]}>{fmt(total)}</Text>
           </View>
           {amountPaid > 0 && (
             <>
-              <View style={styles.totalsRow}><Text>Amount Paid:</Text><Text>{fmt(amountPaid)}</Text></View>
-              <View style={styles.totalsRow}><Text>Amount Due:</Text><Text>{fmt(amountDue)}</Text></View>
+              <View style={styles.totalsRow}>
+                <Text style={styles.td}>Amount Paid:</Text>
+                <Text style={[styles.td]}>{fmt(amountPaid)}</Text>
+              </View>
+              <View style={styles.totalsRow}>
+                <Text style={[styles.td, styles.bold]}>Amount Due:</Text>
+                <Text style={[styles.td, styles.bold]}>{fmt(amountDue)}</Text>
+              </View>
             </>
           )}
         </View>
 
         {/* Notes */}
         {invoice.notes && (
-          <View style={{ marginTop: 12, borderTopWidth: 1, borderColor: '#e5e7eb', paddingTop: 8 }}>
+          <View style={styles.notesContainer}>
             <Text style={styles.sectionTitle}>Notes</Text>
-            <Text>{invoice.notes}</Text>
+            <Text style={styles.billToContent}>{invoice.notes}</Text>
           </View>
         )}
       </Page>
@@ -230,5 +349,3 @@ export async function downloadInvoicePDF(invoice: InvoiceData, customer: Custome
     URL.revokeObjectURL(url);
   }
 }
-
-
