@@ -1,0 +1,47 @@
+{
+  "name": "Jay Kay Digital Press",
+  "short_name": "JK Digital",
+  "description": "Professional printing services with job tracking, invoicing, and customer management.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#dc2626",
+  "categories": ["business", "productivity"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/icons/android/android-launchericon-192-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/android/android-launchericon-512-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/ios/180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "url": "/dashboard",
+      "icons": [{ "src": "/icons/android/android-launchericon-192-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Jobs",
+      "short_name": "Jobs",
+      "url": "/dashboard/jobs",
+      "icons": [{ "src": "/icons/android/android-launchericon-192-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
+
+
