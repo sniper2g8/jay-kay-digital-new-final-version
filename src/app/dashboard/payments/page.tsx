@@ -33,7 +33,12 @@ type PaymentRow = Database['public']['Tables']['payments']['Row'];
 type PaymentMethod = Database['public']['Enums']['payment_method'];
 
 interface Payment extends PaymentRow {
-  invoices?: { invoiceNo: string | null } | null;
+  invoices?: { 
+    invoiceNo: string | null;
+    total?: number | null;
+    amountPaid?: number | null;
+    amountDue?: number | null;
+  } | null;
   customers?: { business_name: string | null } | null;
 }
 
@@ -86,7 +91,7 @@ export default function PaymentsPage() {
         .from('payments')
         .select(`
           *,
-          invoices!fk_payments_invoice_no(invoiceNo),
+          invoices!fk_payments_invoice_no(invoiceNo, total, amountPaid, amountDue),
           customers!fk_payments_customer_human_id(business_name)
         `)
         .order('payment_date', { ascending: false });
@@ -957,9 +962,16 @@ export default function PaymentsPage() {
                   ? {
                       id: selectedPayment.id,
                       invoiceNo: selectedPayment.invoice_no,
-                      total: selectedPayment.amount,
-                      amountPaid: selectedPayment.amount,
-                      amountDue: 0
+                      total: selectedPayment.invoices.total !== undefined && selectedPayment.invoices.total !== null 
+                        ? selectedPayment.invoices.total 
+                        : selectedPayment.amount,
+                      amountPaid: selectedPayment.invoices.amountPaid !== undefined && selectedPayment.invoices.amountPaid !== null 
+                        ? selectedPayment.invoices.amountPaid 
+                        : selectedPayment.amount,
+                      amountDue: selectedPayment.invoices.total !== undefined && selectedPayment.invoices.total !== null &&
+                        selectedPayment.invoices.amountPaid !== undefined && selectedPayment.invoices.amountPaid !== null
+                        ? selectedPayment.invoices.total - selectedPayment.invoices.amountPaid
+                        : selectedPayment.amount - selectedPayment.amount
                     }
                   : undefined
               }
