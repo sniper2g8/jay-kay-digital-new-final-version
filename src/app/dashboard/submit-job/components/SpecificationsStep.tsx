@@ -11,16 +11,16 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { 
-  Settings, 
-  Package, 
-  Scissors, 
-  Layers, 
-  Sparkles, 
-  Zap, 
-  Grip, 
+import {
+  Settings,
+  Package,
+  Scissors,
+  Layers,
+  Sparkles,
+  Zap,
+  Grip,
   LucideIcon,
-  Palette
+  Palette,
 } from "lucide-react";
 import { JobFormData } from "@/lib/hooks/useJobSubmissionForm";
 import { Database } from "@/lib/database.types";
@@ -452,9 +452,20 @@ export default function SpecificationsStep({
                         );
                         const customPrice = finishingOptionPrices[option.id];
                         const defaultPrice =
-                          typeof option.pricing === 'object' && option.pricing !== null && 'base' in option.pricing && typeof (option.pricing as Record<string, unknown>).base === "number"
+                          typeof option.pricing === "object" &&
+                          option.pricing !== null &&
+                          "base" in option.pricing &&
+                          typeof (option.pricing as Record<string, unknown>)
+                            .base === "number"
                             ? (option.pricing as Record<string, number>).base
-                            : Number(typeof option.pricing === 'object' && option.pricing !== null && 'base' in option.pricing ? (option.pricing as Record<string, unknown>).base : 0) || 0;
+                            : Number(
+                                typeof option.pricing === "object" &&
+                                  option.pricing !== null &&
+                                  "base" in option.pricing
+                                  ? (option.pricing as Record<string, unknown>)
+                                      .base
+                                  : 0,
+                              ) || 0;
                         const finalPrice = customPrice || defaultPrice;
 
                         return (
@@ -679,9 +690,20 @@ export default function SpecificationsStep({
                     );
                     const price =
                       finishingOptionPrices[optionId] ||
-                      (typeof option?.pricing === 'object' && option?.pricing !== null && 'base' in option?.pricing && typeof (option?.pricing as Record<string, unknown>).base === "number"
+                      (typeof option?.pricing === "object" &&
+                      option?.pricing !== null &&
+                      "base" in option?.pricing &&
+                      typeof (option?.pricing as Record<string, unknown>)
+                        .base === "number"
                         ? (option?.pricing as Record<string, number>).base
-                        : Number(typeof option?.pricing === 'object' && option?.pricing !== null && 'base' in option?.pricing ? (option?.pricing as Record<string, unknown>).base : 0) || 0);
+                        : Number(
+                            typeof option?.pricing === "object" &&
+                              option?.pricing !== null &&
+                              "base" in option?.pricing
+                              ? (option?.pricing as Record<string, unknown>)
+                                  .base
+                              : 0,
+                          ) || 0);
                     const categoryLabel =
                       categoryInfo[option?.category || "other"]?.label ||
                       option?.category;

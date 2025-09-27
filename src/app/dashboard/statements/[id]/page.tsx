@@ -34,19 +34,22 @@ export default function StatementPage() {
   }
 
   // We know we have an ID at this point
-  const { data: statement, transactions, isLoading, error } = useStatementPeriod(
-    params.id
-  );
-  
+  const {
+    data: statement,
+    transactions,
+    isLoading,
+    error,
+  } = useStatementPeriod(params.id);
+
   // Log the state for debugging
-  console.log("StatementPage: State", { 
+  console.log("StatementPage: State", {
     id: params.id,
     hasStatement: !!statement,
     hasTransactions: !!transactions?.length,
     isLoading,
     error,
     statement,
-    transactions
+    transactions,
   });
 
   // Handle loading state
@@ -67,7 +70,9 @@ export default function StatementPage() {
       <div className="flex items-center justify-center min-h-screen">
         <Card className="max-w-md w-full">
           <CardHeader>
-            <CardTitle className="text-red-500">Error Loading Statement</CardTitle>
+            <CardTitle className="text-red-500">
+              Error Loading Statement
+            </CardTitle>
             <CardDescription>{error}</CardDescription>
           </CardHeader>
           <CardContent className="flex justify-end">
@@ -124,15 +129,22 @@ export default function StatementPage() {
               variant="destructive"
               onClick={async () => {
                 if (!statement?.id) return;
-                const confirmed = window.confirm("Are you sure you want to delete this statement?");
+                const confirmed = window.confirm(
+                  "Are you sure you want to delete this statement?",
+                );
                 if (!confirmed) return;
-                const res = await fetch(`/api/statements/${statement.id}`, { method: 'DELETE' });
+                const res = await fetch(`/api/statements/${statement.id}`, {
+                  method: "DELETE",
+                });
                 if (!res.ok) {
                   const payload = await res.json().catch(() => ({}));
-                  alert('Failed to delete statement: ' + (payload.error || res.statusText));
+                  alert(
+                    "Failed to delete statement: " +
+                      (payload.error || res.statusText),
+                  );
                   return;
                 }
-                window.location.href = '/dashboard/statements';
+                window.location.href = "/dashboard/statements";
               }}
             >
               Delete
@@ -149,7 +161,9 @@ export default function StatementPage() {
           <Card>
             <CardHeader>
               <CardTitle>Statement Summary</CardTitle>
-              <CardDescription>Statement period activity overview</CardDescription>
+              <CardDescription>
+                Statement period activity overview
+              </CardDescription>
             </CardHeader>
             <CardContent className="grid sm:grid-cols-3 gap-4">
               <div>
@@ -172,7 +186,9 @@ export default function StatementPage() {
               </div>
               <div className="sm:col-span-3">
                 <div className="pt-4 border-t">
-                  <p className="text-sm text-muted-foreground">Closing Balance</p>
+                  <p className="text-sm text-muted-foreground">
+                    Closing Balance
+                  </p>
                   <p className="text-xl font-bold">
                     {formatCurrency(statement.closing_balance || 0)}
                   </p>
@@ -239,7 +255,9 @@ export default function StatementPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <p className="font-medium">{statement.customer?.business_name}</p>
+                <p className="font-medium">
+                  {statement.customer?.business_name}
+                </p>
                 <p className="text-sm text-muted-foreground">
                   {statement.customer?.contact_person}
                 </p>

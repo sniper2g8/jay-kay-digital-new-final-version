@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/contexts/AuthContext';
+import { useState, useEffect, useCallback } from "react";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
 
 export interface InvoiceData {
   id: string;
@@ -34,17 +34,17 @@ export interface InvoiceStats {
 // Helper function to parse Firebase timestamp
 function parseFirebaseTimestamp(timestamp: unknown): string | null {
   if (!timestamp) return null;
-  
-  if (typeof timestamp === 'object' && timestamp && '_seconds' in timestamp) {
+
+  if (typeof timestamp === "object" && timestamp && "_seconds" in timestamp) {
     const ts = timestamp as { _seconds: number };
     const date = new Date(ts._seconds * 1000);
-    return date.toISOString().split('T')[0]; // Return YYYY-MM-DD format
+    return date.toISOString().split("T")[0]; // Return YYYY-MM-DD format
   }
-  
-  if (typeof timestamp === 'string') {
+
+  if (typeof timestamp === "string") {
     return timestamp;
   }
-  
+
   return null;
 }
 
@@ -75,8 +75,9 @@ export function useInvoicesData() {
 
       // Get invoices with customer data
       const { data: invoicesData, error: invoicesError } = await supabase
-        .from('invoices')
-        .select(`
+        .from("invoices")
+        .select(
+          `
           id,
           invoiceNo,
           customer_id,
@@ -97,16 +98,16 @@ export function useInvoicesData() {
             business_name,
             contact_person
           )
-        `)
-        .order('created_at', { ascending: false });
+        `,
+        )
+        .order("created_at", { ascending: false });
 
       if (invoicesError) {
-        console.error('Supabase error:', invoicesError);
+        console.error("Supabase error:", invoicesError);
         throw invoicesError;
       }
 
       if (!invoicesData || invoicesData.length === 0) {
-        
         setInvoices([]);
         setStats({
           total_invoices: 0,
@@ -121,24 +122,30 @@ export function useInvoicesData() {
       }
 
       // Transform the data
-      const transformedInvoices: InvoiceData[] = invoicesData.map(invoice => {
-        const customerData = invoice.customers as { business_name?: string; contact_person?: string } | null;
+      const transformedInvoices: InvoiceData[] = invoicesData.map((invoice) => {
+        const customerData = invoice.customers as {
+          business_name?: string;
+          contact_person?: string;
+        } | null;
         const totalAmount = Number(invoice.total || invoice.grandTotal || 0);
         const paidAmount = Number(invoice.amountPaid || 0);
-        const dueAmount = Number(invoice.amountDue || (totalAmount - paidAmount));
-        
+        const dueAmount = Number(invoice.amountDue || totalAmount - paidAmount);
+
         return {
           id: invoice.id,
-          invoice_number: invoice.invoiceNo || 'N/A',
-          customer_name: invoice.customerName || customerData?.business_name || 'Unknown Customer',
+          invoice_number: invoice.invoiceNo || "N/A",
+          customer_name:
+            invoice.customerName ||
+            customerData?.business_name ||
+            "Unknown Customer",
           amount: totalAmount,
           amount_paid: paidAmount,
           amount_due: dueAmount,
-          status: invoice.status || 'draft',
-          payment_status: invoice.payment_status || 'pending',
+          status: invoice.status || "draft",
+          payment_status: invoice.payment_status || "pending",
           issue_date: parseFirebaseTimestamp(invoice.issueDate),
           due_date: parseFirebaseTimestamp(invoice.dueDate),
-          currency: invoice.currency || 'SLL',
+          currency: invoice.currency || "SLL",
           notes: invoice.notes,
           items_count: Array.isArray(invoice.items) ? invoice.items.length : 0,
           created_at: invoice.created_at,
@@ -156,20 +163,20 @@ export function useInvoicesData() {
         overdue_count: 0,
       };
 
-      transformedInvoices.forEach(invoice => {
+      transformedInvoices.forEach((invoice) => {
         statsData.total_revenue += invoice.amount;
         statsData.total_paid += invoice.amount_paid;
-        
+
         switch (invoice.status.toLowerCase()) {
-          case 'paid':
+          case "paid":
             statsData.paid_count++;
             break;
-          case 'pending':
-          case 'sent':
+          case "pending":
+          case "sent":
             statsData.pending_count++;
             statsData.total_pending += invoice.amount_due;
             break;
-          case 'overdue':
+          case "overdue":
             statsData.overdue_count++;
             statsData.total_pending += invoice.amount_due;
             break;
@@ -181,10 +188,9 @@ export function useInvoicesData() {
 
       setInvoices(transformedInvoices);
       setStats(statsData);
-
     } catch (err) {
-      console.error('Error fetching invoices:', err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch invoices');
+      console.error("Error fetching invoices:", err);
+      setError(err instanceof Error ? err.message : "Failed to fetch invoices");
     } finally {
       setIsLoading(false);
     }
@@ -220,8 +226,9 @@ export function useInvoice(invoiceId: string | null) {
       setError(null);
 
       const { data, error: fetchError } = await supabase
-        .from('invoices')
-        .select(`
+        .from("invoices")
+        .select(
+          `
           *,
           customers (
             business_name,
@@ -230,8 +237,9 @@ export function useInvoice(invoiceId: string | null) {
             phone,
             address
           )
-        `)
-        .eq('id', invoiceId)
+        `,
+        )
+        .eq("id", invoiceId)
         .single();
 
       if (fetchError) throw fetchError;
@@ -241,33 +249,41 @@ export function useInvoice(invoiceId: string | null) {
         return;
       }
 
-      const customerData = data.customers as { business_name?: string; contact_person?: string; email?: string; phone?: string; address?: string } | null;
+      const customerData = data.customers as {
+        business_name?: string;
+        contact_person?: string;
+        email?: string;
+        phone?: string;
+        address?: string;
+      } | null;
       const totalAmount = Number(data.total || data.grandTotal || 0);
       const paidAmount = Number(data.amountPaid || 0);
-      const dueAmount = Number(data.amountDue || (totalAmount - paidAmount));
+      const dueAmount = Number(data.amountDue || totalAmount - paidAmount);
 
       const transformedInvoice: InvoiceData = {
         id: data.id,
-        invoice_number: data.invoiceNo || 'N/A',
-        customer_name: data.customerName || customerData?.business_name || 'Unknown Customer',
+        invoice_number: data.invoiceNo || "N/A",
+        customer_name:
+          data.customerName ||
+          customerData?.business_name ||
+          "Unknown Customer",
         amount: totalAmount,
         amount_paid: paidAmount,
         amount_due: dueAmount,
-        status: data.status || 'draft',
-        payment_status: data.payment_status || 'pending',
+        status: data.status || "draft",
+        payment_status: data.payment_status || "pending",
         issue_date: parseFirebaseTimestamp(data.issueDate),
         due_date: parseFirebaseTimestamp(data.dueDate),
-        currency: data.currency || 'SLL',
+        currency: data.currency || "SLL",
         notes: data.notes,
         items_count: Array.isArray(data.items) ? data.items.length : 0,
         created_at: data.created_at,
       };
 
       setInvoice(transformedInvoice);
-
     } catch (err) {
-      console.error('Error fetching invoice:', err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch invoice');
+      console.error("Error fetching invoice:", err);
+      setError(err instanceof Error ? err.message : "Failed to fetch invoice");
     } finally {
       setIsLoading(false);
     }

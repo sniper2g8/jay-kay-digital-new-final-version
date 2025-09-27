@@ -2,14 +2,15 @@
   "[typescript]": {
     "editor.defaultFormatter": "denoland.vscode-deno"
   },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   "deno.enable": false,
-  "deno.enablePaths": [
-    "supabase/functions"
-  ],
+  "deno.enablePaths": ["supabase/functions"],
   "deno.lint": true,
   "deno.unstable": [
     "bare-node-builtins",
-    "byonm",
+    "byonm", 
     "sloppy-imports",
     "unsafe-proto",
     "webgpu",
@@ -22,6 +23,95 @@
     "http",
     "net"
   ],
-  "typescript.preferences.includePackageJsonAutoImports": "auto",
-  "typescript.suggest.autoImports": true
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true,
+    "source.organizeImports": true,
+    "source.addMissingImports": true
+  },
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "typescript.suggest.autoImports": "on",
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+  "typescript.preferences.includeCompletionsForModuleExports": true,
+  "typescript.suggest.completeFunctionCalls": true,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "typescript.suggest.paths": true,
+  "typescript.preferences.quoteStyle": "single",
+  "typescript.preferences.useAliasesForRenames": false,
+  "eslint.format.enable": true,
+  "eslint.codeActionsOnSave.mode": "problems",
+  "eslint.workingDirectories": [".", "supabase/functions"],
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "supabase/functions/node_modules": true
+  }
+
+  {
+    "[typescript]": {
+      "editor.defaultFormatter": "denoland.vscode-deno"
+    },
+    "[typescriptreact]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "deno.enable": false,
+    "deno.enablePaths": [
+      "supabase/functions"
+    ],
+    "deno.lint": true,
+    "deno.unstable": [
+      "bare-node-builtins",
+      "byonm",
+      "sloppy-imports",
+      "unsafe-proto",
+      "webgpu",
+      "broadcast-channel",
+      "worker-options",
+      "cron",
+      "kv",
+      "ffi",
+      "fs",
+      "http",
+      "net"
+    ],
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true,
+      "source.organizeImports": true,
+      "source.addMissingImports": true
+    },
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
+    "typescript.suggest.autoImports": "on",
+    "typescript.preferences.includePackageJsonAutoImports": "on",
+    "typescript.preferences.includeCompletionsForModuleExports": true,
+    "typescript.suggest.completeFunctionCalls": true,
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    "typescript.suggest.paths": true,
+    "typescript.preferences.quoteStyle": "single",
+    "typescript.preferences.useAliasesForRenames": false,
+    "eslint.format.enable": true,
+    "eslint.codeActionsOnSave.mode": "problems",
+    "eslint.workingDirectories": [
+      ".",
+      "supabase/functions"
+    ],
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/.git": true,
+      "**/.DS_Store": true,
+      "**/Thumbs.db": true,
+      "supabase/functions/node_modules": true
+    }
+  }
+  {
+    "editor.suggestSelection": "first",
+    "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+    "typescript.preferences.importModuleSpecifier": "relative",
+    "typescript.suggest.includeAutomaticOptionalChainCompletions": true,
+    "typescript.inlayHints.parameterNames.enabled": "literals",
+    "typescript.inlayHints.variableTypes.enabled": false,
+    "typescript.inlayHints.functionLikeReturnTypes.enabled": true
+  }
 }

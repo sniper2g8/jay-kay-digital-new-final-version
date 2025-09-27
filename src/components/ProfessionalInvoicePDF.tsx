@@ -1,12 +1,23 @@
 "use client";
 
-import { useRef, useState, useEffect, forwardRef, useImperativeHandle, useCallback } from 'react';
+import {
+  useRef,
+  useState,
+  useEffect,
+  forwardRef,
+  useImperativeHandle,
+  useCallback,
+} from "react";
 import { Button } from "@/components/ui/button";
 import { formatCurrency, formatDate } from "@/lib/constants";
-import { Download, FileText, QrCode, Building2, User, MapPin, Phone, Mail } from "lucide-react";
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
-import { useReactToPrint } from 'react-to-print';
+import {
+  Download,
+  FileText,
+  QrCode,
+} from "lucide-react";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import { useReactToPrint } from "react-to-print";
 import QRCode from "qrcode";
 
 interface InvoiceItem {
@@ -60,31 +71,45 @@ export interface ProfessionalInvoicePDFRef {
   generatePDF: () => void;
 }
 
-export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, ProfessionalInvoicePDFProps>(({ 
-  invoice, 
-  customer, 
-  items,
-  showActions = true
-}, ref) => {
+export const ProfessionalInvoicePDF = forwardRef<
+  ProfessionalInvoicePDFRef,
+  ProfessionalInvoicePDFProps
+>(({ invoice, customer, items, showActions = true }, ref) => {
   const invoiceRef = useRef<HTMLDivElement>(null);
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
 
   // Calculate totals with proper type conversion
-  const subtotal = invoice.subtotal || items.reduce((sum, item) => {
-    const totalPrice = typeof item.total_price === 'string' ? parseFloat(item.total_price) || 0 : item.total_price || 0;
-    return sum + totalPrice;
-  }, 0);
-  
-  const taxRate = typeof invoice.tax_rate === 'string' ? parseFloat(invoice.tax_rate) || 0 : invoice.tax_rate || 0;
-  const tax = invoice.tax || (subtotal * taxRate / 100);
-  const discount = typeof invoice.discount === 'string' ? parseFloat(invoice.discount) || 0 : invoice.discount || 0;
+  const subtotal =
+    invoice.subtotal ||
+    items.reduce((sum, item) => {
+      const totalPrice =
+        typeof item.total_price === "string"
+          ? parseFloat(item.total_price) || 0
+          : item.total_price || 0;
+      return sum + totalPrice;
+    }, 0);
+
+  const taxRate =
+    typeof invoice.tax_rate === "string"
+      ? parseFloat(invoice.tax_rate) || 0
+      : invoice.tax_rate || 0;
+  const tax = invoice.tax || (subtotal * taxRate) / 100;
+  const discount =
+    typeof invoice.discount === "string"
+      ? parseFloat(invoice.discount) || 0
+      : invoice.discount || 0;
   const total = invoice.total || subtotal + tax - discount;
-  const amountPaid = typeof invoice.amountPaid === 'string' ? parseFloat(invoice.amountPaid) || 0 : invoice.amountPaid || 0;
+  const amountPaid =
+    typeof invoice.amountPaid === "string"
+      ? parseFloat(invoice.amountPaid) || 0
+      : invoice.amountPaid || 0;
   const amountDue = total - amountPaid;
-  const currency = invoice.currency || 'SLL';
+  // const currency = invoice.currency || "SLL";
 
   // Calculate dates
-  const invoiceDate = invoice.invoice_date ? new Date(invoice.invoice_date) : new Date(invoice.created_at);
+  const invoiceDate = invoice.invoice_date
+    ? new Date(invoice.invoice_date)
+    : new Date(invoice.created_at);
   const dueDate = new Date(invoiceDate);
   dueDate.setDate(dueDate.getDate() + (invoice.terms_days || 30));
 
@@ -92,37 +117,47 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
   const generatePDF = useCallback(async () => {
     if (!invoiceRef.current) {
       console.error("Invoice ref not available for PDF generation.");
-      alert('Could not generate PDF. The invoice content is not ready.');
+      alert("Could not generate PDF. The invoice content is not ready.");
       return;
     }
 
     try {
       // Hide action buttons during PDF generation
-      const actionButtons = invoiceRef.current.querySelectorAll('.no-print');
-      actionButtons.forEach(el => (el as HTMLElement).style.display = 'none');
+      const actionButtons = invoiceRef.current.querySelectorAll(".no-print");
+      actionButtons.forEach(
+        (el) => ((el as HTMLElement).style.display = "none"),
+      );
 
       // Ensure images inside the invoice are fully loaded
-      const images = Array.from(invoiceRef.current.querySelectorAll('img')) as HTMLImageElement[];
-      await Promise.all(images.map(img => {
-        return new Promise<void>((resolve) => {
-          if (img.complete) return resolve();
-          const onLoad = () => { img.removeEventListener('load', onLoad); img.removeEventListener('error', onLoad); resolve(); };
-          img.addEventListener('load', onLoad);
-          img.addEventListener('error', onLoad);
-        });
-      }));
+      const images = Array.from(
+        invoiceRef.current.querySelectorAll("img"),
+      ) as HTMLImageElement[];
+      await Promise.all(
+        images.map((img) => {
+          return new Promise<void>((resolve) => {
+            if (img.complete) return resolve();
+            const onLoad = () => {
+              img.removeEventListener("load", onLoad);
+              img.removeEventListener("error", onLoad);
+              resolve();
+            };
+            img.addEventListener("load", onLoad);
+            img.addEventListener("error", onLoad);
+          });
+        }),
+      );
 
       const canvas = await html2canvas(invoiceRef.current, {
         scale: 2,
         useCORS: true,
         allowTaint: true,
-        backgroundColor: '#ffffff',
+        backgroundColor: "#ffffff",
         width: invoiceRef.current.scrollWidth,
         height: invoiceRef.current.scrollHeight,
         onclone: (clonedDoc) => {
           try {
-            const style = clonedDoc.createElement('style');
-            style.setAttribute('data-export-fallback', '');
+            const style = clonedDoc.createElement("style");
+            style.setAttribute("data-export-fallback", "");
             style.textContent = `
               [data-export-root], [data-export-root] * {
                 color: #111827 !important; /* text-gray-900 */
@@ -152,12 +187,12 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
             `;
             clonedDoc.head.appendChild(style);
           } catch {}
-        }
+        },
       });
 
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
+
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
       const imgWidth = canvas.width;
@@ -166,21 +201,28 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
       const imgX = (pdfWidth - imgWidth * ratio) / 2;
       const imgY = 0;
 
-      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
-      
-      const fileName = `Invoice_${invoice.invoiceNo || invoice.id.slice(0, 8)}_${formatDate(invoiceDate).replace(/\//g, '-')}.pdf`;
+      pdf.addImage(
+        imgData,
+        "PNG",
+        imgX,
+        imgY,
+        imgWidth * ratio,
+        imgHeight * ratio,
+      );
+
+      const fileName = `Invoice_${invoice.invoiceNo || invoice.id.slice(0, 8)}_${formatDate(invoiceDate).replace(/\//g, "-")}.pdf`;
       pdf.save(fileName);
 
       // Show action buttons again
-      actionButtons.forEach(el => (el as HTMLElement).style.display = '');
+      actionButtons.forEach((el) => ((el as HTMLElement).style.display = ""));
     } catch (error) {
-      console.error('Error generating PDF:', error);
-      alert('Error generating PDF. Please try again.');
+      console.error("Error generating PDF:", error);
+      alert("Error generating PDF. Please try again.");
     } finally {
       // Ensure action buttons are restored on error
       if (invoiceRef.current) {
-        const actionButtons = invoiceRef.current.querySelectorAll('.no-print');
-        actionButtons.forEach(el => (el as HTMLElement).style.display = '');
+        const actionButtons = invoiceRef.current.querySelectorAll(".no-print");
+        actionButtons.forEach((el) => ((el as HTMLElement).style.display = ""));
       }
     }
   }, [invoice, invoiceDate]);
@@ -198,21 +240,21 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
           invoice_no: invoice.invoiceNo || `JKDP-INV-${invoice.id.slice(0, 8)}`,
           total: formatCurrency(total),
           due_date: formatDate(dueDate.toISOString()),
-          company: "Jay Kay Digital Press"
+          company: "Jay Kay Digital Press",
         };
-        
+
         const qrData = `Invoice: ${invoiceInfo.invoice_no}\nTotal: ${invoiceInfo.total}\nDue: ${invoiceInfo.due_date}\nCompany: ${invoiceInfo.company}`;
         const qrCodeUrl = await QRCode.toDataURL(qrData, {
           width: 120,
           margin: 1,
           color: {
-            dark: '#1f2937',
-            light: '#ffffff'
-          }
+            dark: "#1f2937",
+            light: "#ffffff",
+          },
         });
         setQrCodeDataUrl(qrCodeUrl);
       } catch (error) {
-        console.error('Error generating QR code:', error);
+        console.error("Error generating QR code:", error);
       }
     };
 
@@ -223,7 +265,7 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
   const handlePrint = useReactToPrint({
     contentRef: invoiceRef,
     documentTitle: `Invoice_${invoice.invoiceNo || invoice.id.slice(0, 8)}`,
-    onAfterPrint: () => {}
+    // onAfterPrint: () => {},
   });
 
   return (
@@ -231,7 +273,7 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
       {/* Action Buttons */}
       {showActions && (
         <div className="flex justify-end space-x-3 no-print">
-          <Button 
+          <Button
             onClick={handlePrint}
             variant="outline"
             size="sm"
@@ -240,7 +282,7 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
             <FileText className="h-4 w-4" />
             <span className="text-xs">Print</span>
           </Button>
-          <Button 
+          <Button
             onClick={generatePDF}
             data-pdf-download
             className="flex items-center space-x-2 bg-red-600 hover:bg-red-700"
@@ -287,37 +329,57 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
               <div className="flex items-start gap-4">
                 {/* Logo */}
                 <div className="flex-shrink-0">
-                  <img 
-                    src="/JK_LogoINV.jpg" 
-                    alt="Jay Kay Digital Press Logo" 
+                  <img
+                    src="/JK_LogoINV.jpg"
+                    alt="Jay Kay Digital Press Logo"
                     className="w-26 h-28 object-contain"
                     crossOrigin="anonymous"
                   />
                 </div>
                 {/* Company Info */}
                 <div>
-                  <h1 className="text-xl font-bold text-gray-900 mb-2">JAY KAY DIGITAL PRESS</h1>
-                  <p className="text-xs text-gray-600 mb-1">Professional Printing & Digital Services</p>
-                  <p className="text-xs text-gray-600 mb-1">Freetown, Sierra Leone</p>
-                  <p className="text-xs text-gray-600 mb-1">Tel: +232 34 788711 | +232 30 741062</p>
-                  <p className="text-xs text-gray-600">Email: info@jaykaydigitalpress.com</p>
+                  <h1 className="text-xl font-bold text-gray-900 mb-2">
+                    JAY KAY DIGITAL PRESS
+                  </h1>
+                  <p className="text-xs text-gray-600 mb-1">
+                    Professional Printing & Digital Services
+                  </p>
+                  <p className="text-xs text-gray-600 mb-1">
+                    Freetown, Sierra Leone
+                  </p>
+                  <p className="text-xs text-gray-600 mb-1">
+                    Tel: +232 34 788711 | +232 30 741062
+                  </p>
+                  <p className="text-xs text-gray-600">
+                    Email: info@jaykaydigitalpress.com
+                  </p>
                 </div>
               </div>
               <div className="text-right">
                 <div className="bg-gray-50 p-4 rounded-md">
-                  <h2 className="text-lg font-bold text-gray-900 mb-2">INVOICE</h2>
+                  <h2 className="text-lg font-bold text-gray-900 mb-2">
+                    INVOICE
+                  </h2>
                   <div className="space-y-1 text-xs">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Invoice No:</span>
-                      <span className="font-medium">#{invoice.invoiceNo || `JKDP-INV-${invoice.id.slice(0, 8)}`}</span>
+                      <span className="font-medium">
+                        #
+                        {invoice.invoiceNo ||
+                          `JKDP-INV-${invoice.id.slice(0, 8)}`}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Issue Date:</span>
-                      <span className="font-medium">{formatDate(invoiceDate.toISOString())}</span>
+                      <span className="font-medium">
+                        {formatDate(invoiceDate.toISOString())}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Due Date:</span>
-                      <span className="font-medium">{formatDate(dueDate.toISOString())}</span>
+                      <span className="font-medium">
+                        {formatDate(dueDate.toISOString())}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -328,44 +390,62 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
           {/* Bill To */}
           <div className="mb-6 flex justify-between items-start relative z-10">
             <div className="flex-1">
-              <h3 className="text-sm font-semibold text-gray-900 mb-2">Bill To</h3>
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">
+                Bill To
+              </h3>
               {customer ? (
                 <div className="text-gray-700 space-y-1">
-                  <p className="font-semibold text-gray-900">{customer.business_name}</p>
+                  <p className="font-semibold text-gray-900">
+                    {customer.business_name}
+                  </p>
                   {customer.contact_person && (
-                    <p className="text-gray-600 text-xs">{customer.contact_person}</p>
+                    <p className="text-gray-600 text-xs">
+                      {customer.contact_person}
+                    </p>
                   )}
                   {customer.address && (
                     <p className="text-gray-600 text-xs">{customer.address}</p>
                   )}
                   {customer.city && (
-                    <p className="text-gray-600 text-xs">{[customer.city, customer.state, customer.zip_code].filter(Boolean).join(", ")}</p>
+                    <p className="text-gray-600 text-xs">
+                      {[customer.city, customer.state, customer.zip_code]
+                        .filter(Boolean)
+                        .join(", ")}
+                    </p>
                   )}
                   {customer.country && (
                     <p className="text-gray-600 text-xs">{customer.country}</p>
                   )}
                   {customer.phone && (
-                    <p className="text-gray-600 text-xs">Phone: {customer.phone}</p>
+                    <p className="text-gray-600 text-xs">
+                      Phone: {customer.phone}
+                    </p>
                   )}
                   {customer.email && (
-                    <p className="text-gray-600 text-xs">Email: {customer.email}</p>
+                    <p className="text-gray-600 text-xs">
+                      Email: {customer.email}
+                    </p>
                   )}
                 </div>
               ) : (
-                <p className="text-gray-500 italic text-sm">Customer information not available</p>
+                <p className="text-gray-500 italic text-sm">
+                  Customer information not available
+                </p>
               )}
             </div>
-            
+
             {/* QR Code */}
             {qrCodeDataUrl && (
               <div className="bg-white p-3 rounded-lg border border-gray-200 ml-6">
                 <div className="text-center mb-1">
                   <QrCode className="w-4 h-4 text-gray-600 mx-auto mb-1" />
-                  <p className="text-[10px] text-gray-600 font-medium">Invoice Details</p>
+                  <p className="text-[10px] text-gray-600 font-medium">
+                    Invoice Details
+                  </p>
                 </div>
-                <img 
-                  src={qrCodeDataUrl} 
-                  alt="Invoice QR Code" 
+                <img
+                  src={qrCodeDataUrl}
+                  alt="Invoice QR Code"
                   className="w-20 h-20 mx-auto"
                 />
                 <p className="text-[10px] text-gray-500 text-center mt-1">
@@ -380,31 +460,54 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-gray-100">
-                  <th className="border border-gray-300 px-3 py-2 text-left text-xs font-semibold text-gray-700 w-[18%]">Job No</th>
-                  <th className="border border-gray-300 px-3 py-2 text-left text-xs font-semibold text-gray-700 w-[37%]">Description</th>
-                  <th className="border border-gray-300 px-3 py-2 text-right text-xs font-semibold text-gray-700 w-[15%]">Qty</th>
-                  <th className="border border-gray-300 px-3 py-2 text-right text-xs font-semibold text-gray-700 w-[15%]">Unit Price</th>
-                  <th className="border border-gray-300 px-3 py-2 text-right text-xs font-semibold text-gray-700 w-[15%]">Total</th>
+                  <th className="border border-gray-300 px-3 py-2 text-left text-xs font-semibold text-gray-700 w-[18%]">
+                    Job No
+                  </th>
+                  <th className="border border-gray-300 px-3 py-2 text-left text-xs font-semibold text-gray-700 w-[37%]">
+                    Description
+                  </th>
+                  <th className="border border-gray-300 px-3 py-2 text-right text-xs font-semibold text-gray-700 w-[15%]">
+                    Qty
+                  </th>
+                  <th className="border border-gray-300 px-3 py-2 text-right text-xs font-semibold text-gray-700 w-[15%]">
+                    Unit Price
+                  </th>
+                  <th className="border border-gray-300 px-3 py-2 text-right text-xs font-semibold text-gray-700 w-[15%]">
+                    Total
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {items.map((item, index) => (
                   <tr key={item.id || index}>
                     <td className="border border-gray-300 px-3 py-2 text-xs">
-                      {item.job_no || '-'}
+                      {item.job_no || "-"}
                     </td>
                     <td className="border border-gray-300 px-3 py-2 text-xs">
                       <div>{item.description}</div>
-                      {item.notes && <div className="text-gray-500 text-[10px] mt-1">{item.notes}</div>}
+                      {item.notes && (
+                        <div className="text-gray-500 text-[10px] mt-1">
+                          {item.notes}
+                        </div>
+                      )}
                     </td>
-                    <td className="border border-gray-300 px-3 py-2 text-right text-xs">{item.quantity.toLocaleString()}</td>
-                    <td className="border border-gray-300 px-3 py-2 text-right text-xs">{formatCurrency(item.unit_price)}</td>
-                    <td className="border border-gray-300 px-3 py-2 text-right text-xs font-medium">{formatCurrency(item.total_price)}</td>
+                    <td className="border border-gray-300 px-3 py-2 text-right text-xs">
+                      {item.quantity.toLocaleString()}
+                    </td>
+                    <td className="border border-gray-300 px-3 py-2 text-right text-xs">
+                      {formatCurrency(item.unit_price)}
+                    </td>
+                    <td className="border border-gray-300 px-3 py-2 text-right text-xs font-medium">
+                      {formatCurrency(item.total_price)}
+                    </td>
                   </tr>
                 ))}
                 {items.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="border border-gray-300 px-3 py-6 text-center text-gray-500 text-xs">
+                    <td
+                      colSpan={5}
+                      className="border border-gray-300 px-3 py-6 text-center text-gray-500 text-xs"
+                    >
                       No items found on this invoice
                     </td>
                   </tr>
@@ -419,36 +522,56 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
               <tbody>
                 <tr>
                   <td className="px-3 py-1 text-xs text-gray-600">Subtotal:</td>
-                  <td className="px-3 py-1 text-right text-xs">{formatCurrency(subtotal)}</td>
+                  <td className="px-3 py-1 text-right text-xs">
+                    {formatCurrency(subtotal)}
+                  </td>
                 </tr>
                 {tax > 0 && (
                   <tr>
                     <td className="px-3 py-1 text-xs text-gray-600">
-                      Tax {taxRate > 0 ? `(${taxRate}%)` : ''}:
+                      Tax {taxRate > 0 ? `(${taxRate}%)` : ""}:
                     </td>
-                    <td className="px-3 py-1 text-right text-xs">{formatCurrency(tax)}</td>
+                    <td className="px-3 py-1 text-right text-xs">
+                      {formatCurrency(tax)}
+                    </td>
                   </tr>
                 )}
                 {discount > 0 && (
                   <tr>
-                    <td className="px-3 py-1 text-xs text-gray-600">Discount:</td>
-                    <td className="px-3 py-1 text-right text-xs">-{formatCurrency(discount)}</td>
+                    <td className="px-3 py-1 text-xs text-gray-600">
+                      Discount:
+                    </td>
+                    <td className="px-3 py-1 text-right text-xs">
+                      -{formatCurrency(discount)}
+                    </td>
                   </tr>
                 )}
                 <tr className="border-t border-gray-300">
                   <td className="px-3 py-1 font-semibold text-xs">Total:</td>
-                  <td className="px-3 py-1 text-right font-semibold text-xs">{formatCurrency(total)}</td>
+                  <td className="px-3 py-1 text-right font-semibold text-xs">
+                    {formatCurrency(total)}
+                  </td>
                 </tr>
                 {amountPaid > 0 && (
                   <>
                     <tr>
-                      <td className="px-3 py-1 text-xs text-gray-600">Amount Paid:</td>
-                      <td className="px-3 py-1 text-right text-xs text-green-600">{formatCurrency(amountPaid)}</td>
+                      <td className="px-3 py-1 text-xs text-gray-600">
+                        Amount Paid:
+                      </td>
+                      <td className="px-3 py-1 text-right text-xs text-green-600">
+                        {formatCurrency(amountPaid)}
+                      </td>
                     </tr>
                     <tr className="border-t border-gray-300">
-                      <td className="px-3 py-1 font-semibold text-xs">Amount Due:</td>
+                      <td className="px-3 py-1 font-semibold text-xs">
+                        Amount Due:
+                      </td>
                       <td className="px-3 py-1 text-right font-semibold text-xs">
-                        <span className={amountDue > 0 ? "text-orange-600" : "text-green-600"}>
+                        <span
+                          className={
+                            amountDue > 0 ? "text-orange-600" : "text-green-600"
+                          }
+                        >
                           {formatCurrency(amountDue)}
                         </span>
                       </td>
@@ -462,13 +585,16 @@ export const ProfessionalInvoicePDF = forwardRef<ProfessionalInvoicePDFRef, Prof
           {/* Notes */}
           {invoice.notes && (
             <div className="mt-6 pt-4 border-t border-gray-300 relative z-10">
-              <h3 className="text-sm font-semibold text-gray-900 mb-2">Notes:</h3>
-              <p className="text-gray-700 text-xs whitespace-pre-wrap">{invoice.notes}</p>
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">
+                Notes:
+              </h3>
+              <p className="text-gray-700 text-xs whitespace-pre-wrap">
+                {invoice.notes}
+              </p>
             </div>
           )}
 
           {/* Footer */}
-
         </div>
       </div>
     </div>

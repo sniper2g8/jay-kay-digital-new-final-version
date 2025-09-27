@@ -232,7 +232,7 @@ serve(async (req: Request) => {
     // Log error in database
     try {
       const { type, job, recipient_email } = await req.json();
-      
+
       // Create a new Supabase client instance for error handling
       const supabaseErrorClient = createClient(
         Deno.env.get("SUPABASE_URL") ?? "",

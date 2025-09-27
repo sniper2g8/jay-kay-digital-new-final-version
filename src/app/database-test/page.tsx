@@ -12,13 +12,12 @@ export default function DatabaseTestPage() {
     setTestResult("");
 
     try {
-      
       // First check auth status
       const {
         data: { session },
         error: sessionError,
       } = await supabase.auth.getSession();
-      
+
       // Test simple query
       const { data, error } = await supabase
         .from("customers")
@@ -29,7 +28,6 @@ export default function DatabaseTestPage() {
         console.error("Database error:", error);
         setTestResult(`Database Error: ${error.message} (Code: ${error.code})`);
       } else {
-        
         setTestResult(`Success! Found ${data?.length || 0} customers`);
       }
     } catch (err) {

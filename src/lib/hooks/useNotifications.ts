@@ -1,18 +1,32 @@
-import { useState, useCallback } from 'react';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/contexts/AuthContext';
+import { useState, useCallback } from "react";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
 
 export interface CreateNotificationData {
   title: string;
   message: string;
-  type: 'job_update' | 'payment_due' | 'delivery_ready' | 'system_alert' | 'promotion' | 'reminder';
+  type:
+    | "job_update"
+    | "payment_due"
+    | "delivery_ready"
+    | "system_alert"
+    | "promotion"
+    | "reminder";
   recipient_id: string;
   related_entity_id?: string;
   related_entity_type?: string;
 }
 
 export interface NotificationFilters {
-  type?: 'job_update' | 'payment_due' | 'delivery_ready' | 'system_alert' | 'promotion' | 'reminder' | 'all' | 'unread';
+  type?:
+    | "job_update"
+    | "payment_due"
+    | "delivery_ready"
+    | "system_alert"
+    | "promotion"
+    | "reminder"
+    | "all"
+    | "unread";
   unread?: boolean;
   limit?: number;
   offset?: number;
@@ -23,155 +37,181 @@ export function useNotifications() {
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
 
-  const createNotification = useCallback(async (data: CreateNotificationData) => {
-    try {
-      setIsLoading(true);
-      setError(null);
+  const createNotification = useCallback(
+    async (data: CreateNotificationData) => {
+      try {
+        setIsLoading(true);
+        setError(null);
 
-      const { data: notification, error: insertError } = await supabase
-        .from('notifications')
-        .insert({
-          title: data.title,
-          message: data.message,
-          type: data.type,
-          recipient_id: data.recipient_id,
-          related_entity_id: data.related_entity_id || null,
-          related_entity_type: data.related_entity_type || null,
-          created_at: new Date().toISOString()
-        })
-        .select()
-        .single();
+        const { data: notification, error: insertError } = await supabase
+          .from("notifications")
+          .insert({
+            title: data.title,
+            message: data.message,
+            type: data.type,
+            recipient_id: data.recipient_id,
+            related_entity_id: data.related_entity_id || null,
+            related_entity_type: data.related_entity_type || null,
+            created_at: new Date().toISOString(),
+          })
+          .select()
+          .single();
 
-      if (insertError) {
-        console.error('Error creating notification:', insertError);
-        setError('Failed to create notification');
+        if (insertError) {
+          console.error("Error creating notification:", insertError);
+          setError("Failed to create notification");
+          return null;
+        }
+
+        return notification;
+      } catch (err) {
+        console.error("Error creating notification:", err);
+        setError("Failed to create notification");
         return null;
+      } finally {
+        setIsLoading(false);
       }
+    },
+    [],
+  );
 
-      return notification;
-    } catch (err) {
-      console.error('Error creating notification:', err);
-      setError('Failed to create notification');
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const getNotifications = useCallback(
+    async (userId?: string, filters: NotificationFilters = {}) => {
+      try {
+        setIsLoading(true);
+        setError(null);
 
-  const getNotifications = useCallback(async (userId?: string, filters: NotificationFilters = {}) => {
-    try {
-      setIsLoading(true);
-      setError(null);
+        // Use current user ID if not provided
+        const targetUserId = userId || user?.id;
 
-      // Use current user ID if not provided
-      const targetUserId = userId || user?.id;
-      
-      // Validate userId
-      if (!targetUserId) {
-        console.warn('getNotifications called without valid userId and no authenticated user');
-        setError('User not authenticated');
-        return [];
-      }
-
-      let query = supabase
-        .from('notifications')
-        .select('*')
-        .eq('recipient_id', targetUserId)
-        .order('created_at', { ascending: false });
-
-      if (filters.type && filters.type !== 'all') {
-        if (filters.type === 'unread') {
-          query = query.is('read_at', null);
-        } else {
-          query = query.eq('type', filters.type);
+        // Validate userId
+        if (!targetUserId) {
+          console.warn(
+            "getNotifications called without valid userId and no authenticated user",
+          );
+          setError("User not authenticated");
+          return [];
         }
-      }
 
-      if (filters.unread) {
-        query = query.is('read_at', null);
-      }
+        let query = supabase
+          .from("notifications")
+          .select("*")
+          .eq("recipient_id", targetUserId)
+          .order("created_at", { ascending: false });
 
-      if (filters.limit) {
-        query = query.limit(filters.limit);
-      }
-
-      if (filters.offset) {
-        query = query.range(filters.offset, filters.offset + (filters.limit || 10) - 1);
-      }
-
-      const { data, error: fetchError } = await query;
-
-      if (fetchError) {
-        // Handle RLS permission errors gracefully
-        if (fetchError.message.includes('permission denied') || fetchError.code === '42501') {
-          console.warn('Notifications table access denied - RLS policies need configuration');
-          return []; // Return empty array instead of throwing error
+        if (filters.type && filters.type !== "all") {
+          if (filters.type === "unread") {
+            query = query.is("read_at", null);
+          } else {
+            query = query.eq("type", filters.type);
+          }
         }
-        
+
+        if (filters.unread) {
+          query = query.is("read_at", null);
+        }
+
+        if (filters.limit) {
+          query = query.limit(filters.limit);
+        }
+
+        if (filters.offset) {
+          query = query.range(
+            filters.offset,
+            filters.offset + (filters.limit || 10) - 1,
+          );
+        }
+
+        const { data, error: fetchError } = await query;
+
+        if (fetchError) {
+          // Handle RLS permission errors gracefully
+          if (
+            fetchError.message.includes("permission denied") ||
+            fetchError.code === "42501"
+          ) {
+            console.warn(
+              "Notifications table access denied - RLS policies need configuration",
+            );
+            return []; // Return empty array instead of throwing error
+          }
+
+          // Only log meaningful error information
+          const errorInfo = [];
+          if (fetchError.message)
+            errorInfo.push(`message: ${fetchError.message}`);
+          if (fetchError.code) errorInfo.push(`code: ${fetchError.code}`);
+          if (fetchError.details)
+            errorInfo.push(`details: ${fetchError.details}`);
+          if (fetchError.hint) errorInfo.push(`hint: ${fetchError.hint}`);
+
+          if (errorInfo.length > 0) {
+            console.error(
+              "Error fetching notifications:",
+              errorInfo.join(", "),
+            );
+          } else {
+            console.error(
+              "Error fetching notifications: Unknown database error",
+            );
+          }
+          setError("Failed to fetch notifications");
+          return [];
+        }
+
+        return data || [];
+      } catch (err) {
         // Only log meaningful error information
-        const errorInfo = [];
-        if (fetchError.message) errorInfo.push(`message: ${fetchError.message}`);
-        if (fetchError.code) errorInfo.push(`code: ${fetchError.code}`);
-        if (fetchError.details) errorInfo.push(`details: ${fetchError.details}`);
-        if (fetchError.hint) errorInfo.push(`hint: ${fetchError.hint}`);
-        
-        if (errorInfo.length > 0) {
-          console.error('Error fetching notifications:', errorInfo.join(', '));
+        if (err instanceof Error && err.message) {
+          console.error("Error fetching notifications:", err.message);
         } else {
-          console.error('Error fetching notifications: Unknown database error');
+          console.error("Error fetching notifications: Unknown error occurred");
         }
-        setError('Failed to fetch notifications');
+        setError("Failed to fetch notifications");
         return [];
+      } finally {
+        setIsLoading(false);
       }
+    },
+    [user],
+  );
 
-      return data || [];
-    } catch (err) {
-      // Only log meaningful error information
-      if (err instanceof Error && err.message) {
-        console.error('Error fetching notifications:', err.message);
-      } else {
-        console.error('Error fetching notifications: Unknown error occurred');
-      }
-      setError('Failed to fetch notifications');
-      return [];
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user]);
+  const markAsRead = useCallback(
+    async (notificationId: string) => {
+      try {
+        setIsLoading(true);
+        setError(null);
 
-  const markAsRead = useCallback(async (notificationId: string) => {
-    try {
-      setIsLoading(true);
-      setError(null);
+        if (!user?.id) {
+          console.warn("markAsRead called without authenticated user");
+          setError("User not authenticated");
+          return false;
+        }
 
-      if (!user?.id) {
-        console.warn('markAsRead called without authenticated user');
-        setError('User not authenticated');
+        const { error: updateError } = await supabase
+          .from("notifications")
+          .update({ read_at: new Date().toISOString() })
+          .eq("id", notificationId)
+          .eq("recipient_id", user.id)
+          .is("read_at", null);
+
+        if (updateError) {
+          console.error("Error marking notification as read:", updateError);
+          setError("Failed to mark notification as read");
+          return false;
+        }
+
+        return true;
+      } catch (err) {
+        console.error("Error marking notification as read:", err);
+        setError("Failed to mark notification as read");
         return false;
+      } finally {
+        setIsLoading(false);
       }
-
-      const { error: updateError } = await supabase
-        .from('notifications')
-        .update({ read_at: new Date().toISOString() })
-        .eq('id', notificationId)
-        .eq('recipient_id', user.id)
-        .is('read_at', null);
-
-      if (updateError) {
-        console.error('Error marking notification as read:', updateError);
-        setError('Failed to mark notification as read');
-        return false;
-      }
-
-      return true;
-    } catch (err) {
-      console.error('Error marking notification as read:', err);
-      setError('Failed to mark notification as read');
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user]);
+    },
+    [user],
+  );
 
   const markAllAsRead = async (userId?: string) => {
     try {
@@ -180,29 +220,31 @@ export function useNotifications() {
 
       // Use current user ID if not provided
       const targetUserId = userId || user?.id;
-      
+
       if (!targetUserId) {
-        console.warn('markAllAsRead called without valid userId and no authenticated user');
-        setError('User not authenticated');
+        console.warn(
+          "markAllAsRead called without valid userId and no authenticated user",
+        );
+        setError("User not authenticated");
         return false;
       }
 
       const { error: updateError } = await supabase
-        .from('notifications')
+        .from("notifications")
         .update({ read_at: new Date().toISOString() })
-        .eq('recipient_id', targetUserId)
-        .is('read_at', null);
+        .eq("recipient_id", targetUserId)
+        .is("read_at", null);
 
       if (updateError) {
-        console.error('Error marking all notifications as read:', updateError);
-        setError('Failed to mark notifications as read');
+        console.error("Error marking all notifications as read:", updateError);
+        setError("Failed to mark notifications as read");
         return false;
       }
 
       return true;
     } catch (err) {
-      console.error('Error marking all notifications as read:', err);
-      setError('Failed to mark notifications as read');
+      console.error("Error marking all notifications as read:", err);
+      setError("Failed to mark notifications as read");
       return false;
     } finally {
       setIsLoading(false);
@@ -215,140 +257,170 @@ export function useNotifications() {
       setError(null);
 
       const { error: deleteError } = await supabase
-        .from('notifications')
+        .from("notifications")
         .delete()
-        .eq('id', notificationId);
+        .eq("id", notificationId);
 
       if (deleteError) {
-        console.error('Error deleting notification:', deleteError);
-        setError('Failed to delete notification');
+        console.error("Error deleting notification:", deleteError);
+        setError("Failed to delete notification");
         return false;
       }
 
       return true;
     } catch (err) {
-      console.error('Error deleting notification:', err);
-      setError('Failed to delete notification');
+      console.error("Error deleting notification:", err);
+      setError("Failed to delete notification");
       return false;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const getUnreadCount = useCallback(async (userId?: string) => {
-    try {
-      // Use current user ID if not provided
-      const targetUserId = userId || user?.id;
-      
-      if (!targetUserId) {
-        console.warn('getUnreadCount called without valid userId and no authenticated user');
-        return 0;
-      }
+  const getUnreadCount = useCallback(
+    async (userId?: string) => {
+      try {
+        // Use current user ID if not provided
+        const targetUserId = userId || user?.id;
 
-      // Ensure we have an authenticated session
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (!sessionData.session) {
-        console.warn('getUnreadCount called without authenticated session');
-        return 0;
-      }
-
-      const { count, error: countError } = await supabase
-        .from('notifications')
-        .select('*', { count: 'exact', head: true })
-        .eq('recipient_id', targetUserId)
-        .is('read_at', null);
-
-      if (countError) {
-        // Handle RLS permission errors gracefully
-        if (countError.message.includes('permission denied') || countError.code === '42501') {
-          console.warn('Notifications table access denied - RLS policies need configuration');
-          return 0; // Return 0 instead of throwing error
+        if (!targetUserId) {
+          console.warn(
+            "getUnreadCount called without valid userId and no authenticated user",
+          );
+          return 0;
         }
-        
+
+        // Ensure we have an authenticated session
+        const { data: sessionData } = await supabase.auth.getSession();
+        if (!sessionData.session) {
+          console.warn("getUnreadCount called without authenticated session");
+          return 0;
+        }
+
+        const { count, error: countError } = await supabase
+          .from("notifications")
+          .select("*", { count: "exact", head: true })
+          .eq("recipient_id", targetUserId)
+          .is("read_at", null);
+
+        if (countError) {
+          // Handle RLS permission errors gracefully
+          if (
+            countError.message.includes("permission denied") ||
+            countError.code === "42501"
+          ) {
+            console.warn(
+              "Notifications table access denied - RLS policies need configuration",
+            );
+            return 0; // Return 0 instead of throwing error
+          }
+
+          // Only log meaningful error information
+          const errorInfo = [];
+          if (countError.message)
+            errorInfo.push(`message: ${countError.message}`);
+          if (countError.code) errorInfo.push(`code: ${countError.code}`);
+          if (countError.details)
+            errorInfo.push(`details: ${countError.details}`);
+          if (countError.hint) errorInfo.push(`hint: ${countError.hint}`);
+
+          if (errorInfo.length > 0) {
+            console.error("Error getting unread count:", errorInfo.join(", "));
+          } else {
+            console.error("Error getting unread count: Unknown database error");
+          }
+          return 0;
+        }
+
+        return count || 0;
+      } catch (err) {
         // Only log meaningful error information
-        const errorInfo = [];
-        if (countError.message) errorInfo.push(`message: ${countError.message}`);
-        if (countError.code) errorInfo.push(`code: ${countError.code}`);
-        if (countError.details) errorInfo.push(`details: ${countError.details}`);
-        if (countError.hint) errorInfo.push(`hint: ${countError.hint}`);
-        
-        if (errorInfo.length > 0) {
-          console.error('Error getting unread count:', errorInfo.join(', '));
+        if (err instanceof Error && err.message) {
+          console.error("Error getting unread count:", err.message);
         } else {
-          console.error('Error getting unread count: Unknown database error');
+          console.error("Error getting unread count: Unknown error occurred");
         }
         return 0;
       }
-
-      return count || 0;
-    } catch (err) {
-      // Only log meaningful error information
-      if (err instanceof Error && err.message) {
-        console.error('Error getting unread count:', err.message);
-      } else {
-        console.error('Error getting unread count: Unknown error occurred');
-      }
-      return 0;
-    }
-  }, [user]);
+    },
+    [user],
+  );
 
   // Helper functions for common notification types
-  const notifyJobUpdate = async (userId: string, jobId: string, status: string, jobTitle: string) => {
+  const notifyJobUpdate = async (
+    userId: string,
+    jobId: string,
+    status: string,
+    jobTitle: string,
+  ) => {
     return createNotification({
-      title: 'Job Status Update',
+      title: "Job Status Update",
       message: `Your job "${jobTitle}" status has been updated to: ${status}`,
-      type: 'job_update',
+      type: "job_update",
       recipient_id: userId,
       related_entity_id: jobId,
-      related_entity_type: 'job'
+      related_entity_type: "job",
     });
   };
 
-  const notifyPaymentDue = async (userId: string, amount: number, dueDate: string, jobTitle: string) => {
+  const notifyPaymentDue = async (
+    userId: string,
+    amount: number,
+    dueDate: string,
+    jobTitle: string,
+  ) => {
     return createNotification({
-      title: 'Payment Due',
+      title: "Payment Due",
       message: `Payment of $${amount.toFixed(2)} is due on ${new Date(dueDate).toLocaleDateString()} for "${jobTitle}"`,
-      type: 'payment_due',
+      type: "payment_due",
       recipient_id: userId,
-      related_entity_type: 'payment'
+      related_entity_type: "payment",
     });
   };
 
-  const notifyDeliveryReady = async (userId: string, jobId: string, jobTitle: string) => {
+  const notifyDeliveryReady = async (
+    userId: string,
+    jobId: string,
+    jobTitle: string,
+  ) => {
     return createNotification({
-      title: 'Order Ready for Pickup',
+      title: "Order Ready for Pickup",
       message: `Your order "${jobTitle}" is ready for pickup or delivery`,
-      type: 'delivery_ready',
+      type: "delivery_ready",
       recipient_id: userId,
       related_entity_id: jobId,
-      related_entity_type: 'job'
+      related_entity_type: "job",
     });
   };
 
   const notifySystemAlert = async (userId: string, alertMessage: string) => {
     return createNotification({
-      title: 'System Alert',
+      title: "System Alert",
       message: alertMessage,
-      type: 'system_alert',
-      recipient_id: userId
+      type: "system_alert",
+      recipient_id: userId,
     });
   };
 
-  const notifyPromotion = async (userId: string, promoTitle: string, promoMessage: string) => {
+  const notifyPromotion = async (
+    userId: string,
+    promoTitle: string,
+    promoMessage: string,
+  ) => {
     return createNotification({
       title: promoTitle,
       message: promoMessage,
-      type: 'promotion',
-      recipient_id: userId
+      type: "promotion",
+      recipient_id: userId,
     });
   };
 
   const notifyReminder = async (userId: string, reminderMessage: string) => {
     return createNotification({
-      title: 'Reminder',
+      title: "Reminder",
       message: reminderMessage,
-      type: 'reminder',
-      recipient_id: userId
+      type: "reminder",
+      recipient_id: userId,
     });
   };
 
@@ -367,6 +439,6 @@ export function useNotifications() {
     notifyDeliveryReady,
     notifySystemAlert,
     notifyPromotion,
-    notifyReminder
+    notifyReminder,
   };
 }

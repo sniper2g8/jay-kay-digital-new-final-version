@@ -5,6 +5,7 @@
 ### Step 1: Verify Environment Variables
 
 **On your production server, run:**
+
 ```bash
 # For Linux/Mac
 ./production-env-check.sh
@@ -14,15 +15,17 @@ powershell -ExecutionPolicy Bypass -File production-env-check.ps1
 ```
 
 **Manual check - Ensure these variables are set:**
+
 ```bash
 echo $NEXT_PUBLIC_SUPABASE_URL
-echo $NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY  
+echo $NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
 echo $SUPABASE_SERVICE_ROLE_KEY
 ```
 
 ### Step 2: Test API Endpoints
 
 **Test the debug endpoints on your production server:**
+
 ```bash
 # Test basic connectivity
 curl https://your-domain.com/api/debug-invoice
@@ -32,6 +35,7 @@ curl https://your-domain.com/api/test-invoice-data
 ```
 
 Expected response from `/api/debug-invoice`:
+
 ```json
 {
   "success": true,
@@ -49,12 +53,14 @@ Expected response from `/api/debug-invoice`:
 **Look for these specific error patterns in your server logs:**
 
 1. **Environment Variable Errors:**
+
    ```
    Missing Supabase environment variables
    Server configuration error
    ```
 
 2. **Database Connection Errors:**
+
    ```
    Database error
    Supabase credentials mismatch
@@ -69,11 +75,13 @@ Expected response from `/api/debug-invoice`:
 ### Step 4: Test Specific Invoice ID
 
 **Find a valid invoice ID:**
+
 ```bash
 curl https://your-domain.com/api/test-invoice-data
 ```
 
 **Then test the invoice items endpoint:**
+
 ```bash
 curl https://your-domain.com/api/invoice-items/[INVOICE_ID_FROM_ABOVE]
 ```
@@ -96,6 +104,7 @@ curl https://your-domain.com/api/invoice-items/[INVOICE_ID_FROM_ABOVE]
 ### Step 6: Fallback Mechanism
 
 The updated invoice page now includes a fallback mechanism that:
+
 1. First tries the API route
 2. If that fails, tries direct database query
 3. Shows detailed error information
@@ -103,28 +112,36 @@ The updated invoice page now includes a fallback mechanism that:
 ### Common Production Issues and Fixes
 
 #### Issue 1: Environment Variables Not Loading
+
 **Symptoms:** "Server configuration error"
-**Fix:** 
+**Fix:**
+
 - Ensure `.env.production` file exists
 - Restart your application server
 - Check file permissions
 
 #### Issue 2: Wrong Environment Variable Names
+
 **Symptoms:** API routes fail with authentication errors
-**Fix:** 
+**Fix:**
+
 - Verify all API routes use `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY`
 - Not `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 
 #### Issue 3: Database Permissions
+
 **Symptoms:** "Database error" or RLS policy errors
 **Fix:**
+
 - Check Supabase Row Level Security (RLS) policies
 - Verify service role key has proper permissions
 - Test with a Supabase admin user
 
 #### Issue 4: CORS or Network Issues
+
 **Symptoms:** Network request failures
 **Fix:**
+
 - Check if your production domain is allowed in Supabase
 - Verify SSL certificates
 - Check firewall settings

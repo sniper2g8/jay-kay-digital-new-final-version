@@ -3,14 +3,20 @@
  * Allows users to manage their notification settings with opt-in/out options
  */
 
-import React, { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
-import { Button } from './ui/button';
-import { Switch } from './ui/switch';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Label } from './ui/label';
-import { Alert, AlertDescription } from './ui/alert';
-import { Loader2, Bell, Mail, MessageSquare, Settings } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { supabase } from "../lib/supabase";
+import { Button } from "./ui/button";
+import { Switch } from "./ui/switch";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
+import { Label } from "./ui/label";
+import { Alert, AlertDescription } from "./ui/alert";
+import { Loader2, Bell, Mail, MessageSquare, Settings } from "lucide-react";
 
 interface NotificationPreference {
   id?: string;
@@ -26,25 +32,27 @@ interface NotificationPreference {
 
 interface NotificationPreferencesProps {
   userId: string;
-  userRole?: 'admin' | 'customer' | 'staff';
+  userRole?: "admin" | "customer" | "staff";
 }
 
-export const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
-  userId,
-  userRole = 'customer'
-}) => {
+export const NotificationPreferences: React.FC<
+  NotificationPreferencesProps
+> = ({ userId, userRole = "customer" }) => {
   const [preferences, setPreferences] = useState<NotificationPreference>({
     user_id: userId,
     email_notifications: true,
     sms_notifications: false,
     job_status_updates: true,
     delivery_updates: true,
-    promotional_messages: false
+    promotional_messages: false,
   });
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   // Load existing preferences
   useEffect(() => {
@@ -55,12 +63,13 @@ export const NotificationPreferences: React.FC<NotificationPreferencesProps> = (
     try {
       setLoading(true);
       const { data, error } = await supabase
-        .from('notification_preferences')
-        .select('*')
-        .eq('user_id', userId)
+        .from("notification_preferences")
+        .select("*")
+        .eq("user_id", userId)
         .single();
 
-      if (error && error.code !== 'PGRST116') { // PGRST116 = not found
+      if (error && error.code !== "PGRST116") {
+        // PGRST116 = not found
         throw error;
       }
 
@@ -68,10 +77,10 @@ export const NotificationPreferences: React.FC<NotificationPreferencesProps> = (
         setPreferences(data);
       }
     } catch (error) {
-      console.error('Error loading notification preferences:', error);
+      console.error("Error loading notification preferences:", error);
       setMessage({
-        type: 'error',
-        text: 'Failed to load notification preferences'
+        type: "error",
+        text: "Failed to load notification preferences",
       });
     } finally {
       setLoading(false);
@@ -90,27 +99,27 @@ export const NotificationPreferences: React.FC<NotificationPreferencesProps> = (
         job_status_updates: preferences.job_status_updates ?? true,
         delivery_updates: preferences.delivery_updates ?? true,
         promotional_messages: preferences.promotional_messages ?? false,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       };
 
       // Check if preferences exist first
       const { data: existingData } = await supabase
-        .from('notification_preferences')
-        .select('id')
-        .eq('user_id', userId)
+        .from("notification_preferences")
+        .select("id")
+        .eq("user_id", userId)
         .single();
 
       let error;
       if (existingData) {
         // Update existing preferences
         ({ error } = await supabase
-          .from('notification_preferences')
+          .from("notification_preferences")
           .update(preferenceData)
-          .eq('user_id', userId));
+          .eq("user_id", userId));
       } else {
         // Insert new preferences
         ({ error } = await supabase
-          .from('notification_preferences')
+          .from("notification_preferences")
           .insert(preferenceData as any));
       }
 
@@ -119,27 +128,30 @@ export const NotificationPreferences: React.FC<NotificationPreferencesProps> = (
       }
 
       setMessage({
-        type: 'success',
-        text: 'Notification preferences saved successfully!'
+        type: "success",
+        text: "Notification preferences saved successfully!",
       });
 
       // Clear success message after 3 seconds
       setTimeout(() => setMessage(null), 3000);
     } catch (error) {
-      console.error('Error saving notification preferences:', error);
+      console.error("Error saving notification preferences:", error);
       setMessage({
-        type: 'error',
-        text: 'Failed to save notification preferences'
+        type: "error",
+        text: "Failed to save notification preferences",
       });
     } finally {
       setSaving(false);
     }
   };
 
-  const updatePreference = (key: keyof NotificationPreference, value: boolean) => {
-    setPreferences(prev => ({
+  const updatePreference = (
+    key: keyof NotificationPreference,
+    value: boolean,
+  ) => {
+    setPreferences((prev) => ({
       ...prev,
-      [key]: value
+      [key]: value,
     }));
   };
 
@@ -163,13 +175,17 @@ export const NotificationPreferences: React.FC<NotificationPreferencesProps> = (
             Notification Preferences
           </CardTitle>
           <CardDescription>
-            Manage how you receive notifications from Jay Kay Digital Press. 
-            You can opt-in or out of different types of notifications.
+            Manage how you receive notifications from Jay Kay Digital Press. You
+            can opt-in or out of different types of notifications.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {message && (
-            <Alert className={message.type === 'error' ? 'border-red-500' : 'border-green-500'}>
+            <Alert
+              className={
+                message.type === "error" ? "border-red-500" : "border-green-500"
+              }
+            >
               <AlertDescription>{message.text}</AlertDescription>
             </Alert>
           )}
@@ -184,14 +200,19 @@ export const NotificationPreferences: React.FC<NotificationPreferencesProps> = (
               <div className="flex items-center justify-between space-x-2">
                 <div className="flex items-center space-x-2">
                   <Mail className="h-4 w-4 text-muted-foreground" />
-                  <Label htmlFor="email-notifications" className="text-sm font-medium">
+                  <Label
+                    htmlFor="email-notifications"
+                    className="text-sm font-medium"
+                  >
                     Email Notifications
                   </Label>
                 </div>
                 <Switch
                   id="email-notifications"
                   checked={preferences.email_notifications ?? true}
-                  onCheckedChange={(checked) => updatePreference('email_notifications', checked)}
+                  onCheckedChange={(checked) =>
+                    updatePreference("email_notifications", checked)
+                  }
                 />
               </div>
               <p className="text-xs text-muted-foreground ml-6">
@@ -201,14 +222,19 @@ export const NotificationPreferences: React.FC<NotificationPreferencesProps> = (
               <div className="flex items-center justify-between space-x-2">
                 <div className="flex items-center space-x-2">
                   <MessageSquare className="h-4 w-4 text-muted-foreground" />
-                  <Label htmlFor="sms-notifications" className="text-sm font-medium">
+                  <Label
+                    htmlFor="sms-notifications"
+                    className="text-sm font-medium"
+                  >
                     SMS Notifications
                   </Label>
                 </div>
                 <Switch
                   id="sms-notifications"
                   checked={preferences.sms_notifications ?? false}
-                  onCheckedChange={(checked) => updatePreference('sms_notifications', checked)}
+                  onCheckedChange={(checked) =>
+                    updatePreference("sms_notifications", checked)
+                  }
                 />
               </div>
               <p className="text-xs text-muted-foreground ml-6">
@@ -222,13 +248,18 @@ export const NotificationPreferences: React.FC<NotificationPreferencesProps> = (
             <h3 className="text-lg font-semibold">Notification Types</h3>
             <div className="grid gap-4">
               <div className="flex items-center justify-between space-x-2">
-                <Label htmlFor="job-status-updates" className="text-sm font-medium">
+                <Label
+                  htmlFor="job-status-updates"
+                  className="text-sm font-medium"
+                >
                   Job Status Updates
                 </Label>
                 <Switch
                   id="job-status-updates"
                   checked={preferences.job_status_updates ?? true}
-                  onCheckedChange={(checked) => updatePreference('job_status_updates', checked)}
+                  onCheckedChange={(checked) =>
+                    updatePreference("job_status_updates", checked)
+                  }
                 />
               </div>
               <p className="text-xs text-muted-foreground">
@@ -236,13 +267,18 @@ export const NotificationPreferences: React.FC<NotificationPreferencesProps> = (
               </p>
 
               <div className="flex items-center justify-between space-x-2">
-                <Label htmlFor="delivery-updates" className="text-sm font-medium">
+                <Label
+                  htmlFor="delivery-updates"
+                  className="text-sm font-medium"
+                >
                   Delivery Updates
                 </Label>
                 <Switch
                   id="delivery-updates"
                   checked={preferences.delivery_updates ?? true}
-                  onCheckedChange={(checked) => updatePreference('delivery_updates', checked)}
+                  onCheckedChange={(checked) =>
+                    updatePreference("delivery_updates", checked)
+                  }
                 />
               </div>
               <p className="text-xs text-muted-foreground">
@@ -250,13 +286,18 @@ export const NotificationPreferences: React.FC<NotificationPreferencesProps> = (
               </p>
 
               <div className="flex items-center justify-between space-x-2">
-                <Label htmlFor="promotional-messages" className="text-sm font-medium">
+                <Label
+                  htmlFor="promotional-messages"
+                  className="text-sm font-medium"
+                >
                   Promotional Messages
                 </Label>
                 <Switch
                   id="promotional-messages"
                   checked={preferences.promotional_messages ?? false}
-                  onCheckedChange={(checked) => updatePreference('promotional_messages', checked)}
+                  onCheckedChange={(checked) =>
+                    updatePreference("promotional_messages", checked)
+                  }
                 />
               </div>
               <p className="text-xs text-muted-foreground">
@@ -266,8 +307,8 @@ export const NotificationPreferences: React.FC<NotificationPreferencesProps> = (
           </div>
 
           <div className="flex justify-end pt-4">
-            <Button 
-              onClick={savePreferences} 
+            <Button
+              onClick={savePreferences}
               disabled={saving}
               className="min-w-[120px]"
             >
@@ -277,7 +318,7 @@ export const NotificationPreferences: React.FC<NotificationPreferencesProps> = (
                   Saving...
                 </>
               ) : (
-                'Save Preferences'
+                "Save Preferences"
               )}
             </Button>
           </div>
@@ -291,16 +332,17 @@ export const NotificationPreferences: React.FC<NotificationPreferencesProps> = (
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground space-y-2">
           <p>
-            • <strong>Email notifications</strong> are sent to your registered email address
+            • <strong>Email notifications</strong> are sent to your registered
+            email address
           </p>
           <p>
-            • <strong>SMS notifications</strong> require a valid phone number in your profile
+            • <strong>SMS notifications</strong> require a valid phone number in
+            your profile
           </p>
+          <p>• You can change these preferences at any time</p>
           <p>
-            • You can change these preferences at any time
-          </p>
-          <p>
-            • Critical system alerts and security notifications cannot be disabled
+            • Critical system alerts and security notifications cannot be
+            disabled
           </p>
         </CardContent>
       </Card>

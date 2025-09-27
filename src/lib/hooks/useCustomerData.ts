@@ -81,7 +81,6 @@ export const useCustomerData = () => {
       }
 
       if (!customerData) {
-        
         setJobs([]);
         setInvoices([]);
         setLoading(false);
@@ -89,7 +88,7 @@ export const useCustomerData = () => {
       }
 
       const customerId = customerData.id;
-      
+
       // Fetch customer's jobs only - using correct column names
       const { data: jobsData, error: jobsError } = await supabase
         .from("jobs")
@@ -116,7 +115,6 @@ export const useCustomerData = () => {
         console.error("❌ Error fetching jobs:", jobsError);
         setJobs([]);
       } else {
-        
         setJobs(jobsData || []);
       }
 
@@ -143,7 +141,6 @@ export const useCustomerData = () => {
         console.error("❌ Error fetching invoices:", invoicesError);
         setInvoices([]);
       } else {
-        
         setInvoices(invoicesData || []);
       }
 
@@ -185,7 +182,6 @@ export const useCustomerData = () => {
       };
 
       setStats(newStats);
-      
     } catch (err) {
       console.error("❌ Error fetching customer data:", err);
       setError(err instanceof Error ? err.message : "Failed to load your data");

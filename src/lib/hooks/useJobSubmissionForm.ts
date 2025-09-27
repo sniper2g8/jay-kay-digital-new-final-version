@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { usePaperSpecifications } from "./usePaperSpecifications.ts";
 import { Database } from "@/lib/database.types";
@@ -156,52 +156,52 @@ export const useJobSubmissionForm = () => {
   ];
 
   // Service-specific specifications mapping - memoized to prevent unnecessary re-renders
-  const serviceSpecifications = useMemo(
-    () => ({
-      business_cards: {
-        paper_types: ["Cardstock", "Premium Paper", "Glossy Paper"],
-        paper_weights: [250, 300, 350],
-        finishing_options: [
-          "lamination",
-          "uv_coating",
-          "embossing",
-          "foil_stamping",
-          "die_cutting",
-        ],
-      },
-      brochures: {
-        paper_types: ["Glossy Paper", "Matte Paper", "Premium Paper"],
-        paper_weights: [80, 100, 120, 150],
-        finishing_options: ["lamination", "uv_coating", "folding", "trimming"],
-      },
-      flyers: {
-        paper_types: ["Copy Paper", "Glossy Paper", "Matte Paper"],
-        paper_weights: [80, 100, 120],
-        finishing_options: ["lamination", "uv_coating", "trimming"],
-      },
-      posters: {
-        paper_types: ["Photo Paper", "Glossy Paper", "Matte Paper"],
-        paper_weights: [120, 150, 200],
-        finishing_options: ["lamination", "uv_coating", "trimming"],
-      },
-      booklets: {
-        paper_types: ["Copy Paper", "Bond Paper", "Premium Paper"],
-        paper_weights: [60, 80, 100],
-        finishing_options: [
-          "binding_spiral",
-          "binding_perfect",
-          "folding",
-          "trimming",
-        ],
-      },
-      banners: {
-        paper_types: ["Vinyl", "Canvas"],
-        paper_weights: [200, 250, 300],
-        finishing_options: ["hole_punching", "trimming"],
-      },
-    }),
-    [],
-  );
+  // const serviceSpecifications = useMemo(
+  //   () => ({
+  //     business_cards: {
+  //       paper_types: ["Cardstock", "Premium Paper", "Glossy Paper"],
+  //       paper_weights: [250, 300, 350],
+  //       finishing_options: [
+  //         "lamination",
+  //         "uv_coating",
+  //         "embossing",
+  //         "foil_stamping",
+  //         "die_cutting",
+  //       ],
+  //     },
+  //     brochures: {
+  //       paper_types: ["Glossy Paper", "Matte Paper", "Premium Paper"],
+  //       paper_weights: [80, 100, 120, 150],
+  //       finishing_options: ["lamination", "uv_coating", "folding", "trimming"],
+  //     },
+  //     flyers: {
+  //       paper_types: ["Copy Paper", "Glossy Paper", "Matte Paper"],
+  //       paper_weights: [80, 100, 120],
+  //       finishing_options: ["lamination", "uv_coating", "trimming"],
+  //     },
+  //     posters: {
+  //       paper_types: ["Photo Paper", "Glossy Paper", "Matte Paper"],
+  //       paper_weights: [120, 150, 200],
+  //       finishing_options: ["lamination", "uv_coating", "trimming"],
+  //     },
+  //     booklets: {
+  //       paper_types: ["Copy Paper", "Bond Paper", "Premium Paper"],
+  //       paper_weights: [60, 80, 100],
+  //       finishing_options: [
+  //         "binding_spiral",
+  //         "binding_perfect",
+  //         "folding",
+  //         "trimming",
+  //       ],
+  //     },
+  //     banners: {
+  //       paper_types: ["Vinyl", "Canvas"],
+  //       paper_weights: [200, 250, 300],
+  //       finishing_options: ["hole_punching", "trimming"],
+  //     },
+  //   }),
+  //   [],
+  // );
 
   // Load customers and services
   const loadCustomers = useCallback(async () => {
@@ -223,7 +223,9 @@ export const useJobSubmissionForm = () => {
     try {
       const { data, error } = await supabase
         .from("services")
-        .select("id, title, description, specSchema, active, slug, imageUrl, options")
+        .select(
+          "id, title, description, specSchema, active, slug, imageUrl, options",
+        )
         .eq("active", true)
         .order("title", { ascending: true });
 
@@ -282,9 +284,10 @@ export const useJobSubmissionForm = () => {
       const availableFinishIds = serviceOptions.finishIds || [];
 
       // Filter finishing options by the service's finishIds
-      const filteredFinishing = finishOptions.data?.filter((option) =>
-        availableFinishIds.includes(option.id),
-      ) || [];
+      const filteredFinishing =
+        finishOptions.data?.filter((option) =>
+          availableFinishIds.includes(option.id),
+        ) || [];
 
       // Set available options (use defaults if service doesn't specify)
       setAvailablePaperTypes(
@@ -298,7 +301,9 @@ export const useJobSubmissionForm = () => {
           : paperWeights.data?.map((p) => p.gsm) || [],
       );
       setAvailableFinishingOptions(
-        filteredFinishing.length > 0 ? filteredFinishing : finishOptions.data || [],
+        filteredFinishing.length > 0
+          ? filteredFinishing
+          : finishOptions.data || [],
       );
 
       // Reset selections if they're no longer valid
@@ -320,10 +325,12 @@ export const useJobSubmissionForm = () => {
       }
 
       // Reset finishing options if any are no longer valid
-      const validFinishingOptions = formData.finishing_options.filter(optionId =>
-        availableFinishIds.length === 0 || availableFinishIds.includes(optionId)
+      const validFinishingOptions = formData.finishing_options.filter(
+        (optionId) =>
+          availableFinishIds.length === 0 ||
+          availableFinishIds.includes(optionId),
       );
-      
+
       if (validFinishingOptions.length !== formData.finishing_options.length) {
         setFormData((prev) => ({
           ...prev,

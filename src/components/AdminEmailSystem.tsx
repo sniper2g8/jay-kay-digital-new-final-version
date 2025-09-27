@@ -1,14 +1,26 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { supabase } from '@/lib/supabase';
-import { Mail, Send, Users, FileText, Palette } from 'lucide-react';
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { supabase } from "@/lib/supabase";
+import { Mail, Send, Users, FileText, Palette } from "lucide-react";
 
 interface Customer {
   id: string;
@@ -35,13 +47,15 @@ export default function AdminEmailSystem() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [templates, setTemplates] = useState<EmailTemplate[]>([]);
   const [selectedCustomers, setSelectedCustomers] = useState<string[]>([]);
-  const [selectedTemplate, setSelectedTemplate] = useState<string>('none');
-  const [customSubject, setCustomSubject] = useState('');
-  const [customMessage, setCustomMessage] = useState('');
+  const [selectedTemplate, setSelectedTemplate] = useState<string>("none");
+  const [customSubject, setCustomSubject] = useState("");
+  const [customMessage, setCustomMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [emailMode, setEmailMode] = useState<'individual' | 'bulk'>('individual');
+  const [emailMode, setEmailMode] = useState<"individual" | "bulk">(
+    "individual",
+  );
 
   useEffect(() => {
     loadCustomers();
@@ -51,41 +65,43 @@ export default function AdminEmailSystem() {
   const loadCustomers = async () => {
     try {
       const { data, error } = await supabase
-        .from('customers')
-        .select('id, email, name, business_name')
-        .order('name');
+        .from("customers")
+        .select("id, email, name, business_name")
+        .order("name");
 
       if (error) throw error;
       // Cast the data to the correct type
-      setCustomers(data as Customer[] || []);
+      setCustomers((data as Customer[]) || []);
     } catch (err) {
-      console.error('Error loading customers:', err);
-      setError('Failed to load customers');
+      console.error("Error loading customers:", err);
+      setError("Failed to load customers");
     }
   };
 
   const loadTemplates = async () => {
     try {
       const { data, error } = await supabase
-        .from('email_templates')
-        .select('*')
-        .eq('type', 'custom')
-        .order('name');
+        .from("email_templates")
+        .select("*")
+        .eq("type", "custom")
+        .order("name");
 
       if (error) throw error;
-      setTemplates((data || []).filter(template => template.type === 'custom'));
+      setTemplates(
+        (data || []).filter((template) => template.type === "custom"),
+      );
     } catch (err) {
-      console.error('Error loading templates:', err);
+      console.error("Error loading templates:", err);
       // Templates table might not exist yet, that's okay
     }
   };
 
   const handleTemplateSelect = (templateId: string) => {
-    if (templateId === 'none') {
-      setCustomSubject('');
-      setCustomMessage('');
+    if (templateId === "none") {
+      setCustomSubject("");
+      setCustomMessage("");
     } else {
-      const template = templates.find(t => t.id === templateId);
+      const template = templates.find((t) => t.id === templateId);
       if (template) {
         setCustomSubject(template.subject);
         setCustomMessage(template.content);
@@ -95,8 +111,14 @@ export default function AdminEmailSystem() {
   };
 
   const sendCustomEmail = async () => {
-    if (!customSubject.trim() || !customMessage.trim() || selectedCustomers.length === 0) {
-      setError('Please fill in all required fields and select at least one customer');
+    if (
+      !customSubject.trim() ||
+      !customMessage.trim() ||
+      selectedCustomers.length === 0
+    ) {
+      setError(
+        "Please fill in all required fields and select at least one customer",
+      );
       return;
     }
 
@@ -105,23 +127,29 @@ export default function AdminEmailSystem() {
     setSuccess(null);
 
     try {
-      const selectedCustomerData = customers.filter(c => selectedCustomers.includes(c.id));
+      const selectedCustomerData = customers.filter((c) =>
+        selectedCustomers.includes(c.id),
+      );
       let successCount = 0;
       let failureCount = 0;
 
       for (const customer of selectedCustomerData) {
         try {
-          const { data, error } = await supabase.functions.invoke('email-notifications', {
-            body: {
-              type: 'custom_email',
-              recipientEmail: customer.email || '',
-              recipientName: customer.name || customer.business_name || 'Valued Customer',
-              data: {
-                customSubject: customSubject,
-                customMessage: customMessage,
-              }
-            }
-          });
+          const { data, error } = await supabase.functions.invoke(
+            "email-notifications",
+            {
+              body: {
+                type: "custom_email",
+                recipientEmail: customer.email || "",
+                recipientName:
+                  customer.name || customer.business_name || "Valued Customer",
+                data: {
+                  customSubject: customSubject,
+                  customMessage: customMessage,
+                },
+              },
+            },
+          );
 
           if (error) throw error;
           successCount++;
@@ -132,20 +160,21 @@ export default function AdminEmailSystem() {
       }
 
       if (successCount > 0) {
-        setSuccess(`Successfully sent ${successCount} email(s)${failureCount > 0 ? ` (${failureCount} failed)` : ''}`);
-        
-        // Clear form
-        setCustomSubject('');
-        setCustomMessage('');
-        setSelectedCustomers([]);
-        setSelectedTemplate('none');
-      } else {
-        setError('Failed to send any emails');
-      }
+        setSuccess(
+          `Successfully sent ${successCount} email(s)${failureCount > 0 ? ` (${failureCount} failed)` : ""}`,
+        );
 
+        // Clear form
+        setCustomSubject("");
+        setCustomMessage("");
+        setSelectedCustomers([]);
+        setSelectedTemplate("none");
+      } else {
+        setError("Failed to send any emails");
+      }
     } catch (err) {
-      console.error('Error sending emails:', err);
-      setError('Failed to send emails');
+      console.error("Error sending emails:", err);
+      setError("Failed to send emails");
     } finally {
       setIsLoading(false);
     }
@@ -153,43 +182,41 @@ export default function AdminEmailSystem() {
 
   const saveTemplate = async () => {
     if (!customSubject.trim() || !customMessage.trim()) {
-      setError('Please fill in subject and message to save template');
+      setError("Please fill in subject and message to save template");
       return;
     }
 
-    const templateName = prompt('Enter a name for this template:');
+    const templateName = prompt("Enter a name for this template:");
     if (!templateName) return;
 
     try {
-      const { error } = await supabase
-        .from('email_templates')
-        .insert({
-          name: templateName,
-          subject: customSubject,
-          content: customMessage,
-          type: 'custom'
-        });
+      const { error } = await supabase.from("email_templates").insert({
+        name: templateName,
+        subject: customSubject,
+        content: customMessage,
+        type: "custom",
+      });
 
       if (error) throw error;
-      
-      setSuccess('Template saved successfully');
+
+      setSuccess("Template saved successfully");
       loadTemplates();
     } catch (err) {
-      console.error('Error saving template:', err);
-      setError('Failed to save template');
+      console.error("Error saving template:", err);
+      setError("Failed to save template");
     }
   };
 
   const toggleCustomerSelection = (customerId: string) => {
-    setSelectedCustomers(prev => 
-      prev.includes(customerId) 
-        ? prev.filter(id => id !== customerId)
-        : [...prev, customerId]
+    setSelectedCustomers((prev) =>
+      prev.includes(customerId)
+        ? prev.filter((id) => id !== customerId)
+        : [...prev, customerId],
     );
   };
 
   const selectAllCustomers = () => {
-    setSelectedCustomers(customers.map(c => c.id));
+    setSelectedCustomers(customers.map((c) => c.id));
   };
 
   const clearSelection = () => {
@@ -214,7 +241,9 @@ export default function AdminEmailSystem() {
 
       {success && (
         <Alert className="border-green-200 bg-green-50">
-          <AlertDescription className="text-green-800">{success}</AlertDescription>
+          <AlertDescription className="text-green-800">
+            {success}
+          </AlertDescription>
         </Alert>
       )}
 
@@ -227,22 +256,23 @@ export default function AdminEmailSystem() {
               Select Recipients
             </CardTitle>
             <CardDescription>
-              Choose customers to send emails to ({selectedCustomers.length} selected)
+              Choose customers to send emails to ({selectedCustomers.length}{" "}
+              selected)
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={selectAllCustomers}
                 disabled={customers.length === 0}
               >
                 Select All
               </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={clearSelection}
                 disabled={selectedCustomers.length === 0}
               >
@@ -255,7 +285,9 @@ export default function AdminEmailSystem() {
                 <div
                   key={customer.id}
                   className={`p-3 border-b last:border-b-0 cursor-pointer hover:bg-gray-50 ${
-                    selectedCustomers.includes(customer.id) ? 'bg-blue-50 border-blue-200' : ''
+                    selectedCustomers.includes(customer.id)
+                      ? "bg-blue-50 border-blue-200"
+                      : ""
                   }`}
                   onClick={() => toggleCustomerSelection(customer.id)}
                 >
@@ -270,9 +302,13 @@ export default function AdminEmailSystem() {
                       <div className="font-medium">
                         {customer.name || customer.business_name}
                       </div>
-                      <div className="text-sm text-gray-600">{customer.email}</div>
+                      <div className="text-sm text-gray-600">
+                        {customer.email}
+                      </div>
                       {customer.business_name && customer.name && (
-                        <div className="text-sm text-gray-500">{customer.business_name}</div>
+                        <div className="text-sm text-gray-500">
+                          {customer.business_name}
+                        </div>
                       )}
                     </div>
                   </div>
@@ -295,21 +331,24 @@ export default function AdminEmailSystem() {
               <FileText className="h-5 w-5" />
               Compose Email
             </CardTitle>
-            <CardDescription>
-              Create your custom email message
-            </CardDescription>
+            <CardDescription>Create your custom email message</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Template Selection */}
             {templates.length > 0 && (
               <div className="space-y-2">
                 <Label>Email Template (Optional)</Label>
-                <Select value={selectedTemplate} onValueChange={handleTemplateSelect}>
+                <Select
+                  value={selectedTemplate}
+                  onValueChange={handleTemplateSelect}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Choose a template or start fresh" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">No template (start fresh)</SelectItem>
+                    <SelectItem value="none">
+                      No template (start fresh)
+                    </SelectItem>
                     {templates.map((template) => (
                       <SelectItem key={template.id} value={template.id}>
                         {template.name}
@@ -344,7 +383,8 @@ export default function AdminEmailSystem() {
                 required
               />
               <p className="text-sm text-gray-500">
-                The message will be automatically formatted with JayKay Digital Press branding
+                The message will be automatically formatted with JayKay Digital
+                Press branding
               </p>
             </div>
 
@@ -352,13 +392,20 @@ export default function AdminEmailSystem() {
             <div className="flex gap-2 pt-4">
               <Button
                 onClick={sendCustomEmail}
-                disabled={isLoading || selectedCustomers.length === 0 || !customSubject.trim() || !customMessage.trim()}
+                disabled={
+                  isLoading ||
+                  selectedCustomers.length === 0 ||
+                  !customSubject.trim() ||
+                  !customMessage.trim()
+                }
                 className="flex-1"
               >
                 <Send className="h-4 w-4 mr-2" />
-                {isLoading ? 'Sending...' : `Send to ${selectedCustomers.length} Customer${selectedCustomers.length !== 1 ? 's' : ''}`}
+                {isLoading
+                  ? "Sending..."
+                  : `Send to ${selectedCustomers.length} Customer${selectedCustomers.length !== 1 ? "s" : ""}`}
               </Button>
-              
+
               <Button
                 variant="outline"
                 onClick={saveTemplate}
@@ -385,14 +432,19 @@ export default function AdminEmailSystem() {
             <div className="border rounded-lg p-4 bg-gray-50">
               <div className="border-b pb-2 mb-4">
                 <div className="text-sm text-gray-600">Subject:</div>
-                <div className="font-medium">{customSubject || 'Message from JayKay Digital Press'}</div>
+                <div className="font-medium">
+                  {customSubject || "Message from JayKay Digital Press"}
+                </div>
               </div>
               <div className="whitespace-pre-wrap text-sm">
                 <div className="mb-4">Dear [Customer Name],</div>
                 <div className="mb-4">{customMessage}</div>
-                <div className="mb-2">Thank you for your continued business!</div>
+                <div className="mb-2">
+                  Thank you for your continued business!
+                </div>
                 <div>
-                  Best regards,<br />
+                  Best regards,
+                  <br />
                   <strong>The JayKay Digital Press Team</strong>
                 </div>
               </div>

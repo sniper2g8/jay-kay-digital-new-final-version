@@ -51,10 +51,10 @@ interface SimplifiedInvoiceTemplateProps {
   items: InvoiceItem[];
 }
 
-export function SimplifiedInvoiceTemplate({ 
-  invoice, 
-  customer, 
-  items
+export function SimplifiedInvoiceTemplate({
+  invoice,
+  customer,
+  items,
 }: SimplifiedInvoiceTemplateProps) {
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
 
@@ -69,13 +69,13 @@ export function SimplifiedInvoiceTemplate({
   const discount = typeof invoice.discount === 'string' ? parseFloat(invoice.discount) || 0 : invoice.discount || 0;
   const total = invoice.total || subtotal + tax - discount;
   const amountPaid = typeof invoice.amountPaid === 'string' ? parseFloat(invoice.amountPaid) || 0 : invoice.amountPaid || 0;
-  
-  // Fix precision issues by rounding to 2 decimal places
   const amountDue = Math.round((total - amountPaid) * 100) / 100;
-  const currency = invoice.currency || 'SLL';
+  // const currency = invoice.currency || 'SLL';
 
   // Calculate dates
-  const invoiceDate = invoice.invoice_date ? new Date(invoice.invoice_date) : new Date(invoice.created_at);
+  const invoiceDate = invoice.invoice_date
+    ? new Date(invoice.invoice_date)
+    : new Date(invoice.created_at);
   const dueDate = new Date(invoiceDate);
   dueDate.setDate(dueDate.getDate() + (invoice.terms_days || 30));
 
@@ -88,21 +88,21 @@ export function SimplifiedInvoiceTemplate({
           invoice_no: invoice.invoiceNo || `JKDP-INV-${invoice.id.slice(0, 8)}`,
           total: formatCurrency(total),
           due_date: formatDate(dueDate.toISOString()),
-          company: "Jay Kay Digital Press"
+          company: "Jay Kay Digital Press",
         };
-        
+
         const qrData = `Invoice: ${invoiceInfo.invoice_no}\nTotal: ${invoiceInfo.total}\nDue: ${invoiceInfo.due_date}\nCompany: ${invoiceInfo.company}`;
         const qrCodeUrl = await QRCode.toDataURL(qrData, {
           width: 120,
           margin: 1,
           color: {
-            dark: '#1f2937',
-            light: '#ffffff'
-          }
+            dark: "#1f2937",
+            light: "#ffffff",
+          },
         });
         setQrCodeDataUrl(qrCodeUrl);
       } catch (error) {
-        console.error('Error generating QR code:', error);
+        console.error("Error generating QR code:", error);
       }
     };
 
@@ -136,19 +136,29 @@ export function SimplifiedInvoiceTemplate({
           <div className="flex items-center gap-6">
             {/* Logo */}
             <div className="flex-shrink-0">
-              <img 
-                src="/JK_Logo.jpg" 
-                alt="Jay Kay Digital Press Logo" 
+              <img
+                src="/JK_Logo.jpg"
+                alt="Jay Kay Digital Press Logo"
                 className="w-20 h-20 object-contain"
               />
             </div>
             {/* Company Info */}
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-1">JAY KAY DIGITAL PRESS</h1>
-              <p className="text-sm text-gray-600 mb-1">Professional Printing & Digital Services</p>
-              <p className="text-sm text-gray-600 mb-1">Freetown, Sierra Leone</p>
-              <p className="text-sm text-gray-600 mb-1">Tel: +232 34 788711 | +232 30 741062</p>
-              <p className="text-sm text-gray-600">Email: info@jaykaydigitalpress.com</p>
+              <h1 className="text-3xl font-bold text-gray-900 mb-1">
+                JAY KAY DIGITAL PRESS
+              </h1>
+              <p className="text-sm text-gray-600 mb-1">
+                Professional Printing & Digital Services
+              </p>
+              <p className="text-sm text-gray-600 mb-1">
+                Freetown, Sierra Leone
+              </p>
+              <p className="text-sm text-gray-600 mb-1">
+                Tel: +232 34 788711 | +232 30 741062
+              </p>
+              <p className="text-sm text-gray-600">
+                Email: info@jaykaydigitalpress.com
+              </p>
             </div>
           </div>
           <div className="text-right">
@@ -157,15 +167,21 @@ export function SimplifiedInvoiceTemplate({
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Invoice No:</span>
-                  <span className="font-medium">#{invoice.invoiceNo || `JKDP-INV-${invoice.id.slice(0, 8)}`}</span>
+                  <span className="font-medium">
+                    #{invoice.invoiceNo || `JKDP-INV-${invoice.id.slice(0, 8)}`}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Issue Date:</span>
-                  <span className="font-medium">{formatDate(invoiceDate.toISOString())}</span>
+                  <span className="font-medium">
+                    {formatDate(invoiceDate.toISOString())}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Due Date:</span>
-                  <span className="font-medium">{formatDate(dueDate.toISOString())}</span>
+                  <span className="font-medium">
+                    {formatDate(dueDate.toISOString())}
+                  </span>
                 </div>
               </div>
             </div>
@@ -177,41 +193,63 @@ export function SimplifiedInvoiceTemplate({
       <div className="mb-8 flex justify-between items-start">
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-            <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium mr-3">Bill To</span>
+            <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium mr-3">
+              Bill To
+            </span>
           </h3>
           {customer ? (
             <div className="text-gray-700 space-y-1">
-              <p className="font-semibold text-lg text-gray-900">{customer.business_name}</p>
-              {customer.contact_person && <p className="text-gray-600">👤 {customer.contact_person}</p>}
-              {customer.address && <p className="text-gray-600">📍 {customer.address}</p>}
+              <p className="font-semibold text-lg text-gray-900">
+                {customer.business_name}
+              </p>
+              {customer.contact_person && (
+                <p className="text-gray-600">👤 {customer.contact_person}</p>
+              )}
+              {customer.address && (
+                <p className="text-gray-600">📍 {customer.address}</p>
+              )}
               {customer.city && (
                 <p className="text-gray-600">
-                  🏙️ {[customer.city, customer.state, customer.zip_code].filter(Boolean).join(", ")}
+                  🏙️{" "}
+                  {[customer.city, customer.state, customer.zip_code]
+                    .filter(Boolean)
+                    .join(", ")}
                 </p>
               )}
-              {customer.country && <p className="text-gray-600">🌍 {customer.country}</p>}
-              {customer.phone && <p className="text-gray-600">📞 {customer.phone}</p>}
-              {customer.email && <p className="text-gray-600">✉️ {customer.email}</p>}
+              {customer.country && (
+                <p className="text-gray-600">🌍 {customer.country}</p>
+              )}
+              {customer.phone && (
+                <p className="text-gray-600">📞 {customer.phone}</p>
+              )}
+              {customer.email && (
+                <p className="text-gray-600">✉️ {customer.email}</p>
+              )}
             </div>
           ) : (
-            <p className="text-gray-500 italic">Customer information not available</p>
+            <p className="text-gray-500 italic">
+              Customer information not available
+            </p>
           )}
         </div>
-        
+
         {/* QR Code */}
         {qrCodeDataUrl && (
           <div className="bg-white p-4 rounded-xl shadow-lg border border-gray-200 ml-8">
             <div className="text-center mb-2">
               <QrCode className="w-5 h-5 text-gray-600 mx-auto mb-1" />
-              <p className="text-xs text-gray-600 font-medium">Invoice Details</p>
+              <p className="text-xs text-gray-600 font-medium">
+                Invoice Details
+              </p>
             </div>
-            <img 
-              src={qrCodeDataUrl} 
-              alt="Invoice QR Code" 
+            <img
+              src={qrCodeDataUrl}
+              alt="Invoice QR Code"
               className="w-24 h-24 mx-auto"
             />
             <p className="text-xs text-gray-500 text-center mt-2">
-              Invoice #{invoice.invoiceNo || `JKDP-INV-${invoice.id.slice(0, 8)}`}
+              Invoice #
+              {invoice.invoiceNo || `JKDP-INV-${invoice.id.slice(0, 8)}`}
             </p>
           </div>
         )}
@@ -222,31 +260,54 @@ export function SimplifiedInvoiceTemplate({
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-gray-100">
-              <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold text-gray-700">Job No</th>
-              <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold text-gray-700">Description</th>
-              <th className="border border-gray-300 px-4 py-2 text-right text-sm font-semibold text-gray-700">Qty</th>
-              <th className="border border-gray-300 px-4 py-2 text-right text-sm font-semibold text-gray-700">Unit Price</th>
-              <th className="border border-gray-300 px-4 py-2 text-right text-sm font-semibold text-gray-700">Total</th>
+              <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold text-gray-700">
+                Job No
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold text-gray-700">
+                Description
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-right text-sm font-semibold text-gray-700">
+                Qty
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-right text-sm font-semibold text-gray-700">
+                Unit Price
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-right text-sm font-semibold text-gray-700">
+                Total
+              </th>
             </tr>
           </thead>
           <tbody>
             {items.map((item, index) => (
               <tr key={item.id || index}>
                 <td className="border border-gray-300 px-4 py-2 text-sm">
-                  {item.job_no || '-'}
+                  {item.job_no || "-"}
                 </td>
                 <td className="border border-gray-300 px-4 py-2 text-sm">
                   <div>{item.description}</div>
-                  {item.notes && <div className="text-gray-500 text-xs mt-1">{item.notes}</div>}
+                  {item.notes && (
+                    <div className="text-gray-500 text-xs mt-1">
+                      {item.notes}
+                    </div>
+                  )}
                 </td>
-                <td className="border border-gray-300 px-4 py-2 text-right text-sm">{item.quantity.toLocaleString()}</td>
-                <td className="border border-gray-300 px-4 py-2 text-right text-sm">{formatCurrency(item.unit_price)}</td>
-                <td className="border border-gray-300 px-4 py-2 text-right text-sm font-medium">{formatCurrency(item.total_price)}</td>
+                <td className="border border-gray-300 px-4 py-2 text-right text-sm">
+                  {item.quantity.toLocaleString()}
+                </td>
+                <td className="border border-gray-300 px-4 py-2 text-right text-sm">
+                  {formatCurrency(item.unit_price)}
+                </td>
+                <td className="border border-gray-300 px-4 py-2 text-right text-sm font-medium">
+                  {formatCurrency(item.total_price)}
+                </td>
               </tr>
             ))}
             {items.length === 0 && (
               <tr>
-                <td colSpan={5} className="border border-gray-300 px-4 py-8 text-center text-gray-500">
+                <td
+                  colSpan={5}
+                  className="border border-gray-300 px-4 py-8 text-center text-gray-500"
+                >
                   No items found on this invoice
                 </td>
               </tr>
@@ -261,36 +322,52 @@ export function SimplifiedInvoiceTemplate({
           <tbody>
             <tr>
               <td className="px-4 py-1 text-sm text-gray-600">Subtotal:</td>
-              <td className="px-4 py-1 text-right text-sm">{formatCurrency(subtotal)}</td>
+              <td className="px-4 py-1 text-right text-sm">
+                {formatCurrency(subtotal)}
+              </td>
             </tr>
             {tax > 0 && (
               <tr>
                 <td className="px-4 py-1 text-sm text-gray-600">
-                  Tax {taxRate > 0 ? `(${taxRate}%)` : ''}:
+                  Tax {taxRate > 0 ? `(${taxRate}%)` : ""}:
                 </td>
-                <td className="px-4 py-1 text-right text-sm">{formatCurrency(tax)}</td>
+                <td className="px-4 py-1 text-right text-sm">
+                  {formatCurrency(tax)}
+                </td>
               </tr>
             )}
             {discount > 0 && (
               <tr>
                 <td className="px-4 py-1 text-sm text-gray-600">Discount:</td>
-                <td className="px-4 py-1 text-right text-sm">-{formatCurrency(discount)}</td>
+                <td className="px-4 py-1 text-right text-sm">
+                  -{formatCurrency(discount)}
+                </td>
               </tr>
             )}
             <tr className="border-t border-gray-300">
               <td className="px-4 py-2 font-semibold">Total:</td>
-              <td className="px-4 py-2 text-right font-bold text-lg">{formatCurrency(total)}</td>
+              <td className="px-4 py-2 text-right font-bold text-lg">
+                {formatCurrency(total)}
+              </td>
             </tr>
             {amountPaid > 0 && (
               <>
                 <tr>
-                  <td className="px-4 py-1 text-sm text-gray-600">Amount Paid:</td>
-                  <td className="px-4 py-1 text-right text-sm text-green-600">{formatCurrency(amountPaid)}</td>
+                  <td className="px-4 py-1 text-sm text-gray-600">
+                    Amount Paid:
+                  </td>
+                  <td className="px-4 py-1 text-right text-sm text-green-600">
+                    {formatCurrency(amountPaid)}
+                  </td>
                 </tr>
                 <tr className="border-t border-gray-300">
                   <td className="px-4 py-2 font-semibold">Amount Due:</td>
                   <td className="px-4 py-2 text-right font-bold text-lg">
-                    <span className={amountDue > 0 ? "text-orange-600" : "text-green-600"}>
+                    <span
+                      className={
+                        amountDue > 0 ? "text-orange-600" : "text-green-600"
+                      }
+                    >
                       {formatCurrency(amountDue)}
                     </span>
                   </td>
@@ -312,7 +389,9 @@ export function SimplifiedInvoiceTemplate({
       {/* Footer */}
       <div className="mt-12 pt-6 border-t border-gray-300 text-center text-sm text-gray-500">
         <p>Thank you for your business!</p>
-        <p className="mt-1">Payment is due within {invoice.terms_days || 30} days</p>
+        <p className="mt-1">
+          Payment is due within {invoice.terms_days || 30} days
+        </p>
       </div>
     </div>
   );

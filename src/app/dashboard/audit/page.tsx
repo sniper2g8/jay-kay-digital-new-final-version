@@ -12,7 +12,13 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Shield,
   Search,
@@ -40,12 +46,22 @@ import ProtectedDashboard from "@/components/ProtectedDashboard";
 interface AuditLogEntry {
   id: string;
   action: string;
-  resource_type: "user" | "job" | "customer" | "finance" | "system" | "auth" | "database";
+  resource_type:
+    | "user"
+    | "job"
+    | "customer"
+    | "finance"
+    | "system"
+    | "auth"
+    | "database";
   resource_id?: string;
   user_id: string;
   user_email: string;
   timestamp: string;
-  details: Record<string, string | number | boolean | string[] | number[] | undefined>;
+  details: Record<
+    string,
+    string | number | boolean | string[] | number[] | undefined
+  >;
   ip_address?: string;
   user_agent?: string;
   severity: "low" | "medium" | "high" | "critical";
@@ -65,7 +81,7 @@ const mockAuditLogs: AuditLogEntry[] = [
     ip_address: "192.168.1.100",
     user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
     severity: "low",
-    status: "success"
+    status: "success",
   },
   {
     id: "audit_002",
@@ -75,15 +91,15 @@ const mockAuditLogs: AuditLogEntry[] = [
     user_id: "user_002",
     user_email: "operator@jaykaydigital.com",
     timestamp: "2025-01-20T13:45:00Z",
-    details: { 
+    details: {
       job_number: "JKDP-JOB-0114",
       customer_id: "cust_045",
       service_type: "business_cards",
-      total_amount: 150000
+      total_amount: 150000,
     },
     ip_address: "192.168.1.105",
     severity: "medium",
-    status: "success"
+    status: "success",
   },
   {
     id: "audit_003",
@@ -98,11 +114,11 @@ const mockAuditLogs: AuditLogEntry[] = [
       old_phone: "+232 76 123456",
       new_phone: "+232 76 123457",
       old_address: "123 Main St",
-      new_address: "123 Main Street, Freetown"
+      new_address: "123 Main Street, Freetown",
     },
     ip_address: "192.168.1.100",
     severity: "medium",
-    status: "success"
+    status: "success",
   },
   {
     id: "audit_004",
@@ -111,15 +127,15 @@ const mockAuditLogs: AuditLogEntry[] = [
     user_id: "unknown",
     user_email: "suspicious@example.com",
     timestamp: "2025-01-20T10:30:00Z",
-    details: { 
-      method: "email_password", 
+    details: {
+      method: "email_password",
       reason: "invalid_credentials",
-      attempts: 5
+      attempts: 5,
     },
     ip_address: "203.0.113.45",
     user_agent: "Automated Script",
     severity: "high",
-    status: "failed"
+    status: "failed",
   },
   {
     id: "audit_005",
@@ -132,10 +148,10 @@ const mockAuditLogs: AuditLogEntry[] = [
       backup_type: "full",
       file_size: "15.2MB",
       duration: "5m 30s",
-      tables_backed_up: 5
+      tables_backed_up: 5,
     },
     severity: "low",
-    status: "success"
+    status: "success",
   },
   {
     id: "audit_006",
@@ -149,12 +165,12 @@ const mockAuditLogs: AuditLogEntry[] = [
       target_user: "manager@jaykaydigital.com",
       old_role: "operator",
       new_role: "manager",
-      reason: "promotion"
+      reason: "promotion",
     },
     ip_address: "192.168.1.100",
     severity: "high",
-    status: "success"
-  }
+    status: "success",
+  },
 ];
 
 function AuditContent() {
@@ -175,23 +191,25 @@ function AuditContent() {
   };
 
   // Filter logs based on search and filters
-  const filteredLogs = auditLogs.filter(log => {
-    const matchesSearch = 
+  const filteredLogs = auditLogs.filter((log) => {
+    const matchesSearch =
       log.action.toLowerCase().includes(searchTerm.toLowerCase()) ||
       log.user_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       log.resource_type.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesResource = resourceFilter === "all" || log.resource_type === resourceFilter;
-    const matchesSeverity = severityFilter === "all" || log.severity === severityFilter;
+
+    const matchesResource =
+      resourceFilter === "all" || log.resource_type === resourceFilter;
+    const matchesSeverity =
+      severityFilter === "all" || log.severity === severityFilter;
     const matchesStatus = statusFilter === "all" || log.status === statusFilter;
-    
+
     // Basic date filtering (last 24h, 7d, 30d)
     let matchesDate = true;
     if (dateRange !== "all") {
       const now = new Date();
       const logDate = new Date(log.timestamp);
       const diffHours = (now.getTime() - logDate.getTime()) / (1000 * 60 * 60);
-      
+
       switch (dateRange) {
         case "24h":
           matchesDate = diffHours <= 24;
@@ -204,16 +222,26 @@ function AuditContent() {
           break;
       }
     }
-    
-    return matchesSearch && matchesResource && matchesSeverity && matchesStatus && matchesDate;
+
+    return (
+      matchesSearch &&
+      matchesResource &&
+      matchesSeverity &&
+      matchesStatus &&
+      matchesDate
+    );
   });
 
   // Calculate statistics
   const stats = {
     total_entries: auditLogs.length,
-    high_severity: auditLogs.filter(log => log.severity === "high" || log.severity === "critical").length,
-    failed_actions: auditLogs.filter(log => log.status === "failed").length,
-    recent_logins: auditLogs.filter(log => log.action === "user_login" && log.status === "success").length
+    high_severity: auditLogs.filter(
+      (log) => log.severity === "high" || log.severity === "critical",
+    ).length,
+    failed_actions: auditLogs.filter((log) => log.status === "failed").length,
+    recent_logins: auditLogs.filter(
+      (log) => log.action === "user_login" && log.status === "success",
+    ).length,
   };
 
   const getSeverityColor = (severity: string) => {
@@ -386,9 +414,7 @@ function AuditContent() {
                 <div className="text-2xl font-bold text-green-600">
                   {stats.recent_logins}
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Recent logins
-                </p>
+                <p className="text-xs text-muted-foreground">Recent logins</p>
               </CardContent>
             </Card>
           </div>
@@ -415,7 +441,10 @@ function AuditContent() {
 
                 <div className="space-y-2">
                   <Label>Resource</Label>
-                  <Select value={resourceFilter} onValueChange={setResourceFilter}>
+                  <Select
+                    value={resourceFilter}
+                    onValueChange={setResourceFilter}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="All Resources" />
                     </SelectTrigger>
@@ -434,7 +463,10 @@ function AuditContent() {
 
                 <div className="space-y-2">
                   <Label>Severity</Label>
-                  <Select value={severityFilter} onValueChange={setSeverityFilter}>
+                  <Select
+                    value={severityFilter}
+                    onValueChange={setSeverityFilter}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="All Levels" />
                     </SelectTrigger>
@@ -479,8 +511,8 @@ function AuditContent() {
                 </div>
 
                 <div className="space-y-2 flex items-end">
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={() => {
                       setSearchTerm("");
                       setResourceFilter("all");
@@ -503,7 +535,8 @@ function AuditContent() {
             <CardHeader>
               <CardTitle>Audit Log Entries</CardTitle>
               <CardDescription>
-                System activity and security events ({filteredLogs.length} entries)
+                System activity and security events ({filteredLogs.length}{" "}
+                entries)
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -531,7 +564,9 @@ function AuditContent() {
                         <div className="flex-1">
                           <div className="flex items-center space-x-2 mb-2">
                             <h3 className="font-semibold text-gray-900">
-                              {log.action.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                              {log.action
+                                .replace(/_/g, " ")
+                                .replace(/\b\w/g, (l) => l.toUpperCase())}
                             </h3>
                             <Badge className={getSeverityColor(log.severity)}>
                               {log.severity.toUpperCase()}
@@ -543,15 +578,24 @@ function AuditContent() {
                               </div>
                             </Badge>
                           </div>
-                          
+
                           <div className="space-y-1 text-sm text-gray-600">
-                            <p><strong>User:</strong> {log.user_email}</p>
-                            <p><strong>Time:</strong> {new Date(log.timestamp).toLocaleString()}</p>
+                            <p>
+                              <strong>User:</strong> {log.user_email}
+                            </p>
+                            <p>
+                              <strong>Time:</strong>{" "}
+                              {new Date(log.timestamp).toLocaleString()}
+                            </p>
                             {log.resource_id && (
-                              <p><strong>Resource ID:</strong> {log.resource_id}</p>
+                              <p>
+                                <strong>Resource ID:</strong> {log.resource_id}
+                              </p>
                             )}
                             {log.ip_address && (
-                              <p><strong>IP Address:</strong> {log.ip_address}</p>
+                              <p>
+                                <strong>IP Address:</strong> {log.ip_address}
+                              </p>
                             )}
                           </div>
 
@@ -588,9 +632,7 @@ function AuditContent() {
 // Main component with role-based protection
 export default function AuditPage() {
   return (
-    <ProtectedDashboard
-      allowedRoles={["super_admin", "admin"]}
-    >
+    <ProtectedDashboard allowedRoles={["super_admin", "admin"]}>
       <AuditContent />
     </ProtectedDashboard>
   );

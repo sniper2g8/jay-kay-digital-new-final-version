@@ -1,7 +1,6 @@
 "use server";
 
 import { createServiceRoleClient } from "@/lib/supabase-admin";
-import { Database } from "@/lib/database.types";
 
 export async function processPayment(paymentData: {
   customer_human_id: string;
@@ -29,32 +28,38 @@ export async function processPayment(paymentData: {
 
     // Generate a shorter payment number that fits within VARCHAR(20)
     const timestamp = Date.now().toString().slice(-6); // Get last 6 digits of timestamp
-    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0'); // 3 digit random number
+    const random = Math.floor(Math.random() * 1000)
+      .toString()
+      .padStart(3, "0"); // 3 digit random number
     const paymentNumber = `PAY-${timestamp}-${random}`; // Format: PAY-XXXXXX-XXX (15 chars max)
 
     // Truncate notes to fit within VARCHAR(20) limit
-    const truncatedNotes = paymentData.notes 
-      ? paymentData.notes.substring(0, 20) 
+    const truncatedNotes = paymentData.notes
+      ? paymentData.notes.substring(0, 20)
       : null;
 
-    const { data, error: paymentError } = await supabase.from("payments").insert({
-      customer_human_id: paymentData.customer_human_id,
-      invoice_no: paymentData.invoice_no,
-      amount: paymentAmount,
-      payment_method: (paymentMethodMapping[paymentData.payment_method] ||
-        paymentData.payment_method) as
-        | "cash"
-        | "bank_transfer"
-        | "mobile_money"
-        | "card"
-        | "cheque"
-        | "credit",
-      payment_date: paymentData.payment_date,
-      reference_number: paymentData.reference_number || null,
-      notes: truncatedNotes,
-      payment_status: "completed",
-      payment_number: paymentNumber,
-    }).select().single();
+    const { data, error: paymentError } = await supabase
+      .from("payments")
+      .insert({
+        customer_human_id: paymentData.customer_human_id,
+        invoice_no: paymentData.invoice_no,
+        amount: paymentAmount,
+        payment_method: (paymentMethodMapping[paymentData.payment_method] ||
+          paymentData.payment_method) as
+          | "cash"
+          | "bank_transfer"
+          | "mobile_money"
+          | "card"
+          | "cheque"
+          | "credit",
+        payment_date: paymentData.payment_date,
+        reference_number: paymentData.reference_number || null,
+        notes: truncatedNotes,
+        payment_status: "completed",
+        payment_number: paymentNumber,
+      })
+      .select()
+      .single();
 
     if (paymentError) {
       console.error("Error creating payment record:", paymentError);
@@ -64,11 +69,18 @@ export async function processPayment(paymentData: {
     return { success: true, data };
   } catch (error) {
     console.error("Error processing payment:", error);
-    return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
   }
 }
 
-export async function updateInvoiceAfterPayment(invoiceId: string, amountPaid: number, newStatus: string) {
+export async function updateInvoiceAfterPayment(
+  invoiceId: string,
+  amountPaid: number,
+  newStatus: string,
+) {
   try {
     const supabase = createServiceRoleClient();
 
@@ -116,7 +128,10 @@ export async function updateInvoiceAfterPayment(invoiceId: string, amountPaid: n
         });
 
       if (historyError) {
-        console.error("Error inserting into invoice_status_history:", historyError);
+        console.error(
+          "Error inserting into invoice_status_history:",
+          historyError,
+        );
         // Note: We don't return here because the invoice update was successful
         // We just log the error for the history record
       }
@@ -125,11 +140,17 @@ export async function updateInvoiceAfterPayment(invoiceId: string, amountPaid: n
     return { success: true };
   } catch (error) {
     console.error("Error updating invoice after payment:", error);
-    return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
   }
 }
 
-export async function updateInvoiceStatus(invoiceId: string, newStatus: string) {
+export async function updateInvoiceStatus(
+  invoiceId: string,
+  newStatus: string,
+) {
   try {
     const supabase = createServiceRoleClient();
 
@@ -174,7 +195,10 @@ export async function updateInvoiceStatus(invoiceId: string, newStatus: string) 
       });
 
     if (historyError) {
-      console.error("Error inserting into invoice_status_history:", historyError);
+      console.error(
+        "Error inserting into invoice_status_history:",
+        historyError,
+      );
       // Note: We don't return here because the invoice update was successful
       // We just log the error for the history record
     }
@@ -182,7 +206,10 @@ export async function updateInvoiceStatus(invoiceId: string, newStatus: string) 
     return { success: true };
   } catch (error) {
     console.error("Error updating invoice status:", error);
-    return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
   }
 }
 
@@ -193,7 +220,7 @@ export async function updateInvoice(invoiceId: string, updateData: any) {
     // If invoice_status is being updated, we need to handle the history
     let currentStatus = null;
     let newStatus = null;
-    
+
     if (updateData.invoice_status) {
       // First, get the current status of the invoice
       const { data: currentInvoice, error: fetchError } = await supabase
@@ -239,7 +266,10 @@ export async function updateInvoice(invoiceId: string, updateData: any) {
         });
 
       if (historyError) {
-        console.error("Error inserting into invoice_status_history:", historyError);
+        console.error(
+          "Error inserting into invoice_status_history:",
+          historyError,
+        );
         // Note: We don't return here because the invoice update was successful
         // We just log the error for the history record
       }
@@ -248,6 +278,9 @@ export async function updateInvoice(invoiceId: string, updateData: any) {
     return { success: true };
   } catch (error) {
     console.error("Error updating invoice:", error);
-    return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
   }
 }

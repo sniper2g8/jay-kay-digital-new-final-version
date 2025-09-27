@@ -3,33 +3,33 @@
  * Confirmation modal for deleting users with safety checks
  */
 
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
+import React, { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
   DialogTitle,
-  DialogFooter
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  Loader2, 
-  Trash2, 
-  AlertTriangle, 
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Loader2,
+  Trash2,
+  AlertTriangle,
   CheckCircle,
   User,
-  Shield
-} from 'lucide-react';
-import { deleteUser } from '@/lib/hooks/useUserManagement';
-import { Database } from '@/lib/database.types';
+  Shield,
+} from "lucide-react";
+import { deleteUser } from "@/lib/hooks/useUserManagement";
+import { Database } from "@/lib/database.types";
 
-type UserRole = Database['public']['Enums']['user_role'];
+type UserRole = Database["public"]["Enums"]["user_role"];
 
 interface DeleteUserModalProps {
   isOpen: boolean;
@@ -48,30 +48,30 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
   userId,
   userName,
   userEmail,
-  userRole
+  userRole,
 }) => {
-  const [confirmationText, setConfirmationText] = useState('');
+  const [confirmationText, setConfirmationText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
-  const [successMessage, setSuccessMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState("");
 
-  const expectedConfirmation = 'DELETE';
+  const expectedConfirmation = "DELETE";
   const isConfirmationValid = confirmationText === expectedConfirmation;
 
   // Check if user is a high-privilege user
-  const isHighPrivilegeUser = ['admin'].includes(userRole);
+  const isHighPrivilegeUser = ["admin"].includes(userRole);
 
   const handleClose = () => {
-    setConfirmationText('');
+    setConfirmationText("");
     setErrors([]);
-    setSuccessMessage('');
+    setSuccessMessage("");
     onClose();
   };
 
   const handleDelete = async () => {
     setIsLoading(true);
     setErrors([]);
-    setSuccessMessage('');
+    setSuccessMessage("");
 
     try {
       if (!isConfirmationValid) {
@@ -82,18 +82,18 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
       const result = await deleteUser(userId);
 
       if (result.success) {
-        setSuccessMessage('User has been successfully deleted.');
-        
+        setSuccessMessage("User has been successfully deleted.");
+
         // Close modal and refresh data after 1.5 seconds
         setTimeout(() => {
           handleClose();
           onSuccess();
         }, 1500);
       } else {
-        setErrors([result.error || 'Failed to delete user']);
+        setErrors([result.error || "Failed to delete user"]);
       }
     } catch (error) {
-      setErrors(['An unexpected error occurred while deleting the user']);
+      setErrors(["An unexpected error occurred while deleting the user"]);
     } finally {
       setIsLoading(false);
     }
@@ -101,21 +101,22 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
 
   const getRoleColor = (role: UserRole) => {
     switch (role) {
-      case 'admin':
-        return 'text-red-600 bg-red-100';
-      case 'staff':
-        return 'text-green-600 bg-green-100';
-      case 'customer':
-        return 'text-gray-600 bg-gray-100';
+      case "admin":
+        return "text-red-600 bg-red-100";
+      case "staff":
+        return "text-green-600 bg-green-100";
+      case "customer":
+        return "text-gray-600 bg-gray-100";
       default:
-        return 'text-gray-600 bg-gray-100';
+        return "text-gray-600 bg-gray-100";
     }
   };
 
   const getRoleLabel = (role: UserRole) => {
-    return role.split('_').map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1)
-    ).join(' ');
+    return role
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
   };
 
   return (
@@ -127,7 +128,8 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
             Delete User
           </DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete the user account and all associated data.
+            This action cannot be undone. This will permanently delete the user
+            account and all associated data.
           </DialogDescription>
         </DialogHeader>
 
@@ -149,7 +151,9 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
               <AlertDescription>
                 <ul className="list-disc list-inside space-y-1">
                   {errors.map((error, index) => (
-                    <li key={index} className="text-red-800">{error}</li>
+                    <li key={index} className="text-red-800">
+                      {error}
+                    </li>
                   ))}
                 </ul>
               </AlertDescription>
@@ -163,7 +167,9 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <h4 className="font-medium text-gray-900">{userName}</h4>
-                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(userRole)}`}>
+                  <span
+                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(userRole)}`}
+                  >
                     <Shield className="h-3 w-3 mr-1" />
                     {getRoleLabel(userRole)}
                   </span>
@@ -179,8 +185,9 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
             <Alert className="border-red-200 bg-red-50">
               <AlertTriangle className="h-4 w-4 text-red-600" />
               <AlertDescription className="text-red-800">
-                <strong>Warning:</strong> You are about to delete a user with elevated privileges ({getRoleLabel(userRole)}). 
-                This action will remove all their permissions and access rights.
+                <strong>Warning:</strong> You are about to delete a user with
+                elevated privileges ({getRoleLabel(userRole)}). This action will
+                remove all their permissions and access rights.
               </AlertDescription>
             </Alert>
           )}
@@ -202,7 +209,11 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
           {/* Confirmation Input */}
           <div className="space-y-2">
             <Label htmlFor="confirmation">
-              Type <code className="bg-gray-100 px-1 py-0.5 rounded text-sm">DELETE</code> to confirm
+              Type{" "}
+              <code className="bg-gray-100 px-1 py-0.5 rounded text-sm">
+                DELETE
+              </code>{" "}
+              to confirm
             </Label>
             <Input
               id="confirmation"
@@ -214,10 +225,14 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
                 setErrors([]);
               }}
               disabled={isLoading}
-              className={confirmationText && !isConfirmationValid ? 'border-red-300' : ''}
+              className={
+                confirmationText && !isConfirmationValid ? "border-red-300" : ""
+              }
             />
             {confirmationText && !isConfirmationValid && (
-              <p className="text-sm text-red-600">Please type &quot;DELETE&quot; exactly as shown</p>
+              <p className="text-sm text-red-600">
+                Please type &quot;DELETE&quot; exactly as shown
+              </p>
             )}
           </div>
         </div>

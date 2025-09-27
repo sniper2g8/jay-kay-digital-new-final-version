@@ -3,9 +3,9 @@
  * Uses Resend API for email notifications
  */
 
-import { useState, useCallback } from 'react';
-import { toast } from 'sonner';
-import { supabase } from '../supabase.ts';
+import { useState, useCallback } from "react";
+import { toast } from "sonner";
+import { supabase } from "../supabase.ts";
 
 export interface JobStatusNotificationData {
   customerEmail: string;
@@ -43,150 +43,180 @@ export function useJobNotifications() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const sendJobStatusNotification = useCallback(async (
-    data: JobStatusNotificationData
-  ): Promise<NotificationResponse | null> => {
-    try {
-      setIsLoading(true);
-      setError(null);
+  const sendJobStatusNotification = useCallback(
+    async (
+      data: JobStatusNotificationData,
+    ): Promise<NotificationResponse | null> => {
+      try {
+        setIsLoading(true);
+        setError(null);
 
-      // Validate required fields
-      if (!data.customerEmail || !data.customerName || !data.jobNumber || !data.jobTitle || !data.newStatus) {
-        const errorMsg = 'Missing required fields for notification';
+        // Validate required fields
+        if (
+          !data.customerEmail ||
+          !data.customerName ||
+          !data.jobNumber ||
+          !data.jobTitle ||
+          !data.newStatus
+        ) {
+          const errorMsg = "Missing required fields for notification";
+          setError(errorMsg);
+          toast.error(errorMsg);
+          return null;
+        }
+
+        // Check if email notifications are enabled
+        const emailNotificationsEnabled =
+          process.env.NEXT_PUBLIC_ENABLE_EMAIL_NOTIFICATIONS !== "false";
+        if (!emailNotificationsEnabled) {
+          console.log(
+            "Email notifications are disabled, skipping notification",
+          );
+          return { success: true, message: "Notifications disabled" };
+        }
+
+        const response = await fetch("/api/notifications/job-status", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          const errorMsg = result.error || "Failed to send notification";
+          setError(errorMsg);
+          toast.error(`Notification failed: ${errorMsg}`);
+          return null;
+        }
+
+        toast.success(`Status update email sent to ${data.customerEmail}`);
+        return result;
+      } catch (err) {
+        const errorMsg =
+          err instanceof Error ? err.message : "Unknown error occurred";
+        console.error("Error sending job status notification:", errorMsg);
         setError(errorMsg);
-        toast.error(errorMsg);
+        toast.error(`Notification error: ${errorMsg}`);
         return null;
+      } finally {
+        setIsLoading(false);
       }
-
-      // Check if email notifications are enabled
-      const emailNotificationsEnabled = process.env.NEXT_PUBLIC_ENABLE_EMAIL_NOTIFICATIONS !== 'false';
-      if (!emailNotificationsEnabled) {
-        console.log('Email notifications are disabled, skipping notification');
-        return { success: true, message: 'Notifications disabled' };
-      }
-
-      const response = await fetch('/api/notifications/job-status', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        const errorMsg = result.error || 'Failed to send notification';
-        setError(errorMsg);
-        toast.error(`Notification failed: ${errorMsg}`);
-        return null;
-      }
-
-      toast.success(`Status update email sent to ${data.customerEmail}`);
-      return result;
-
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Unknown error occurred';
-      console.error('Error sending job status notification:', errorMsg);
-      setError(errorMsg);
-      toast.error(`Notification error: ${errorMsg}`);
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+    },
+    [],
+  );
 
   // Helper function to send notifications for common status changes
-  const notifyJobStatusChange = useCallback(async (
-    job: JobNotificationData,
-    customer: CustomerNotificationData,
-    oldStatus: string,
-    notes?: string
-  ) => {
-    if (!customer.email) {
-      console.warn('Customer email not provided, skipping notification');
-      return null;
-    }
+  const notifyJobStatusChange = useCallback(
+    async (
+      job: JobNotificationData,
+      customer: CustomerNotificationData,
+      oldStatus: string,
+      notes?: string,
+    ) => {
+      if (!customer.email) {
+        console.warn("Customer email not provided, skipping notification");
+        return null;
+      }
 
-    const customerName = customer.contact_person || customer.business_name;
-    
-    return await sendJobStatusNotification({
-      customerEmail: customer.email,
-      customerName,
-      jobNumber: job.jobNo,
-      jobTitle: job.title,
-      oldStatus,
-      newStatus: job.status,
-      estimatedDelivery: job.estimated_delivery,
-      notes
-    });
-  }, [sendJobStatusNotification]);
+      const customerName = customer.contact_person || customer.business_name;
+
+      return await sendJobStatusNotification({
+        customerEmail: customer.email,
+        customerName,
+        jobNumber: job.jobNo,
+        jobTitle: job.title,
+        oldStatus,
+        newStatus: job.status,
+        estimatedDelivery: job.estimated_delivery,
+        notes,
+      });
+    },
+    [sendJobStatusNotification],
+  );
 
   // Specific notification functions for different status changes
-  const notifyJobStarted = useCallback(async (
-    job: JobNotificationData,
-    customer: CustomerNotificationData,
-    oldStatus: string
-  ) => {
-    return await notifyJobStatusChange(
-      job,
-      customer,
-      oldStatus,
-      'Your job has been started and is now in production. We\'ll keep you updated on the progress.'
-    );
-  }, [notifyJobStatusChange]);
+  const notifyJobStarted = useCallback(
+    async (
+      job: JobNotificationData,
+      customer: CustomerNotificationData,
+      oldStatus: string,
+    ) => {
+      return await notifyJobStatusChange(
+        job,
+        customer,
+        oldStatus,
+        "Your job has been started and is now in production. We'll keep you updated on the progress.",
+      );
+    },
+    [notifyJobStatusChange],
+  );
 
-  const notifyJobCompleted = useCallback(async (
-    job: JobNotificationData,
-    customer: CustomerNotificationData,
-    oldStatus: string
-  ) => {
-    return await notifyJobStatusChange(
-      job,
-      customer,
-      oldStatus,
-      'Great news! Your order is now complete and ready for pickup or delivery. Please contact us to arrange collection.'
-    );
-  }, [notifyJobStatusChange]);
+  const notifyJobCompleted = useCallback(
+    async (
+      job: JobNotificationData,
+      customer: CustomerNotificationData,
+      oldStatus: string,
+    ) => {
+      return await notifyJobStatusChange(
+        job,
+        customer,
+        oldStatus,
+        "Great news! Your order is now complete and ready for pickup or delivery. Please contact us to arrange collection.",
+      );
+    },
+    [notifyJobStatusChange],
+  );
 
-  const notifyJobOnHold = useCallback(async (
-    job: JobNotificationData,
-    customer: CustomerNotificationData,
-    oldStatus: string,
-    reason?: string
-  ) => {
-    const notes = reason 
-      ? `Your job has been temporarily placed on hold. Reason: ${reason}. We will contact you shortly to resolve this.`
-      : 'Your job has been temporarily placed on hold. We will contact you shortly with more details.';
-      
-    return await notifyJobStatusChange(job, customer, oldStatus, notes);
-  }, [notifyJobStatusChange]);
+  const notifyJobOnHold = useCallback(
+    async (
+      job: JobNotificationData,
+      customer: CustomerNotificationData,
+      oldStatus: string,
+      reason?: string,
+    ) => {
+      const notes = reason
+        ? `Your job has been temporarily placed on hold. Reason: ${reason}. We will contact you shortly to resolve this.`
+        : "Your job has been temporarily placed on hold. We will contact you shortly with more details.";
 
-  const notifyJobCancelled = useCallback(async (
-    job: JobNotificationData,
-    customer: CustomerNotificationData,
-    oldStatus: string,
-    reason?: string
-  ) => {
-    const notes = reason 
-      ? `Your job has been cancelled. Reason: ${reason}. Please contact us if you have any questions.`
-      : 'Your job has been cancelled. Please contact us if you have any questions or concerns.';
-      
-    return await notifyJobStatusChange(job, customer, oldStatus, notes);
-  }, [notifyJobStatusChange]);
+      return await notifyJobStatusChange(job, customer, oldStatus, notes);
+    },
+    [notifyJobStatusChange],
+  );
 
-  const notifyQuoteSent = useCallback(async (
-    job: JobNotificationData,
-    customer: CustomerNotificationData,
-    oldStatus: string
-  ) => {
-    return await notifyJobStatusChange(
-      job,
-      customer,
-      oldStatus,
-      'We\'ve prepared a quote for your project. Please review it and let us know if you have any questions or would like to proceed.'
-    );
-  }, [notifyJobStatusChange]);
+  const notifyJobCancelled = useCallback(
+    async (
+      job: JobNotificationData,
+      customer: CustomerNotificationData,
+      oldStatus: string,
+      reason?: string,
+    ) => {
+      const notes = reason
+        ? `Your job has been cancelled. Reason: ${reason}. Please contact us if you have any questions.`
+        : "Your job has been cancelled. Please contact us if you have any questions or concerns.";
+
+      return await notifyJobStatusChange(job, customer, oldStatus, notes);
+    },
+    [notifyJobStatusChange],
+  );
+
+  const notifyQuoteSent = useCallback(
+    async (
+      job: JobNotificationData,
+      customer: CustomerNotificationData,
+      oldStatus: string,
+    ) => {
+      return await notifyJobStatusChange(
+        job,
+        customer,
+        oldStatus,
+        "We've prepared a quote for your project. Please review it and let us know if you have any questions or would like to proceed.",
+      );
+    },
+    [notifyJobStatusChange],
+  );
 
   return {
     isLoading,
@@ -198,7 +228,7 @@ export function useJobNotifications() {
     notifyJobCompleted,
     notifyJobOnHold,
     notifyJobCancelled,
-    notifyQuoteSent
+    notifyQuoteSent,
   };
 }
 
@@ -209,13 +239,14 @@ export async function updateJobStatusWithNotification(
   jobId: string,
   newStatus: string,
   adminMessage?: string,
-  userId?: string
+  userId?: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
     // Get current job data with customer info
     const { data: jobWithCustomer, error: fetchError } = await supabase
-      .from('jobs')
-      .select(`
+      .from("jobs")
+      .select(
+        `
         id, 
         jobNo, 
         title,
@@ -227,55 +258,61 @@ export async function updateJobStatusWithNotification(
           business_name,
           contact_person
         )
-      `)
-      .eq('id', jobId)
+      `,
+      )
+      .eq("id", jobId)
       .single();
 
     if (fetchError || !jobWithCustomer) {
-      return { success: false, error: 'Job not found' };
+      return { success: false, error: "Job not found" };
     }
 
     const oldStatus = jobWithCustomer.status;
 
     // Update job status
     const { error: updateError } = await supabase
-      .from('jobs')
-      .update({ 
+      .from("jobs")
+      .update({
         status: newStatus,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
-      .eq('id', jobId);
+      .eq("id", jobId);
 
     if (updateError) {
-      return { success: false, error: 'Failed to update job status' };
+      return { success: false, error: "Failed to update job status" };
     }
 
     // Send notifications if status actually changed and customer has email
     if (oldStatus !== newStatus && jobWithCustomer.customers?.email) {
       try {
-        const response = await fetch('/api/notifications/job-status', {
-          method: 'POST',
+        const response = await fetch("/api/notifications/job-status", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             customerEmail: jobWithCustomer.customers.email,
-            customerName: jobWithCustomer.customers.contact_person || jobWithCustomer.customers.business_name,
+            customerName:
+              jobWithCustomer.customers.contact_person ||
+              jobWithCustomer.customers.business_name,
             jobNumber: jobWithCustomer.jobNo || `JOB-${jobId.slice(-6)}`,
-            jobTitle: jobWithCustomer.title || 'Untitled Job',
-            oldStatus: oldStatus || 'unknown',
+            jobTitle: jobWithCustomer.title || "Untitled Job",
+            oldStatus: oldStatus || "unknown",
             newStatus: newStatus,
             estimatedDelivery: jobWithCustomer.estimated_delivery,
-            notes: adminMessage
+            notes: adminMessage,
           }),
         });
 
         if (!response.ok) {
-          console.error('Failed to send notification email');
+          console.error("Failed to send notification email");
         }
       } catch (notificationError) {
-        const errorMessage = notificationError instanceof Error ? notificationError.message : String(notificationError);
-        console.error('Error sending notification:', errorMessage);
+        const errorMessage =
+          notificationError instanceof Error
+            ? notificationError.message
+            : String(notificationError);
+        console.error("Error sending notification:", errorMessage);
         // Don't fail the status update if notification fails
       }
     }
@@ -283,7 +320,7 @@ export async function updateJobStatusWithNotification(
     return { success: true };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Error updating job status with notification:', errorMessage);
-    return { success: false, error: 'Internal server error' };
+    console.error("Error updating job status with notification:", errorMessage);
+    return { success: false, error: "Internal server error" };
   }
 }

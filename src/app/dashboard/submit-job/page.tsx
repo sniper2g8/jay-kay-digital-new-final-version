@@ -101,11 +101,11 @@ export default function SubmitJobPage() {
       fileHook.clearFiles();
     } catch (error) {
       console.error("Submission failed:", {
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? error.message : "Unknown error",
         error: error,
         stack: error instanceof Error ? error.stack : undefined,
         type: typeof error,
-        errorString: String(error)
+        errorString: String(error),
       });
     }
   };
@@ -119,9 +119,7 @@ export default function SubmitJobPage() {
       case 2:
         return <SpecificationsStep {...formHook} />;
       case 3:
-        return (
-          <FilesStep {...fileHook} />
-        );
+        return <FilesStep {...fileHook} />;
       case 4:
         return (
           <ReviewStep

@@ -338,9 +338,14 @@ export default function EditJobPage() {
 
       if (error instanceof Error) {
         // Handle specific permission errors
-        if (error.message.includes("permission denied") || 
-            (typeof error === "object" && "code" in error && (error as { code: unknown }).code === "42501")) {
-          errorMessage = "Permission denied: You don't have permission to update job details. Please contact your administrator.";
+        if (
+          error.message.includes("permission denied") ||
+          (typeof error === "object" &&
+            "code" in error &&
+            (error as { code: unknown }).code === "42501")
+        ) {
+          errorMessage =
+            "Permission denied: You don't have permission to update job details. Please contact your administrator.";
         } else if (error.message.includes("unique constraint")) {
           errorMessage = "A job with this information already exists.";
         } else if (error.message.includes("foreign key")) {

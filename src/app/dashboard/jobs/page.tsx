@@ -11,7 +11,13 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useState, useMemo } from "react";
 import {
   Search,
@@ -55,13 +61,13 @@ function JobsContent() {
 
   // Filter states
   const [filters, setFilters] = useState<JobFilters>({
-    search: '',
-    status: 'all',
-    priority: 'all',
-    customer: 'all',
-    dateFrom: '',
-    dateTo: '',
-    assignedTo: 'all'
+    search: "",
+    status: "all",
+    priority: "all",
+    customer: "all",
+    dateFrom: "",
+    dateTo: "",
+    assignedTo: "all",
   });
 
   const [showFilters, setShowFilters] = useState(false);
@@ -69,21 +75,25 @@ function JobsContent() {
   // Get unique values for filter dropdowns
   const uniqueCustomers = useMemo(() => {
     if (!jobs) return [];
-    const customers = [...new Set(jobs.map(job => job.customer_name).filter(Boolean))];
+    const customers = [
+      ...new Set(jobs.map((job) => job.customer_name).filter(Boolean)),
+    ];
     return customers.sort();
   }, [jobs]);
 
   const uniqueAssignees = useMemo(() => {
     if (!jobs) return [];
-    const assignees = [...new Set(jobs.map(job => job.assigned_to).filter(Boolean))];
+    const assignees = [
+      ...new Set(jobs.map((job) => job.assigned_to).filter(Boolean)),
+    ];
     return assignees.sort();
   }, [jobs]);
 
   // Filter jobs based on current filters
   const filteredJobs = useMemo(() => {
     if (!jobs) return [];
-    
-    return jobs.filter(job => {
+
+    return jobs.filter((job) => {
       // Search filter
       if (filters.search) {
         const searchTerm = filters.search.toLowerCase();
@@ -91,41 +101,52 @@ function JobsContent() {
           job.jobNo,
           job.title,
           job.customer_name,
-          job.description
-        ].filter(Boolean).map(field => field?.toLowerCase());
-        
-        if (!searchableFields.some(field => field?.includes(searchTerm))) {
+          job.description,
+        ]
+          .filter(Boolean)
+          .map((field) => field?.toLowerCase());
+
+        if (!searchableFields.some((field) => field?.includes(searchTerm))) {
           return false;
         }
       }
 
       // Status filter
-      if (filters.status !== 'all' && job.status !== filters.status) {
+      if (filters.status !== "all" && job.status !== filters.status) {
         return false;
       }
 
       // Priority filter
-      if (filters.priority !== 'all' && job.priority !== filters.priority) {
+      if (filters.priority !== "all" && job.priority !== filters.priority) {
         return false;
       }
 
       // Customer filter
-      if (filters.customer !== 'all' && job.customer_name !== filters.customer) {
+      if (
+        filters.customer !== "all" &&
+        job.customer_name !== filters.customer
+      ) {
         return false;
       }
 
       // Assigned to filter
-      if (filters.assignedTo !== 'all' && job.assigned_to !== filters.assignedTo) {
+      if (
+        filters.assignedTo !== "all" &&
+        job.assigned_to !== filters.assignedTo
+      ) {
         return false;
       }
 
       // Date range filter
       if (filters.dateFrom || filters.dateTo) {
-        const jobDate = new Date(job.created_at || '');
+        const jobDate = new Date(job.created_at || "");
         if (filters.dateFrom && jobDate < new Date(filters.dateFrom)) {
           return false;
         }
-        if (filters.dateTo && jobDate > new Date(filters.dateTo + 'T23:59:59')) {
+        if (
+          filters.dateTo &&
+          jobDate > new Date(filters.dateTo + "T23:59:59")
+        ) {
           return false;
         }
       }
@@ -137,18 +158,20 @@ function JobsContent() {
   // Clear all filters
   const clearFilters = () => {
     setFilters({
-      search: '',
-      status: 'all',
-      priority: 'all',
-      customer: 'all',
-      dateFrom: '',
-      dateTo: '',
-      assignedTo: 'all'
+      search: "",
+      status: "all",
+      priority: "all",
+      customer: "all",
+      dateFrom: "",
+      dateTo: "",
+      assignedTo: "all",
     });
   };
 
   // Check if any filters are active
-  const hasActiveFilters = Object.values(filters).some(value => value !== '' && value !== 'all');
+  const hasActiveFilters = Object.values(filters).some(
+    (value) => value !== "" && value !== "all",
+  );
 
   if (jobsLoading) {
     return (
@@ -221,16 +244,22 @@ function JobsContent() {
                   placeholder="Search by job number, customer, title, or description..."
                   className="pl-10"
                   value={filters.search}
-                  onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                  onChange={(e) =>
+                    setFilters((prev) => ({ ...prev, search: e.target.value }))
+                  }
                 />
               </div>
-              <Button 
+              <Button
                 variant="outline"
                 onClick={() => setShowFilters(!showFilters)}
-                className={hasActiveFilters ? "border-blue-500 text-blue-600" : ""}
+                className={
+                  hasActiveFilters ? "border-blue-500 text-blue-600" : ""
+                }
               >
                 <Filter className="h-4 w-4 mr-2" />
-                Filter {hasActiveFilters && `(${Object.values(filters).filter(v => v !== '').length})`}
+                Filter{" "}
+                {hasActiveFilters &&
+                  `(${Object.values(filters).filter((v) => v !== "").length})`}
               </Button>
               {hasActiveFilters && (
                 <Button variant="ghost" onClick={clearFilters}>
@@ -247,7 +276,12 @@ function JobsContent() {
                   {/* Status Filter */}
                   <div className="space-y-2">
                     <Label className="text-sm font-medium">Status</Label>
-                    <Select value={filters.status} onValueChange={(value) => setFilters(prev => ({ ...prev, status: value }))}>
+                    <Select
+                      value={filters.status}
+                      onValueChange={(value) =>
+                        setFilters((prev) => ({ ...prev, status: value }))
+                      }
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="All Statuses" />
                       </SelectTrigger>
@@ -265,7 +299,12 @@ function JobsContent() {
                   {/* Priority Filter */}
                   <div className="space-y-2">
                     <Label className="text-sm font-medium">Priority</Label>
-                    <Select value={filters.priority} onValueChange={(value) => setFilters(prev => ({ ...prev, priority: value }))}>
+                    <Select
+                      value={filters.priority}
+                      onValueChange={(value) =>
+                        setFilters((prev) => ({ ...prev, priority: value }))
+                      }
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="All Priorities" />
                       </SelectTrigger>
@@ -282,14 +321,21 @@ function JobsContent() {
                   {/* Customer Filter */}
                   <div className="space-y-2">
                     <Label className="text-sm font-medium">Customer</Label>
-                    <Select value={filters.customer} onValueChange={(value) => setFilters(prev => ({ ...prev, customer: value }))}>
+                    <Select
+                      value={filters.customer}
+                      onValueChange={(value) =>
+                        setFilters((prev) => ({ ...prev, customer: value }))
+                      }
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="All Customers" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All Customers</SelectItem>
-                        {uniqueCustomers.map(customer => (
-                          <SelectItem key={customer} value={customer || ''}>{customer}</SelectItem>
+                        {uniqueCustomers.map((customer) => (
+                          <SelectItem key={customer} value={customer || ""}>
+                            {customer}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -301,7 +347,12 @@ function JobsContent() {
                     <Input
                       type="date"
                       value={filters.dateFrom}
-                      onChange={(e) => setFilters(prev => ({ ...prev, dateFrom: e.target.value }))}
+                      onChange={(e) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          dateFrom: e.target.value,
+                        }))
+                      }
                     />
                   </div>
 
@@ -311,22 +362,34 @@ function JobsContent() {
                     <Input
                       type="date"
                       value={filters.dateTo}
-                      onChange={(e) => setFilters(prev => ({ ...prev, dateTo: e.target.value }))}
+                      onChange={(e) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          dateTo: e.target.value,
+                        }))
+                      }
                     />
                   </div>
 
                   {/* Assigned To Filter */}
                   <div className="space-y-2">
                     <Label className="text-sm font-medium">Assigned To</Label>
-                    <Select value={filters.assignedTo} onValueChange={(value) => setFilters(prev => ({ ...prev, assignedTo: value }))}>
+                    <Select
+                      value={filters.assignedTo}
+                      onValueChange={(value) =>
+                        setFilters((prev) => ({ ...prev, assignedTo: value }))
+                      }
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="All Assignees" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All Assignees</SelectItem>
                         <SelectItem value="unassigned">Unassigned</SelectItem>
-                        {uniqueAssignees.map(assignee => (
-                          <SelectItem key={assignee} value={assignee || ''}>{assignee}</SelectItem>
+                        {uniqueAssignees.map((assignee) => (
+                          <SelectItem key={assignee} value={assignee || ""}>
+                            {assignee}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -336,7 +399,9 @@ function JobsContent() {
                 {/* Filter Summary */}
                 <div className="mt-4 pt-4 border-t">
                   <div className="flex items-center justify-between text-sm text-gray-600">
-                    <span>Showing {filteredJobs.length} of {jobs?.length || 0} jobs</span>
+                    <span>
+                      Showing {filteredJobs.length} of {jobs?.length || 0} jobs
+                    </span>
                     <div className="flex items-center space-x-4">
                       <Button variant="ghost" size="sm" onClick={clearFilters}>
                         Clear All Filters
@@ -434,13 +499,14 @@ function JobsContent() {
                 <div className="text-center py-8">
                   <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    {hasActiveFilters ? 'No jobs match your filters' : 'No jobs found'}
+                    {hasActiveFilters
+                      ? "No jobs match your filters"
+                      : "No jobs found"}
                   </h3>
                   <p className="text-gray-600 mb-4">
-                    {hasActiveFilters 
-                      ? 'Try adjusting your filters to see more results' 
-                      : 'Get started by creating your first printing job'
-                    }
+                    {hasActiveFilters
+                      ? "Try adjusting your filters to see more results"
+                      : "Get started by creating your first printing job"}
                   </p>
                   {hasActiveFilters ? (
                     <Button variant="outline" onClick={clearFilters}>
@@ -555,9 +621,9 @@ function JobsContent() {
                                   <Calendar className="h-3 w-3 mr-1" />
                                   Due:{" "}
                                   {typeof job.estimated_delivery === "string"
-                                    ? new Date(job.estimated_delivery).toLocaleDateString(
-                                        "en-SL",
-                                      )
+                                    ? new Date(
+                                        job.estimated_delivery,
+                                      ).toLocaleDateString("en-SL")
                                     : "TBD"}
                                 </div>
                               )}
@@ -596,8 +662,8 @@ function JobsContent() {
                               )}
                           </div>
                           <div className="flex space-x-2">
-                            <Button 
-                              variant="outline" 
+                            <Button
+                              variant="outline"
                               size="sm"
                               onClick={() => {
                                 const url = `${window.location.origin}/track/${job.jobNo || job.id}`;

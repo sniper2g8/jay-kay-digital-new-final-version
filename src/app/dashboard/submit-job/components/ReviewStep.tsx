@@ -8,10 +8,10 @@ import {
   Settings,
   Upload,
 } from "lucide-react";
-import { 
-  JobFormData, 
-  Customer, 
-  Service 
+import {
+  JobFormData,
+  Customer,
+  Service,
 } from "@/lib/hooks/useJobSubmissionForm";
 import { FileUpload } from "@/lib/hooks/useFileUploadFixed";
 import { Database } from "@/lib/database.types";

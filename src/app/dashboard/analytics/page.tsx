@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -18,12 +18,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  BarChart3, 
-  TrendingUp, 
-  Users, 
-  Package, 
-  DollarSign, 
+import {
+  BarChart3,
+  TrendingUp,
+  Users,
+  Package,
+  DollarSign,
   Calendar,
   Filter,
   ArrowLeft,
@@ -34,18 +34,18 @@ import {
   LineChart,
   PieChart,
   Target,
-  Activity
+  Activity,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { Database } from "@/lib/database.types";
 
 type Job = Database["public"]["Tables"]["jobs"]["Row"];
 type Customer = Database["public"]["Tables"]["customers"]["Row"];
-type Payment = {
+interface Payment {
   amount: number | null;
   payment_date: string | null;
   payment_method: string | null;
-};
+}
 
 // Type for inventory movements (if not in database types)
 interface InventoryMovement {
@@ -58,7 +58,7 @@ const SimpleBarChart = ({
   data,
   title,
 }: {
-  data: Array<{ label: string; value: number }>;
+  data: { label: string; value: number }[];
   title: string;
 }) => (
   <div className="space-y-2">
@@ -90,7 +90,7 @@ const SimpleLineChart = ({
   data,
   title,
 }: {
-  data: Array<{ label: string; value: number }>;
+  data: { label: string; value: number }[];
   title: string;
 }) => (
   <div className="space-y-2">
@@ -118,35 +118,35 @@ interface AnalyticsData {
     totalRevenue: number;
     monthlyRevenue: number;
     revenueGrowth: number;
-    monthlyRevenueData: Array<{ month: string; revenue: number }>;
+    monthlyRevenueData: { month: string; revenue: number }[];
   };
   jobs: {
     totalJobs: number;
     completedJobs: number;
     pendingJobs: number;
     jobCompletionRate: number;
-    jobStatusData: Array<{ status: string; count: number }>;
-    monthlyJobsData: Array<{ month: string; jobs: number }>;
+    jobStatusData: { status: string; count: number }[];
+    monthlyJobsData: { month: string; jobs: number }[];
   };
   customers: {
     totalCustomers: number;
     newCustomers: number;
-    topCustomers: Array<{ name: string; totalSpent: number; jobCount: number }>;
-    customerGrowthData: Array<{ month: string; customers: number }>;
+    topCustomers: { name: string; totalSpent: number; jobCount: number }[];
+    customerGrowthData: { month: string; customers: number }[];
   };
   inventory: {
     totalItems: number;
     totalValue: number;
     lowStockItems: number;
-    topMovingItems: Array<{ item: string; movements: number }>;
-    inventoryValueData: Array<{ category: string; value: number }>;
+    topMovingItems: { item: string; movements: number }[];
+    inventoryValueData: { category: string; value: number }[];
   };
   financial: {
     totalPayments: number;
     pendingPayments: number;
     overduePayments: number;
-    paymentMethodData: Array<{ method: string; amount: number }>;
-    monthlyPaymentsData: Array<{ month: string; amount: number }>;
+    paymentMethodData: { method: string; amount: number }[];
+    monthlyPaymentsData: { month: string; amount: number }[];
   };
 }
 
@@ -244,8 +244,7 @@ export default function AnalyticsPage() {
       if (paymentsError) throw paymentsError;
 
       const totalRevenue = (jobsData || []).reduce(
-        (sum: number, job) =>
-          sum + (job.final_price || 0),
+        (sum: number, job) => sum + (job.final_price || 0),
         0,
       );
       const currentMonth = new Date().getMonth();
@@ -266,7 +265,7 @@ export default function AnalyticsPage() {
       );
 
       // Generate monthly revenue data for the last 6 months
-      const monthlyRevenueData: Array<{ month: string; revenue: number }> = [];
+      const monthlyRevenueData: { month: string; revenue: number }[] = [];
       for (let i = 5; i >= 0; i--) {
         const date = new Date();
         date.setMonth(date.getMonth() - i);
@@ -340,7 +339,7 @@ export default function AnalyticsPage() {
       );
 
       // Monthly jobs data
-      const monthlyJobsData: Array<{ month: string; jobs: number }> = [];
+      const monthlyJobsData: { month: string; jobs: number }[] = [];
       for (let i = 5; i >= 0; i--) {
         const date = new Date();
         date.setMonth(date.getMonth() - i);
@@ -476,13 +475,12 @@ export default function AnalyticsPage() {
       );
 
       const lowStockItems = inventoryItems.filter(
-        (item) =>
-          (item.current_stock || 0) <= (item.minimum_stock || 0),
+        (item) => (item.current_stock || 0) <= (item.minimum_stock || 0),
       ).length;
 
       // Top moving items
       const itemMovements = (
-        (movementsData || []) as Array<{ inventory_id: string }>
+        (movementsData || []) as { inventory_id: string }[]
       ).reduce(
         (acc, movement) => {
           acc[movement.inventory_id || ""] =
@@ -493,7 +491,7 @@ export default function AnalyticsPage() {
       );
 
       const topMovingItems = Object.entries(itemMovements)
-        .sort(([,a], [,b]) => (b as number) - (a as number))
+        .sort(([, a], [, b]) => (b as number) - (a as number))
         .slice(0, 5)
         .map(([inventoryId, movements]) => {
           const item = inventoryItems.find((i) => i.id === inventoryId);

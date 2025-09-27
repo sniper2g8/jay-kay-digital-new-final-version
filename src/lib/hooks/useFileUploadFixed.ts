@@ -109,7 +109,6 @@ export const useFileUploadFixed = () => {
 
       for (const upload of fileUploads) {
         if (upload.status === "completed") {
-          
           continue;
         }
 
@@ -118,12 +117,12 @@ export const useFileUploadFixed = () => {
           setFileUploads((prev) =>
             prev.map((u) =>
               u.id === upload.id
-                ? { 
-                    ...u, 
-                    status: "uploading", 
+                ? {
+                    ...u,
+                    status: "uploading",
                     progress: 0,
                     uploadSpeed: 0,
-                    estimatedTimeRemaining: 0 
+                    estimatedTimeRemaining: 0,
                   }
                 : u,
             ),
@@ -140,29 +139,40 @@ export const useFileUploadFixed = () => {
           // Simulate upload progress with intervals
           const startTime = Date.now();
           const fileSize = upload.file.size;
-          
+
           const progressInterval = setInterval(() => {
             setFileUploads((prev) =>
               prev.map((u) => {
                 if (u.id === upload.id && u.status === "uploading") {
                   const currentTime = Date.now();
                   const elapsedSeconds = (currentTime - startTime) / 1000;
-                  const estimatedTotalTime = Math.max(2, fileSize / (1024 * 1024) * 2); // 2 seconds per MB minimum
-                  const newProgress = Math.min(90, (elapsedSeconds / estimatedTotalTime) * 100);
-                  
-                  const uploadSpeed = fileSize * (newProgress / 100) / elapsedSeconds;
+                  const estimatedTotalTime = Math.max(
+                    2,
+                    (fileSize / (1024 * 1024)) * 2,
+                  ); // 2 seconds per MB minimum
+                  const newProgress = Math.min(
+                    90,
+                    (elapsedSeconds / estimatedTotalTime) * 100,
+                  );
+
+                  const uploadSpeed =
+                    (fileSize * (newProgress / 100)) / elapsedSeconds;
                   const remainingProgress = 100 - newProgress;
-                  const estimatedTimeRemaining = remainingProgress > 0 ? (remainingProgress / 100) * estimatedTotalTime - elapsedSeconds : 0;
-                  
+                  const estimatedTimeRemaining =
+                    remainingProgress > 0
+                      ? (remainingProgress / 100) * estimatedTotalTime -
+                        elapsedSeconds
+                      : 0;
+
                   return {
                     ...u,
                     progress: Math.round(newProgress),
                     uploadSpeed: uploadSpeed,
-                    estimatedTimeRemaining: Math.max(0, estimatedTimeRemaining)
+                    estimatedTimeRemaining: Math.max(0, estimatedTimeRemaining),
                   };
                 }
                 return u;
-              })
+              }),
             );
           }, 200); // Update every 200ms
 
@@ -191,10 +201,15 @@ export const useFileUploadFixed = () => {
 
             // Update progress to 95% after upload
             setFileUploads((prev) =>
-              prev.map((u) => 
-                u.id === upload.id 
-                  ? { ...u, progress: 95, uploadSpeed: 0, estimatedTimeRemaining: 0 } 
-                  : u
+              prev.map((u) =>
+                u.id === upload.id
+                  ? {
+                      ...u,
+                      progress: 95,
+                      uploadSpeed: 0,
+                      estimatedTimeRemaining: 0,
+                    }
+                  : u,
               ),
             );
 
@@ -225,7 +240,9 @@ export const useFileUploadFixed = () => {
               console.error("❌ Database error:", dbError);
 
               // Clean up uploaded file if database insert fails
-              await supabase.storage.from("job-files").remove([uploadData.path]);
+              await supabase.storage
+                .from("job-files")
+                .remove([uploadData.path]);
 
               throw dbError;
             }
@@ -234,14 +251,19 @@ export const useFileUploadFixed = () => {
             setFileUploads((prev) =>
               prev.map((u) =>
                 u.id === upload.id
-                  ? { ...u, status: "completed", progress: 100, uploadSpeed: 0, estimatedTimeRemaining: 0 }
+                  ? {
+                      ...u,
+                      status: "completed",
+                      progress: 100,
+                      uploadSpeed: 0,
+                      estimatedTimeRemaining: 0,
+                    }
                   : u,
               ),
             );
 
             uploadedFiles.push(dbData);
             toast.success(`File "${upload.file.name}" uploaded successfully`);
-            
           } catch (uploadError) {
             clearInterval(progressInterval);
             throw uploadError;
@@ -267,7 +289,6 @@ export const useFileUploadFixed = () => {
           toast.error(`Failed to upload ${upload.file.name}: ${errorMessage}`);
         }
       }
-
     } catch (globalError: unknown) {
       const errorMessage =
         globalError instanceof Error ? globalError.message : "Unknown error";

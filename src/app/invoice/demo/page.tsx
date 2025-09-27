@@ -13,13 +13,13 @@ export default function InvoiceDemoPage() {
     payment_status: "pending",
     terms_days: 30,
     notes: "Thank you for your business! Please make payment within 30 days.",
-    subtotal: 1200.00,
-    tax: 120.00,
+    subtotal: 1200.0,
+    tax: 120.0,
     tax_rate: 10,
-    discount: 50.00,
-    total: 1270.00,
+    discount: 50.0,
+    total: 1270.0,
     amountPaid: 0,
-    currency: "SLL"
+    currency: "SLL",
   };
 
   const sampleCustomer = {
@@ -31,7 +31,7 @@ export default function InvoiceDemoPage() {
     city: "Freetown",
     state: "Western Area",
     zip_code: "12345",
-    country: "Sierra Leone"
+    country: "Sierra Leone",
   };
 
   const sampleItems = [
@@ -39,38 +39,39 @@ export default function InvoiceDemoPage() {
       id: 1,
       description: "Business Card Printing",
       quantity: 1000,
-      unit_price: 0.50,
-      total_price: 500.00,
-      notes: "Standard business cards, 300gsm"
+      unit_price: 0.5,
+      total_price: 500.0,
+      notes: "Standard business cards, 300gsm",
     },
     {
       id: 2,
       description: "Flyer Design & Printing",
       quantity: 500,
-      unit_price: 1.00,
-      total_price: 500.00,
-      notes: "A4 size, full color printing"
+      unit_price: 1.0,
+      total_price: 500.0,
+      notes: "A4 size, full color printing",
     },
     {
       id: 3,
       description: "Logo Design",
       quantity: 1,
-      unit_price: 200.00,
-      total_price: 200.00,
-      notes: "Custom logo design with revisions"
-    }
+      unit_price: 200.0,
+      total_price: 200.0,
+      notes: "Custom logo design with revisions",
+    },
   ];
 
   return (
     <div className="container mx-auto py-8">
       <h1 className="text-3xl font-bold mb-6">Invoice Template Demo</h1>
       <p className="text-gray-600 mb-6">
-        This is a preview of the new simplified and professional invoice template.
+        This is a preview of the new simplified and professional invoice
+        template.
       </p>
-      <SimplifiedInvoiceTemplate 
-        invoice={sampleInvoice} 
-        customer={sampleCustomer} 
-        items={sampleItems} 
+      <SimplifiedInvoiceTemplate
+        invoice={sampleInvoice}
+        customer={sampleCustomer}
+        items={sampleItems}
       />
     </div>
   );

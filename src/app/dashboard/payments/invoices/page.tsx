@@ -1,37 +1,32 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-// import { getInvoiceLineItems_SA } from '@/app/actions/getInvoiceLineItems_SA';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { ProfessionalInvoicePDF } from "@/components/ProfessionalInvoicePDF";
 import { formatCurrency, formatDate } from "@/lib/constants";
-import { 
+import {
   ArrowLeft,
   Plus,
   Search,
-  Filter,
   FileText,
-  Download,
   Eye,
   Edit,
-  MoreHorizontal,
-  Calendar,
   DollarSign,
   TrendingUp,
   Clock,
-  AlertCircle
+  AlertCircle,
 } from "lucide-react";
 
 interface Invoice {
@@ -89,7 +84,7 @@ export default function InvoiceManagementPage() {
     totalRevenue: 0,
     paidAmount: 0,
     overdueAmount: 0,
-    pendingAmount: 0
+    pendingAmount: 0,
   });
 
   useEffect(() => {
@@ -104,8 +99,9 @@ export default function InvoiceManagementPage() {
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from('invoices')
-        .select(`
+        .from("invoices")
+        .select(
+          `
           id,
           invoiceNo,
           customer_id,
@@ -122,30 +118,36 @@ export default function InvoiceManagementPage() {
           customers (
             business_name
           )
-        `)
-        .order('created_at', { ascending: false });
+        `,
+        )
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
 
-      const processedInvoices = data?.map(invoice => ({
-        id: invoice.id,
-        invoiceNo: invoice.invoiceNo || `JKDP-INV-${invoice.id.slice(0, 8)}`,
-        customer_id: invoice.customer_id,
-        customerName: invoice.customerName || invoice.customers?.business_name || 'Unknown Customer',
-        due_date: invoice.due_date || invoice.created_at || new Date().toISOString(),
-        status: invoice.status || 'draft',
-        payment_status: invoice.payment_status || 'pending',
-        total: invoice.total || 0,
-        amountPaid: invoice.amountPaid || 0,
-        currency: invoice.currency || 'SLL',
-        notes: invoice.notes || undefined,
-        created_at: invoice.created_at,
-        updated_at: invoice.updated_at
-      })) || [];
+      const processedInvoices =
+        data?.map((invoice) => ({
+          id: invoice.id,
+          invoiceNo: invoice.invoiceNo || `JKDP-INV-${invoice.id.slice(0, 8)}`,
+          customer_id: invoice.customer_id,
+          customerName:
+            invoice.customerName ||
+            invoice.customers?.business_name ||
+            "Unknown Customer",
+          due_date:
+            invoice.due_date || invoice.created_at || new Date().toISOString(),
+          status: invoice.status || "draft",
+          payment_status: invoice.payment_status || "pending",
+          total: invoice.total || 0,
+          amountPaid: invoice.amountPaid || 0,
+          currency: invoice.currency || "SLL",
+          notes: invoice.notes || undefined,
+          created_at: invoice.created_at,
+          updated_at: invoice.updated_at,
+        })) || [];
 
       setInvoices(processedInvoices);
     } catch (error) {
-      console.error('Error fetching invoices:', error);
+      console.error("Error fetching invoices:", error);
     } finally {
       setLoading(false);
     }
@@ -153,47 +155,48 @@ export default function InvoiceManagementPage() {
 
   const fetchInvoiceDetails = async (invoiceId: string) => {
     try {
-      console.log('Fetching invoice items for invoice:', invoiceId);
+      console.log("Fetching invoice items for invoice:", invoiceId);
       // Prefer API route to ensure stable server environment and consistent response shape
       const res = await fetch(`/api/invoice-items/${invoiceId}`);
       const rawText = await res.text();
       let itemsPayload: any = undefined;
       try {
         itemsPayload = rawText ? JSON.parse(rawText) : null;
-      } catch (e) {
-        console.warn('Items response is not valid JSON, raw:', rawText);
+      } catch (_e) {
+        console.warn("Items response is not valid JSON, raw:", rawText);
       }
       if (!res.ok) {
-        console.error('Error fetching items:', {
+        console.error("Error fetching items:", {
           status: res.status,
           statusText: res.statusText,
-          body: itemsPayload ?? rawText
+          body: itemsPayload ?? rawText,
         });
         throw new Error(`Items request failed: ${res.status}`);
       }
 
       const processedItems = (itemsPayload || []).map((item: any) => ({
         id: item.id,
-        description: item.description || 'No description',
+        description: item.description || "No description",
         quantity: Number(item.quantity) || 1,
         unit_price: Number(item.unit_price) || 0,
         total_price: Number(item.total_price) || 0,
         job_no: item.job_no || undefined,
-        notes: item.notes || undefined
+        notes: item.notes || undefined,
       }));
 
-      console.log('Processed items:', processedItems);
+      console.log("Processed items:", processedItems);
       setInvoiceItems(processedItems);
 
       // Fetch customer details for selected invoice
-      const invoice = invoices.find(inv => inv.id === invoiceId);
-      console.log('Found invoice:', invoice);
-      
+      const invoice = invoices.find((inv) => inv.id === invoiceId);
+      console.log("Found invoice:", invoice);
+
       if (invoice?.customer_id) {
-        console.log('Fetching customer details for:', invoice.customer_id);
+        console.log("Fetching customer details for:", invoice.customer_id);
         const { data: customerData, error: customerError } = await supabase
-          .from('customers')
-          .select(`
+          .from("customers")
+          .select(
+            `
             id,
             business_name,
             contact_person,
@@ -203,31 +206,44 @@ export default function InvoiceManagementPage() {
             city,
             state,
             zip_code
-          `)
-          .eq('id', invoice.customer_id)
+          `,
+          )
+          .eq("id", invoice.customer_id)
           .single();
 
         if (customerError) {
-          console.error('Error fetching customer:', customerError);
+          console.error("Error fetching customer:", customerError);
         } else {
-          console.log('Fetched customer data:', customerData);
+          console.log("Fetched customer data:", customerData);
           setCustomer(customerData);
         }
       }
     } catch (error) {
-      console.error('Error fetching invoice details:', error);
-      alert('Failed to load invoice details. Please try again.');
+      console.error("Error fetching invoice details:", error);
+      alert("Failed to load invoice details. Please try again.");
     }
   };
 
   const calculateStats = () => {
-    const totalRevenue = invoices.reduce((sum, inv) => sum + (inv.total || 0), 0);
-    const paidAmount = invoices.reduce((sum, inv) => sum + (inv.amountPaid || 0), 0);
-    const overdueInvoices = invoices.filter(inv => 
-      inv.payment_status === 'overdue' || 
-      (inv.due_date && new Date(inv.due_date) < new Date() && inv.payment_status !== 'paid')
+    const totalRevenue = invoices.reduce(
+      (sum, inv) => sum + (inv.total || 0),
+      0,
     );
-    const overdueAmount = overdueInvoices.reduce((sum, inv) => sum + ((inv.total || 0) - (inv.amountPaid || 0)), 0);
+    const paidAmount = invoices.reduce(
+      (sum, inv) => sum + (inv.amountPaid || 0),
+      0,
+    );
+    const overdueInvoices = invoices.filter(
+      (inv) =>
+        inv.payment_status === "overdue" ||
+        (inv.due_date &&
+          new Date(inv.due_date) < new Date() &&
+          inv.payment_status !== "paid"),
+    );
+    const overdueAmount = overdueInvoices.reduce(
+      (sum, inv) => sum + ((inv.total || 0) - (inv.amountPaid || 0)),
+      0,
+    );
     const pendingAmount = totalRevenue - paidAmount;
 
     setStats({
@@ -235,18 +251,20 @@ export default function InvoiceManagementPage() {
       totalRevenue,
       paidAmount,
       overdueAmount,
-      pendingAmount
+      pendingAmount,
     });
   };
 
-  const filteredInvoices = invoices.filter(invoice => {
-    const matchesSearch = 
+  const filteredInvoices = invoices.filter((invoice) => {
+    const matchesSearch =
       invoice.invoiceNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
       invoice.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       invoice.notes?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesStatus = statusFilter === "all" || invoice.status === statusFilter;
-    const matchesPayment = paymentFilter === "all" || invoice.payment_status === paymentFilter;
+    const matchesStatus =
+      statusFilter === "all" || invoice.status === statusFilter;
+    const matchesPayment =
+      paymentFilter === "all" || invoice.payment_status === paymentFilter;
 
     return matchesSearch && matchesStatus && matchesPayment;
   });
@@ -259,36 +277,36 @@ export default function InvoiceManagementPage() {
 
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
-      case 'paid':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'partial':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'sent':
-        return 'bg-purple-100 text-purple-800 border-purple-200';
-      case 'overdue':
-        return 'bg-red-100 text-red-800 border-red-200';
-      case 'cancelled':
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-      case 'draft':
+      case "paid":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "partial":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "sent":
+        return "bg-purple-100 text-purple-800 border-purple-200";
+      case "overdue":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "cancelled":
+        return "bg-gray-100 text-gray-800 border-gray-200";
+      case "draft":
       default:
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
     }
   };
 
   const getPaymentStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
-      case 'paid':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'partial':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'overdue':
-        return 'bg-red-100 text-red-800 border-red-200';
-      case 'failed':
-        return 'bg-red-100 text-red-800 border-red-200';
+      case "paid":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "partial":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "overdue":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "failed":
+        return "bg-red-100 text-red-800 border-red-200";
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
@@ -313,25 +331,30 @@ export default function InvoiceManagementPage() {
             id: selectedInvoice.id,
             invoiceNo: selectedInvoice.invoiceNo,
             created_at: selectedInvoice.created_at || new Date().toISOString(),
-            invoice_date: selectedInvoice.created_at || new Date().toISOString(),
+            invoice_date:
+              selectedInvoice.created_at || new Date().toISOString(),
             invoice_status: selectedInvoice.status,
             payment_status: selectedInvoice.payment_status,
             terms_days: 30,
             notes: selectedInvoice.notes,
             total: selectedInvoice.total,
             amountPaid: selectedInvoice.amountPaid,
-            currency: selectedInvoice.currency
+            currency: selectedInvoice.currency,
           }}
-          customer={customer ? {
-            business_name: customer.business_name,
-            contact_person: customer.contact_person || undefined,
-            email: customer.email || undefined,
-            phone: customer.phone || undefined,
-            address: customer.address || undefined,
-            city: customer.city || undefined,
-            state: customer.state || undefined,
-            zip_code: customer.zip_code || undefined
-          } : undefined}
+          customer={
+            customer
+              ? {
+                  business_name: customer.business_name,
+                  contact_person: customer.contact_person || undefined,
+                  email: customer.email || undefined,
+                  phone: customer.phone || undefined,
+                  address: customer.address || undefined,
+                  city: customer.city || undefined,
+                  state: customer.state || undefined,
+                  zip_code: customer.zip_code || undefined,
+                }
+              : undefined
+          }
           items={invoiceItems}
           showActions={true}
         />
@@ -355,8 +378,12 @@ export default function InvoiceManagementPage() {
             <span>Back to Payments</span>
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Invoice Management</h1>
-            <p className="text-gray-600">Manage and generate professional invoices with PDF export</p>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Invoice Management
+            </h1>
+            <p className="text-gray-600">
+              Manage and generate professional invoices with PDF export
+            </p>
           </div>
         </div>
         <Button className="flex items-center space-x-2 bg-red-600 hover:bg-red-700">
@@ -372,8 +399,12 @@ export default function InvoiceManagementPage() {
             <div className="flex items-center space-x-2">
               <FileText className="h-8 w-8 text-blue-600" />
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Invoices</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalInvoices}</p>
+                <p className="text-sm font-medium text-gray-600">
+                  Total Invoices
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {stats.totalInvoices}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -384,8 +415,12 @@ export default function InvoiceManagementPage() {
             <div className="flex items-center space-x-2">
               <TrendingUp className="h-8 w-8 text-green-600" />
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-                <p className="text-2xl font-bold text-gray-900">{formatCurrency(stats.totalRevenue)}</p>
+                <p className="text-sm font-medium text-gray-600">
+                  Total Revenue
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {formatCurrency(stats.totalRevenue)}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -397,7 +432,9 @@ export default function InvoiceManagementPage() {
               <DollarSign className="h-8 w-8 text-green-600" />
               <div>
                 <p className="text-sm font-medium text-gray-600">Paid Amount</p>
-                <p className="text-2xl font-bold text-green-600">{formatCurrency(stats.paidAmount)}</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {formatCurrency(stats.paidAmount)}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -409,7 +446,9 @@ export default function InvoiceManagementPage() {
               <Clock className="h-8 w-8 text-yellow-600" />
               <div>
                 <p className="text-sm font-medium text-gray-600">Pending</p>
-                <p className="text-2xl font-bold text-yellow-600">{formatCurrency(stats.pendingAmount)}</p>
+                <p className="text-2xl font-bold text-yellow-600">
+                  {formatCurrency(stats.pendingAmount)}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -421,7 +460,9 @@ export default function InvoiceManagementPage() {
               <AlertCircle className="h-8 w-8 text-red-600" />
               <div>
                 <p className="text-sm font-medium text-gray-600">Overdue</p>
-                <p className="text-2xl font-bold text-red-600">{formatCurrency(stats.overdueAmount)}</p>
+                <p className="text-2xl font-bold text-red-600">
+                  {formatCurrency(stats.overdueAmount)}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -490,7 +531,9 @@ export default function InvoiceManagementPage() {
           ) : filteredInvoices.length === 0 ? (
             <div className="text-center py-12">
               <FileText className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No invoices found</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No invoices found
+              </h3>
               <p className="text-gray-600 mb-4">
                 {searchTerm || statusFilter !== "all" || paymentFilter !== "all"
                   ? "No invoices match your current filters."
@@ -536,25 +579,39 @@ export default function InvoiceManagementPage() {
                   {filteredInvoices.map((invoice) => (
                     <tr key={invoice.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="font-medium text-gray-900">{invoice.invoiceNo}</div>
+                        <div className="font-medium text-gray-900">
+                          {invoice.invoiceNo}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{invoice.customerName}</div>
+                        <div className="text-sm text-gray-900">
+                          {invoice.customerName}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                        {formatDate(invoice.created_at || new Date().toISOString())}
+                        {formatDate(
+                          invoice.created_at || new Date().toISOString(),
+                        )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                        {formatDate(invoice.due_date || new Date().toISOString())}
+                        {formatDate(
+                          invoice.due_date || new Date().toISOString(),
+                        )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <Badge className={getStatusColor(invoice.status)}>
-                          {invoice.status?.charAt(0).toUpperCase() + invoice.status?.slice(1)}
+                          {invoice.status?.charAt(0).toUpperCase() +
+                            invoice.status?.slice(1)}
                         </Badge>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <Badge className={getPaymentStatusColor(invoice.payment_status)}>
-                          {invoice.payment_status?.charAt(0).toUpperCase() + invoice.payment_status?.slice(1)}
+                        <Badge
+                          className={getPaymentStatusColor(
+                            invoice.payment_status,
+                          )}
+                        >
+                          {invoice.payment_status?.charAt(0).toUpperCase() +
+                            invoice.payment_status?.slice(1)}
                         </Badge>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -574,7 +631,11 @@ export default function InvoiceManagementPage() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => router.push(`/dashboard/invoices/${invoice.id}/edit?number=${encodeURIComponent(invoice.invoiceNo)}`)}
+                            onClick={() =>
+                              router.push(
+                                `/dashboard/invoices/${invoice.id}/edit?number=${encodeURIComponent(invoice.invoiceNo)}`,
+                              )
+                            }
                             className="flex items-center space-x-1"
                           >
                             <Edit className="h-4 w-4" />

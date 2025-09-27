@@ -1,36 +1,36 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { formatCurrency } from "@/lib/constants";
-import { 
-  Plus, 
-  Trash2, 
-  Save, 
-  Send, 
-  FileText, 
+import {
+  Plus,
+  Trash2,
+  Save,
+  Send,
+  FileText,
   Calendar,
   User,
-  CreditCard
+  CreditCard,
 } from "lucide-react";
 import { ProfessionalInvoicePDF } from "@/components/ProfessionalInvoicePDF";
 
@@ -93,7 +93,7 @@ export function InvoiceManagement() {
     discount: 0,
     total: 0,
     amountPaid: 0,
-    currency: "SLL"
+    currency: "SLL",
   });
 
   // State for items
@@ -103,13 +103,15 @@ export function InvoiceManagement() {
       description: "",
       quantity: 1,
       unit_price: 0,
-      total_price: 0
-    }
+      total_price: 0,
+    },
   ]);
 
   // State for customers
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
+    null,
+  );
 
   // State for UI
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -117,93 +119,109 @@ export function InvoiceManagement() {
   // Calculate totals whenever items change
   useEffect(() => {
     const newSubtotal = items.reduce((sum, item) => {
-      const totalPrice = typeof item.total_price === 'string' ? parseFloat(item.total_price) || 0 : item.total_price || 0;
+      const totalPrice =
+        typeof item.total_price === "string"
+          ? parseFloat(item.total_price) || 0
+          : item.total_price || 0;
       return sum + totalPrice;
     }, 0);
-    
-    const taxRate = typeof invoice.tax_rate === 'string' ? parseFloat(invoice.tax_rate) || 0 : invoice.tax_rate || 0;
-    const newTax = newSubtotal * taxRate / 100;
-    const discount = typeof invoice.discount === 'string' ? parseFloat(invoice.discount) || 0 : invoice.discount || 0;
+
+    const taxRate =
+      typeof invoice.tax_rate === "string"
+        ? parseFloat(invoice.tax_rate) || 0
+        : invoice.tax_rate || 0;
+    const newTax = (newSubtotal * taxRate) / 100;
+    const discount =
+      typeof invoice.discount === "string"
+        ? parseFloat(invoice.discount) || 0
+        : invoice.discount || 0;
     const newTotal = newSubtotal + newTax - discount;
-    
-    setInvoice(prev => ({
+
+    setInvoice((prev) => ({
       ...prev,
       subtotal: newSubtotal,
       tax: newTax,
-      total: newTotal
+      total: newTotal,
     }));
   }, [items, invoice.tax_rate, invoice.discount]);
 
   // Handle item changes
-  const handleItemChange = (id: number, field: keyof InvoiceItem, value: string | number) => {
-    setItems(prevItems => 
-      prevItems.map(item => {
+  const handleItemChange = (
+    id: number,
+    field: keyof InvoiceItem,
+    value: string | number,
+  ) => {
+    setItems((prevItems) =>
+      prevItems.map((item) => {
         if (item.id === id) {
           const updatedItem = { ...item, [field]: value };
-          
+
           // Recalculate total when quantity or unit_price changes
           if (field === "quantity" || field === "unit_price") {
-            const quantity = field === "quantity" ? Number(value) : item.quantity;
-            const unitPrice = field === "unit_price" ? Number(value) : item.unit_price;
+            const quantity =
+              field === "quantity" ? Number(value) : item.quantity;
+            const unitPrice =
+              field === "unit_price" ? Number(value) : item.unit_price;
             updatedItem.total_price = quantity * unitPrice;
           }
-          
+
           return updatedItem;
         }
         return item;
-      })
+      }),
     );
   };
 
   // Add new item
   const addItem = () => {
-    setItems(prevItems => [
+    setItems((prevItems) => [
       ...prevItems,
       {
         id: prevItems.length + 1,
         description: "",
         quantity: 1,
         unit_price: 0,
-        total_price: 0
-      }
+        total_price: 0,
+      },
     ]);
   };
 
   // Remove item
   const removeItem = (id: number) => {
     if (items.length > 1) {
-      setItems(prevItems => prevItems.filter(item => item.id !== id));
+      setItems((prevItems) => prevItems.filter((item) => item.id !== id));
     }
   };
 
   // Handle invoice field changes
-  const handleInvoiceChange = (field: keyof InvoiceData, value: string | number) => {
-    setInvoice(prev => ({
+  const handleInvoiceChange = (
+    field: keyof InvoiceData,
+    value: string | number,
+  ) => {
+    setInvoice((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   // Handle customer selection
   const handleCustomerSelect = (customerId: string) => {
-    const customer = customers.find(c => c.id === customerId) || null;
+    const customer = customers.find((c) => c.id === customerId) || null;
     setSelectedCustomer(customer);
-    setInvoice(prev => ({
+    setInvoice((prev) => ({
       ...prev,
-      customer_id: customerId
+      customer_id: customerId,
     }));
   };
 
   // Save invoice
   const saveInvoice = () => {
-    
     // In a real app, this would make an API call to save the invoice
     alert("Invoice saved successfully!");
   };
 
   // Send invoice
   const sendInvoice = () => {
-    
     // In a real app, this would send the invoice to the customer
     alert("Invoice sent successfully!");
   };
@@ -223,23 +241,23 @@ export function InvoiceManagement() {
               Create New Invoice
             </span>
             <div className="flex space-x-2">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={previewInvoice}
                 className="flex items-center"
               >
                 <FileText className="mr-2 h-4 w-4" />
                 Preview
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={saveInvoice}
                 className="flex items-center"
               >
                 <Save className="mr-2 h-4 w-4" />
                 Save Draft
               </Button>
-              <Button 
+              <Button
                 onClick={sendInvoice}
                 className="flex items-center bg-red-600 hover:bg-red-700"
               >
@@ -257,29 +275,41 @@ export function InvoiceManagement() {
               <Input
                 id="invoiceNo"
                 value={invoice.invoiceNo || ""}
-                onChange={(e) => handleInvoiceChange("invoiceNo", e.target.value)}
+                onChange={(e) =>
+                  handleInvoiceChange("invoiceNo", e.target.value)
+                }
                 placeholder="INV-001"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="invoiceDate">Invoice Date</Label>
               <div className="relative">
                 <Input
                   id="invoiceDate"
                   type="date"
-                  value={invoice.invoice_date ? new Date(invoice.invoice_date).toISOString().split('T')[0] : ""}
-                  onChange={(e) => handleInvoiceChange("invoice_date", e.target.value)}
+                  value={
+                    invoice.invoice_date
+                      ? new Date(invoice.invoice_date)
+                          .toISOString()
+                          .split("T")[0]
+                      : ""
+                  }
+                  onChange={(e) =>
+                    handleInvoiceChange("invoice_date", e.target.value)
+                  }
                 />
                 <Calendar className="absolute right-3 top-3 h-4 w-4 text-gray-400" />
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="termsDays">Payment Terms</Label>
-              <Select 
-                value={invoice.terms_days?.toString() || "30"} 
-                onValueChange={(value) => handleInvoiceChange("terms_days", parseInt(value))}
+              <Select
+                value={invoice.terms_days?.toString() || "30"}
+                onValueChange={(value) =>
+                  handleInvoiceChange("terms_days", parseInt(value))
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -299,15 +329,15 @@ export function InvoiceManagement() {
           <div className="space-y-2">
             <Label htmlFor="customer">Customer</Label>
             <div className="flex space-x-2">
-              <Select 
-                value={invoice.customer_id || ""} 
+              <Select
+                value={invoice.customer_id || ""}
                 onValueChange={handleCustomerSelect}
               >
                 <SelectTrigger className="flex-1">
                   <SelectValue placeholder="Select a customer" />
                 </SelectTrigger>
                 <SelectContent>
-                  {customers.map(customer => (
+                  {customers.map((customer) => (
                     <SelectItem key={customer.id} value={customer.id}>
                       {customer.business_name}
                     </SelectItem>
@@ -327,15 +357,19 @@ export function InvoiceManagement() {
                 <div className="flex items-start space-x-4">
                   <User className="h-5 w-5 text-gray-500 mt-0.5" />
                   <div>
-                    <h4 className="font-semibold">{selectedCustomer.business_name}</h4>
+                    <h4 className="font-semibold">
+                      {selectedCustomer.business_name}
+                    </h4>
                     <p className="text-sm text-gray-600">
-                      {selectedCustomer.contact_person && `${selectedCustomer.contact_person} • `}
+                      {selectedCustomer.contact_person &&
+                        `${selectedCustomer.contact_person} • `}
                       {selectedCustomer.email}
                     </p>
                     <p className="text-sm text-gray-600">
                       {selectedCustomer.address}
                       {selectedCustomer.city && `, ${selectedCustomer.city}`}
-                      {selectedCustomer.country && `, ${selectedCustomer.country}`}
+                      {selectedCustomer.country &&
+                        `, ${selectedCustomer.country}`}
                     </p>
                   </div>
                 </div>
@@ -347,12 +381,17 @@ export function InvoiceManagement() {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-medium">Items</h3>
-              <Button onClick={addItem} variant="outline" size="sm" className="flex items-center">
+              <Button
+                onClick={addItem}
+                variant="outline"
+                size="sm"
+                className="flex items-center"
+              >
                 <Plus className="h-4 w-4 mr-1" />
                 Add Item
               </Button>
             </div>
-            
+
             <Table>
               <TableHeader>
                 <TableRow>
@@ -369,7 +408,13 @@ export function InvoiceManagement() {
                     <TableCell>
                       <Textarea
                         value={item.description}
-                        onChange={(e) => handleItemChange(item.id, "description", e.target.value)}
+                        onChange={(e) =>
+                          handleItemChange(
+                            item.id,
+                            "description",
+                            e.target.value,
+                          )
+                        }
                         placeholder="Item description"
                         className="min-h-[40px]"
                       />
@@ -379,7 +424,13 @@ export function InvoiceManagement() {
                         type="number"
                         min="1"
                         value={item.quantity}
-                        onChange={(e) => handleItemChange(item.id, "quantity", parseInt(e.target.value) || 0)}
+                        onChange={(e) =>
+                          handleItemChange(
+                            item.id,
+                            "quantity",
+                            parseInt(e.target.value) || 0,
+                          )
+                        }
                         className="w-20"
                       />
                     </TableCell>
@@ -389,7 +440,13 @@ export function InvoiceManagement() {
                         min="0"
                         step="0.01"
                         value={item.unit_price}
-                        onChange={(e) => handleItemChange(item.id, "unit_price", parseFloat(e.target.value) || 0)}
+                        onChange={(e) =>
+                          handleItemChange(
+                            item.id,
+                            "unit_price",
+                            parseFloat(e.target.value) || 0,
+                          )
+                        }
                         className="w-24"
                       />
                     </TableCell>
@@ -423,7 +480,7 @@ export function InvoiceManagement() {
                 rows={4}
               />
             </div>
-            
+
             <div className="space-y-4">
               <h3 className="text-lg font-medium">Summary</h3>
               <Card>
@@ -442,21 +499,33 @@ export function InvoiceManagement() {
                   </div>
                   <div className="flex justify-between font-semibold border-t pt-2">
                     <span>Total:</span>
-                    <span className="text-lg">{formatCurrency(invoice.total || 0)}</span>
+                    <span className="text-lg">
+                      {formatCurrency(invoice.total || 0)}
+                    </span>
                   </div>
                   <div className="flex justify-between font-semibold border-t pt-2">
                     <span>Amount Paid:</span>
-                    <span className="text-green-600">{formatCurrency(invoice.amountPaid || 0)}</span>
+                    <span className="text-green-600">
+                      {formatCurrency(invoice.amountPaid || 0)}
+                    </span>
                   </div>
                   <div className="flex justify-between font-semibold border-t pt-2">
                     <span>Amount Due:</span>
-                    <span className={((invoice.total || 0) - (invoice.amountPaid || 0)) > 0 ? "text-orange-600" : "text-green-600"}>
-                      {formatCurrency((invoice.total || 0) - (invoice.amountPaid || 0))}
+                    <span
+                      className={
+                        (invoice.total || 0) - (invoice.amountPaid || 0) > 0
+                          ? "text-orange-600"
+                          : "text-green-600"
+                      }
+                    >
+                      {formatCurrency(
+                        (invoice.total || 0) - (invoice.amountPaid || 0),
+                      )}
                     </span>
                   </div>
                 </CardContent>
               </Card>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="taxRate">Tax Rate (%)</Label>
@@ -466,7 +535,12 @@ export function InvoiceManagement() {
                     min="0"
                     step="0.1"
                     value={invoice.tax_rate || 0}
-                    onChange={(e) => handleInvoiceChange("tax_rate", parseFloat(e.target.value) || 0)}
+                    onChange={(e) =>
+                      handleInvoiceChange(
+                        "tax_rate",
+                        parseFloat(e.target.value) || 0,
+                      )
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -477,7 +551,12 @@ export function InvoiceManagement() {
                     min="0"
                     step="0.01"
                     value={invoice.discount || 0}
-                    onChange={(e) => handleInvoiceChange("discount", parseFloat(e.target.value) || 0)}
+                    onChange={(e) =>
+                      handleInvoiceChange(
+                        "discount",
+                        parseFloat(e.target.value) || 0,
+                      )
+                    }
                   />
                 </div>
               </div>
@@ -492,10 +571,12 @@ export function InvoiceManagement() {
           <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto">
             <div className="p-4 border-b flex justify-between items-center">
               <h3 className="text-lg font-semibold">Invoice Preview</h3>
-              <Button variant="ghost" onClick={() => setIsPreviewOpen(false)}>×</Button>
+              <Button variant="ghost" onClick={() => setIsPreviewOpen(false)}>
+                ×
+              </Button>
             </div>
             <div className="p-4">
-              <ProfessionalInvoicePDF 
+              <ProfessionalInvoicePDF
                 invoice={invoice}
                 customer={selectedCustomer || undefined}
                 items={items}

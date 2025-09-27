@@ -1,9 +1,12 @@
 "use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { InvoicePDFDocument, downloadInvoicePDF } from "@/components/ProfessionalInvoicePDFDocument";
+import {
+  InvoicePDFDocument,
+  downloadInvoicePDF,
+} from "@/components/ProfessionalInvoicePDFDocument";
 
 // Sample data for testing
 const sampleInvoice = {
@@ -21,7 +24,7 @@ const sampleInvoice = {
   discount: 0,
   total: 1320,
   amountPaid: 0,
-  currency: "SLL"
+  currency: "SLL",
 };
 
 const sampleCustomer = {
@@ -33,7 +36,7 @@ const sampleCustomer = {
   city: "Freetown",
   state: "Western Area",
   zip_code: "12345",
-  country: "Sierra Leone"
+  country: "Sierra Leone",
 };
 
 const sampleItems = [
@@ -41,20 +44,20 @@ const sampleItems = [
     id: 1,
     description: "Business Card Printing",
     quantity: 500,
-    unit_price: 2.00,
+    unit_price: 2.0,
     total_price: 1000,
     job_no: "JOB-001",
-    notes: "Standard business cards with logo"
+    notes: "Standard business cards with logo",
   },
   {
     id: 2,
     description: "Flyer Design & Printing",
     quantity: 100,
-    unit_price: 2.00,
+    unit_price: 2.0,
     total_price: 200,
     job_no: "JOB-002",
-    notes: "A4 size, full color printing"
-  }
+    notes: "A4 size, full color printing",
+  },
 ];
 
 export function TestInvoicePDF() {
@@ -65,7 +68,7 @@ export function TestInvoicePDF() {
     try {
       await downloadInvoicePDF(sampleInvoice, sampleCustomer, sampleItems);
     } catch (error) {
-      console.error("Error generating PDF:", error);
+      // console.error("Error generating PDF:", error);
       alert("Error generating PDF. Please check the console for details.");
     } finally {
       setIsGenerating(false);
@@ -78,19 +81,22 @@ export function TestInvoicePDF() {
         <CardTitle>Test Invoice PDF</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <p>Click the button below to generate a test PDF with the improved design:</p>
-        <Button 
-          onClick={handleGeneratePDF} 
+        <p>
+          Click the button below to generate a test PDF with the improved
+          design:
+        </p>
+        <Button
+          onClick={handleGeneratePDF}
           disabled={isGenerating}
           className="flex items-center gap-2"
         >
           {isGenerating ? "Generating..." : "Generate Test PDF"}
         </Button>
-        
+
         <div className="mt-6">
           <h3 className="text-lg font-semibold mb-2">Preview:</h3>
           <div className="border rounded-lg overflow-hidden max-w-2xl">
-            <InvoicePDFDocument 
+            <InvoicePDFDocument
               invoice={sampleInvoice}
               customer={sampleCustomer}
               items={sampleItems}

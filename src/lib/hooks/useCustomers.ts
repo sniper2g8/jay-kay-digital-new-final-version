@@ -43,7 +43,6 @@ const fetchCustomers = async (): Promise<Customer[]> => {
   }
 
   try {
-    
     // Check current session status
     const {
       data: { session },
@@ -187,13 +186,11 @@ export const useCustomers = () => {
   const isBuildTime = typeof window === "undefined";
 
   if (!isBuildTime) {
-    
   }
 
   const shouldFetch = user && session && !loading && !isBuildTime;
 
   if (!isBuildTime) {
-    
   }
 
   return useSWR(

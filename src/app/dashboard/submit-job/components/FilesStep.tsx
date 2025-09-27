@@ -2,7 +2,15 @@ import React, { useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Upload, FileText, X, CheckCircle, AlertCircle, Cloud, Zap } from "lucide-react";
+import {
+  Upload,
+  FileText,
+  X,
+  CheckCircle,
+  AlertCircle,
+  Cloud,
+  Zap,
+} from "lucide-react";
 import { FileUpload } from "@/lib/hooks/useFileUploadFixed";
 
 // Helper functions for formatting
@@ -58,7 +66,7 @@ export default function FilesStep({
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(false);
-    
+
     const droppedFiles = Array.from(e.dataTransfer.files);
     if (droppedFiles.length > 0) {
       addFiles(droppedFiles);
@@ -93,9 +101,9 @@ export default function FilesStep({
           />
           <div
             className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-              isDragOver 
-                ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/30' 
-                : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50 dark:border-gray-600 dark:hover:border-gray-500'
+              isDragOver
+                ? "border-blue-500 bg-blue-50 dark:bg-blue-950/30"
+                : "border-gray-300 hover:border-gray-400 hover:bg-gray-50 dark:border-gray-600 dark:hover:border-gray-500"
             }`}
             onClick={handleUploadAreaClick}
             onDragOver={handleDragOver}
@@ -112,7 +120,9 @@ export default function FilesStep({
               </div>
               <div>
                 <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                  {isDragOver ? 'Drop files here' : 'Click to upload files or drag and drop'}
+                  {isDragOver
+                    ? "Drop files here"
+                    : "Click to upload files or drag and drop"}
                 </p>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                   PDF, DOC, JPG, PNG, AI, PSD files supported

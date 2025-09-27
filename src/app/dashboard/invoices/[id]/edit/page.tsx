@@ -90,11 +90,11 @@ function InvoiceEditContent() {
   const [showPaymentReceipt, setShowPaymentReceipt] = useState(false);
   const [lastPaymentData, setLastPaymentData] = useState<any>(null);
   const [paymentForm, setPaymentForm] = useState({
-    amount: '',
-    payment_method: 'cash',
-    payment_date: new Date().toISOString().split('T')[0],
-    reference_number: '',
-    notes: ''
+    amount: "",
+    payment_method: "cash",
+    payment_date: new Date().toISOString().split("T")[0],
+    reference_number: "",
+    notes: "",
   });
 
   // Form state
@@ -114,49 +114,50 @@ function InvoiceEditContent() {
   const fetchPayments = async () => {
     try {
       const { data, error } = await supabase
-        .from('payments')
-        .select('*')
-        .eq('applied_to_invoice_id', invoiceId)
-        .order('payment_date', { ascending: false });
-      
+        .from("payments")
+        .select("*")
+        .eq("applied_to_invoice_id", invoiceId)
+        .order("payment_date", { ascending: false });
+
       if (error) {
-        console.error('Error fetching payments:', error);
+        console.error("Error fetching payments:", error);
       } else {
         setPayments(data || []);
       }
     } catch (error) {
-      console.error('Error fetching payments:', error);
+      console.error("Error fetching payments:", error);
     }
   };
 
   // Record a new payment
   const recordPayment = async () => {
     if (!invoice || !paymentForm.amount) {
-      setError('Please fill in the payment amount');
+      setError("Please fill in the payment amount");
       return;
     }
-    
+
     try {
       setIsSaving(true);
       setError(null); // Clear any previous errors
-      
+
       // Validate payment amount
       let paymentAmount = parseFloat(paymentForm.amount);
       if (isNaN(paymentAmount) || paymentAmount <= 0) {
-        setError('Please enter a valid payment amount');
+        setError("Please enter a valid payment amount");
         return;
       }
-      
+
       // Fix precision issues by rounding to 2 decimal places
       paymentAmount = Math.round(paymentAmount * 100) / 100;
-      
+
       // Generate payment number
       const paymentNumber = `PAY-${Date.now()}`;
-      
+
       // Get customer data for proper customer_id and ensure foreign key constraints
       const { data: invoiceData, error: fetchError } = await supabase
-        .from('invoices')
-        .select(`
+        .from("invoices")
+        .select(
+          `
           customer_id, 
           customerName, 
           invoiceNo,
@@ -165,53 +166,67 @@ function InvoiceEditContent() {
             human_id,
             business_name
           )
-        `)
-        .eq('id', invoiceId)
+        `,
+        )
+        .eq("id", invoiceId)
         .single();
-      
+
       if (fetchError) {
-        console.error('Error fetching invoice data:', {
+        console.error("Error fetching invoice data:", {
           error: fetchError,
           message: fetchError.message,
           details: fetchError.details,
           hint: fetchError.hint,
-          code: fetchError.code
+          code: fetchError.code,
         });
         setError(`Failed to fetch invoice data: ${fetchError.message}`);
         return;
       }
-      
+
       if (!invoiceData) {
-        console.error('No invoice data found for ID:', invoiceId);
-        setError('Invoice not found');
+        console.error("No invoice data found for ID:", invoiceId);
+        setError("Invoice not found");
         return;
       }
-      
+
       // Validate that we have the required foreign key references
       if (!invoiceData.invoiceNo) {
-        console.error('Invoice has no invoiceNo for foreign key constraint');
-        setError('Invoice number is missing - cannot record payment');
+        console.error("Invoice has no invoiceNo for foreign key constraint");
+        setError("Invoice number is missing - cannot record payment");
         return;
       }
-      
+
       if (!invoiceData.customers?.human_id) {
-        console.error('Customer has no human_id for foreign key constraint');
-        setError('Customer ID is missing - cannot record payment');
+        console.error("Customer has no human_id for foreign key constraint");
+        setError("Customer ID is missing - cannot record payment");
         return;
       }
-      
+
       // Validate payment method
-      const validPaymentMethods = ['cash', 'bank_transfer', 'mobile_money', 'card', 'cheque', 'credit'];
+      const validPaymentMethods = [
+        "cash",
+        "bank_transfer",
+        "mobile_money",
+        "card",
+        "cheque",
+        "credit",
+      ];
       if (!validPaymentMethods.includes(paymentForm.payment_method)) {
-        setError('Please select a valid payment method');
+        setError("Please select a valid payment method");
         return;
       }
-      
+
       // Prepare payment data matching the exact table structure
       const paymentData = {
         payment_number: paymentNumber,
         amount: paymentAmount, // numeric(10,2) - already validated as number
-        payment_method: paymentForm.payment_method as 'cash' | 'bank_transfer' | 'mobile_money' | 'card' | 'cheque' | 'credit',
+        payment_method: paymentForm.payment_method as
+          | "cash"
+          | "bank_transfer"
+          | "mobile_money"
+          | "card"
+          | "cheque"
+          | "credit",
         payment_date: paymentForm.payment_date, // date - should be in YYYY-MM-DD format
         reference_number: paymentForm.reference_number?.trim() || null, // varchar(100) nullable
         notes: paymentForm.notes?.trim() || null, // text nullable
@@ -219,103 +234,123 @@ function InvoiceEditContent() {
         // created_at and updated_at will be set by database defaults
         invoice_no: invoiceData.invoiceNo, // varchar(50) NOT NULL - foreign key to invoices.invoiceNo
         customer_human_id: invoiceData.customers.human_id, // varchar(20) NOT NULL - foreign key to customers.human_id
-        payment_status: 'completed' as const, // varchar(20) with constraint check
+        payment_status: "completed" as const, // varchar(20) with constraint check
         transaction_id: null, // varchar(100) nullable
         payment_gateway: null, // varchar(50) nullable
         customer_id: invoiceData.customer_id, // uuid nullable - foreign key to customers.id
         applied_to_invoice_id: invoiceId, // uuid nullable - foreign key to invoices.id
         overpayment_amount: 0, // numeric(10,2) default 0
         refund_amount: 0, // numeric(10,2) default 0
-        fees: 0 // numeric(10,2) default 0
+        fees: 0, // numeric(10,2) default 0
       };
-      
+
       // Validate each required field against table constraints
       const validationErrors = [];
-      if (!paymentData.payment_number) validationErrors.push('payment_number is required (varchar(20))');
-      if (!paymentData.amount || paymentData.amount <= 0) validationErrors.push('amount must be positive (numeric(10,2))');
-      if (!paymentData.payment_method) validationErrors.push('payment_method is required (enum)');
-      if (!paymentData.payment_date) validationErrors.push('payment_date is required (date)');
-      if (!paymentData.invoice_no) validationErrors.push('invoice_no is required (varchar(50)) - foreign key constraint');
-      if (!paymentData.customer_human_id) validationErrors.push('customer_human_id is required (varchar(20)) - foreign key constraint');
-      
+      if (!paymentData.payment_number)
+        validationErrors.push("payment_number is required (varchar(20))");
+      if (!paymentData.amount || paymentData.amount <= 0)
+        validationErrors.push("amount must be positive (numeric(10,2))");
+      if (!paymentData.payment_method)
+        validationErrors.push("payment_method is required (enum)");
+      if (!paymentData.payment_date)
+        validationErrors.push("payment_date is required (date)");
+      if (!paymentData.invoice_no)
+        validationErrors.push(
+          "invoice_no is required (varchar(50)) - foreign key constraint",
+        );
+      if (!paymentData.customer_human_id)
+        validationErrors.push(
+          "customer_human_id is required (varchar(20)) - foreign key constraint",
+        );
+
       // Validate data types and formats
-      if (paymentData.payment_date && !/^\d{4}-\d{2}-\d{2}$/.test(paymentData.payment_date)) {
-        validationErrors.push('payment_date must be in YYYY-MM-DD format');
+      if (
+        paymentData.payment_date &&
+        !/^\d{4}-\d{2}-\d{2}$/.test(paymentData.payment_date)
+      ) {
+        validationErrors.push("payment_date must be in YYYY-MM-DD format");
       }
-      
+
       if (validationErrors.length > 0) {
-        console.error('Payment data validation failed:', validationErrors);
-        setError(`Payment validation failed: ${validationErrors.join(', ')}`);
+        console.error("Payment data validation failed:", validationErrors);
+        setError(`Payment validation failed: ${validationErrors.join(", ")}`);
         return;
       }
-      
-      console.log('Payment data validation passed. Data structure matches table definition:', {
-        ...paymentData,
-        amount_type: typeof paymentData.amount,
-        date_format: paymentData.payment_date,
-        foreign_keys: {
-          invoice_no: paymentData.invoice_no,
-          customer_human_id: paymentData.customer_human_id,
-          customer_id: paymentData.customer_id,
-          applied_to_invoice_id: paymentData.applied_to_invoice_id
-        }
-      });
-      
+
+      console.log(
+        "Payment data validation passed. Data structure matches table definition:",
+        {
+          ...paymentData,
+          amount_type: typeof paymentData.amount,
+          date_format: paymentData.payment_date,
+          foreign_keys: {
+            invoice_no: paymentData.invoice_no,
+            customer_human_id: paymentData.customer_human_id,
+            customer_id: paymentData.customer_id,
+            applied_to_invoice_id: paymentData.applied_to_invoice_id,
+          },
+        },
+      );
+
       // First test if we can access the payments table
-      console.log('Testing payments table access...');
+      console.log("Testing payments table access...");
       try {
         const { data: testData, error: testError } = await supabase
-          .from('payments')
-          .select('id')
+          .from("payments")
+          .select("id")
           .limit(1);
-        
-        console.log('Payments table test result:', {
+
+        console.log("Payments table test result:", {
           canRead: !testError,
           error: testError,
-          dataCount: testData?.length || 0
+          dataCount: testData?.length || 0,
         });
-        
+
         if (testError) {
-          console.error('Cannot access payments table:', testError);
-          setError(`Database access error: ${(testError as any)?.message || 'Unknown error'}`);
+          console.error("Cannot access payments table:", testError);
+          setError(
+            `Database access error: ${(testError as any)?.message || "Unknown error"}`,
+          );
           return;
         }
       } catch (accessException) {
-        console.error('Exception testing table access:', accessException);
-        setError('Cannot access payments table');
+        console.error("Exception testing table access:", accessException);
+        setError("Cannot access payments table");
         return;
       }
-      
+
       // Try the insert with additional debugging
-      console.log('About to attempt Supabase insert...');
-      
+      console.log("About to attempt Supabase insert...");
+
       let insertResult;
       try {
         insertResult = await supabase
-          .from('payments')
+          .from("payments")
           .insert([paymentData])
           .select()
           .single();
       } catch (insertException: any) {
-        console.error('Exception during insert:', {
+        console.error("Exception during insert:", {
           exception: insertException,
           exceptionType: typeof insertException,
           exceptionMessage: insertException?.message,
-          exceptionStack: insertException?.stack
+          exceptionStack: insertException?.stack,
         });
-        setError(`Insert operation failed: ${insertException?.message || 'Unknown exception'}`);
+        setError(
+          `Insert operation failed: ${insertException?.message || "Unknown exception"}`,
+        );
         return;
       }
-      
+
       const { data: insertedPayment, error: insertError } = insertResult;
-      
-      console.log('Insert result received:', {
+
+      console.log("Insert result received:", {
         hasData: !!insertedPayment,
         hasError: !!insertError,
         dataType: typeof insertedPayment,
-        errorType: typeof insertError
+        errorType: typeof insertError,
       });
-      
+
       if (insertError) {
         // Try multiple approaches to extract error information
         const errorInfo = {
@@ -323,50 +358,61 @@ function InvoiceEditContent() {
           errorType: typeof insertError,
           errorConstructor: insertError?.constructor?.name,
           errorToString: String(insertError),
-          errorMessage: insertError?.message || 'No message property',
-          errorDetails: insertError?.details || 'No details property',
-          errorHint: insertError?.hint || 'No hint property',
-          errorCode: insertError?.code || 'No code property',
+          errorMessage: insertError?.message || "No message property",
+          errorDetails: insertError?.details || "No details property",
+          errorHint: insertError?.hint || "No hint property",
+          errorCode: insertError?.code || "No code property",
           errorJson: (() => {
             try {
-              return JSON.stringify(insertError, Object.getOwnPropertyNames(insertError));
+              return JSON.stringify(
+                insertError,
+                Object.getOwnPropertyNames(insertError),
+              );
             } catch {
-              return 'JSON stringify failed';
+              return "JSON stringify failed";
             }
-          })()
+          })(),
         };
-        
-        console.error('Supabase insert error detailed:', errorInfo);
-        console.error('Raw error object:', insertError);
-        console.error('Payment data that failed:', paymentData);
-        
+
+        console.error("Supabase insert error detailed:", errorInfo);
+        console.error("Raw error object:", insertError);
+        console.error("Payment data that failed:", paymentData);
+
         // Extract the actual error message
-        let errorMessage = 'Database error';
+        let errorMessage = "Database error";
         if (insertError?.message) {
           errorMessage = insertError.message;
-        } else if (typeof insertError === 'string') {
+        } else if (typeof insertError === "string") {
           errorMessage = insertError;
-        } else if (insertError?.toString && insertError.toString() !== '[object Object]') {
+        } else if (
+          insertError?.toString &&
+          insertError.toString() !== "[object Object]"
+        ) {
           errorMessage = insertError.toString();
         }
-        
+
         setError(`Failed to record payment: ${errorMessage}`);
         return;
       }
-      
+
       if (!insertedPayment) {
-        console.error('Payment insert succeeded but no data returned');
-        setError('Payment recorded but confirmation failed');
+        console.error("Payment insert succeeded but no data returned");
+        setError("Payment recorded but confirmation failed");
         return;
       }
-      
-      console.log('Payment successfully recorded:', insertedPayment);
-      
+
+      console.log("Payment successfully recorded:", insertedPayment);
+
       // Fix precision issues in calculations
-      const previousPaymentsTotal = Math.round(payments.reduce((sum, p) => sum + parseFloat(p.amount), 0) * 100) / 100;
-      const newTotalPaid = Math.round((previousPaymentsTotal + paymentAmount) * 100) / 100;
-      const newAmountDue = Math.round((invoice.total - newTotalPaid) * 100) / 100;
-      
+      const previousPaymentsTotal =
+        Math.round(
+          payments.reduce((sum, p) => sum + parseFloat(p.amount), 0) * 100,
+        ) / 100;
+      const newTotalPaid =
+        Math.round((previousPaymentsTotal + paymentAmount) * 100) / 100;
+      const newAmountDue =
+        Math.round((invoice.total - newTotalPaid) * 100) / 100;
+
       // Store payment data for receipt generation
       const receiptData = {
         ...insertedPayment,
@@ -376,79 +422,81 @@ function InvoiceEditContent() {
           invoiceNo: invoiceData.invoiceNo,
           total: invoice.total,
           amountPaid: newTotalPaid,
-          amountDue: newAmountDue
-        }
+          amountDue: newAmountDue,
+        },
       };
       setLastPaymentData(receiptData);
-      
+
       // Update invoice amountPaid
       const totalPaid = newTotalPaid;
       const amountDue = newAmountDue;
-      
-      console.log('Updating invoice with payment totals:', {
+
+      console.log("Updating invoice with payment totals:", {
         invoiceId,
         totalPaid,
         amountDue,
-        newStatus: amountDue <= 0 ? 'paid' : totalPaid > 0 ? 'partial' : 'pending'
+        newStatus:
+          amountDue <= 0 ? "paid" : totalPaid > 0 ? "partial" : "pending",
       });
-      
+
       const { error: updateError } = await supabase
-        .from('invoices')
+        .from("invoices")
         .update({
           amountPaid: totalPaid,
           amountDue: amountDue,
-          payment_status: amountDue <= 0 ? 'paid' : totalPaid > 0 ? 'partial' : 'pending',
-          updated_at: new Date().toISOString()
+          payment_status:
+            amountDue <= 0 ? "paid" : totalPaid > 0 ? "partial" : "pending",
+          updated_at: new Date().toISOString(),
         })
-        .eq('id', invoiceId);
-      
+        .eq("id", invoiceId);
+
       if (updateError) {
-        console.error('Error updating invoice after payment:', {
+        console.error("Error updating invoice after payment:", {
           error: updateError,
           message: updateError.message,
           details: updateError.details,
           hint: updateError.hint,
-          code: updateError.code
+          code: updateError.code,
         });
         // Don't return here as payment was successful, just log the warning
-        console.warn('Payment recorded successfully but invoice update failed');
+        console.warn("Payment recorded successfully but invoice update failed");
       }
-      
+
       // Reset form and refresh data
       setPaymentForm({
-        amount: '',
-        payment_method: 'cash',
-        payment_date: new Date().toISOString().split('T')[0],
-        reference_number: '',
-        notes: ''
+        amount: "",
+        payment_method: "cash",
+        payment_date: new Date().toISOString().split("T")[0],
+        reference_number: "",
+        notes: "",
       });
       setShowPaymentForm(false);
-      
+
       // Refresh data
-      await Promise.all([
-        fetchPayments(),
-        fetchInvoice()
-      ]);
-      
+      await Promise.all([fetchPayments(), fetchInvoice()]);
+
       // Show payment receipt
       setShowPaymentReceipt(true);
-      
-      console.log('Payment recording completed successfully');
-      
+
+      console.log("Payment recording completed successfully");
     } catch (error) {
-      console.error('Unexpected error in recordPayment:', {
+      console.error("Unexpected error in recordPayment:", {
         error: error,
         errorType: typeof error,
         errorConstructor: error?.constructor?.name,
-        message: error instanceof Error ? error.message : 'Non-Error object thrown',
+        message:
+          error instanceof Error ? error.message : "Non-Error object thrown",
         stack: error instanceof Error ? error.stack : undefined,
-        stringified: JSON.stringify(error, Object.getOwnPropertyNames(error))
+        stringified: JSON.stringify(error, Object.getOwnPropertyNames(error)),
       });
-      
-      const errorMessage = error instanceof Error 
-        ? error.message 
-        : (typeof error === 'string' ? error : 'An unexpected error occurred while recording the payment');
-      
+
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : typeof error === "string"
+            ? error
+            : "An unexpected error occurred while recording the payment";
+
       setError(`Failed to record payment: ${errorMessage}`);
     } finally {
       setIsSaving(false);
@@ -670,9 +718,9 @@ function InvoiceEditContent() {
 
       // Update invoice using Supabase
       const { error: updateError } = await supabase
-        .from('invoices')
+        .from("invoices")
         .update(invoiceData)
-        .eq('id', invoiceId);
+        .eq("id", invoiceId);
 
       if (updateError) {
         throw new Error(updateError.message);
@@ -1035,14 +1083,18 @@ function InvoiceEditContent() {
                     <div className="text-center">
                       <div className="flex items-center justify-center gap-2 mb-2">
                         <QrCode className="h-4 w-4 text-gray-600" />
-                        <span className="text-sm font-medium text-gray-600">Invoice QR Code</span>
+                        <span className="text-sm font-medium text-gray-600">
+                          Invoice QR Code
+                        </span>
                       </div>
-                      <img 
-                        src={qrCodeDataUrl} 
-                        alt="Invoice QR Code" 
+                      <img
+                        src={qrCodeDataUrl}
+                        alt="Invoice QR Code"
                         className="w-24 h-24 mx-auto border rounded-lg"
                       />
-                      <p className="text-xs text-gray-500 mt-2">Scan for invoice details</p>
+                      <p className="text-xs text-gray-500 mt-2">
+                        Scan for invoice details
+                      </p>
                     </div>
                   </div>
                 )}
@@ -1072,19 +1124,35 @@ function InvoiceEditContent() {
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Total Amount:</span>
-                    <span className="font-medium">{formatCurrency(invoice?.total || 0)}</span>
+                    <span className="font-medium">
+                      {formatCurrency(invoice?.total || 0)}
+                    </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Amount Paid:</span>
                     <span className="font-medium text-green-600">
-                      {formatCurrency(Math.round(payments.reduce((sum, p) => sum + parseFloat(p.amount), 0) * 100) / 100)}
+                      {formatCurrency(
+                        Math.round(
+                          payments.reduce(
+                            (sum, p) => sum + parseFloat(p.amount),
+                            0,
+                          ) * 100,
+                        ) / 100,
+                      )}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm font-bold border-t pt-2">
                     <span>Amount Due:</span>
                     <span className="text-red-600">
                       {formatCurrency(
-                        Math.round(((invoice?.total || 0) - payments.reduce((sum, p) => sum + parseFloat(p.amount), 0)) * 100) / 100
+                        Math.round(
+                          ((invoice?.total || 0) -
+                            payments.reduce(
+                              (sum, p) => sum + parseFloat(p.amount),
+                              0,
+                            )) *
+                            100,
+                        ) / 100,
                       )}
                     </span>
                   </div>
@@ -1101,22 +1169,36 @@ function InvoiceEditContent() {
                         step="0.01"
                         placeholder="0.00"
                         value={paymentForm.amount}
-                        onChange={(e) => setPaymentForm(prev => ({ ...prev, amount: e.target.value }))}
+                        onChange={(e) =>
+                          setPaymentForm((prev) => ({
+                            ...prev,
+                            amount: e.target.value,
+                          }))
+                        }
                       />
                     </div>
                     <div>
                       <Label htmlFor="payment_method">Payment Method</Label>
                       <Select
                         value={paymentForm.payment_method}
-                        onValueChange={(value) => setPaymentForm(prev => ({ ...prev, payment_method: value }))}
+                        onValueChange={(value) =>
+                          setPaymentForm((prev) => ({
+                            ...prev,
+                            payment_method: value,
+                          }))
+                        }
                       >
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="cash">Cash</SelectItem>
-                          <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                          <SelectItem value="mobile_money">Mobile Money</SelectItem>
+                          <SelectItem value="bank_transfer">
+                            Bank Transfer
+                          </SelectItem>
+                          <SelectItem value="mobile_money">
+                            Mobile Money
+                          </SelectItem>
                           <SelectItem value="card">Card</SelectItem>
                           <SelectItem value="cheque">Cheque</SelectItem>
                           <SelectItem value="credit">Credit</SelectItem>
@@ -1129,7 +1211,12 @@ function InvoiceEditContent() {
                         id="payment_date"
                         type="date"
                         value={paymentForm.payment_date}
-                        onChange={(e) => setPaymentForm(prev => ({ ...prev, payment_date: e.target.value }))}
+                        onChange={(e) =>
+                          setPaymentForm((prev) => ({
+                            ...prev,
+                            payment_date: e.target.value,
+                          }))
+                        }
                       />
                     </div>
                     <div>
@@ -1138,7 +1225,12 @@ function InvoiceEditContent() {
                         id="reference_number"
                         placeholder="Transaction ID, Check #, etc."
                         value={paymentForm.reference_number}
-                        onChange={(e) => setPaymentForm(prev => ({ ...prev, reference_number: e.target.value }))}
+                        onChange={(e) =>
+                          setPaymentForm((prev) => ({
+                            ...prev,
+                            reference_number: e.target.value,
+                          }))
+                        }
                       />
                     </div>
                     <div>
@@ -1147,7 +1239,12 @@ function InvoiceEditContent() {
                         id="payment_notes"
                         placeholder="Payment notes..."
                         value={paymentForm.notes}
-                        onChange={(e) => setPaymentForm(prev => ({ ...prev, notes: e.target.value }))}
+                        onChange={(e) =>
+                          setPaymentForm((prev) => ({
+                            ...prev,
+                            notes: e.target.value,
+                          }))
+                        }
                         rows={2}
                       />
                     </div>
@@ -1182,14 +1279,24 @@ function InvoiceEditContent() {
                     <h4 className="font-medium text-sm">Payment History</h4>
                     <div className="space-y-2 max-h-40 overflow-y-auto">
                       {payments.map((payment) => (
-                        <div key={payment.id} className="flex justify-between items-start text-xs p-2 bg-gray-50 rounded">
+                        <div
+                          key={payment.id}
+                          className="flex justify-between items-start text-xs p-2 bg-gray-50 rounded"
+                        >
                           <div>
-                            <div className="font-medium">{formatCurrency(payment.amount)}</div>
+                            <div className="font-medium">
+                              {formatCurrency(payment.amount)}
+                            </div>
                             <div className="text-muted-foreground">
-                              {payment.payment_method} • {new Date(payment.payment_date).toLocaleDateString()}
+                              {payment.payment_method} •{" "}
+                              {new Date(
+                                payment.payment_date,
+                              ).toLocaleDateString()}
                             </div>
                             {payment.reference_number && (
-                              <div className="text-muted-foreground">Ref: {payment.reference_number}</div>
+                              <div className="text-muted-foreground">
+                                Ref: {payment.reference_number}
+                              </div>
                             )}
                           </div>
                           <Badge variant="outline" className="text-xs">
@@ -1265,17 +1372,18 @@ function InvoiceEditContent() {
             </Card>
           </div>
         </div>
-        
+
         {/* Payment Receipt Dialog */}
         <Dialog open={showPaymentReceipt} onOpenChange={setShowPaymentReceipt}>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Payment Receipt</DialogTitle>
               <DialogDescription>
-                Payment has been successfully recorded. You can download or print the receipt below.
+                Payment has been successfully recorded. You can download or
+                print the receipt below.
               </DialogDescription>
             </DialogHeader>
-            
+
             {lastPaymentData && (
               <PaymentReceiptPDF
                 payment={lastPaymentData}
@@ -1284,7 +1392,7 @@ function InvoiceEditContent() {
                 showActions={true}
               />
             )}
-            
+
             <div className="flex justify-end space-x-3 pt-4 border-t">
               <Button
                 variant="outline"

@@ -3,31 +3,34 @@
  * Modal for resetting user passwords with admin functionality
  */
 
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
+import React, { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
   DialogTitle,
-  DialogFooter
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  Loader2, 
-  Key, 
-  Eye, 
-  EyeOff, 
-  AlertTriangle, 
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Loader2,
+  Key,
+  Eye,
+  EyeOff,
+  AlertTriangle,
   CheckCircle,
-  RefreshCw
-} from 'lucide-react';
-import { resetUserPassword, generateRandomPassword } from '@/lib/hooks/useUserManagement';
+  RefreshCw,
+} from "lucide-react";
+import {
+  resetUserPassword,
+  generateRandomPassword,
+} from "@/lib/hooks/useUserManagement";
 
 interface PasswordResetModalProps {
   isOpen: boolean;
@@ -42,23 +45,23 @@ const PasswordResetModal: React.FC<PasswordResetModalProps> = ({
   onClose,
   userId,
   userName,
-  userEmail
+  userEmail,
 }) => {
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
-  const [successMessage, setSuccessMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleClose = () => {
-    setNewPassword('');
-    setConfirmPassword('');
+    setNewPassword("");
+    setConfirmPassword("");
     setShowNewPassword(false);
     setShowConfirmPassword(false);
     setErrors([]);
-    setSuccessMessage('');
+    setSuccessMessage("");
     onClose();
   };
 
@@ -67,37 +70,37 @@ const PasswordResetModal: React.FC<PasswordResetModalProps> = ({
     setNewPassword(password);
     setConfirmPassword(password);
     setErrors([]);
-    setSuccessMessage('');
+    setSuccessMessage("");
   };
 
   const validatePassword = (password: string): string[] => {
     const errors: string[] = [];
-    
+
     if (!password) {
-      errors.push('Password is required');
+      errors.push("Password is required");
       return errors;
     }
-    
+
     if (password.length < 8) {
-      errors.push('Password must be at least 8 characters long');
+      errors.push("Password must be at least 8 characters long");
     }
-    
+
     if (!/[A-Z]/.test(password)) {
-      errors.push('Password must contain at least one uppercase letter');
+      errors.push("Password must contain at least one uppercase letter");
     }
-    
+
     if (!/[a-z]/.test(password)) {
-      errors.push('Password must contain at least one lowercase letter');
+      errors.push("Password must contain at least one lowercase letter");
     }
-    
+
     if (!/\d/.test(password)) {
-      errors.push('Password must contain at least one number');
+      errors.push("Password must contain at least one number");
     }
-    
+
     if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
-      errors.push('Password must contain at least one special character');
+      errors.push("Password must contain at least one special character");
     }
-    
+
     return errors;
   };
 
@@ -105,7 +108,7 @@ const PasswordResetModal: React.FC<PasswordResetModalProps> = ({
     e.preventDefault();
     setIsLoading(true);
     setErrors([]);
-    setSuccessMessage('');
+    setSuccessMessage("");
 
     try {
       // Validate passwords
@@ -116,7 +119,7 @@ const PasswordResetModal: React.FC<PasswordResetModalProps> = ({
       }
 
       if (newPassword !== confirmPassword) {
-        setErrors(['Passwords do not match']);
+        setErrors(["Passwords do not match"]);
         return;
       }
 
@@ -124,17 +127,19 @@ const PasswordResetModal: React.FC<PasswordResetModalProps> = ({
       const result = await resetUserPassword(userId, newPassword);
 
       if (result.success) {
-        setSuccessMessage('Password has been successfully reset. The user will be notified via email.');
-        
+        setSuccessMessage(
+          "Password has been successfully reset. The user will be notified via email.",
+        );
+
         // Close modal after 2 seconds
         setTimeout(() => {
           handleClose();
         }, 2000);
       } else {
-        setErrors([result.error || 'Failed to reset password']);
+        setErrors([result.error || "Failed to reset password"]);
       }
     } catch (error) {
-      setErrors(['An unexpected error occurred while resetting the password']);
+      setErrors(["An unexpected error occurred while resetting the password"]);
     } finally {
       setIsLoading(false);
     }
@@ -171,7 +176,9 @@ const PasswordResetModal: React.FC<PasswordResetModalProps> = ({
               <AlertDescription>
                 <ul className="list-disc list-inside space-y-1">
                   {errors.map((error, index) => (
-                    <li key={index} className="text-red-800">{error}</li>
+                    <li key={index} className="text-red-800">
+                      {error}
+                    </li>
                   ))}
                 </ul>
               </AlertDescription>
@@ -198,13 +205,13 @@ const PasswordResetModal: React.FC<PasswordResetModalProps> = ({
           <div className="space-y-2">
             <div className="relative">
               <Input
-                type={showNewPassword ? 'text' : 'password'}
+                type={showNewPassword ? "text" : "password"}
                 placeholder="Enter new password"
                 value={newPassword}
                 onChange={(e) => {
                   setNewPassword(e.target.value);
                   setErrors([]);
-                  setSuccessMessage('');
+                  setSuccessMessage("");
                 }}
                 className="pr-10"
                 required
@@ -218,7 +225,11 @@ const PasswordResetModal: React.FC<PasswordResetModalProps> = ({
                 onClick={() => setShowNewPassword(!showNewPassword)}
                 disabled={isLoading}
               >
-                {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                {showNewPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
               </Button>
             </div>
             <div className="text-xs text-gray-600 space-y-1">
@@ -238,13 +249,13 @@ const PasswordResetModal: React.FC<PasswordResetModalProps> = ({
             <Label>Confirm Password</Label>
             <div className="relative">
               <Input
-                type={showConfirmPassword ? 'text' : 'password'}
+                type={showConfirmPassword ? "text" : "password"}
                 placeholder="Confirm new password"
                 value={confirmPassword}
                 onChange={(e) => {
                   setConfirmPassword(e.target.value);
                   setErrors([]);
-                  setSuccessMessage('');
+                  setSuccessMessage("");
                 }}
                 className="pr-10"
                 required
@@ -258,7 +269,11 @@ const PasswordResetModal: React.FC<PasswordResetModalProps> = ({
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 disabled={isLoading}
               >
-                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                {showConfirmPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
               </Button>
             </div>
           </div>
@@ -267,7 +282,8 @@ const PasswordResetModal: React.FC<PasswordResetModalProps> = ({
           <Alert className="border-yellow-200 bg-yellow-50">
             <AlertTriangle className="h-4 w-4 text-yellow-600" />
             <AlertDescription className="text-yellow-800">
-              This will immediately change the user&apos;s password. They will need to use the new password for their next login.
+              This will immediately change the user&apos;s password. They will
+              need to use the new password for their next login.
             </AlertDescription>
           </Alert>
 

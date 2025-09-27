@@ -91,7 +91,9 @@ export default function CustomerStep({
                         </div>
                         <div className="text-sm text-gray-500 flex items-center space-x-2">
                           {customer.contact_person && (
-                            <span className="truncate">{customer.contact_person}</span>
+                            <span className="truncate">
+                              {customer.contact_person}
+                            </span>
                           )}
                           {customer.contact_person && customer.phone && (
                             <span>•</span>
@@ -246,7 +248,9 @@ export default function CustomerStep({
                         {selectedCustomer.contact_person && (
                           <div className="flex items-center space-x-1">
                             <User className="w-3 h-3" />
-                            <span className="truncate">{selectedCustomer.contact_person}</span>
+                            <span className="truncate">
+                              {selectedCustomer.contact_person}
+                            </span>
                           </div>
                         )}
                         <div className="flex items-center space-x-4">
@@ -259,7 +263,9 @@ export default function CustomerStep({
                           {selectedCustomer.email && (
                             <div className="flex items-center space-x-1">
                               <Mail className="w-3 h-3" />
-                              <span className="truncate">{selectedCustomer.email}</span>
+                              <span className="truncate">
+                                {selectedCustomer.email}
+                              </span>
                             </div>
                           )}
                         </div>

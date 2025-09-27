@@ -30,7 +30,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { fetchUserNotifications, markNotificationAsRead, deleteNotification, markAllNotificationsAsRead } from "@/app/actions/notificationActions";
+import {
+  fetchUserNotifications,
+  markNotificationAsRead,
+  deleteNotification,
+  markAllNotificationsAsRead,
+} from "@/app/actions/notificationActions";
 
 interface Notification {
   id: string;
@@ -107,10 +112,10 @@ function NotificationsContent() {
 
     try {
       setIsLoading(true);
-      
+
       // Use server action to fetch notifications
       const result = await fetchUserNotifications();
-      
+
       if (result.success) {
         setNotifications(result.notifications);
         setStats(result.stats);
@@ -179,7 +184,7 @@ function NotificationsContent() {
   const markAsRead = async (notificationId: string) => {
     try {
       const result = await markNotificationAsRead(notificationId);
-      
+
       if (!result.success) {
         console.error("Error marking notification as read:", result.error);
         return;
@@ -196,7 +201,7 @@ function NotificationsContent() {
 
     try {
       const result = await deleteNotification(notificationId);
-      
+
       if (!result.success) {
         console.error("Error deleting notification:", result.error);
         alert("Error deleting notification");
@@ -215,7 +220,7 @@ function NotificationsContent() {
 
     try {
       const result = await markAllNotificationsAsRead();
-      
+
       if (!result.success) {
         console.error("Error marking all notifications as read:", result.error);
         return;
@@ -467,9 +472,9 @@ function NotificationsContent() {
                 <Bell className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-500">No notifications found</p>
                 <p className="text-sm text-gray-400">
-                  {searchTerm || filterType !== 'all' 
-                    ? 'Try adjusting your search or filters' 
-                    : 'You\'re all caught up!'}
+                  {searchTerm || filterType !== "all"
+                    ? "Try adjusting your search or filters"
+                    : "You're all caught up!"}
                 </p>
               </div>
             </CardContent>

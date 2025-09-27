@@ -2,13 +2,11 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { FileRecord } from "./useFileUploadFixed.ts";
 
-interface FileCache {
-  [jobId: string]: {
+type FileCache = Record<string, {
     files: FileRecord[];
     timestamp: number;
     hasFiles: boolean;
-  };
-}
+  }>;
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 const fileCache: FileCache = {};
@@ -58,7 +56,6 @@ export const useJobFiles = (jobId: string | null) => {
         const isExpired = Date.now() - cached.timestamp > CACHE_DURATION;
 
         if (!isExpired) {
-          
           setFiles(cached.files);
           return;
         }
@@ -68,12 +65,10 @@ export const useJobFiles = (jobId: string | null) => {
       setError(null);
 
       try {
-        
         let entityId = jobId;
 
         // If jobId is human-readable (JKDP-JOB-XXXX), resolve to UUID
         if (jobId.startsWith("JKDP-JOB-")) {
-          
           const { data: jobData, error: jobError } = await supabase
             .from("jobs")
             .select("id")
@@ -94,7 +89,6 @@ export const useJobFiles = (jobId: string | null) => {
           }
 
           entityId = jobData.id;
-          
         }
 
         // Query files using the resolved UUID (or direct UUID if passed)
@@ -164,7 +158,6 @@ export const useJobFiles = (jobId: string | null) => {
 
   const deleteFile = async (fileId: string, filePath?: string) => {
     try {
-      
       // Delete from database first
       const { error: dbError } = await supabase
         .from("file_attachments")
@@ -197,7 +190,6 @@ export const useJobFiles = (jobId: string | null) => {
             );
             // Don't throw error here as database deletion succeeded
           } else {
-            
           }
         }
       }
@@ -219,23 +211,20 @@ export const useJobFiles = (jobId: string | null) => {
 
   const downloadFile = async (fileUrl: string, fileName: string) => {
     try {
-      
       // Handle blob URLs (temporary URLs from browser)
       if (fileUrl.startsWith("blob:")) {
-        
         const link = document.createElement("a");
         link.href = fileUrl;
         link.download = fileName;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        
+
         return true;
       }
 
       // Handle Supabase storage URLs - now that bucket is public, use direct download
       if (fileUrl.includes("/storage/v1/object/")) {
-        
         try {
           // First try direct URL download since bucket is public
           const response = await fetch(fileUrl, {
@@ -261,17 +250,14 @@ export const useJobFiles = (jobId: string | null) => {
 
             return true;
           } else {
-            
           }
-        } catch (fetchError) {
-          
-        }
+        } catch (fetchError) {}
 
         // Fallback: Extract file path and use storage API
         const urlParts = fileUrl.split("/storage/v1/object/public/job-files/");
         if (urlParts.length > 1) {
           const filePath = urlParts[1];
-          
+
           const { data, error } = await supabase.storage
             .from("job-files")
             .download(filePath);
@@ -300,7 +286,7 @@ export const useJobFiles = (jobId: string | null) => {
       }
 
       // Final fallback: try direct download with fetch
-      
+
       const response = await fetch(fileUrl, {
         method: "GET",
         headers: {

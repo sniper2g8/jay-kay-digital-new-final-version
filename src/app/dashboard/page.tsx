@@ -28,6 +28,7 @@ import DashboardLayout from "@/components/DashboardLayout";
 import ProtectedDashboard from "@/components/ProtectedDashboard";
 import { useAuth } from "@/contexts/AuthContext";
 import { formatCurrency } from "@/lib/constants";
+import { useState } from "react";
 
 function DashboardContent() {
   const { user, session, loading: authLoading } = useAuth();
@@ -39,6 +40,17 @@ function DashboardContent() {
   const { data: jobStats, isLoading: jobStatsLoading } = useJobStats();
   const { data: financialStats, isLoading: financialStatsLoading } =
     useFinancialStats();
+
+  const [activeTab, setActiveTab] = useState("overview");
+  // const shouldFetchData = true; // Comment out or remove unused variable
+  const [stats, setStats] = useState({
+    totalJobs: 0,
+    pendingJobs: 0,
+    completedJobs: 0,
+    activeCustomers: 0,
+    totalRevenue: 0,
+    collectionRate: 0,
+  });
 
   // Show loading state while authentication is being determined
   if (authLoading) {
@@ -261,7 +273,11 @@ function DashboardContent() {
                   </Button>
                 </Link>
 
-                <Link href="/job-board" target="_blank" rel="noopener noreferrer">
+                <Link
+                  href="/job-board"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <Button
                     variant="outline"
                     className="h-20 flex-col space-y-2 w-full hover-lift border-green-500 text-green-600 hover:bg-green-50"

@@ -4,8 +4,8 @@ import Image from "next/image";
 import { BRAND_ASSETS, COMPANY_INFO } from "@/lib/brand";
 
 interface LogoProps {
-  variant?: 'full' | 'icon';
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  variant?: "full" | "icon";
+  size?: "sm" | "md" | "lg" | "xl";
   showText?: boolean;
   className?: string;
   textClassName?: string;
@@ -13,22 +13,23 @@ interface LogoProps {
 }
 
 const sizeMap = {
-  sm: { width: 24, height: 24, textSize: 'text-sm' },
-  md: { width: 32, height: 32, textSize: 'text-base' },
-  lg: { width: 48, height: 48, textSize: 'text-lg' },
-  xl: { width: 64, height: 64, textSize: 'text-xl' },
+  sm: { width: 24, height: 24, textSize: "text-sm" },
+  md: { width: 32, height: 32, textSize: "text-base" },
+  lg: { width: 48, height: 48, textSize: "text-lg" },
+  xl: { width: 64, height: 64, textSize: "text-xl" },
 };
 
-export default function Logo({ 
-  variant = 'icon', 
-  size = 'md', 
-  showText = false, 
-  className = '', 
-  textClassName = '',
-  onClick 
+export default function Logo({
+  variant = "icon",
+  size = "md",
+  showText = false,
+  className = "",
+  textClassName = "",
+  onClick,
 }: LogoProps) {
   const { width, height, textSize } = sizeMap[size];
-  const logoSrc = variant === 'full' ? BRAND_ASSETS.logo.main : BRAND_ASSETS.logo.icon;
+  const logoSrc =
+    variant === "full" ? BRAND_ASSETS.logo.main : BRAND_ASSETS.logo.icon;
 
   const handleClick = () => {
     if (onClick) {
@@ -36,9 +37,9 @@ export default function Logo({
     }
   };
 
-  if (variant === 'full') {
+  if (variant === "full") {
     return (
-      <div 
+      <div
         className={`flex items-center cursor-pointer ${className}`}
         onClick={handleClick}
       >
@@ -55,7 +56,7 @@ export default function Logo({
   }
 
   return (
-    <div 
+    <div
       className={`flex items-center space-x-3 cursor-pointer ${className}`}
       onClick={handleClick}
     >
@@ -64,7 +65,7 @@ export default function Logo({
         alt={`${COMPANY_INFO.name} Logo`}
         width={width}
         height={height}
-        className={`h-${size === 'sm' ? '6' : size === 'md' ? '8' : size === 'lg' ? '12' : '16'} w-${size === 'sm' ? '6' : size === 'md' ? '8' : size === 'lg' ? '12' : '16'}`}
+        className={`h-${size === "sm" ? "6" : size === "md" ? "8" : size === "lg" ? "12" : "16"} w-${size === "sm" ? "6" : size === "md" ? "8" : size === "lg" ? "12" : "16"}`}
         priority
       />
       {showText && (
@@ -72,8 +73,10 @@ export default function Logo({
           <h1 className={`font-bold text-foreground ${textSize}`}>
             {COMPANY_INFO.name}
           </h1>
-          {size !== 'sm' && (
-            <p className={`text-muted-foreground ${size === 'xl' ? 'text-sm' : 'text-xs'}`}>
+          {size !== "sm" && (
+            <p
+              className={`text-muted-foreground ${size === "xl" ? "text-sm" : "text-xs"}`}
+            >
               {COMPANY_INFO.tagline}
             </p>
           )}
@@ -89,24 +92,28 @@ export const LogoVariants = {
   NavLogo: (props: Partial<LogoProps>) => (
     <Logo variant="icon" size="md" showText={true} {...props} />
   ),
-  
+
   // Auth page logo
   AuthLogo: (props: Partial<LogoProps>) => (
     <Logo variant="icon" size="xl" showText={false} {...props} />
   ),
-  
+
   // Invoice header logo
   InvoiceLogo: (props: Partial<LogoProps>) => (
-    <Logo variant="icon" size="lg" showText={false} className="bg-white rounded-full p-2" {...props} />
+    <Logo
+      variant="icon"
+      size="lg"
+      showText={false}
+      className="bg-white rounded-full p-2"
+      {...props}
+    />
   ),
-  
+
   // Footer logo
   FooterLogo: (props: Partial<LogoProps>) => (
     <Logo variant="icon" size="sm" showText={false} {...props} />
   ),
-  
+
   // Full logo for hero sections
-  HeroLogo: (props: Partial<LogoProps>) => (
-    <Logo variant="full" {...props} />
-  ),
+  HeroLogo: (props: Partial<LogoProps>) => <Logo variant="full" {...props} />,
 };

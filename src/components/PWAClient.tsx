@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 export default function PWAClient() {
   const [installEvent, setInstallEvent] = useState<any>(null);
@@ -9,22 +9,28 @@ export default function PWAClient() {
 
   useEffect(() => {
     // Only register SW in production
-    if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').then((reg) => {
-        if (reg.waiting) setUpdateReady(true);
-        reg.addEventListener('updatefound', () => {
-          const newWorker = reg.installing;
-          if (!newWorker) return;
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              setUpdateReady(true);
-            }
+    if (process.env.NODE_ENV === "production" && "serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/sw.js")
+        .then((reg) => {
+          if (reg.waiting) setUpdateReady(true);
+          reg.addEventListener("updatefound", () => {
+            const newWorker = reg.installing;
+            if (!newWorker) return;
+            newWorker.addEventListener("statechange", () => {
+              if (
+                newWorker.state === "installed" &&
+                navigator.serviceWorker.controller
+              ) {
+                setUpdateReady(true);
+              }
+            });
           });
-        });
-      }).catch(() => {});
+        })
+        .catch(() => {});
 
       let refreshing = false;
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
         if (!refreshing) {
           window.location.reload();
           refreshing = true;
@@ -36,17 +42,17 @@ export default function PWAClient() {
       e.preventDefault();
       setInstallEvent(e);
     };
-    window.addEventListener('beforeinstallprompt', onBeforeInstall);
+    window.addEventListener("beforeinstallprompt", onBeforeInstall);
 
     const goOnline = () => setIsOnline(true);
     const goOffline = () => setIsOnline(false);
-    window.addEventListener('online', goOnline);
-    window.addEventListener('offline', goOffline);
+    window.addEventListener("online", goOnline);
+    window.addEventListener("offline", goOffline);
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', onBeforeInstall);
-      window.removeEventListener('online', goOnline);
-      window.removeEventListener('offline', goOffline);
+      window.removeEventListener("beforeinstallprompt", onBeforeInstall);
+      window.removeEventListener("online", goOnline);
+      window.removeEventListener("offline", goOffline);
     };
   }, []);
 
@@ -58,9 +64,9 @@ export default function PWAClient() {
   };
 
   const applyUpdate = () => {
-    if ('serviceWorker' in navigator) {
+    if ("serviceWorker" in navigator) {
       navigator.serviceWorker.getRegistration().then((reg) => {
-        reg?.waiting?.postMessage({ type: 'SKIP_WAITING' });
+        reg?.waiting?.postMessage({ type: "SKIP_WAITING" });
       });
     }
   };
@@ -73,17 +79,21 @@ export default function PWAClient() {
         </div>
       )}
       {installEvent && (
-        <button onClick={triggerInstall} className="pointer-events-auto bg-red-600 text-white text-sm px-3 py-2 rounded-md shadow">
+        <button
+          onClick={triggerInstall}
+          className="pointer-events-auto bg-red-600 text-white text-sm px-3 py-2 rounded-md shadow"
+        >
           Install app
         </button>
       )}
       {updateReady && (
-        <button onClick={applyUpdate} className="pointer-events-auto bg-amber-500 text-white text-sm px-3 py-2 rounded-md shadow">
+        <button
+          onClick={applyUpdate}
+          className="pointer-events-auto bg-amber-500 text-white text-sm px-3 py-2 rounded-md shadow"
+        >
           Update available — Reload
         </button>
       )}
     </div>
   );
 }
-
-

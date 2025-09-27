@@ -45,14 +45,14 @@ export const useJobSubmission = () => {
 
       // Generate formatted job number with human-readable format
       const jobNumber = `JKDP-JOB-${String(nextJobNumber).padStart(4, "0")}`;
-      
+
       // Get customer and service names for display
       const { data: customer } = await supabase
         .from("customers")
         .select("business_name")
         .eq("id", formData.customer_id)
         .single();
-        
+
       const { data: service } = await supabase
         .from("services")
         .select("title")
@@ -116,7 +116,11 @@ export const useJobSubmission = () => {
       // The uploadedFileRecords contain files that have already been inserted into the database
       // by the useFileUploadFixed hook, so we don't need to insert them again here.
       if (uploadedFileRecords.length > 0) {
-        console.log("Files already attached during upload process:", uploadedFileRecords.length, "files");
+        console.log(
+          "Files already attached during upload process:",
+          uploadedFileRecords.length,
+          "files",
+        );
       }
 
       toast.success("Job submitted successfully!");
@@ -125,7 +129,7 @@ export const useJobSubmission = () => {
       mutate("jobs");
       mutate("jobs-with-customers");
       mutate("job-stats");
-      
+
       router.push(`/dashboard/jobs`);
 
       return job;
@@ -145,7 +149,8 @@ export const useJobSubmission = () => {
         } else if (err.message.includes("duplicate")) {
           userFriendlyMessage = "A job with this information already exists.";
         } else if (err.message.includes("foreign key")) {
-          userFriendlyMessage = "Please select valid customer and service options.";
+          userFriendlyMessage =
+            "Please select valid customer and service options.";
         } else {
           userFriendlyMessage = err.message;
         }

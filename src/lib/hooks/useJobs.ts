@@ -125,9 +125,7 @@ const fetchJobsWithCustomers = async (): Promise<JobWithCustomer[]> => {
 };
 
 // Fetcher for specific job by ID
-const fetchJobById = async (
-  jobId: string,
-): Promise<JobWithCustomer> => {
+const fetchJobById = async (jobId: string): Promise<JobWithCustomer> => {
   const { data: job, error: jobError } = await supabase
     .from("jobs")
     .select("*")
@@ -158,7 +156,8 @@ const fetchJobById = async (
 
   return {
     ...(job as unknown as Job),
-    customer_name: (customer as CustomerNameData)?.business_name || "Unknown Customer",
+    customer_name:
+      (customer as CustomerNameData)?.business_name || "Unknown Customer",
   } as JobWithCustomer;
 };
 
@@ -247,7 +246,6 @@ export const useJobs = () => {
         "postgres_changes",
         { event: "*", schema: "public", table: "jobs" },
         (payload) => {
-          
           // Revalidate SWR cache when jobs table changes
           mutate("jobs");
           // Also revalidate related caches
@@ -289,7 +287,6 @@ export const useJobsWithCustomers = () => {
         "postgres_changes",
         { event: "*", schema: "public", table: "jobs" },
         (payload) => {
-          
           mutate("jobs-with-customers");
           mutate("jobs");
           mutate("job-stats");
@@ -299,7 +296,6 @@ export const useJobsWithCustomers = () => {
         "postgres_changes",
         { event: "*", schema: "public", table: "customers" },
         (payload) => {
-          
           mutate("jobs-with-customers");
         },
       )
@@ -419,7 +415,6 @@ export const useJobStats = () => {
         "postgres_changes",
         { event: "*", schema: "public", table: "jobs" },
         (payload) => {
-          
           mutate("job-stats");
           mutate("jobs");
           mutate("jobs-with-customers");

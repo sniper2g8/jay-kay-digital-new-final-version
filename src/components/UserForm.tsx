@@ -3,28 +3,51 @@
  * Form for creating and editing users
  */
 
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, User, Mail, Phone, MapPin, Shield, Eye, EyeOff, Save, X } from 'lucide-react';
-import { 
-  createUser, 
-  updateUser, 
-  getUserById, 
-  checkEmailExists, 
-  validateUserData, 
-  UserFormData 
-} from '@/lib/hooks/useUserManagement';
-import { Database } from '@/lib/database.types';
+import React, { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Loader2,
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Shield,
+  Eye,
+  EyeOff,
+  Save,
+  X,
+} from "lucide-react";
+import {
+  createUser,
+  updateUser,
+  getUserById,
+  checkEmailExists,
+  validateUserData,
+  UserFormData,
+} from "@/lib/hooks/useUserManagement";
+import { Database } from "@/lib/database.types";
 
-type UserRole = Database['public']['Enums']['user_role'];
-type UserStatus = Database['public']['Enums']['user_status'];
+type UserRole = Database["public"]["Enums"]["user_role"];
+type UserStatus = Database["public"]["Enums"]["user_status"];
 
 interface UserFormProps {
   userId?: string;
@@ -34,14 +57,14 @@ interface UserFormProps {
 
 const UserForm: React.FC<UserFormProps> = ({ userId, onSuccess, onCancel }) => {
   const [formData, setFormData] = useState<UserFormData>({
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-    primary_role: 'customer',
-    status: 'active',
-    password: '',
-    confirmPassword: ''
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    primary_role: "customer",
+    status: "active",
+    password: "",
+    confirmPassword: "",
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -68,31 +91,31 @@ const UserForm: React.FC<UserFormProps> = ({ userId, onSuccess, onCancel }) => {
       if (result.success && result.user) {
         setFormData({
           id: result.user.id,
-          name: result.user.name || '',
-          email: result.user.email || '',
-          phone: result.user.phone || '',
-          address: result.user.address || '',
-          primary_role: (result.user.primary_role as UserRole) || 'customer',
-          status: (result.user.status as UserStatus) || 'active',
-          password: '',
-          confirmPassword: ''
+          name: result.user.name || "",
+          email: result.user.email || "",
+          phone: result.user.phone || "",
+          address: result.user.address || "",
+          primary_role: (result.user.primary_role as UserRole) || "customer",
+          status: (result.user.status as UserStatus) || "active",
+          password: "",
+          confirmPassword: "",
         });
       } else {
-        setErrors([result.error || 'Failed to load user data']);
+        setErrors([result.error || "Failed to load user data"]);
       }
-    } catch (error) {
-      setErrors(['Failed to load user data']);
+    } catch (_error) {
+      setErrors(["Failed to load user data"]);
     } finally {
       setIsLoadingUser(false);
     }
   };
 
   const handleInputChange = (field: keyof UserFormData, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
-    
+
     // Clear errors when user starts typing
     if (errors.length > 0) {
       setErrors([]);
@@ -113,15 +136,18 @@ const UserForm: React.FC<UserFormProps> = ({ userId, onSuccess, onCancel }) => {
       }
 
       // Check if email already exists (except for current user when editing)
-      const emailExists = await checkEmailExists(formData.email, isEditing ? userId : undefined);
+      const emailExists = await checkEmailExists(
+        formData.email,
+        isEditing ? userId : undefined,
+      );
       if (emailExists) {
-        setErrors(['Email address is already in use']);
+        setErrors(["Email address is already in use"]);
         return;
       }
 
       // For new users, password is required
       if (!isEditing && !formData.password) {
-        setErrors(['Password is required for new users']);
+        setErrors(["Password is required for new users"]);
         return;
       }
 
@@ -135,7 +161,7 @@ const UserForm: React.FC<UserFormProps> = ({ userId, onSuccess, onCancel }) => {
           phone: formData.phone,
           address: formData.address,
           primary_role: formData.primary_role,
-          status: formData.status
+          status: formData.status,
         });
       } else {
         // Create new user
@@ -146,17 +172,17 @@ const UserForm: React.FC<UserFormProps> = ({ userId, onSuccess, onCancel }) => {
           phone: formData.phone,
           address: formData.address,
           primary_role: formData.primary_role,
-          status: formData.status
+          status: formData.status,
         });
       }
 
       if (result.success) {
         onSuccess();
       } else {
-        setErrors([result.error || 'Failed to save user']);
+        setErrors([result.error || "Failed to save user"]);
       }
-    } catch (error) {
-      setErrors(['An unexpected error occurred']);
+    } catch (_error) {
+      setErrors(["An unexpected error occurred"]);
     } finally {
       setIsLoading(false);
     }
@@ -180,13 +206,12 @@ const UserForm: React.FC<UserFormProps> = ({ userId, onSuccess, onCancel }) => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <User className="h-5 w-5" />
-          {isEditing ? 'Edit User' : 'Add New User'}
+          {isEditing ? "Edit User" : "Add New User"}
         </CardTitle>
         <CardDescription>
-          {isEditing 
-            ? 'Update user information and permissions' 
-            : 'Create a new user account with role and permissions'
-          }
+          {isEditing
+            ? "Update user information and permissions"
+            : "Create a new user account with role and permissions"}
         </CardDescription>
       </CardHeader>
 
@@ -198,7 +223,9 @@ const UserForm: React.FC<UserFormProps> = ({ userId, onSuccess, onCancel }) => {
               <AlertDescription>
                 <ul className="list-disc list-inside space-y-1">
                   {errors.map((error, index) => (
-                    <li key={index} className="text-red-800">{error}</li>
+                    <li key={index} className="text-red-800">
+                      {error}
+                    </li>
                   ))}
                 </ul>
               </AlertDescription>
@@ -216,7 +243,7 @@ const UserForm: React.FC<UserFormProps> = ({ userId, onSuccess, onCancel }) => {
                   type="text"
                   placeholder="John Doe"
                   value={formData.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  onChange={(e) => handleInputChange("name", e.target.value)}
                   className="pl-10"
                   required
                 />
@@ -233,7 +260,7 @@ const UserForm: React.FC<UserFormProps> = ({ userId, onSuccess, onCancel }) => {
                   type="email"
                   placeholder="john@example.com"
                   value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
                   className="pl-10"
                   required
                 />
@@ -250,7 +277,7 @@ const UserForm: React.FC<UserFormProps> = ({ userId, onSuccess, onCancel }) => {
                   type="tel"
                   placeholder="+232 XX XXX XXX"
                   value={formData.phone}
-                  onChange={(e) => handleInputChange('phone', e.target.value)}
+                  onChange={(e) => handleInputChange("phone", e.target.value)}
                   className="pl-10"
                 />
               </div>
@@ -263,7 +290,9 @@ const UserForm: React.FC<UserFormProps> = ({ userId, onSuccess, onCancel }) => {
                 <Shield className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
                 <Select
                   value={formData.primary_role}
-                  onValueChange={(value: UserRole) => handleInputChange('primary_role', value)}
+                  onValueChange={(value: UserRole) =>
+                    handleInputChange("primary_role", value)
+                  }
                 >
                   <SelectTrigger className="pl-10">
                     <SelectValue placeholder="Select role" />
@@ -288,7 +317,7 @@ const UserForm: React.FC<UserFormProps> = ({ userId, onSuccess, onCancel }) => {
                 type="text"
                 placeholder="Street address, city, country"
                 value={formData.address}
-                onChange={(e) => handleInputChange('address', e.target.value)}
+                onChange={(e) => handleInputChange("address", e.target.value)}
                 className="pl-10"
               />
             </div>
@@ -299,7 +328,9 @@ const UserForm: React.FC<UserFormProps> = ({ userId, onSuccess, onCancel }) => {
             <Label htmlFor="status">Status</Label>
             <Select
               value={formData.status}
-              onValueChange={(value: UserStatus) => handleInputChange('status', value)}
+              onValueChange={(value: UserStatus) =>
+                handleInputChange("status", value)
+              }
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select status" />
@@ -322,10 +353,12 @@ const UserForm: React.FC<UserFormProps> = ({ userId, onSuccess, onCancel }) => {
                 <div className="relative">
                   <Input
                     id="password"
-                    type={showPassword ? 'text' : 'password'}
+                    type={showPassword ? "text" : "password"}
                     placeholder="Enter password"
                     value={formData.password}
-                    onChange={(e) => handleInputChange('password', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("password", e.target.value)
+                    }
                     className="pr-10"
                     required
                   />
@@ -336,7 +369,11 @@ const UserForm: React.FC<UserFormProps> = ({ userId, onSuccess, onCancel }) => {
                     className="absolute right-0 top-0 h-full px-3"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </Button>
                 </div>
                 <p className="text-sm text-gray-600">Minimum 8 characters</p>
@@ -348,10 +385,12 @@ const UserForm: React.FC<UserFormProps> = ({ userId, onSuccess, onCancel }) => {
                 <div className="relative">
                   <Input
                     id="confirmPassword"
-                    type={showConfirmPassword ? 'text' : 'password'}
+                    type={showConfirmPassword ? "text" : "password"}
                     placeholder="Confirm password"
                     value={formData.confirmPassword}
-                    onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("confirmPassword", e.target.value)
+                    }
                     className="pr-10"
                     required
                   />
@@ -362,7 +401,11 @@ const UserForm: React.FC<UserFormProps> = ({ userId, onSuccess, onCancel }) => {
                     className="absolute right-0 top-0 h-full px-3"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   >
-                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </Button>
                 </div>
               </div>
@@ -388,12 +431,12 @@ const UserForm: React.FC<UserFormProps> = ({ userId, onSuccess, onCancel }) => {
               {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  {isEditing ? 'Updating...' : 'Creating...'}
+                  {isEditing ? "Updating..." : "Creating..."}
                 </>
               ) : (
                 <>
                   <Save className="h-4 w-4 mr-2" />
-                  {isEditing ? 'Update User' : 'Create User'}
+                  {isEditing ? "Update User" : "Create User"}
                 </>
               )}
             </Button>

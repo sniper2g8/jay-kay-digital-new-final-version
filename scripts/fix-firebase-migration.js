@@ -1,4 +1,4 @@
-import { Client } from 'pg';;
+import { Client } from "pg";
 require("dotenv").config({ path: ".env.local" });
 
 async function fixFirebaseMigration() {

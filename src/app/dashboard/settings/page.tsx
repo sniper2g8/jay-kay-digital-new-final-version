@@ -1,20 +1,39 @@
 "use client";
 
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { 
-  Globe, 
-  Key, 
-  Database, 
-  Bell, 
-  Shield, 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Globe,
+  Key,
+  Database,
+  Bell,
+  Shield,
   Save,
   RefreshCw,
   Copy,
@@ -25,7 +44,7 @@ import {
   CheckCircle,
   Download,
   Upload,
-  ArrowLeft
+  ArrowLeft,
 } from "lucide-react";
 
 interface SiteSettings {
@@ -84,7 +103,7 @@ export default function SettingsPage() {
     timezone: "GMT",
     currency: "SLL",
     language: "en",
-    theme: "light"
+    theme: "light",
   });
 
   // API Keys
@@ -96,28 +115,29 @@ export default function SettingsPage() {
       permissions: ["read", "write"],
       created_at: "2024-01-15T10:30:00Z",
       last_used: "2024-01-20T14:22:00Z",
-      is_active: true
+      is_active: true,
     },
     {
-      id: "2", 
+      id: "2",
       name: "Mobile App",
       key: "jkdp_sk_abcdef1234567890",
       permissions: ["read"],
       created_at: "2024-01-10T08:15:00Z",
       last_used: null,
-      is_active: false
-    }
+      is_active: false,
+    },
   ]);
 
   // Notification Settings
-  const [notificationSettings, setNotificationSettings] = useState<NotificationSettings>({
-    email_notifications: true,
-    job_updates: true,
-    payment_reminders: true,
-    low_stock_alerts: true,
-    system_alerts: true,
-    marketing_emails: false
-  });
+  const [notificationSettings, setNotificationSettings] =
+    useState<NotificationSettings>({
+      email_notifications: true,
+      job_updates: true,
+      payment_reminders: true,
+      low_stock_alerts: true,
+      system_alerts: true,
+      marketing_emails: false,
+    });
 
   // Backup Settings
   const [backupSettings, setBackupSettings] = useState<BackupSettings>({
@@ -125,7 +145,7 @@ export default function SettingsPage() {
     backup_frequency: "daily",
     backup_retention: 30,
     backup_location: "cloud",
-    last_backup: "2024-01-20T02:00:00Z"
+    last_backup: "2024-01-20T02:00:00Z",
   });
 
   // Dialog states
@@ -133,7 +153,7 @@ export default function SettingsPage() {
   const [showApiKeys, setShowApiKeys] = useState<Record<string, boolean>>({});
   const [newApiKey, setNewApiKey] = useState({
     name: "",
-    permissions: [] as string[]
+    permissions: [] as string[],
   });
 
   const handleSaveSettings = async () => {
@@ -141,32 +161,32 @@ export default function SettingsPage() {
       setLoading(true);
       // Here you would typically save to database
       // For now, we'll simulate an API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (error) {
-      console.error('Error saving settings:', error);
+      console.error("Error saving settings:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const generateApiKey = () => {
-    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
     const keyLength = 32;
-    let result = 'jkdp_sk_';
-    
+    let result = "jkdp_sk_";
+
     for (let i = 0; i < keyLength; i++) {
       result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-    
+
     return result;
   };
 
   const handleCreateApiKey = () => {
     if (!newApiKey.name || newApiKey.permissions.length === 0) {
-      alert('Please provide a name and select permissions');
+      alert("Please provide a name and select permissions");
       return;
     }
 
@@ -177,23 +197,29 @@ export default function SettingsPage() {
       permissions: newApiKey.permissions,
       created_at: new Date().toISOString(),
       last_used: null,
-      is_active: true
+      is_active: true,
     };
 
-    setApiKeys(prev => [...prev, apiKey]);
+    setApiKeys((prev) => [...prev, apiKey]);
     setIsAddApiKeyOpen(false);
     setNewApiKey({ name: "", permissions: [] });
   };
 
   const handleToggleApiKey = (id: string) => {
-    setApiKeys(prev => prev.map(key => 
-      key.id === id ? { ...key, is_active: !key.is_active } : key
-    ));
+    setApiKeys((prev) =>
+      prev.map((key) =>
+        key.id === id ? { ...key, is_active: !key.is_active } : key,
+      ),
+    );
   };
 
   const handleDeleteApiKey = (id: string) => {
-    if (confirm('Are you sure you want to delete this API key? This action cannot be undone.')) {
-      setApiKeys(prev => prev.filter(key => key.id !== id));
+    if (
+      confirm(
+        "Are you sure you want to delete this API key? This action cannot be undone.",
+      )
+    ) {
+      setApiKeys((prev) => prev.filter((key) => key.id !== id));
     }
   };
 
@@ -203,37 +229,42 @@ export default function SettingsPage() {
   };
 
   const toggleKeyVisibility = (id: string) => {
-    setShowApiKeys(prev => ({
+    setShowApiKeys((prev) => ({
       ...prev,
-      [id]: !prev[id]
+      [id]: !prev[id],
     }));
   };
 
   const maskApiKey = (key: string) => {
-    return key.substring(0, 12) + '•'.repeat(20) + key.substring(key.length - 4);
+    return (
+      key.substring(0, 12) + "•".repeat(20) + key.substring(key.length - 4)
+    );
   };
 
   const formatDate = (dateString: string | null) => {
-    if (!dateString) return 'Never';
-    return new Date(dateString).toLocaleDateString() + ' ' + 
-           new Date(dateString).toLocaleTimeString();
+    if (!dateString) return "Never";
+    return (
+      new Date(dateString).toLocaleDateString() +
+      " " +
+      new Date(dateString).toLocaleTimeString()
+    );
   };
 
   const handleRunBackup = async () => {
     try {
       setLoading(true);
       // Simulate backup process
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      
-      setBackupSettings(prev => ({
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+
+      setBackupSettings((prev) => ({
         ...prev,
-        last_backup: new Date().toISOString()
+        last_backup: new Date().toISOString(),
       }));
-      
-      alert('Backup completed successfully!');
+
+      alert("Backup completed successfully!");
     } catch (error) {
-      console.error('Error running backup:', error);
-      alert('Backup failed. Please try again.');
+      console.error("Error running backup:", error);
+      alert("Backup failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -243,8 +274,8 @@ export default function SettingsPage() {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             onClick={() => window.history.back()}
             className="flex items-center gap-2"
           >
@@ -253,12 +284,17 @@ export default function SettingsPage() {
           </Button>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-            <p className="text-gray-600 mt-1">Manage your application settings and preferences</p>
+            <p className="text-gray-600 mt-1">
+              Manage your application settings and preferences
+            </p>
           </div>
         </div>
         <div className="flex gap-2">
           {saved && (
-            <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">
+            <Badge
+              variant="outline"
+              className="bg-green-100 text-green-800 border-green-200"
+            >
               <CheckCircle className="h-3 w-3 mr-1" />
               Saved
             </Badge>
@@ -287,7 +323,9 @@ export default function SettingsPage() {
                 <Globe className="h-5 w-5" />
                 Company Information
               </CardTitle>
-              <CardDescription>Basic company details and branding settings</CardDescription>
+              <CardDescription>
+                Basic company details and branding settings
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -296,7 +334,12 @@ export default function SettingsPage() {
                   <Input
                     id="company_name"
                     value={siteSettings.company_name}
-                    onChange={(e) => setSiteSettings(prev => ({ ...prev, company_name: e.target.value }))}
+                    onChange={(e) =>
+                      setSiteSettings((prev) => ({
+                        ...prev,
+                        company_name: e.target.value,
+                      }))
+                    }
                   />
                 </div>
                 <div>
@@ -305,18 +348,28 @@ export default function SettingsPage() {
                     id="company_email"
                     type="email"
                     value={siteSettings.company_email}
-                    onChange={(e) => setSiteSettings(prev => ({ ...prev, company_email: e.target.value }))}
+                    onChange={(e) =>
+                      setSiteSettings((prev) => ({
+                        ...prev,
+                        company_email: e.target.value,
+                      }))
+                    }
                   />
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="company_phone">Phone Number</Label>
                   <Input
                     id="company_phone"
                     value={siteSettings.company_phone}
-                    onChange={(e) => setSiteSettings(prev => ({ ...prev, company_phone: e.target.value }))}
+                    onChange={(e) =>
+                      setSiteSettings((prev) => ({
+                        ...prev,
+                        company_phone: e.target.value,
+                      }))
+                    }
                   />
                 </div>
                 <div>
@@ -324,7 +377,12 @@ export default function SettingsPage() {
                   <Input
                     id="business_hours"
                     value={siteSettings.business_hours}
-                    onChange={(e) => setSiteSettings(prev => ({ ...prev, business_hours: e.target.value }))}
+                    onChange={(e) =>
+                      setSiteSettings((prev) => ({
+                        ...prev,
+                        business_hours: e.target.value,
+                      }))
+                    }
                   />
                 </div>
               </div>
@@ -334,7 +392,12 @@ export default function SettingsPage() {
                 <Input
                   id="company_address"
                   value={siteSettings.company_address}
-                  onChange={(e) => setSiteSettings(prev => ({ ...prev, company_address: e.target.value }))}
+                  onChange={(e) =>
+                    setSiteSettings((prev) => ({
+                      ...prev,
+                      company_address: e.target.value,
+                    }))
+                  }
                 />
               </div>
 
@@ -343,15 +406,23 @@ export default function SettingsPage() {
                   <Label htmlFor="timezone">Timezone</Label>
                   <Select
                     value={siteSettings.timezone}
-                    onValueChange={(value) => setSiteSettings(prev => ({ ...prev, timezone: value }))}
+                    onValueChange={(value) =>
+                      setSiteSettings((prev) => ({ ...prev, timezone: value }))
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="GMT">GMT (Greenwich Mean Time)</SelectItem>
-                      <SelectItem value="Africa/Accra">GMT (West Africa Time)</SelectItem>
-                      <SelectItem value="Africa/Freetown">GMT (Sierra Leone Time)</SelectItem>
+                      <SelectItem value="GMT">
+                        GMT (Greenwich Mean Time)
+                      </SelectItem>
+                      <SelectItem value="Africa/Accra">
+                        GMT (West Africa Time)
+                      </SelectItem>
+                      <SelectItem value="Africa/Freetown">
+                        GMT (Sierra Leone Time)
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -359,7 +430,9 @@ export default function SettingsPage() {
                   <Label htmlFor="currency">Currency</Label>
                   <Select
                     value={siteSettings.currency}
-                    onValueChange={(value) => setSiteSettings(prev => ({ ...prev, currency: value }))}
+                    onValueChange={(value) =>
+                      setSiteSettings((prev) => ({ ...prev, currency: value }))
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -374,7 +447,9 @@ export default function SettingsPage() {
                   <Label htmlFor="theme">Theme</Label>
                   <Select
                     value={siteSettings.theme}
-                    onValueChange={(value) => setSiteSettings(prev => ({ ...prev, theme: value }))}
+                    onValueChange={(value) =>
+                      setSiteSettings((prev) => ({ ...prev, theme: value }))
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -389,10 +464,7 @@ export default function SettingsPage() {
               </div>
 
               <div className="flex justify-end pt-4">
-                <Button 
-                  onClick={() => handleSaveSettings()}
-                  disabled={loading}
-                >
+                <Button onClick={() => handleSaveSettings()} disabled={loading}>
                   {loading ? (
                     <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
                   ) : (
@@ -415,9 +487,14 @@ export default function SettingsPage() {
                     <Key className="h-5 w-5" />
                     API Keys
                   </CardTitle>
-                  <CardDescription>Manage API keys for external integrations</CardDescription>
+                  <CardDescription>
+                    Manage API keys for external integrations
+                  </CardDescription>
                 </div>
-                <Dialog open={isAddApiKeyOpen} onOpenChange={setIsAddApiKeyOpen}>
+                <Dialog
+                  open={isAddApiKeyOpen}
+                  onOpenChange={setIsAddApiKeyOpen}
+                >
                   <DialogTrigger asChild>
                     <Button>
                       <Plus className="h-4 w-4 mr-2" />
@@ -438,7 +515,12 @@ export default function SettingsPage() {
                           id="api_name"
                           placeholder="e.g., Frontend App, Mobile App"
                           value={newApiKey.name}
-                          onChange={(e) => setNewApiKey(prev => ({ ...prev, name: e.target.value }))}
+                          onChange={(e) =>
+                            setNewApiKey((prev) => ({
+                              ...prev,
+                              name: e.target.value,
+                            }))
+                          }
                         />
                       </div>
                       <div>
@@ -447,17 +529,19 @@ export default function SettingsPage() {
                           <label className="flex items-center space-x-2">
                             <input
                               type="checkbox"
-                              checked={newApiKey.permissions.includes('read')}
+                              checked={newApiKey.permissions.includes("read")}
                               onChange={(e) => {
                                 if (e.target.checked) {
-                                  setNewApiKey(prev => ({
+                                  setNewApiKey((prev) => ({
                                     ...prev,
-                                    permissions: [...prev.permissions, 'read']
+                                    permissions: [...prev.permissions, "read"],
                                   }));
                                 } else {
-                                  setNewApiKey(prev => ({
+                                  setNewApiKey((prev) => ({
                                     ...prev,
-                                    permissions: prev.permissions.filter(p => p !== 'read')
+                                    permissions: prev.permissions.filter(
+                                      (p) => p !== "read",
+                                    ),
                                   }));
                                 }
                               }}
@@ -467,17 +551,19 @@ export default function SettingsPage() {
                           <label className="flex items-center space-x-2">
                             <input
                               type="checkbox"
-                              checked={newApiKey.permissions.includes('write')}
+                              checked={newApiKey.permissions.includes("write")}
                               onChange={(e) => {
                                 if (e.target.checked) {
-                                  setNewApiKey(prev => ({
+                                  setNewApiKey((prev) => ({
                                     ...prev,
-                                    permissions: [...prev.permissions, 'write']
+                                    permissions: [...prev.permissions, "write"],
                                   }));
                                 } else {
-                                  setNewApiKey(prev => ({
+                                  setNewApiKey((prev) => ({
                                     ...prev,
-                                    permissions: prev.permissions.filter(p => p !== 'write')
+                                    permissions: prev.permissions.filter(
+                                      (p) => p !== "write",
+                                    ),
                                   }));
                                 }
                               }}
@@ -487,17 +573,19 @@ export default function SettingsPage() {
                           <label className="flex items-center space-x-2">
                             <input
                               type="checkbox"
-                              checked={newApiKey.permissions.includes('admin')}
+                              checked={newApiKey.permissions.includes("admin")}
                               onChange={(e) => {
                                 if (e.target.checked) {
-                                  setNewApiKey(prev => ({
+                                  setNewApiKey((prev) => ({
                                     ...prev,
-                                    permissions: [...prev.permissions, 'admin']
+                                    permissions: [...prev.permissions, "admin"],
                                   }));
                                 } else {
-                                  setNewApiKey(prev => ({
+                                  setNewApiKey((prev) => ({
                                     ...prev,
-                                    permissions: prev.permissions.filter(p => p !== 'admin')
+                                    permissions: prev.permissions.filter(
+                                      (p) => p !== "admin",
+                                    ),
                                   }));
                                 }
                               }}
@@ -510,7 +598,10 @@ export default function SettingsPage() {
                         <Button onClick={handleCreateApiKey} className="flex-1">
                           Create Key
                         </Button>
-                        <Button variant="outline" onClick={() => setIsAddApiKeyOpen(false)}>
+                        <Button
+                          variant="outline"
+                          onClick={() => setIsAddApiKeyOpen(false)}
+                        >
                           Cancel
                         </Button>
                       </div>
@@ -522,12 +613,17 @@ export default function SettingsPage() {
             <CardContent>
               <div className="space-y-4">
                 {apiKeys.map((apiKey) => (
-                  <div key={apiKey.id} className="border rounded-lg p-4 space-y-3">
+                  <div
+                    key={apiKey.id}
+                    className="border rounded-lg p-4 space-y-3"
+                  >
                     <div className="flex justify-between items-start">
                       <div>
                         <div className="flex items-center gap-2">
                           <h3 className="font-medium">{apiKey.name}</h3>
-                          <Badge variant={apiKey.is_active ? "default" : "secondary"}>
+                          <Badge
+                            variant={apiKey.is_active ? "default" : "secondary"}
+                          >
                             {apiKey.is_active ? "Active" : "Inactive"}
                           </Badge>
                         </div>
@@ -544,7 +640,7 @@ export default function SettingsPage() {
                           size="sm"
                           onClick={() => handleToggleApiKey(apiKey.id)}
                         >
-                          {apiKey.is_active ? 'Disable' : 'Enable'}
+                          {apiKey.is_active ? "Disable" : "Enable"}
                         </Button>
                         <Button
                           variant="ghost"
@@ -556,19 +652,25 @@ export default function SettingsPage() {
                         </Button>
                       </div>
                     </div>
-                    
+
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-medium">API Key:</span>
                         <code className="text-sm bg-gray-100 px-2 py-1 rounded flex-1">
-                          {showApiKeys[apiKey.id] ? apiKey.key : maskApiKey(apiKey.key)}
+                          {showApiKeys[apiKey.id]
+                            ? apiKey.key
+                            : maskApiKey(apiKey.key)}
                         </code>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => toggleKeyVisibility(apiKey.id)}
                         >
-                          {showApiKeys[apiKey.id] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          {showApiKeys[apiKey.id] ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
                         </Button>
                         <Button
                           variant="ghost"
@@ -578,12 +680,18 @@ export default function SettingsPage() {
                           <Copy className="h-4 w-4" />
                         </Button>
                       </div>
-                      
+
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">Permissions:</span>
+                        <span className="text-sm font-medium">
+                          Permissions:
+                        </span>
                         <div className="flex gap-1">
                           {apiKey.permissions.map((permission) => (
-                            <Badge key={permission} variant="outline" className="text-xs">
+                            <Badge
+                              key={permission}
+                              variant="outline"
+                              className="text-xs"
+                            >
                               {permission}
                             </Badge>
                           ))}
@@ -605,22 +713,28 @@ export default function SettingsPage() {
                 <Bell className="h-5 w-5" />
                 Notification Preferences
               </CardTitle>
-              <CardDescription>Configure how and when you receive notifications</CardDescription>
+              <CardDescription>
+                Configure how and when you receive notifications
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-medium">Email Notifications</h4>
-                    <p className="text-sm text-gray-500">Receive notifications via email</p>
+                    <p className="text-sm text-gray-500">
+                      Receive notifications via email
+                    </p>
                   </div>
                   <input
                     type="checkbox"
                     checked={notificationSettings.email_notifications}
-                    onChange={(e) => setNotificationSettings(prev => ({
-                      ...prev,
-                      email_notifications: e.target.checked
-                    }))}
+                    onChange={(e) =>
+                      setNotificationSettings((prev) => ({
+                        ...prev,
+                        email_notifications: e.target.checked,
+                      }))
+                    }
                     className="h-4 w-4"
                   />
                 </div>
@@ -628,15 +742,19 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-medium">Job Updates</h4>
-                    <p className="text-sm text-gray-500">Notifications for job status changes</p>
+                    <p className="text-sm text-gray-500">
+                      Notifications for job status changes
+                    </p>
                   </div>
                   <input
                     type="checkbox"
                     checked={notificationSettings.job_updates}
-                    onChange={(e) => setNotificationSettings(prev => ({
-                      ...prev,
-                      job_updates: e.target.checked
-                    }))}
+                    onChange={(e) =>
+                      setNotificationSettings((prev) => ({
+                        ...prev,
+                        job_updates: e.target.checked,
+                      }))
+                    }
                     className="h-4 w-4"
                   />
                 </div>
@@ -644,15 +762,19 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-medium">Payment Reminders</h4>
-                    <p className="text-sm text-gray-500">Reminders for outstanding payments</p>
+                    <p className="text-sm text-gray-500">
+                      Reminders for outstanding payments
+                    </p>
                   </div>
                   <input
                     type="checkbox"
                     checked={notificationSettings.payment_reminders}
-                    onChange={(e) => setNotificationSettings(prev => ({
-                      ...prev,
-                      payment_reminders: e.target.checked
-                    }))}
+                    onChange={(e) =>
+                      setNotificationSettings((prev) => ({
+                        ...prev,
+                        payment_reminders: e.target.checked,
+                      }))
+                    }
                     className="h-4 w-4"
                   />
                 </div>
@@ -660,15 +782,19 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-medium">Low Stock Alerts</h4>
-                    <p className="text-sm text-gray-500">Alerts when inventory is running low</p>
+                    <p className="text-sm text-gray-500">
+                      Alerts when inventory is running low
+                    </p>
                   </div>
                   <input
                     type="checkbox"
                     checked={notificationSettings.low_stock_alerts}
-                    onChange={(e) => setNotificationSettings(prev => ({
-                      ...prev,
-                      low_stock_alerts: e.target.checked
-                    }))}
+                    onChange={(e) =>
+                      setNotificationSettings((prev) => ({
+                        ...prev,
+                        low_stock_alerts: e.target.checked,
+                      }))
+                    }
                     className="h-4 w-4"
                   />
                 </div>
@@ -676,15 +802,19 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-medium">System Alerts</h4>
-                    <p className="text-sm text-gray-500">Important system notifications</p>
+                    <p className="text-sm text-gray-500">
+                      Important system notifications
+                    </p>
                   </div>
                   <input
                     type="checkbox"
                     checked={notificationSettings.system_alerts}
-                    onChange={(e) => setNotificationSettings(prev => ({
-                      ...prev,
-                      system_alerts: e.target.checked
-                    }))}
+                    onChange={(e) =>
+                      setNotificationSettings((prev) => ({
+                        ...prev,
+                        system_alerts: e.target.checked,
+                      }))
+                    }
                     className="h-4 w-4"
                   />
                 </div>
@@ -692,25 +822,26 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-medium">Marketing Emails</h4>
-                    <p className="text-sm text-gray-500">Product updates and promotional content</p>
+                    <p className="text-sm text-gray-500">
+                      Product updates and promotional content
+                    </p>
                   </div>
                   <input
                     type="checkbox"
                     checked={notificationSettings.marketing_emails}
-                    onChange={(e) => setNotificationSettings(prev => ({
-                      ...prev,
-                      marketing_emails: e.target.checked
-                    }))}
+                    onChange={(e) =>
+                      setNotificationSettings((prev) => ({
+                        ...prev,
+                        marketing_emails: e.target.checked,
+                      }))
+                    }
                     className="h-4 w-4"
                   />
                 </div>
               </div>
 
               <div className="flex justify-end pt-4">
-                <Button 
-                  onClick={() => handleSaveSettings()}
-                  disabled={loading}
-                >
+                <Button onClick={() => handleSaveSettings()} disabled={loading}>
                   {loading ? (
                     <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
                   ) : (
@@ -731,7 +862,9 @@ export default function SettingsPage() {
                 <Database className="h-5 w-5" />
                 Backup & Recovery
               </CardTitle>
-              <CardDescription>Configure automatic backups and manage data recovery</CardDescription>
+              <CardDescription>
+                Configure automatic backups and manage data recovery
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-2 gap-6">
@@ -739,15 +872,19 @@ export default function SettingsPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="font-medium">Auto Backup</h4>
-                      <p className="text-sm text-gray-500">Automatically backup your data</p>
+                      <p className="text-sm text-gray-500">
+                        Automatically backup your data
+                      </p>
                     </div>
                     <input
                       type="checkbox"
                       checked={backupSettings.auto_backup}
-                      onChange={(e) => setBackupSettings(prev => ({
-                        ...prev,
-                        auto_backup: e.target.checked
-                      }))}
+                      onChange={(e) =>
+                        setBackupSettings((prev) => ({
+                          ...prev,
+                          auto_backup: e.target.checked,
+                        }))
+                      }
                       className="h-4 w-4"
                     />
                   </div>
@@ -756,7 +893,12 @@ export default function SettingsPage() {
                     <Label htmlFor="backup_frequency">Backup Frequency</Label>
                     <Select
                       value={backupSettings.backup_frequency}
-                      onValueChange={(value) => setBackupSettings(prev => ({ ...prev, backup_frequency: value }))}
+                      onValueChange={(value) =>
+                        setBackupSettings((prev) => ({
+                          ...prev,
+                          backup_frequency: value,
+                        }))
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue />
@@ -771,15 +913,19 @@ export default function SettingsPage() {
                   </div>
 
                   <div>
-                    <Label htmlFor="backup_retention">Retention Period (days)</Label>
+                    <Label htmlFor="backup_retention">
+                      Retention Period (days)
+                    </Label>
                     <Input
                       id="backup_retention"
                       type="number"
                       value={backupSettings.backup_retention}
-                      onChange={(e) => setBackupSettings(prev => ({
-                        ...prev,
-                        backup_retention: parseInt(e.target.value) || 30
-                      }))}
+                      onChange={(e) =>
+                        setBackupSettings((prev) => ({
+                          ...prev,
+                          backup_retention: parseInt(e.target.value) || 30,
+                        }))
+                      }
                     />
                   </div>
 
@@ -787,7 +933,12 @@ export default function SettingsPage() {
                     <Label htmlFor="backup_location">Backup Location</Label>
                     <Select
                       value={backupSettings.backup_location}
-                      onValueChange={(value) => setBackupSettings(prev => ({ ...prev, backup_location: value }))}
+                      onValueChange={(value) =>
+                        setBackupSettings((prev) => ({
+                          ...prev,
+                          backup_location: value,
+                        }))
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue />
@@ -806,14 +957,19 @@ export default function SettingsPage() {
                     <h4 className="font-medium mb-2">Backup Status</h4>
                     <div className="space-y-2">
                       <div className="flex justify-between">
-                        <span className="text-sm text-gray-600">Last Backup:</span>
+                        <span className="text-sm text-gray-600">
+                          Last Backup:
+                        </span>
                         <span className="text-sm font-medium">
                           {formatDate(backupSettings.last_backup)}
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-sm text-gray-600">Status:</span>
-                        <Badge variant="outline" className="bg-green-100 text-green-800">
+                        <Badge
+                          variant="outline"
+                          className="bg-green-100 text-green-800"
+                        >
                           <CheckCircle className="h-3 w-3 mr-1" />
                           Up to date
                         </Badge>
@@ -827,7 +983,7 @@ export default function SettingsPage() {
                     </div>
                   </div>
 
-                  <Button 
+                  <Button
                     onClick={handleRunBackup}
                     disabled={loading}
                     className="w-full"
@@ -854,10 +1010,7 @@ export default function SettingsPage() {
               </div>
 
               <div className="flex justify-end pt-4">
-                <Button 
-                  onClick={() => handleSaveSettings()}
-                  disabled={loading}
-                >
+                <Button onClick={() => handleSaveSettings()} disabled={loading}>
                   {loading ? (
                     <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
                   ) : (
@@ -878,18 +1031,20 @@ export default function SettingsPage() {
                 <Shield className="h-5 w-5" />
                 Security Settings
               </CardTitle>
-              <CardDescription>Manage security preferences and access controls</CardDescription>
+              <CardDescription>
+                Manage security preferences and access controls
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
                 <div className="border rounded-lg p-4">
-                  <h4 className="font-medium mb-2">Two-Factor Authentication</h4>
+                  <h4 className="font-medium mb-2">
+                    Two-Factor Authentication
+                  </h4>
                   <p className="text-sm text-gray-600 mb-3">
                     Add an extra layer of security to your account
                   </p>
-                  <Button variant="outline">
-                    Enable 2FA
-                  </Button>
+                  <Button variant="outline">Enable 2FA</Button>
                 </div>
 
                 <div className="border rounded-lg p-4">
@@ -898,10 +1053,11 @@ export default function SettingsPage() {
                     Manage active sessions and login history
                   </p>
                   <div className="flex gap-2">
-                    <Button variant="outline">
-                      View Sessions
-                    </Button>
-                    <Button variant="outline" className="text-red-600 hover:text-red-700">
+                    <Button variant="outline">View Sessions</Button>
+                    <Button
+                      variant="outline"
+                      className="text-red-600 hover:text-red-700"
+                    >
                       Revoke All Sessions
                     </Button>
                   </div>
@@ -914,20 +1070,34 @@ export default function SettingsPage() {
                   </p>
                   <div className="space-y-2">
                     <label className="flex items-center space-x-2">
-                      <input type="checkbox" defaultChecked className="h-4 w-4" />
+                      <input
+                        type="checkbox"
+                        defaultChecked
+                        className="h-4 w-4"
+                      />
                       <span className="text-sm">Minimum 8 characters</span>
                     </label>
                     <label className="flex items-center space-x-2">
-                      <input type="checkbox" defaultChecked className="h-4 w-4" />
+                      <input
+                        type="checkbox"
+                        defaultChecked
+                        className="h-4 w-4"
+                      />
                       <span className="text-sm">Require uppercase letters</span>
                     </label>
                     <label className="flex items-center space-x-2">
-                      <input type="checkbox" defaultChecked className="h-4 w-4" />
+                      <input
+                        type="checkbox"
+                        defaultChecked
+                        className="h-4 w-4"
+                      />
                       <span className="text-sm">Require numbers</span>
                     </label>
                     <label className="flex items-center space-x-2">
                       <input type="checkbox" className="h-4 w-4" />
-                      <span className="text-sm">Require special characters</span>
+                      <span className="text-sm">
+                        Require special characters
+                      </span>
                     </label>
                   </div>
                 </div>
@@ -937,17 +1107,12 @@ export default function SettingsPage() {
                   <p className="text-sm text-gray-600 mb-3">
                     Monitor system activity and user actions
                   </p>
-                  <Button variant="outline">
-                    View Activity Logs
-                  </Button>
+                  <Button variant="outline">View Activity Logs</Button>
                 </div>
               </div>
 
               <div className="flex justify-end pt-4">
-                <Button 
-                  onClick={() => handleSaveSettings()}
-                  disabled={loading}
-                >
+                <Button onClick={() => handleSaveSettings()} disabled={loading}>
                   {loading ? (
                     <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
                   ) : (

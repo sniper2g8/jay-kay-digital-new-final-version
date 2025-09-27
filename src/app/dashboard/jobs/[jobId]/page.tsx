@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -331,20 +331,24 @@ export default function JobDetailPage() {
 
                       if (error) {
                         console.error("Status update error:", {
-                          message: error.message || 'Unknown database error',
-                          code: error.code || 'N/A',
-                          details: error.details || 'N/A',
-                          hint: error.hint || 'N/A',
+                          message: error.message || "Unknown database error",
+                          code: error.code || "N/A",
+                          details: error.details || "N/A",
+                          hint: error.hint || "N/A",
                           errorType: typeof error,
                           errorString: String(error),
-                          context: 'statusUpdate_onValueChange'
+                          context: "statusUpdate_onValueChange",
                         });
-                        
+
                         // Handle specific permission errors
-                        if (error.code === '42501') {
-                          toast.error("Permission denied: You don't have permission to update job status. Please contact your administrator.");
+                        if (error.code === "42501") {
+                          toast.error(
+                            "Permission denied: You don't have permission to update job status. Please contact your administrator.",
+                          );
                         } else {
-                          toast.error(`Failed to update status: ${error.message || 'Unknown error'}`);
+                          toast.error(
+                            `Failed to update status: ${error.message || "Unknown error"}`,
+                          );
                         }
                       } else {
                         toast.success("Status updated successfully");
@@ -357,13 +361,18 @@ export default function JobDetailPage() {
                       }
                     } catch (error) {
                       console.error("Status update error:", {
-                        message: error instanceof Error ? error.message : 'Unknown error',
+                        message:
+                          error instanceof Error
+                            ? error.message
+                            : "Unknown error",
                         error: error,
                         stack: error instanceof Error ? error.stack : undefined,
                         errorType: typeof error,
-                        errorString: String(error)
+                        errorString: String(error),
                       });
-                      toast.error(`Failed to update status: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                      toast.error(
+                        `Failed to update status: ${error instanceof Error ? error.message : "Unknown error"}`,
+                      );
                     }
                   }}
                 >

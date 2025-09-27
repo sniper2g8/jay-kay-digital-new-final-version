@@ -62,8 +62,18 @@ interface StatusConfig {
 }
 
 const statusConfig = {
-  pending: { label: "Pending Review", color: "bg-yellow-500", icon: Clock, progress: 10 },
-  approved: { label: "Approved", color: "bg-blue-500", icon: CheckCircle, progress: 25 },
+  pending: {
+    label: "Pending Review",
+    color: "bg-yellow-500",
+    icon: Clock,
+    progress: 10,
+  },
+  approved: {
+    label: "Approved",
+    color: "bg-blue-500",
+    icon: CheckCircle,
+    progress: 25,
+  },
   in_progress: {
     label: "In Progress",
     color: "bg-blue-600",
@@ -108,7 +118,7 @@ const priorityConfig = {
     color: "bg-gray-100 text-gray-800",
   },
   normal: {
-    label: "Normal", 
+    label: "Normal",
     color: "bg-blue-100 text-blue-800",
   },
   high: {
@@ -134,13 +144,16 @@ export default function JobTrackingPage() {
       try {
         setLoading(true);
         setError(null);
-        
+
         // Check if jobId is in job number format (JKDP-JOB-XXXX) or UUID format
         const isJobNumber = /^JKDP-JOB-\d+$/i.test(jobId);
-        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(jobId);
-        
+        const isUUID =
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+            jobId,
+          );
+
         let finalJobData = null;
-        
+
         if (isJobNumber) {
           // If it's a job number, search by jobNo first
           console.log("Fetching job by jobNo (job number format):", jobId);
@@ -155,7 +168,6 @@ export default function JobTrackingPage() {
             throw new Error(`Job not found with job number: ${jobId}`);
           }
           finalJobData = jobByNumber;
-          
         } else if (isUUID) {
           // If it's a UUID, search by ID
           console.log("Fetching job by ID (UUID format):", jobId);
@@ -167,13 +179,14 @@ export default function JobTrackingPage() {
 
           if (jobError) {
             console.error("Error fetching job by ID:", jobError);
-            throw new Error(`Database error: ${jobError.message || JSON.stringify(jobError)}`);
+            throw new Error(
+              `Database error: ${jobError.message || JSON.stringify(jobError)}`,
+            );
           }
           finalJobData = jobData;
-          
         } else {
           // If format is unclear, try both approaches with proper error handling
-          
+
           // Try as job number first (more likely to be human-readable)
           const { data: jobByNumber, error: jobByNumberError } = await supabase
             .from("jobs")
@@ -186,7 +199,7 @@ export default function JobTrackingPage() {
             console.log("Found job by jobNo (fallback):", finalJobData);
           } else {
             // Only try UUID if it could potentially be a UUID format
-            if (jobId.length === 36 && jobId.includes('-')) {
+            if (jobId.length === 36 && jobId.includes("-")) {
               const { data: jobData, error: jobError } = await supabase
                 .from("jobs")
                 .select("*")
@@ -198,39 +211,44 @@ export default function JobTrackingPage() {
                 console.log("Found job by ID (fallback):", finalJobData);
               }
             }
-            
+
             if (!finalJobData) {
-              throw new Error(`Job not found with identifier: ${jobId}. Please check the job number or ID.`);
+              throw new Error(
+                `Job not found with identifier: ${jobId}. Please check the job number or ID.`,
+              );
             }
           }
         }
 
         // Set the job data
-        
+
         setJob(finalJobData as unknown as Job);
 
         // Note: Customer information is not fetched for privacy protection
-        
       } catch (err) {
         console.error("Error fetching job details:", err);
-        
+
         // More detailed error handling
         let errorMessage = "Failed to load job details";
         if (err instanceof Error) {
           errorMessage = err.message;
-        } else if (typeof err === 'object' && err !== null) {
+        } else if (typeof err === "object" && err !== null) {
           errorMessage = JSON.stringify(err);
-        } else if (typeof err === 'string') {
+        } else if (typeof err === "string") {
           errorMessage = err;
         }
-        
+
         console.error("Error details:", {
           error: err,
           jobId,
-          supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL ? "configured" : "missing",
-          supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "configured" : "missing"
+          supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL
+            ? "configured"
+            : "missing",
+          supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+            ? "configured"
+            : "missing",
         });
-        
+
         setError(errorMessage);
       } finally {
         setLoading(false);
@@ -244,14 +262,15 @@ export default function JobTrackingPage() {
 
   const getStatusConfig = (status: string | null): StatusConfig => {
     if (!status) {
-      
       return statusConfig.pending;
     }
 
     const config = statusConfig[status as keyof typeof statusConfig];
-    
+
     if (!config) {
-      console.warn(`Status '${status}' not found in statusConfig, using pending as fallback`);
+      console.warn(
+        `Status '${status}' not found in statusConfig, using pending as fallback`,
+      );
       return statusConfig.pending;
     }
 
@@ -260,21 +279,23 @@ export default function JobTrackingPage() {
 
   const getPriorityConfig = (priority: string | null) => {
     if (!priority) return priorityConfig.low;
-    return priorityConfig[priority as keyof typeof priorityConfig] || priorityConfig.low;
+    return (
+      priorityConfig[priority as keyof typeof priorityConfig] ||
+      priorityConfig.low
+    );
   };
 
   const shareJob = async () => {
     const currentUrl = window.location.href;
-    
+
     if (navigator.share) {
       try {
         await navigator.share({
           title: `Job ${job?.jobNo || job?.id} - Jay Kay Digital Press`,
-          text: `Track your printing job: ${job?.title || 'Printing Service'}`,
+          text: `Track your printing job: ${job?.title || "Printing Service"}`,
           url: currentUrl,
         });
       } catch (err) {
-        
         copyToClipboard(currentUrl);
       }
     } else {
@@ -284,7 +305,7 @@ export default function JobTrackingPage() {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text).then(() => {
-      alert('Tracking link copied to clipboard!');
+      alert("Tracking link copied to clipboard!");
     });
   };
 
@@ -311,9 +332,12 @@ export default function JobTrackingPage() {
             <Card className="w-full max-w-md">
               <CardContent className="p-6 text-center">
                 <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">Job Not Found</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                  Job Not Found
+                </h2>
                 <p className="text-gray-600 mb-4">
-                  {error || "The job you're looking for doesn't exist or may have been removed."}
+                  {error ||
+                    "The job you're looking for doesn't exist or may have been removed."}
                 </p>
                 <Button asChild>
                   <Link href="/">Return to Home</Link>
@@ -372,21 +396,24 @@ export default function JobTrackingPage() {
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-semibold">Current Status</h3>
-                  <Badge className={`${statusInfo.color} flex items-center gap-1`}>
+                  <Badge
+                    className={`${statusInfo.color} flex items-center gap-1`}
+                  >
                     <StatusIcon className="h-3 w-3" />
                     {statusInfo.label}
                   </Badge>
                 </div>
-                
+
                 <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-                  <div 
+                  <div
                     className="bg-blue-600 h-2 rounded-full transition-all duration-500"
                     style={{ width: `${statusInfo.progress}%` }}
                   ></div>
                 </div>
-                
+
                 <p className="text-sm text-gray-600">
-                  {statusInfo.description || `Your job is currently ${statusInfo.label.toLowerCase()}.`}
+                  {statusInfo.description ||
+                    `Your job is currently ${statusInfo.label.toLowerCase()}.`}
                 </p>
               </div>
 
@@ -401,20 +428,26 @@ export default function JobTrackingPage() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Service:</span>
-                      <span className="font-medium">{job.title || "Printing Service"}</span>
+                      <span className="font-medium">
+                        {job.title || "Printing Service"}
+                      </span>
                     </div>
                     {job.estimated_delivery && (
                       <div className="flex justify-between">
                         <span className="text-gray-600">Est. Delivery:</span>
                         <span className="font-medium">
-                          {new Date(job.estimated_delivery).toLocaleDateString()}
+                          {new Date(
+                            job.estimated_delivery,
+                          ).toLocaleDateString()}
                         </span>
                       </div>
                     )}
                     <div className="flex justify-between">
                       <span className="text-gray-600">Created:</span>
                       <span className="font-medium">
-                        {job.created_at ? new Date(job.created_at).toLocaleDateString() : "N/A"}
+                        {job.created_at
+                          ? new Date(job.created_at).toLocaleDateString()
+                          : "N/A"}
                       </span>
                     </div>
                   </div>
@@ -439,7 +472,9 @@ export default function JobTrackingPage() {
                 <CardContent>
                   <div className="flex justify-center">
                     <div className="p-4 bg-white rounded-lg">
-                      <p className="text-center text-sm text-gray-600">QR Code: {job.qr_code}</p>
+                      <p className="text-center text-sm text-gray-600">
+                        QR Code: {job.qr_code}
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -463,30 +498,40 @@ export default function JobTrackingPage() {
                       </Link>
                     </Button>
                   )}
-                  
-                  <Button variant="outline" className="w-full" onClick={shareJob}>
+
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={shareJob}
+                  >
                     <Share2 className="h-4 w-4 mr-2" />
                     Share Job Status
                   </Button>
-                  
+
                   <Button variant="outline" className="w-full" asChild>
-                    <Link href="/">
-                      Back to Home
-                    </Link>
+                    <Link href="/">Back to Home</Link>
                   </Button>
 
                   <div className="pt-3 border-t">
-                    <p className="text-sm text-gray-600 mb-2">Need help? Contact us:</p>
+                    <p className="text-sm text-gray-600 mb-2">
+                      Need help? Contact us:
+                    </p>
                     <div className="space-y-1 text-sm">
                       <div className="flex items-center gap-2">
                         <Phone className="h-3 w-3 text-gray-400" />
-                        <a href="tel:+23234788711" className="text-blue-600 hover:underline">
+                        <a
+                          href="tel:+23234788711"
+                          className="text-blue-600 hover:underline"
+                        >
                           +232 34 788711
                         </a>
                       </div>
                       <div className="flex items-center gap-2">
                         <Mail className="h-3 w-3 text-gray-400" />
-                        <a href="mailto:jaykaydigitalpress@gmail.com" className="text-blue-600 hover:underline">
+                        <a
+                          href="mailto:jaykaydigitalpress@gmail.com"
+                          className="text-blue-600 hover:underline"
+                        >
                           jaykaydigitalpress@gmail.com
                         </a>
                       </div>

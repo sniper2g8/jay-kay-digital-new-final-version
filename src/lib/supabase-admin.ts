@@ -7,16 +7,12 @@ export const createServiceRoleClient = () => {
   const serviceRoleKey =
     process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY!;
 
-  return createClient<Database>(
-    supabaseUrl,
-    serviceRoleKey,
-    {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false
-      }
-    }
-  );
+  return createClient<Database>(supabaseUrl, serviceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
 };
 
 // For backward compatibility, export a default instance

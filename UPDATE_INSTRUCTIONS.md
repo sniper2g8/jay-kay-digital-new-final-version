@@ -36,6 +36,7 @@ SUPABASE_DB_PASSWORD=YourActualDatabasePasswordHere
 ## 5. Verify Your Keys
 
 After updating, run:
+
 ```bash
 node verify-supabase-connection.mjs
 ```
@@ -43,11 +44,13 @@ node verify-supabase-connection.mjs
 ## What Your Keys Should Look Like
 
 ✅ **Correct Format:**
+
 - Anon Key: Starts with `eyJ` and is 100+ characters long
 - Service Role Key: Starts with `eyJ` and is 100+ characters long
 - Database Password: Complex password with letters, numbers, and special characters
 
 ❌ **Incorrect (Placeholders):**
+
 - `sb_publishable_...`
 - `sb_secret_...`
 - Generic passwords like `...()Admin@1`

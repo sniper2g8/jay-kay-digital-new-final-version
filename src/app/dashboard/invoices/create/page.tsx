@@ -223,7 +223,10 @@ function CreateInvoiceContent() {
 
         return {
           tempId: `job-${job.id}`,
-          description: job.title || job.description || (job.jobNo ? `Job: ${job.jobNo}` : 'Job item'),
+          description:
+            job.title ||
+            job.description ||
+            (job.jobNo ? `Job: ${job.jobNo}` : "Job item"),
           quantity: job.quantity || 1,
           unit_price: unitPrice,
           total_price: totalPrice,
@@ -318,7 +321,8 @@ function CreateInvoiceContent() {
       };
 
       let invoice;
-      if (jobId) { // Changed from params?.jobId to jobId
+      if (jobId) {
+        // Changed from params?.jobId to jobId
         invoice = await createInvoiceFromJob(jobId, invoiceData); // Changed from params.jobId to jobId
       } else {
         invoice = await createInvoice(invoiceData);
@@ -347,7 +351,11 @@ function CreateInvoiceContent() {
         if (typeof err === "object") return err;
         return String(err);
       };
-      console.error("Error creating invoice:", formatSupabaseError(error), error);
+      console.error(
+        "Error creating invoice:",
+        formatSupabaseError(error),
+        error,
+      );
     } finally {
       setIsLoading(false);
     }
@@ -386,7 +394,8 @@ function CreateInvoiceContent() {
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
-              {jobId ? "Create Invoice from Job" : "Create New Invoice"} {/* Changed from params?.jobId to jobId */}
+              {jobId ? "Create Invoice from Job" : "Create New Invoice"}{" "}
+              {/* Changed from params?.jobId to jobId */}
             </h1>
             <p className="text-muted-foreground mt-1">
               Generate a new invoice for services or products

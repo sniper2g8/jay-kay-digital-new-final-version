@@ -1,5 +1,5 @@
-import AdminNotificationLogs from '@/components/AdminNotificationLogs';
-import ProtectedRoute from '@/components/ProtectedRoute';
+import AdminNotificationLogs from "@/components/AdminNotificationLogs";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 export default function AdminNotificationLogsPage() {
   return (

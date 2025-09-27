@@ -53,7 +53,7 @@ export default function DashboardHeader() {
 
         <div className="flex items-center space-x-4">
           <NotificationBadge />
-          
+
           <div className="text-right">
             <p className="text-sm font-medium text-gray-900">
               {getUserDisplayName()}

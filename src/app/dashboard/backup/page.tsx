@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -19,7 +19,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Database,
   Download,
@@ -63,8 +69,14 @@ const mockBackups: BackupRecord[] = [
     file_size: 15728640, // 15MB in bytes
     created_at: "2025-01-20T08:00:00Z",
     completed_at: "2025-01-20T08:05:30Z",
-    tables_included: ["customers", "jobs", "finances", "users", "notifications"],
-    created_by: "admin@jaykaydigital.com"
+    tables_included: [
+      "customers",
+      "jobs",
+      "finances",
+      "users",
+      "notifications",
+    ],
+    created_by: "admin@jaykaydigital.com",
   },
   {
     id: "backup_002",
@@ -75,7 +87,7 @@ const mockBackups: BackupRecord[] = [
     created_at: "2025-01-19T20:00:00Z",
     completed_at: "2025-01-19T20:01:15Z",
     tables_included: ["jobs", "finances"],
-    created_by: "system"
+    created_by: "system",
   },
   {
     id: "backup_003",
@@ -84,23 +96,31 @@ const mockBackups: BackupRecord[] = [
     created_at: "2025-01-18T12:00:00Z",
     error_message: "Connection timeout - unable to access database",
     tables_included: ["customers"],
-    created_by: "manager@jaykaydigital.com"
+    created_by: "manager@jaykaydigital.com",
   },
   {
     id: "backup_004",
     backup_type: "full",
     status: "running",
     created_at: "2025-01-20T14:30:00Z",
-    tables_included: ["customers", "jobs", "finances", "users", "notifications"],
-    created_by: "admin@jaykaydigital.com"
-  }
+    tables_included: [
+      "customers",
+      "jobs",
+      "finances",
+      "users",
+      "notifications",
+    ],
+    created_by: "admin@jaykaydigital.com",
+  },
 ];
 
 function BackupContent() {
   const [backups, setBackups] = useState<BackupRecord[]>(mockBackups);
   const [isLoading, setIsLoading] = useState(false);
   const [isCreatingBackup, setIsCreatingBackup] = useState(false);
-  const [newBackupType, setNewBackupType] = useState<"full" | "incremental" | "tables_only">("full");
+  const [newBackupType, setNewBackupType] = useState<
+    "full" | "incremental" | "tables_only"
+  >("full");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const refreshBackups = async () => {
@@ -113,49 +133,50 @@ function BackupContent() {
 
   const createBackup = async () => {
     setIsCreatingBackup(true);
-    
+
     // Simulate backup creation
     const newBackup: BackupRecord = {
       id: `backup_${Date.now()}`,
       backup_type: newBackupType,
       status: "pending",
       created_at: new Date().toISOString(),
-      tables_included: newBackupType === "full" 
-        ? ["customers", "jobs", "finances", "users", "notifications"]
-        : ["jobs", "finances"],
-      created_by: "current_user@jaykaydigital.com"
+      tables_included:
+        newBackupType === "full"
+          ? ["customers", "jobs", "finances", "users", "notifications"]
+          : ["jobs", "finances"],
+      created_by: "current_user@jaykaydigital.com",
     };
 
-    setBackups(prev => [newBackup, ...prev]);
+    setBackups((prev) => [newBackup, ...prev]);
     setIsDialogOpen(false);
-    
+
     // Simulate processing
     setTimeout(() => {
-      setBackups(prev => 
-        prev.map(backup => 
-          backup.id === newBackup.id 
-            ? { 
-                ...backup, 
-                status: "running" as const
+      setBackups((prev) =>
+        prev.map((backup) =>
+          backup.id === newBackup.id
+            ? {
+                ...backup,
+                status: "running" as const,
               }
-            : backup
-        )
+            : backup,
+        ),
       );
-      
+
       // Complete after another delay
       setTimeout(() => {
-        setBackups(prev => 
-          prev.map(backup => 
-            backup.id === newBackup.id 
-              ? { 
-                  ...backup, 
+        setBackups((prev) =>
+          prev.map((backup) =>
+            backup.id === newBackup.id
+              ? {
+                  ...backup,
                   status: "completed" as const,
                   completed_at: new Date().toISOString(),
-                  file_path: `/backups/${newBackupType}_backup_${new Date().toISOString().split('T')[0]}.sql`,
-                  file_size: Math.floor(Math.random() * 20000000) + 1000000 // Random size 1-20MB
+                  file_path: `/backups/${newBackupType}_backup_${new Date().toISOString().split("T")[0]}.sql`,
+                  file_size: Math.floor(Math.random() * 20000000) + 1000000, // Random size 1-20MB
                 }
-              : backup
-          )
+              : backup,
+          ),
         );
         setIsCreatingBackup(false);
       }, 3000);
@@ -211,12 +232,12 @@ function BackupContent() {
 
   const stats = {
     total_backups: backups.length,
-    completed_backups: backups.filter(b => b.status === "completed").length,
-    failed_backups: backups.filter(b => b.status === "failed").length,
-    running_backups: backups.filter(b => b.status === "running").length,
+    completed_backups: backups.filter((b) => b.status === "completed").length,
+    failed_backups: backups.filter((b) => b.status === "failed").length,
+    running_backups: backups.filter((b) => b.status === "running").length,
     total_size: backups
-      .filter(b => b.status === "completed" && b.file_size)
-      .reduce((sum, b) => sum + (b.file_size || 0), 0)
+      .filter((b) => b.status === "completed" && b.file_size)
+      .reduce((sum, b) => sum + (b.file_size || 0), 0),
   };
 
   if (isLoading) {
@@ -273,19 +294,34 @@ function BackupContent() {
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <Label>Backup Type</Label>
-                      <Select value={newBackupType} onValueChange={(value: "full" | "incremental" | "tables_only") => setNewBackupType(value)}>
+                      <Select
+                        value={newBackupType}
+                        onValueChange={(
+                          value: "full" | "incremental" | "tables_only",
+                        ) => setNewBackupType(value)}
+                      >
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="full">Full Backup - All tables and data</SelectItem>
-                          <SelectItem value="incremental">Incremental - Recent changes only</SelectItem>
-                          <SelectItem value="tables_only">Tables Only - Structure without data</SelectItem>
+                          <SelectItem value="full">
+                            Full Backup - All tables and data
+                          </SelectItem>
+                          <SelectItem value="incremental">
+                            Incremental - Recent changes only
+                          </SelectItem>
+                          <SelectItem value="tables_only">
+                            Tables Only - Structure without data
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div className="flex space-x-2">
-                      <Button onClick={createBackup} disabled={isCreatingBackup} className="flex-1">
+                      <Button
+                        onClick={createBackup}
+                        disabled={isCreatingBackup}
+                        className="flex-1"
+                      >
                         {isCreatingBackup ? (
                           <>
                             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -298,7 +334,10 @@ function BackupContent() {
                           </>
                         )}
                       </Button>
-                      <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                      <Button
+                        variant="outline"
+                        onClick={() => setIsDialogOpen(false)}
+                      >
                         Cancel
                       </Button>
                     </div>
@@ -329,9 +368,7 @@ function BackupContent() {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Completed
-                </CardTitle>
+                <CardTitle className="text-sm font-medium">Completed</CardTitle>
                 <CheckCircle className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -355,9 +392,7 @@ function BackupContent() {
                 <div className="text-2xl font-bold text-blue-600">
                   {stats.running_backups}
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  In progress
-                </p>
+                <p className="text-xs text-muted-foreground">In progress</p>
               </CardContent>
             </Card>
 
@@ -372,9 +407,7 @@ function BackupContent() {
                 <div className="text-2xl font-bold">
                   {formatFileSize(stats.total_size)}
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Storage used
-                </p>
+                <p className="text-xs text-muted-foreground">Storage used</p>
               </CardContent>
             </Card>
           </div>
@@ -416,23 +449,36 @@ function BackupContent() {
                         <div>
                           <div className="flex items-center space-x-2 mb-1">
                             <h3 className="font-semibold text-gray-900 capitalize">
-                              {backup.backup_type.replace('_', ' ')} Backup
+                              {backup.backup_type.replace("_", " ")} Backup
                             </h3>
                             <Badge className={getStatusColor(backup.status)}>
                               <div className="flex items-center space-x-1">
                                 {getStatusIcon(backup.status)}
-                                <span className="capitalize">{backup.status}</span>
+                                <span className="capitalize">
+                                  {backup.status}
+                                </span>
                               </div>
                             </Badge>
                           </div>
                           <p className="text-sm text-gray-600 mb-2">
-                            Created: {new Date(backup.created_at).toLocaleString()}
+                            Created:{" "}
+                            {new Date(backup.created_at).toLocaleString()}
                           </p>
                           <div className="flex items-center space-x-4 text-xs text-gray-500">
-                            <span>Tables: {backup.tables_included.join(', ')}</span>
-                            <span>Duration: {formatDuration(backup.created_at, backup.completed_at)}</span>
+                            <span>
+                              Tables: {backup.tables_included.join(", ")}
+                            </span>
+                            <span>
+                              Duration:{" "}
+                              {formatDuration(
+                                backup.created_at,
+                                backup.completed_at,
+                              )}
+                            </span>
                             {backup.file_size && (
-                              <span>Size: {formatFileSize(backup.file_size)}</span>
+                              <span>
+                                Size: {formatFileSize(backup.file_size)}
+                              </span>
                             )}
                           </div>
                           {backup.error_message && (
@@ -475,9 +521,7 @@ function BackupContent() {
 // Main component with role-based protection
 export default function BackupPage() {
   return (
-    <ProtectedDashboard
-      allowedRoles={["super_admin", "admin"]}
-    >
+    <ProtectedDashboard allowedRoles={["super_admin", "admin"]}>
       <BackupContent />
     </ProtectedDashboard>
   );

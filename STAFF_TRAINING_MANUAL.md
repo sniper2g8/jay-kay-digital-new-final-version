@@ -1,6 +1,7 @@
 # Jay Kay Digital Press - Staff Training Manual
 
 ## Table of Contents
+
 1. [Introduction](#introduction)
 2. [Getting Started](#getting-started)
 3. [System Overview](#system-overview)
@@ -21,6 +22,7 @@
 Welcome to the Jay Kay Digital Press Management System! This manual will guide you through all the features and functions of our business management platform. The system is designed to help you efficiently manage customers, jobs, invoices, payments, and generate statements.
 
 ### Who This Manual Is For
+
 - New staff members
 - Existing staff needing a refresher
 - Managers and supervisors
@@ -31,6 +33,7 @@ Welcome to the Jay Kay Digital Press Management System! This manual will guide y
 ## Getting Started
 
 ### System Access
+
 1. **Login Process**
    - Navigate to the Jay Kay Digital Press application
    - Enter your assigned username and password
@@ -42,6 +45,7 @@ Welcome to the Jay Kay Digital Press Management System! This manual will guide y
    - Review your user permissions with your supervisor
 
 ### Navigation
+
 - **Dashboard**: Main overview of business metrics
 - **Customers**: Manage customer information and history
 - **Jobs**: Create and track print jobs
@@ -54,6 +58,7 @@ Welcome to the Jay Kay Digital Press Management System! This manual will guide y
 ## System Overview
 
 ### Key Features
+
 - **Customer Database**: Complete customer information management
 - **Job Tracking**: From order to completion
 - **Invoice Generation**: Professional invoice creation
@@ -62,6 +67,7 @@ Welcome to the Jay Kay Digital Press Management System! This manual will guide y
 - **Dashboard Analytics**: Business performance overview
 
 ### User Interface
+
 - **Top Navigation**: Quick access to all main sections
 - **Search Functions**: Find customers, jobs, and invoices quickly
 - **Action Buttons**: Clearly labeled for all operations
@@ -116,6 +122,7 @@ Welcome to the Jay Kay Digital Press Management System! This manual will guide y
    - Access previous invoices and statements
 
 ### Customer Best Practices
+
 - Always verify customer information before creating records
 - Keep contact information up to date
 - Add notes for special requirements or preferences

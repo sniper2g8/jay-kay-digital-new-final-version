@@ -3,13 +3,17 @@
  * Allows testing of email and SMS notifications
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { notificationService } from '@/lib/notification-service';
-import { v4 as uuidv4 } from 'uuid';
+import { NextRequest, NextResponse } from "next/server";
+import { notificationService } from "@/lib/notification-service";
+import { v4 as uuidv4 } from "uuid";
 
 interface TestNotificationRequest {
-  type: 'job_submission' | 'job_status_change' | 'payment_recorded' | 'invoice_generated';
-  recipient_type: 'admin' | 'customer';
+  type:
+    | "job_submission"
+    | "job_status_change"
+    | "payment_recorded"
+    | "invoice_generated";
+  recipient_type: "admin" | "customer";
   email?: string;
   phone?: string;
   test_data?: Record<string, unknown>;
@@ -23,24 +27,26 @@ export async function POST(request: NextRequest) {
     // Validate required fields
     if (!type || !recipient_type) {
       return NextResponse.json(
-        { error: 'Missing required fields: type, recipient_type' },
-        { status: 400 }
+        { error: "Missing required fields: type, recipient_type" },
+        { status: 400 },
       );
     }
 
     // Test the basic email sending functionality first
-    if (type === 'job_submission' && recipient_type === 'customer') {
+    if (type === "job_submission" && recipient_type === "customer") {
       try {
         // Test email sending directly without database dependency
-        const emailResponse = await fetch('http://localhost:3000/api/send-email', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            to: email || 'test@example.com',
-            subject: 'Test Notification from Jay Kay Digital Press',
-            html: `
+        const emailResponse = await fetch(
+          "http://localhost:3000/api/send-email",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              to: email || "test@example.com",
+              subject: "Test Notification from Jay Kay Digital Press",
+              html: `
               <html>
                 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
                   <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -63,56 +69,63 @@ export async function POST(request: NextRequest) {
                 </body>
               </html>
             `,
-            from: 'noreply@jaykaydigitalpress.com',
-            fromName: 'Jay Kay Digital Press'
-          }),
-        });
+              from: "noreply@jaykaydigitalpress.com",
+              fromName: "Jay Kay Digital Press",
+            }),
+          },
+        );
 
         if (!emailResponse.ok) {
           const errorData = await emailResponse.text();
-          throw new Error(`Email sending failed: ${emailResponse.status} - ${errorData}`);
+          throw new Error(
+            `Email sending failed: ${emailResponse.status} - ${errorData}`,
+          );
         }
 
         const emailResult = await emailResponse.json();
-        
-        return NextResponse.json(
-          { 
-            success: true, 
-            message: `Test email sent successfully to ${email || 'test@example.com'}`,
-            email_result: emailResult,
-            test_mode: true
-          },
-          { status: 200 }
-        );
 
-      } catch (emailError) {
-        console.error('Email test error:', emailError);
         return NextResponse.json(
-          { 
-            error: 'Email sending failed', 
-            details: emailError instanceof Error ? emailError.message : 'Unknown email error',
-            test_mode: true
+          {
+            success: true,
+            message: `Test email sent successfully to ${email || "test@example.com"}`,
+            email_result: emailResult,
+            test_mode: true,
           },
-          { status: 500 }
+          { status: 200 },
+        );
+      } catch (emailError) {
+        console.error("Email test error:", emailError);
+        return NextResponse.json(
+          {
+            error: "Email sending failed",
+            details:
+              emailError instanceof Error
+                ? emailError.message
+                : "Unknown email error",
+            test_mode: true,
+          },
+          { status: 500 },
         );
       }
     }
 
     // For other notification types, return a simple success response for now
     return NextResponse.json(
-      { 
-        success: true, 
+      {
+        success: true,
         message: `Test ${type} notification for ${recipient_type} (placeholder)`,
-        note: 'Full notification system temporarily bypassed for testing'
+        note: "Full notification system temporarily bypassed for testing",
       },
-      { status: 200 }
+      { status: 200 },
     );
-
   } catch (error) {
-    console.error('Test notification API error:', error);
+    console.error("Test notification API error:", error);
     return NextResponse.json(
-      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
+      {
+        error: "Internal server error",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
     );
   }
 }
@@ -120,16 +133,18 @@ export async function POST(request: NextRequest) {
 // Handle other HTTP methods
 export async function GET() {
   return NextResponse.json(
-    { 
-      message: 'Notification Test API',
+    {
+      message: "Notification Test API",
       endpoints: {
-        'POST /api/notifications/test': 'Send test notifications',
-        'POST /api/notifications/job-submission': 'Send job submission notification',
-        'POST /api/notifications/job-status': 'Send job status change notification',
-        'POST /api/notifications/payment': 'Send payment notification',
-        'POST /api/notifications/invoice': 'Send invoice notification'
-      }
+        "POST /api/notifications/test": "Send test notifications",
+        "POST /api/notifications/job-submission":
+          "Send job submission notification",
+        "POST /api/notifications/job-status":
+          "Send job status change notification",
+        "POST /api/notifications/payment": "Send payment notification",
+        "POST /api/notifications/invoice": "Send invoice notification",
+      },
     },
-    { status: 200 }
+    { status: 200 },
   );
 }

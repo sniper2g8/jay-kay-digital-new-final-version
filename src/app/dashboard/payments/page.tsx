@@ -1,39 +1,67 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { 
-  CreditCard, 
-  DollarSign, 
-  TrendingUp, 
-  Plus, 
-  Search, 
+import {
+  CreditCard,
+  DollarSign,
+  TrendingUp,
+  Plus,
+  Search,
   Download,
   Eye,
   Edit,
   Trash2,
   FileText,
   User,
-  ArrowLeft
+  ArrowLeft,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { Database } from "@/lib/database.types";
+import { recordPaymentWithNotification } from "@/lib/hooks/usePaymentNotifications";
 import PaymentReceiptPDF from "@/components/PaymentReceiptPDF";
 
-type PaymentRow = Database['public']['Tables']['payments']['Row'];
-type PaymentMethod = Database['public']['Enums']['payment_method'];
+type PaymentRow = Database["public"]["Tables"]["payments"]["Row"];
+type PaymentMethod = Database["public"]["Enums"]["payment_method"];
 
 interface Payment extends PaymentRow {
-  invoices?: { 
+  invoices?: {
     invoiceNo: string | null;
     total?: number | null;
     amountPaid?: number | null;
@@ -54,7 +82,7 @@ export default function PaymentsPage() {
   const [stats, setStats] = useState<PaymentStats>({
     totalReceived: 0,
     thisMonth: 0,
-    paymentsCount: 0
+    paymentsCount: 0,
   });
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -70,13 +98,13 @@ export default function PaymentsPage() {
   const [newPayment, setNewPayment] = useState({
     amount: "",
     payment_method: "" as PaymentMethod | "",
-    payment_date: new Date().toISOString().split('T')[0],
+    payment_date: new Date().toISOString().split("T")[0],
     reference_number: "",
     notes: "",
     invoice_no: "",
     customer_human_id: "",
     payment_number: "",
-    received_by: ""
+    received_by: "",
   });
 
   useEffect(() => {
@@ -88,23 +116,28 @@ export default function PaymentsPage() {
     try {
       setLoading(true);
       const { data, error } = await supabase
-        .from('payments')
-        .select(`
+        .from("payments")
+        .select(
+          `
           *,
           invoices!fk_payments_invoice_no(invoiceNo, total, amountPaid, amountDue),
           customers!fk_payments_customer_human_id(business_name)
-        `)
-        .order('payment_date', { ascending: false });
+        `,
+        )
+        .order("payment_date", { ascending: false });
 
       if (error) throw error;
       setPayments(data || []);
     } catch (error) {
-      console.error('Error fetching payments:', {
-        message: error instanceof Error ? error.message : 'Unknown payments fetch error',
+      console.error("Error fetching payments:", {
+        message:
+          error instanceof Error
+            ? error.message
+            : "Unknown payments fetch error",
         error: error,
         stack: error instanceof Error ? error.stack : undefined,
         errorType: typeof error,
-        context: 'fetchPayments'
+        context: "fetchPayments",
       });
     } finally {
       setLoading(false);
@@ -115,87 +148,106 @@ export default function PaymentsPage() {
     try {
       // Get payment statistics
       const { data: allPayments, error } = await supabase
-        .from('payments')
-        .select('amount, payment_date');
+        .from("payments")
+        .select("amount, payment_date");
 
       if (error) throw error;
 
       const currentMonth = new Date().getMonth();
       const currentYear = new Date().getFullYear();
 
-      const stats = (allPayments || []).reduce((acc, payment) => {
-        const paymentDate = new Date(payment.payment_date);
-        
-        acc.totalReceived += payment.amount;
-        acc.paymentsCount += 1;
-        
-        if (paymentDate.getMonth() === currentMonth && paymentDate.getFullYear() === currentYear) {
-          acc.thisMonth += payment.amount;
-        }
-        
-        return acc;
-      }, {
-        totalReceived: 0,
-        thisMonth: 0,
-        paymentsCount: 0
-      });
+      const stats = (allPayments || []).reduce(
+        (acc, payment) => {
+          const paymentDate = new Date(payment.payment_date);
+
+          acc.totalReceived += payment.amount;
+          acc.paymentsCount += 1;
+
+          if (
+            paymentDate.getMonth() === currentMonth &&
+            paymentDate.getFullYear() === currentYear
+          ) {
+            acc.thisMonth += payment.amount;
+          }
+
+          return acc;
+        },
+        {
+          totalReceived: 0,
+          thisMonth: 0,
+          paymentsCount: 0,
+        },
+      );
 
       setStats(stats);
     } catch (error) {
-      console.error('Error fetching payment stats:', error);
+      console.error("Error fetching payment stats:", error);
     }
   };
 
   const handleAddPayment = async () => {
     try {
-      if (!newPayment.payment_method || !newPayment.customer_human_id || !newPayment.invoice_no || !newPayment.payment_number) {
-        alert('Please fill in all required fields');
+      if (
+        !newPayment.payment_method ||
+        !newPayment.customer_human_id ||
+        !newPayment.invoice_no ||
+        !newPayment.payment_number
+      ) {
+        alert("Please fill in all required fields");
         return;
       }
 
       // Fix precision issues by rounding to 2 decimal places
-      const paymentAmount = Math.round(parseFloat(newPayment.amount) * 100) / 100;
+      const paymentAmount =
+        Math.round(parseFloat(newPayment.amount) * 100) / 100;
 
-      const { error } = await supabase
-        .from('payments')
-        .insert([{
-          amount: paymentAmount,
-          payment_method: newPayment.payment_method as PaymentMethod,
-          payment_date: newPayment.payment_date,
-          reference_number: newPayment.reference_number || null,
-          notes: newPayment.notes || null,
-          invoice_no: newPayment.invoice_no,
-          customer_human_id: newPayment.customer_human_id,
-          payment_number: newPayment.payment_number,
-          received_by: newPayment.received_by || null
-        }]);
+      // Use the recordPaymentWithNotification function instead of direct insert
+      const result = await recordPaymentWithNotification({
+        invoice_no: newPayment.invoice_no,
+        customer_human_id: newPayment.customer_human_id,
+        amount: paymentAmount,
+        payment_method: newPayment.payment_method as
+          | "cash"
+          | "bank_transfer"
+          | "mobile_money"
+          | "card"
+          | "cheque"
+          | "credit",
+        payment_date: newPayment.payment_date,
+        notes: newPayment.notes || undefined,
+        received_by: newPayment.received_by || undefined,
+        reference_number: newPayment.reference_number || undefined,
+      });
 
-      if (error) throw error;
+      if (!result.success) {
+        throw new Error(result.error || "Failed to record payment");
+      }
 
       setIsAddDialogOpen(false);
       setNewPayment({
         amount: "",
         payment_method: "",
-        payment_date: new Date().toISOString().split('T')[0],
+        payment_date: new Date().toISOString().split("T")[0],
         reference_number: "",
         notes: "",
         invoice_no: "",
         customer_human_id: "",
         payment_number: "",
-        received_by: ""
+        received_by: "",
       });
-      
+
       fetchPayments();
       fetchPaymentStats();
     } catch (error) {
-      console.error('Error adding payment:', error);
+      console.error("Error adding payment:", error);
+      alert("Failed to add payment. Please try again.");
     }
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-SL', {
-      style: 'currency',
-      currency: 'SLL'
+    return new Intl.NumberFormat("en-SL", {
+      style: "currency",
+      currency: "SLL",
     }).format(amount);
   };
 
@@ -206,25 +258,28 @@ export default function PaymentsPage() {
       bank_transfer: "bg-purple-100 text-purple-800 border-purple-200",
       mobile_money: "bg-orange-100 text-orange-800 border-orange-200",
       cheque: "bg-yellow-100 text-yellow-800 border-yellow-200",
-      credit: "bg-red-100 text-red-800 border-red-200"
+      credit: "bg-red-100 text-red-800 border-red-200",
     };
 
     return (
       <Badge variant="outline" className={variants[method] || variants.cash}>
-        <span className="capitalize">{method.replace('_', ' ')}</span>
+        <span className="capitalize">{method.replace("_", " ")}</span>
       </Badge>
     );
   };
 
-  const filteredPayments = payments.filter(payment => {
-    const matchesSearch = 
-      payment.reference_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  const filteredPayments = payments.filter((payment) => {
+    const matchesSearch =
+      payment.reference_number
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       payment.payment_method.toLowerCase().includes(searchTerm.toLowerCase()) ||
       payment.amount.toString().includes(searchTerm) ||
       payment.payment_number.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesMethod = methodFilter === "all" || payment.payment_method === methodFilter;
-    
+
+    const matchesMethod =
+      methodFilter === "all" || payment.payment_method === methodFilter;
+
     return matchesSearch && matchesMethod;
   });
 
@@ -252,34 +307,38 @@ export default function PaymentsPage() {
       invoice_no: payment.invoice_no,
       customer_human_id: payment.customer_human_id,
       payment_number: payment.payment_number,
-      received_by: payment.received_by || ""
+      received_by: payment.received_by || "",
     });
     setIsEditDialogOpen(true);
   };
 
   // Handle delete payment
   const handleDeletePayment = async (paymentId: string) => {
-    if (!confirm("Are you sure you want to delete this payment? This action cannot be undone.")) {
+    if (
+      !confirm(
+        "Are you sure you want to delete this payment? This action cannot be undone.",
+      )
+    ) {
       return;
     }
 
     try {
       setIsDeleting(true);
       const { error } = await supabase
-        .from('payments')
+        .from("payments")
         .delete()
-        .eq('id', paymentId);
+        .eq("id", paymentId);
 
       if (error) throw error;
 
       // Refresh the payments list
       await fetchPayments();
       await fetchPaymentStats();
-      
-      console.log('Payment deleted successfully');
+
+      console.log("Payment deleted successfully");
     } catch (error) {
-      console.error('Error deleting payment:', error);
-      alert('Failed to delete payment. Please try again.');
+      console.error("Error deleting payment:", error);
+      alert("Failed to delete payment. Please try again.");
     } finally {
       setIsDeleting(false);
     }
@@ -289,52 +348,77 @@ export default function PaymentsPage() {
   const handleSavePayment = async () => {
     try {
       // Validate required fields
-      if (!newPayment.amount || !newPayment.payment_method || !newPayment.invoice_no) {
-        alert('Please fill in all required fields');
+      if (
+        !newPayment.amount ||
+        !newPayment.payment_method ||
+        !newPayment.invoice_no ||
+        !newPayment.customer_human_id ||
+        !newPayment.payment_number
+      ) {
+        alert("Please fill in all required fields");
         return;
       }
 
       // Fix precision issues by rounding to 2 decimal places
-      const paymentAmount = Math.round(parseFloat(newPayment.amount) * 100) / 100;
+      const paymentAmount =
+        Math.round(parseFloat(newPayment.amount) * 100) / 100;
 
-      const paymentData = {
-        amount: paymentAmount,
-        payment_method: newPayment.payment_method,
-        payment_date: newPayment.payment_date,
-        reference_number: newPayment.reference_number || null,
-        notes: newPayment.notes || null,
-        invoice_no: newPayment.invoice_no,
-        customer_human_id: newPayment.customer_human_id,
-        payment_number: newPayment.payment_number
-      };
-
-      let result;
       if (isEditDialogOpen && selectedPayment) {
         // Update existing payment
-        result = await supabase
-          .from('payments')
-          .update(paymentData)
-          .eq('id', selectedPayment.id);
-      } else {
-        // Add new payment
-        result = await supabase
-          .from('payments')
-          .insert(paymentData);
-      }
+        const paymentData = {
+          amount: paymentAmount,
+          payment_method: newPayment.payment_method,
+          payment_date: newPayment.payment_date,
+          reference_number: newPayment.reference_number || null,
+          notes: newPayment.notes || null,
+          invoice_no: newPayment.invoice_no,
+          customer_human_id: newPayment.customer_human_id,
+          payment_number: newPayment.payment_number,
+          received_by: newPayment.received_by || null,
+          payment_status: "completed",
+        };
 
-      if (result.error) throw result.error;
+        const result = await supabase
+          .from("payments")
+          .update(paymentData)
+          .eq("id", selectedPayment.id);
+
+        if (result.error) throw result.error;
+      } else {
+        // Add new payment using recordPaymentWithNotification
+        const result = await recordPaymentWithNotification({
+          invoice_no: newPayment.invoice_no,
+          customer_human_id: newPayment.customer_human_id,
+          amount: paymentAmount,
+          payment_method: newPayment.payment_method as
+            | "cash"
+            | "bank_transfer"
+            | "mobile_money"
+            | "card"
+            | "cheque"
+            | "credit",
+          payment_date: newPayment.payment_date,
+          notes: newPayment.notes || undefined,
+          received_by: newPayment.received_by || undefined,
+          reference_number: newPayment.reference_number || undefined,
+        });
+
+        if (!result.success) {
+          throw new Error(result.error || "Failed to record payment");
+        }
+      }
 
       // Reset form and close dialogs
       setNewPayment({
         amount: "",
         payment_method: "" as PaymentMethod | "",
-        payment_date: new Date().toISOString().split('T')[0],
+        payment_date: new Date().toISOString().split("T")[0],
         reference_number: "",
         notes: "",
         invoice_no: "",
         customer_human_id: "",
         payment_number: "",
-        received_by: ""
+        received_by: "",
       });
       setIsAddDialogOpen(false);
       setIsEditDialogOpen(false);
@@ -343,11 +427,15 @@ export default function PaymentsPage() {
       // Refresh the payments list
       await fetchPayments();
       await fetchPaymentStats();
-      
-      console.log(isEditDialogOpen ? 'Payment updated successfully' : 'Payment added successfully');
+
+      console.log(
+        isEditDialogOpen
+          ? "Payment updated successfully"
+          : "Payment added successfully",
+      );
     } catch (error) {
-      console.error('Error saving payment:', error);
-      alert('Failed to save payment. Please try again.');
+      console.error("Error saving payment:", error);
+      alert("Failed to save payment. Please try again.");
     }
   };
 
@@ -355,8 +443,8 @@ export default function PaymentsPage() {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             onClick={() => window.history.back()}
             className="flex items-center gap-2"
           >
@@ -364,8 +452,12 @@ export default function PaymentsPage() {
             Back to Dashboard
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Payment Management</h1>
-            <p className="text-gray-600 mt-1">Track and manage all payments and transactions</p>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Payment Management
+            </h1>
+            <p className="text-gray-600 mt-1">
+              Track and manage all payments and transactions
+            </p>
           </div>
         </div>
         <div className="flex items-center space-x-3">
@@ -383,119 +475,169 @@ export default function PaymentsPage() {
                 <Plus className="h-4 w-4 mr-2" />
                 Record Payment
               </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Record New Payment</DialogTitle>
-              <DialogDescription>
-                Add a new payment record to the system
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="amount">Amount *</Label>
-                <Input
-                  id="amount"
-                  type="number"
-                  step="0.01"
-                  placeholder="0.00"
-                  value={newPayment.amount}
-                  onChange={(e) => setNewPayment(prev => ({ ...prev, amount: e.target.value }))}
-                />
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Record New Payment</DialogTitle>
+                <DialogDescription>
+                  Add a new payment record to the system
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="amount">Amount *</Label>
+                  <Input
+                    id="amount"
+                    type="number"
+                    step="0.01"
+                    placeholder="0.00"
+                    value={newPayment.amount}
+                    onChange={(e) =>
+                      setNewPayment((prev) => ({
+                        ...prev,
+                        amount: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="payment_number">Payment Number *</Label>
+                  <Input
+                    id="payment_number"
+                    placeholder="PAY-001"
+                    value={newPayment.payment_number}
+                    onChange={(e) =>
+                      setNewPayment((prev) => ({
+                        ...prev,
+                        payment_number: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="payment_method">Payment Method *</Label>
+                  <Select
+                    value={newPayment.payment_method}
+                    onValueChange={(value: PaymentMethod) =>
+                      setNewPayment((prev) => ({
+                        ...prev,
+                        payment_method: value,
+                      }))
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select payment method" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cash">Cash</SelectItem>
+                      <SelectItem value="card">Card</SelectItem>
+                      <SelectItem value="bank_transfer">
+                        Bank Transfer
+                      </SelectItem>
+                      <SelectItem value="mobile_money">Mobile Money</SelectItem>
+                      <SelectItem value="cheque">Cheque</SelectItem>
+                      <SelectItem value="credit">Credit</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="customer_human_id">Customer ID *</Label>
+                  <Input
+                    id="customer_human_id"
+                    placeholder="Customer ID"
+                    value={newPayment.customer_human_id}
+                    onChange={(e) =>
+                      setNewPayment((prev) => ({
+                        ...prev,
+                        customer_human_id: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="invoice_no">Invoice Number *</Label>
+                  <Input
+                    id="invoice_no"
+                    placeholder="INV-001"
+                    value={newPayment.invoice_no}
+                    onChange={(e) =>
+                      setNewPayment((prev) => ({
+                        ...prev,
+                        invoice_no: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="payment_date">Payment Date</Label>
+                  <Input
+                    id="payment_date"
+                    type="date"
+                    value={newPayment.payment_date}
+                    onChange={(e) =>
+                      setNewPayment((prev) => ({
+                        ...prev,
+                        payment_date: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="reference_number">Reference Number</Label>
+                  <Input
+                    id="reference_number"
+                    placeholder="Optional reference number"
+                    value={newPayment.reference_number}
+                    onChange={(e) =>
+                      setNewPayment((prev) => ({
+                        ...prev,
+                        reference_number: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="received_by">Received By</Label>
+                  <Input
+                    id="received_by"
+                    placeholder="Staff member name"
+                    value={newPayment.received_by}
+                    onChange={(e) =>
+                      setNewPayment((prev) => ({
+                        ...prev,
+                        received_by: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="notes">Notes</Label>
+                  <Input
+                    id="notes"
+                    placeholder="Optional notes"
+                    value={newPayment.notes}
+                    onChange={(e) =>
+                      setNewPayment((prev) => ({
+                        ...prev,
+                        notes: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <div className="flex gap-2 pt-4">
+                  <Button onClick={handleAddPayment} className="flex-1">
+                    Record Payment
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsAddDialogOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                </div>
               </div>
-              <div>
-                <Label htmlFor="payment_number">Payment Number *</Label>
-                <Input
-                  id="payment_number"
-                  placeholder="PAY-001"
-                  value={newPayment.payment_number}
-                  onChange={(e) => setNewPayment(prev => ({ ...prev, payment_number: e.target.value }))}
-                />
-              </div>
-              <div>
-                <Label htmlFor="payment_method">Payment Method *</Label>
-                <Select
-                  value={newPayment.payment_method}
-                  onValueChange={(value: PaymentMethod) => setNewPayment(prev => ({ ...prev, payment_method: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select payment method" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="cash">Cash</SelectItem>
-                    <SelectItem value="card">Card</SelectItem>
-                    <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                    <SelectItem value="mobile_money">Mobile Money</SelectItem>
-                    <SelectItem value="cheque">Cheque</SelectItem>
-                    <SelectItem value="credit">Credit</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="customer_human_id">Customer ID *</Label>
-                <Input
-                  id="customer_human_id"
-                  placeholder="Customer ID"
-                  value={newPayment.customer_human_id}
-                  onChange={(e) => setNewPayment(prev => ({ ...prev, customer_human_id: e.target.value }))}
-                />
-              </div>
-              <div>
-                <Label htmlFor="invoice_no">Invoice Number *</Label>
-                <Input
-                  id="invoice_no"
-                  placeholder="INV-001"
-                  value={newPayment.invoice_no}
-                  onChange={(e) => setNewPayment(prev => ({ ...prev, invoice_no: e.target.value }))}
-                />
-              </div>
-              <div>
-                <Label htmlFor="payment_date">Payment Date</Label>
-                <Input
-                  id="payment_date"
-                  type="date"
-                  value={newPayment.payment_date}
-                  onChange={(e) => setNewPayment(prev => ({ ...prev, payment_date: e.target.value }))}
-                />
-              </div>
-              <div>
-                <Label htmlFor="reference_number">Reference Number</Label>
-                <Input
-                  id="reference_number"
-                  placeholder="Optional reference number"
-                  value={newPayment.reference_number}
-                  onChange={(e) => setNewPayment(prev => ({ ...prev, reference_number: e.target.value }))}
-                />
-              </div>
-              <div>
-                <Label htmlFor="received_by">Received By</Label>
-                <Input
-                  id="received_by"
-                  placeholder="Staff member name"
-                  value={newPayment.received_by}
-                  onChange={(e) => setNewPayment(prev => ({ ...prev, received_by: e.target.value }))}
-                />
-              </div>
-              <div>
-                <Label htmlFor="notes">Notes</Label>
-                <Input
-                  id="notes"
-                  placeholder="Optional notes"
-                  value={newPayment.notes}
-                  onChange={(e) => setNewPayment(prev => ({ ...prev, notes: e.target.value }))}
-                />
-              </div>
-              <div className="flex gap-2 pt-4">
-                <Button onClick={handleAddPayment} className="flex-1">
-                  Record Payment
-                </Button>
-                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
@@ -503,14 +645,18 @@ export default function PaymentsPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Received</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Received
+            </CardTitle>
             <DollarSign className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
               {formatCurrency(stats.totalReceived)}
             </div>
-            <p className="text-xs text-gray-500">{stats.paymentsCount} payments total</p>
+            <p className="text-xs text-gray-500">
+              {stats.paymentsCount} payments total
+            </p>
           </CardContent>
         </Card>
 
@@ -529,12 +675,18 @@ export default function PaymentsPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Average Payment</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Average Payment
+            </CardTitle>
             <CreditCard className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-600">
-              {formatCurrency(stats.paymentsCount > 0 ? stats.totalReceived / stats.paymentsCount : 0)}
+              {formatCurrency(
+                stats.paymentsCount > 0
+                  ? stats.totalReceived / stats.paymentsCount
+                  : 0,
+              )}
             </div>
             <p className="text-xs text-gray-500">Per transaction</p>
           </CardContent>
@@ -603,7 +755,10 @@ export default function PaymentsPage() {
                   </TableRow>
                 ) : filteredPayments.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-gray-500">
+                    <TableCell
+                      colSpan={7}
+                      className="text-center py-8 text-gray-500"
+                    >
                       No payments found
                     </TableCell>
                   </TableRow>
@@ -631,38 +786,41 @@ export default function PaymentsPage() {
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <User className="h-4 w-4 text-gray-400" />
-                          <span>{payment.customers?.business_name || payment.customer_human_id}</span>
+                          <span>
+                            {payment.customers?.business_name ||
+                              payment.customer_human_id}
+                          </span>
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Button 
-                            variant="ghost" 
+                          <Button
+                            variant="ghost"
                             size="sm"
                             onClick={() => handleViewPayment(payment)}
                             title="View Payment Details"
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          <Button 
-                            variant="ghost" 
+                          <Button
+                            variant="ghost"
                             size="sm"
                             onClick={() => handleViewReceipt(payment)}
                             title="View Receipt"
                           >
                             <FileText className="h-4 w-4" />
                           </Button>
-                          <Button 
-                            variant="ghost" 
+                          <Button
+                            variant="ghost"
                             size="sm"
                             onClick={() => handleEditPayment(payment)}
                             title="Edit Payment"
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             className="text-red-600 hover:text-red-700"
                             onClick={() => handleDeletePayment(payment.id)}
                             disabled={isDeleting}
@@ -691,45 +849,80 @@ export default function PaymentsPage() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-sm font-medium text-gray-500">Payment Number</Label>
-                  <p className="text-lg font-semibold">{selectedPayment.payment_number}</p>
+                  <Label className="text-sm font-medium text-gray-500">
+                    Payment Number
+                  </Label>
+                  <p className="text-lg font-semibold">
+                    {selectedPayment.payment_number}
+                  </p>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium text-gray-500">Amount</Label>
-                  <p className="text-lg font-semibold">{formatCurrency(selectedPayment.amount)}</p>
+                  <Label className="text-sm font-medium text-gray-500">
+                    Amount
+                  </Label>
+                  <p className="text-lg font-semibold">
+                    {formatCurrency(selectedPayment.amount)}
+                  </p>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium text-gray-500">Payment Method</Label>
+                  <Label className="text-sm font-medium text-gray-500">
+                    Payment Method
+                  </Label>
                   <p>{getMethodBadge(selectedPayment.payment_method)}</p>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium text-gray-500">Payment Date</Label>
-                  <p>{new Date(selectedPayment.payment_date).toLocaleDateString()}</p>
+                  <Label className="text-sm font-medium text-gray-500">
+                    Payment Date
+                  </Label>
+                  <p>
+                    {new Date(
+                      selectedPayment.payment_date,
+                    ).toLocaleDateString()}
+                  </p>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium text-gray-500">Invoice Number</Label>
+                  <Label className="text-sm font-medium text-gray-500">
+                    Invoice Number
+                  </Label>
                   <p>{selectedPayment.invoice_no}</p>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium text-gray-500">Customer</Label>
-                  <p>{selectedPayment.customers?.business_name || selectedPayment.customer_human_id}</p>
+                  <Label className="text-sm font-medium text-gray-500">
+                    Customer
+                  </Label>
+                  <p>
+                    {selectedPayment.customers?.business_name ||
+                      selectedPayment.customer_human_id}
+                  </p>
                 </div>
               </div>
               {selectedPayment.reference_number && (
                 <div>
-                  <Label className="text-sm font-medium text-gray-500">Reference Number</Label>
+                  <Label className="text-sm font-medium text-gray-500">
+                    Reference Number
+                  </Label>
                   <p>{selectedPayment.reference_number}</p>
                 </div>
               )}
               {selectedPayment.notes && (
                 <div>
-                  <Label className="text-sm font-medium text-gray-500">Notes</Label>
-                  <p className="bg-gray-50 p-3 rounded-md">{selectedPayment.notes}</p>
+                  <Label className="text-sm font-medium text-gray-500">
+                    Notes
+                  </Label>
+                  <p className="bg-gray-50 p-3 rounded-md">
+                    {selectedPayment.notes}
+                  </p>
                 </div>
               )}
               <div>
-                <Label className="text-sm font-medium text-gray-500">Created</Label>
-                <p>{selectedPayment.created_at ? new Date(selectedPayment.created_at).toLocaleString() : 'N/A'}</p>
+                <Label className="text-sm font-medium text-gray-500">
+                  Created
+                </Label>
+                <p>
+                  {selectedPayment.created_at
+                    ? new Date(selectedPayment.created_at).toLocaleString()
+                    : "N/A"}
+                </p>
               </div>
             </div>
           )}
@@ -752,14 +945,24 @@ export default function PaymentsPage() {
                   step="0.01"
                   placeholder="0.00"
                   value={newPayment.amount}
-                  onChange={(e) => setNewPayment(prev => ({ ...prev, amount: e.target.value }))}
+                  onChange={(e) =>
+                    setNewPayment((prev) => ({
+                      ...prev,
+                      amount: e.target.value,
+                    }))
+                  }
                 />
               </div>
               <div>
                 <Label htmlFor="edit_payment_method">Payment Method *</Label>
                 <Select
                   value={newPayment.payment_method}
-                  onValueChange={(value: PaymentMethod) => setNewPayment(prev => ({ ...prev, payment_method: value }))}
+                  onValueChange={(value: PaymentMethod) =>
+                    setNewPayment((prev) => ({
+                      ...prev,
+                      payment_method: value,
+                    }))
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select payment method" />
@@ -775,14 +978,65 @@ export default function PaymentsPage() {
                 </Select>
               </div>
             </div>
-            <div>
-              <Label htmlFor="edit_payment_date">Payment Date</Label>
-              <Input
-                id="edit_payment_date"
-                type="date"
-                value={newPayment.payment_date}
-                onChange={(e) => setNewPayment(prev => ({ ...prev, payment_date: e.target.value }))}
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="edit_payment_number">Payment Number *</Label>
+                <Input
+                  id="edit_payment_number"
+                  placeholder="PAY-001"
+                  value={newPayment.payment_number}
+                  onChange={(e) =>
+                    setNewPayment((prev) => ({
+                      ...prev,
+                      payment_number: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit_invoice_no">Invoice Number *</Label>
+                <Input
+                  id="edit_invoice_no"
+                  placeholder="INV-001"
+                  value={newPayment.invoice_no}
+                  onChange={(e) =>
+                    setNewPayment((prev) => ({
+                      ...prev,
+                      invoice_no: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="edit_customer_human_id">Customer ID *</Label>
+                <Input
+                  id="edit_customer_human_id"
+                  placeholder="CUST-001"
+                  value={newPayment.customer_human_id}
+                  onChange={(e) =>
+                    setNewPayment((prev) => ({
+                      ...prev,
+                      customer_human_id: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit_payment_date">Payment Date</Label>
+                <Input
+                  id="edit_payment_date"
+                  type="date"
+                  value={newPayment.payment_date}
+                  onChange={(e) =>
+                    setNewPayment((prev) => ({
+                      ...prev,
+                      payment_date: e.target.value,
+                    }))
+                  }
+                />
+              </div>
             </div>
             <div>
               <Label htmlFor="edit_reference_number">Reference Number</Label>
@@ -790,7 +1044,26 @@ export default function PaymentsPage() {
                 id="edit_reference_number"
                 placeholder="Transaction ID, Check #, etc."
                 value={newPayment.reference_number}
-                onChange={(e) => setNewPayment(prev => ({ ...prev, reference_number: e.target.value }))}
+                onChange={(e) =>
+                  setNewPayment((prev) => ({
+                    ...prev,
+                    reference_number: e.target.value,
+                  }))
+                }
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit_received_by">Received By</Label>
+              <Input
+                id="edit_received_by"
+                placeholder="Staff member name"
+                value={newPayment.received_by}
+                onChange={(e) =>
+                  setNewPayment((prev) => ({
+                    ...prev,
+                    received_by: e.target.value,
+                  }))
+                }
               />
             </div>
             <div>
@@ -799,7 +1072,9 @@ export default function PaymentsPage() {
                 id="edit_notes"
                 placeholder="Payment notes..."
                 value={newPayment.notes}
-                onChange={(e) => setNewPayment(prev => ({ ...prev, notes: e.target.value }))}
+                onChange={(e) =>
+                  setNewPayment((prev) => ({ ...prev, notes: e.target.value }))
+                }
                 rows={3}
               />
             </div>
@@ -814,9 +1089,7 @@ export default function PaymentsPage() {
             >
               Cancel
             </Button>
-            <Button onClick={handleSavePayment}>
-              Update Payment
-            </Button>
+            <Button onClick={handleSavePayment}>Update Payment</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -837,7 +1110,12 @@ export default function PaymentsPage() {
                   step="0.01"
                   placeholder="0.00"
                   value={newPayment.amount}
-                  onChange={(e) => setNewPayment(prev => ({ ...prev, amount: e.target.value }))}
+                  onChange={(e) =>
+                    setNewPayment((prev) => ({
+                      ...prev,
+                      amount: e.target.value,
+                    }))
+                  }
                 />
               </div>
               <div>
@@ -846,7 +1124,12 @@ export default function PaymentsPage() {
                   id="add_invoice_no"
                   placeholder="INV-001"
                   value={newPayment.invoice_no}
-                  onChange={(e) => setNewPayment(prev => ({ ...prev, invoice_no: e.target.value }))}
+                  onChange={(e) =>
+                    setNewPayment((prev) => ({
+                      ...prev,
+                      invoice_no: e.target.value,
+                    }))
+                  }
                 />
               </div>
             </div>
@@ -857,7 +1140,12 @@ export default function PaymentsPage() {
                   id="add_customer_human_id"
                   placeholder="CUST-001"
                   value={newPayment.customer_human_id}
-                  onChange={(e) => setNewPayment(prev => ({ ...prev, customer_human_id: e.target.value }))}
+                  onChange={(e) =>
+                    setNewPayment((prev) => ({
+                      ...prev,
+                      customer_human_id: e.target.value,
+                    }))
+                  }
                 />
               </div>
               <div>
@@ -866,7 +1154,12 @@ export default function PaymentsPage() {
                   id="add_payment_number"
                   placeholder="PAY-001"
                   value={newPayment.payment_number}
-                  onChange={(e) => setNewPayment(prev => ({ ...prev, payment_number: e.target.value }))}
+                  onChange={(e) =>
+                    setNewPayment((prev) => ({
+                      ...prev,
+                      payment_number: e.target.value,
+                    }))
+                  }
                 />
               </div>
             </div>
@@ -874,7 +1167,9 @@ export default function PaymentsPage() {
               <Label htmlFor="add_payment_method">Payment Method *</Label>
               <Select
                 value={newPayment.payment_method}
-                onValueChange={(value: PaymentMethod) => setNewPayment(prev => ({ ...prev, payment_method: value }))}
+                onValueChange={(value: PaymentMethod) =>
+                  setNewPayment((prev) => ({ ...prev, payment_method: value }))
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select payment method" />
@@ -895,7 +1190,12 @@ export default function PaymentsPage() {
                 id="add_payment_date"
                 type="date"
                 value={newPayment.payment_date}
-                onChange={(e) => setNewPayment(prev => ({ ...prev, payment_date: e.target.value }))}
+                onChange={(e) =>
+                  setNewPayment((prev) => ({
+                    ...prev,
+                    payment_date: e.target.value,
+                  }))
+                }
               />
             </div>
             <div>
@@ -904,7 +1204,26 @@ export default function PaymentsPage() {
                 id="add_reference_number"
                 placeholder="Transaction ID, Check #, etc."
                 value={newPayment.reference_number}
-                onChange={(e) => setNewPayment(prev => ({ ...prev, reference_number: e.target.value }))}
+                onChange={(e) =>
+                  setNewPayment((prev) => ({
+                    ...prev,
+                    reference_number: e.target.value,
+                  }))
+                }
+              />
+            </div>
+            <div>
+              <Label htmlFor="add_received_by">Received By</Label>
+              <Input
+                id="add_received_by"
+                placeholder="Staff member name"
+                value={newPayment.received_by}
+                onChange={(e) =>
+                  setNewPayment((prev) => ({
+                    ...prev,
+                    received_by: e.target.value,
+                  }))
+                }
               />
             </div>
             <div>
@@ -913,21 +1232,18 @@ export default function PaymentsPage() {
                 id="add_notes"
                 placeholder="Payment notes..."
                 value={newPayment.notes}
-                onChange={(e) => setNewPayment(prev => ({ ...prev, notes: e.target.value }))}
+                onChange={(e) =>
+                  setNewPayment((prev) => ({ ...prev, notes: e.target.value }))
+                }
                 rows={3}
               />
             </div>
           </div>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsAddDialogOpen(false)}
-            >
+            <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleSavePayment}>
-              Add Payment
-            </Button>
+            <Button onClick={handleSavePayment}>Add Payment</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -953,13 +1269,17 @@ export default function PaymentsPage() {
                 notes: selectedPayment.notes || undefined,
                 invoice_no: selectedPayment.invoice_no,
                 customer_human_id: selectedPayment.customer_human_id,
-                payment_status: selectedPayment.payment_status || 'completed',
-                created_at: selectedPayment.created_at || new Date().toISOString()
+                payment_status: selectedPayment.payment_status || "completed",
+                created_at:
+                  selectedPayment.created_at || new Date().toISOString(),
               }}
               customer={
-                selectedPayment.customers 
+                selectedPayment.customers
                   ? {
-                      business_name: selectedPayment.customers.business_name || selectedPayment.customer_human_id || '',
+                      business_name:
+                        selectedPayment.customers.business_name ||
+                        selectedPayment.customer_human_id ||
+                        "",
                     }
                   : undefined
               }
@@ -968,16 +1288,31 @@ export default function PaymentsPage() {
                   ? {
                       id: selectedPayment.id,
                       invoiceNo: selectedPayment.invoice_no,
-                      total: selectedPayment.invoices.total !== undefined && selectedPayment.invoices.total !== null 
-                        ? selectedPayment.invoices.total 
-                        : selectedPayment.amount,
-                      amountPaid: selectedPayment.invoices.amountPaid !== undefined && selectedPayment.invoices.amountPaid !== null 
-                        ? selectedPayment.invoices.amountPaid 
-                        : selectedPayment.amount,
-                      amountDue: selectedPayment.invoices.total !== undefined && selectedPayment.invoices.total !== null &&
-                        selectedPayment.invoices.amountPaid !== undefined && selectedPayment.invoices.amountPaid !== null
-                        ? Math.round((selectedPayment.invoices.total - selectedPayment.invoices.amountPaid) * 100) / 100
-                        : Math.round((selectedPayment.amount - selectedPayment.amount) * 100) / 100
+                      total:
+                        selectedPayment.invoices.total !== undefined &&
+                        selectedPayment.invoices.total !== null
+                          ? selectedPayment.invoices.total
+                          : selectedPayment.amount,
+                      amountPaid:
+                        selectedPayment.invoices.amountPaid !== undefined &&
+                        selectedPayment.invoices.amountPaid !== null
+                          ? selectedPayment.invoices.amountPaid
+                          : selectedPayment.amount,
+                      amountDue:
+                        selectedPayment.invoices.total !== undefined &&
+                        selectedPayment.invoices.total !== null &&
+                        selectedPayment.invoices.amountPaid !== undefined &&
+                        selectedPayment.invoices.amountPaid !== null
+                          ? Math.round(
+                              (selectedPayment.invoices.total -
+                                selectedPayment.invoices.amountPaid) *
+                                100,
+                            ) / 100
+                          : Math.round(
+                              (selectedPayment.amount -
+                                selectedPayment.amount) *
+                                100,
+                            ) / 100,
                     }
                   : undefined
               }
@@ -985,9 +1320,7 @@ export default function PaymentsPage() {
             />
           )}
           <DialogFooter>
-            <Button onClick={() => setIsReceiptDialogOpen(false)}>
-              Close
-            </Button>
+            <Button onClick={() => setIsReceiptDialogOpen(false)}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

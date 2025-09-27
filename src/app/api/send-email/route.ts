@@ -3,8 +3,8 @@
  * Handles sending emails using Resend service
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { Resend } from 'resend';
+import { NextRequest, NextResponse } from "next/server";
+import { Resend } from "resend";
 
 interface EmailRequest {
   to: string;
@@ -18,16 +18,22 @@ export async function POST(request: NextRequest) {
   try {
     // Initialize Resend client inside the function to avoid build-time errors
     const resend = new Resend(process.env.RESEND_API_KEY);
-    
+
     // Parse request body
     const body: EmailRequest = await request.json();
-    const { to, subject, html, from = 'noreply@jaykaydigitalpress.com', fromName = 'Jay Kay Digital Press' } = body;
+    const {
+      to,
+      subject,
+      html,
+      from = "noreply@jaykaydigitalpress.com",
+      fromName = "Jay Kay Digital Press",
+    } = body;
 
     // Validate required fields
     if (!to || !subject || !html) {
       return NextResponse.json(
-        { error: 'Missing required fields: to, subject, html' },
-        { status: 400 }
+        { error: "Missing required fields: to, subject, html" },
+        { status: 400 },
       );
     }
 
@@ -35,8 +41,8 @@ export async function POST(request: NextRequest) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(to)) {
       return NextResponse.json(
-        { error: 'Invalid email address format' },
-        { status: 400 }
+        { error: "Invalid email address format" },
+        { status: 400 },
       );
     }
 
@@ -49,49 +55,42 @@ export async function POST(request: NextRequest) {
     });
 
     if (error) {
-      console.error('Resend error:', error);
+      console.error("Resend error:", error);
       return NextResponse.json(
-        { error: 'Failed to send email', details: error },
-        { status: 500 }
+        { error: "Failed to send email", details: error },
+        { status: 500 },
       );
     }
 
     return NextResponse.json(
-      { 
-        success: true, 
+      {
+        success: true,
         messageId: data?.id,
-        message: 'Email sent successfully' 
+        message: "Email sent successfully",
       },
-      { status: 200 }
+      { status: 200 },
     );
-
   } catch (error) {
-    console.error('Email API error:', error);
+    console.error("Email API error:", error);
     return NextResponse.json(
-      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
+      {
+        error: "Internal server error",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
     );
   }
 }
 
 // Handle other HTTP methods
 export async function GET() {
-  return NextResponse.json(
-    { error: 'Method not allowed' },
-    { status: 405 }
-  );
+  return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
 }
 
 export async function PUT() {
-  return NextResponse.json(
-    { error: 'Method not allowed' },
-    { status: 405 }
-  );
+  return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
 }
 
 export async function DELETE() {
-  return NextResponse.json(
-    { error: 'Method not allowed' },
-    { status: 405 }
-  );
+  return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
 }

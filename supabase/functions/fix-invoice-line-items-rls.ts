@@ -1,17 +1,17 @@
 // Function to fix RLS policies for invoice_line_items table
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 serve(async (_req) => {
   try {
     // Create a Supabase client with service role key for full access
     const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
     );
 
     // Execute the RLS policy fixes
-    const { error } = await supabase.rpc('execute_sql', {
+    const { error } = await supabase.rpc("execute_sql", {
       sql: `
         -- Drop all previous, conflicting policies to ensure a clean slate
         DROP POLICY IF EXISTS "Users can view invoice line items based on role" ON "public"."invoice_line_items";
@@ -131,7 +131,7 @@ serve(async (_req) => {
         TO service_role
         USING (true)
         WITH CHECK (true);
-      `
+      `,
     });
 
     if (error) {
@@ -139,13 +139,16 @@ serve(async (_req) => {
     }
 
     return new Response(
-      JSON.stringify({ message: 'RLS policies for invoice_line_items have been successfully updated' }),
+      JSON.stringify({
+        message:
+          "RLS policies for invoice_line_items have been successfully updated",
+      }),
       { headers: { "Content-Type": "application/json" } },
     );
   } catch (error) {
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { headers: { "Content-Type": "application/json" }, status: 500 },
-    );
+    return new Response(JSON.stringify({ error: error.message }), {
+      headers: { "Content-Type": "application/json" },
+      status: 500,
+    });
   }
 });

@@ -12,7 +12,13 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Package,
   Plus,
@@ -39,10 +45,10 @@ const mockInventoryItems = [
     current_stock: 50,
     minimum_stock: 20,
     maximum_stock: 200,
-    unit_price: 25.00,
+    unit_price: 25.0,
     supplier: "Paper Plus",
     last_restocked: "2025-09-15",
-    status: "in_stock"
+    status: "in_stock",
   },
   {
     id: "2",
@@ -51,10 +57,10 @@ const mockInventoryItems = [
     current_stock: 5,
     minimum_stock: 10,
     maximum_stock: 50,
-    unit_price: 85.00,
+    unit_price: 85.0,
     supplier: "Ink Solutions",
     last_restocked: "2025-09-10",
-    status: "low_stock"
+    status: "low_stock",
   },
   {
     id: "3",
@@ -63,10 +69,10 @@ const mockInventoryItems = [
     current_stock: 0,
     minimum_stock: 5,
     maximum_stock: 25,
-    unit_price: 45.00,
+    unit_price: 45.0,
     supplier: "CardStock Pro",
     last_restocked: "2025-08-28",
-    status: "out_of_stock"
+    status: "out_of_stock",
   },
   {
     id: "4",
@@ -75,10 +81,10 @@ const mockInventoryItems = [
     current_stock: 120,
     minimum_stock: 30,
     maximum_stock: 150,
-    unit_price: 1.50,
+    unit_price: 1.5,
     supplier: "Office Depot",
     last_restocked: "2025-09-12",
-    status: "in_stock"
+    status: "in_stock",
   },
   {
     id: "5",
@@ -87,11 +93,11 @@ const mockInventoryItems = [
     current_stock: 8,
     minimum_stock: 15,
     maximum_stock: 40,
-    unit_price: 120.00,
+    unit_price: 120.0,
     supplier: "Ink Solutions",
     last_restocked: "2025-09-08",
-    status: "low_stock"
-  }
+    status: "low_stock",
+  },
 ];
 
 function InventoryContent() {
@@ -101,21 +107,31 @@ function InventoryContent() {
   const [isLoading] = useState(false);
 
   // Filter items based on search and filters
-  const filteredItems = mockInventoryItems.filter(item => {
-    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.supplier.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = categoryFilter === "all" || item.category === categoryFilter;
-    const matchesStatus = statusFilter === "all" || item.status === statusFilter;
-    
+  const filteredItems = mockInventoryItems.filter((item) => {
+    const matchesSearch =
+      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.supplier.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory =
+      categoryFilter === "all" || item.category === categoryFilter;
+    const matchesStatus =
+      statusFilter === "all" || item.status === statusFilter;
+
     return matchesSearch && matchesCategory && matchesStatus;
   });
 
   // Calculate inventory statistics
   const stats = {
     total_items: mockInventoryItems.length,
-    low_stock_items: mockInventoryItems.filter(item => item.status === "low_stock").length,
-    out_of_stock_items: mockInventoryItems.filter(item => item.status === "out_of_stock").length,
-    total_value: mockInventoryItems.reduce((sum, item) => sum + (item.current_stock * item.unit_price), 0)
+    low_stock_items: mockInventoryItems.filter(
+      (item) => item.status === "low_stock",
+    ).length,
+    out_of_stock_items: mockInventoryItems.filter(
+      (item) => item.status === "out_of_stock",
+    ).length,
+    total_value: mockInventoryItems.reduce(
+      (sum, item) => sum + item.current_stock * item.unit_price,
+      0,
+    ),
   };
 
   const getStatusColor = (status: string) => {
@@ -144,7 +160,9 @@ function InventoryContent() {
     }
   };
 
-  const categories = [...new Set(mockInventoryItems.map(item => item.category))];
+  const categories = [
+    ...new Set(mockInventoryItems.map((item) => item.category)),
+  ];
 
   if (isLoading) {
     return (
@@ -279,13 +297,16 @@ function InventoryContent() {
 
                 <div className="space-y-2">
                   <Label>Category</Label>
-                  <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <Select
+                    value={categoryFilter}
+                    onValueChange={setCategoryFilter}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="All Categories" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Categories</SelectItem>
-                      {categories.map(category => (
+                      {categories.map((category) => (
                         <SelectItem key={category} value={category}>
                           {category}
                         </SelectItem>
@@ -310,8 +331,8 @@ function InventoryContent() {
                 </div>
 
                 <div className="space-y-2 flex items-end">
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={() => {
                       setSearchTerm("");
                       setCategoryFilter("all");
@@ -378,7 +399,12 @@ function InventoryContent() {
                             <span>Stock: {item.current_stock} units</span>
                             <span>Min: {item.minimum_stock}</span>
                             <span>Max: {item.maximum_stock}</span>
-                            <span>Last restocked: {new Date(item.last_restocked).toLocaleDateString()}</span>
+                            <span>
+                              Last restocked:{" "}
+                              {new Date(
+                                item.last_restocked,
+                              ).toLocaleDateString()}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -389,7 +415,8 @@ function InventoryContent() {
                             SLL {item.unit_price.toFixed(2)}/unit
                           </p>
                           <p className="text-xs text-gray-500">
-                            Total: SLL {(item.current_stock * item.unit_price).toFixed(2)}
+                            Total: SLL{" "}
+                            {(item.current_stock * item.unit_price).toFixed(2)}
                           </p>
                         </div>
                         <div className="flex space-x-2">
@@ -416,9 +443,7 @@ function InventoryContent() {
 // Main component with role-based protection
 export default function InventoryPage() {
   return (
-    <ProtectedDashboard
-      allowedRoles={["super_admin", "admin", "manager"]}
-    >
+    <ProtectedDashboard allowedRoles={["super_admin", "admin", "manager"]}>
       <InventoryContent />
     </ProtectedDashboard>
   );

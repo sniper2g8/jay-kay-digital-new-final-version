@@ -26,7 +26,6 @@ export default function ProtectedDashboard({
       const userRole = userData.primary_role;
 
       if (userRole && !allowedRoles.includes(userRole)) {
-        
         router.replace(redirectPath);
         return;
       }

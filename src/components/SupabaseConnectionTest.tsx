@@ -15,7 +15,7 @@ interface TestResults {
   connection: string;
   customers: {
     count: number;
-    sample: Array<{ human_id: string | null; business_name: string }>;
+    sample: { human_id: string | null; business_name: string }[];
     error: string | null;
   };
   jobs: {
@@ -43,7 +43,6 @@ export default function SupabaseConnectionTest() {
     setResults(null);
 
     try {
-      
       // Test 1: Basic configuration check
       const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
       const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -57,7 +56,7 @@ export default function SupabaseConnectionTest() {
       }
 
       // Test 2: Simple query to customers table
-      
+
       const { data: customers, error: customersError } = await supabase
         .from("customers")
         .select("human_id, business_name")
@@ -85,7 +84,7 @@ export default function SupabaseConnectionTest() {
       }
 
       // Test 3: Count query
-      
+
       const { count, error: countError } = await supabase
         .from("customers")
         .select("*", { count: "exact", head: true });
@@ -97,7 +96,7 @@ export default function SupabaseConnectionTest() {
       }
 
       // Test 4: Test other tables
-      
+
       const { error: jobsError } = await supabase
         .from("jobs")
         .select("job_human_id")
@@ -133,7 +132,6 @@ export default function SupabaseConnectionTest() {
           error: paymentsError?.message || null,
         },
       });
-
     } catch (err) {
       console.error("Connection test failed with error:", err);
       console.error("Error type:", typeof err);

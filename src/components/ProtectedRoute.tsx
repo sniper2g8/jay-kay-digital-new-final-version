@@ -31,19 +31,19 @@ export default function ProtectedRoute({
   const checkUserRole = async (userId: string) => {
     try {
       const { data: userData, error } = await supabase
-        .from('appUsers')
-        .select('primary_role, status')
-        .eq('id', userId)
+        .from("appUsers")
+        .select("primary_role, status")
+        .eq("id", userId)
         .single();
 
       if (error) {
-        console.error('Error fetching user role:', error);
+        console.error("Error fetching user role:", error);
         return null;
       }
 
       return userData;
     } catch (error) {
-      console.error('Error checking user role:', error);
+      console.error("Error checking user role:", error);
       return null;
     }
   };
@@ -51,34 +51,34 @@ export default function ProtectedRoute({
   useEffect(() => {
     // Role hierarchy - higher numbers have more permissions
     const roleHierarchy: Record<string, number> = {
-      'customer': 1,
-      'staff': 2,
-      'manager': 3,
-      'admin': 4,
-      'super_admin': 5
+      customer: 1,
+      staff: 2,
+      manager: 3,
+      admin: 4,
+      super_admin: 5,
     };
 
-    const hasRequiredAccess = (userRole: string | null, requiredRole: string): boolean => {
+    const hasRequiredAccess = (
+      userRole: string | null,
+      requiredRole: string,
+    ): boolean => {
       if (!userRole || !requiredRole) return false;
-      
+
       const userLevel = roleHierarchy[userRole] || 0;
       const requiredLevel = roleHierarchy[requiredRole] || 999;
-      
+
       return userLevel >= requiredLevel;
     };
 
     const performAuthCheck = async () => {
-      
       if (!loading) {
         if (!user) {
-          
           router.push(redirectTo);
           return;
         }
 
         // If no role required, just check authentication
         if (!requiredRole) {
-          
           setChecking(false);
           return;
         }
@@ -88,21 +88,18 @@ export default function ProtectedRoute({
         setUserRole(role);
 
         if (!role) {
-          
           setAccessDenied(true);
           setChecking(false);
           return;
         }
 
-        if (role.status !== 'active') {
-          
+        if (role.status !== "active") {
           setAccessDenied(true);
           setChecking(false);
           return;
         }
 
         if (!hasRequiredAccess(role.primary_role, requiredRole)) {
-          
           setAccessDenied(true);
           setChecking(false);
           return;
@@ -135,17 +132,31 @@ export default function ProtectedRoute({
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto p-6">
           <ShieldOff className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Access Denied
+          </h1>
           <p className="text-gray-600 mb-4">
             You don&apos;t have permission to access this page.
           </p>
           <div className="space-y-2 text-sm text-gray-500">
-            <p>Your role: <span className="font-medium">{userRole?.primary_role || 'Unknown'}</span></p>
-            <p>Required role: <span className="font-medium">{requiredRole}</span></p>
-            <p>Account status: <span className="font-medium">{userRole?.status || 'Unknown'}</span></p>
+            <p>
+              Your role:{" "}
+              <span className="font-medium">
+                {userRole?.primary_role || "Unknown"}
+              </span>
+            </p>
+            <p>
+              Required role: <span className="font-medium">{requiredRole}</span>
+            </p>
+            <p>
+              Account status:{" "}
+              <span className="font-medium">
+                {userRole?.status || "Unknown"}
+              </span>
+            </p>
           </div>
           <button
-            onClick={() => router.push('/dashboard')}
+            onClick={() => router.push("/dashboard")}
             className="mt-6 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
             Return to Dashboard

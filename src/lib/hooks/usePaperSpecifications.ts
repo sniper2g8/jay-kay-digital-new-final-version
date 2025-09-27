@@ -469,7 +469,6 @@ const fallbackFinishOptions: FinishOption[] = [
 // Fetcher functions with fallback
 const fetchPaperSizes = async (): Promise<PaperSize[]> => {
   try {
-    
     // Fetch paper sizes with proper typing
     const { data, error } = await supabase
       .from("paper_sizes")
@@ -477,26 +476,21 @@ const fetchPaperSizes = async (): Promise<PaperSize[]> => {
       .order("name");
 
     if (error) {
-      
       return fallbackPaperSizes;
     }
 
     if (data && data.length > 0) {
-      
       return data;
     } else {
-      
       return fallbackPaperSizes;
     }
   } catch {
-    
     return fallbackPaperSizes;
   }
 };
 
 const fetchPaperWeights = async (): Promise<PaperWeight[]> => {
   try {
-    
     // Fetch paper weights with proper typing
     const { data, error } = await supabase
       .from("paper_weights")
@@ -504,26 +498,21 @@ const fetchPaperWeights = async (): Promise<PaperWeight[]> => {
       .order("weight_gsm");
 
     if (error) {
-      
       return fallbackPaperWeights;
     }
 
     if (data && data.length > 0) {
-      
       return data;
     } else {
-      
       return fallbackPaperWeights;
     }
   } catch {
-    
     return fallbackPaperWeights;
   }
 };
 
 const fetchPaperTypes = async (): Promise<PaperType[]> => {
   try {
-    
     // Fetch paper types with proper typing
     const { data, error } = await supabase
       .from("paper_types")
@@ -531,19 +520,15 @@ const fetchPaperTypes = async (): Promise<PaperType[]> => {
       .order("name");
 
     if (error) {
-      
       return fallbackPaperTypes;
     }
 
     if (data && data.length > 0) {
-      
       return data;
     } else {
-      
       return fallbackPaperTypes;
     }
   } catch {
-    
     return fallbackPaperTypes;
   }
 };
@@ -579,7 +564,6 @@ const fetchFinishOptions = async (): Promise<FinishOption[]> => {
 
     return transformedData.length > 0 ? transformedData : fallbackFinishOptions;
   } catch {
-    
     return fallbackFinishOptions;
   }
 };

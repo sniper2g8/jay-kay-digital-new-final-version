@@ -45,16 +45,20 @@ psql -h YOUR_DB_HOST -U postgres -d postgres -f supabase/migrations/20241231_ema
 Make sure these environment variables are set in your Supabase project:
 
 #### Required Secrets (set via Supabase CLI or Dashboard)
+
 - `RESEND_API_KEY`: Your Resend API key for sending emails
 
 #### Project Settings
+
 Update the database function URLs in the migration file:
+
 - Replace `https://your-project.supabase.co` with your actual Supabase project URL
 - Update the `service_role_key` configuration
 
 ### 4. Update Database Triggers
 
 The migration includes triggers for:
+
 - Job status changes (automatically sends notifications)
 - Payment received notifications
 - Invoice sent notifications
@@ -88,6 +92,7 @@ The migrations include RLS policies, but ensure your project has the correct pol
 ### 7. Test the System
 
 1. Test the Edge Function directly:
+
 ```bash
 curl -X POST 'https://YOUR_PROJECT_REF.supabase.co/functions/v1/email-notifications' \
   -H 'Authorization: Bearer YOUR_ANON_KEY' \
@@ -154,12 +159,14 @@ curl -X POST 'https://YOUR_PROJECT_REF.supabase.co/functions/v1/email-notificati
 ## Features Included
 
 ### Automatic Notifications
+
 - ✅ Job created notifications
 - ✅ Job status change notifications
 - ✅ Payment received notifications
 - ✅ Invoice sent notifications
 
 ### Admin Email System
+
 - ✅ Custom email composition
 - ✅ Bulk email to multiple customers
 - ✅ Email template management
@@ -167,6 +174,7 @@ curl -X POST 'https://YOUR_PROJECT_REF.supabase.co/functions/v1/email-notificati
 - ✅ Email preview functionality
 
 ### Professional Templates
+
 - ✅ Responsive HTML email designs
 - ✅ JayKay Digital Press branding
 - ✅ Status-specific content and styling

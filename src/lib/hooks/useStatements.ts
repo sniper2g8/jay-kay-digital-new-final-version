@@ -156,13 +156,13 @@ export function useStatementPeriods() {
           message: fetchError.message,
           code: fetchError.code,
           details: fetchError.details,
-          hint: fetchError.hint
+          hint: fetchError.hint,
         });
         throw fetchError;
       }
 
       console.log("useStatementPeriods: Successfully fetched data", {
-        count: periods?.length || 0
+        count: periods?.length || 0,
       });
       setData(periods || []);
     } catch (err) {
@@ -172,9 +172,9 @@ export function useStatementPeriods() {
         message: err instanceof Error ? err.message : "Unknown error",
         stack: err instanceof Error ? err.stack : undefined,
         errorType: typeof err,
-        errorDetails: JSON.stringify(err, null, 2)
+        errorDetails: JSON.stringify(err, null, 2),
       });
-      const errorMessage = 
+      const errorMessage =
         err instanceof Error ? err.message : "Failed to load statement periods";
       setError(errorMessage);
       toast.error("Failed to load statement periods");
@@ -237,14 +237,17 @@ export function useStatementPeriod(id: string | null) {
       console.error("Error fetching statement period:", {
         error: err,
         message: err instanceof Error ? err.message : "Unknown error",
-        code: err instanceof Error && 'code' in err ? (err as any).code : undefined,
-        details: err instanceof Error && 'details' in err ? (err as any).details : undefined,
+        code:
+          err instanceof Error && "code" in err ? (err as any).code : undefined,
+        details:
+          err instanceof Error && "details" in err
+            ? (err as any).details
+            : undefined,
         stack: err instanceof Error ? err.stack : undefined,
       });
 
-      const errorMessage = err instanceof Error 
-        ? err.message 
-        : "Failed to load statement period";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to load statement period";
 
       setError(errorMessage);
       toast.error(errorMessage);
@@ -419,19 +422,29 @@ export function useStatementActions() {
       // Enhanced error logging with structured details
       const errorDetails = {
         message: error instanceof Error ? error.message : "Unknown error",
-        code: error instanceof Error && 'code' in error ? (error as any).code : undefined,
-        details: error instanceof Error && 'details' in error ? (error as any).details : undefined,
-        hint: error instanceof Error && 'hint' in error ? (error as any).hint : undefined,
+        code:
+          error instanceof Error && "code" in error
+            ? (error as any).code
+            : undefined,
+        details:
+          error instanceof Error && "details" in error
+            ? (error as any).details
+            : undefined,
+        hint:
+          error instanceof Error && "hint" in error
+            ? (error as any).hint
+            : undefined,
         stack: error instanceof Error ? error.stack : undefined,
       };
-      
+
       console.error("Error creating statement period:", errorDetails);
-      
+
       // Show a more specific error message based on the error type
-      const errorMessage = error instanceof Error && 'message' in error 
-        ? error.message
-        : "Failed to create statement period. Please check the form and try again.";
-      
+      const errorMessage =
+        error instanceof Error && "message" in error
+          ? error.message
+          : "Failed to create statement period. Please check the form and try again.";
+
       toast.error(errorMessage);
       throw new Error(errorMessage, { cause: error });
     } finally {
@@ -686,11 +699,10 @@ async function updateStatementTotals(periodId: string) {
   }
 }
 
-async function updateCustomerBalance(customerId: string) {
+async function updateCustomerBalance(_customerId: string) {
   try {
     // Note: Customer balance is now tracked in customer_statement_periods table
     // No need to maintain a separate account balances table
-    
   } catch (error) {
     console.error("Error updating customer balance:", error);
   }

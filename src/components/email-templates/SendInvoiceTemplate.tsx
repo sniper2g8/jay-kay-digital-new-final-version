@@ -8,12 +8,12 @@ interface SendInvoiceTemplateProps {
   invoiceNumber: string;
   invoiceDate: string;
   dueDate: string;
-  items: Array<{
+  items: {
     description: string;
     quantity: number;
     unitPrice: number;
     total: number;
-  }>;
+  }[];
   subtotal: number;
   tax?: number;
   totalAmount: number;
@@ -39,74 +39,93 @@ export const SendInvoiceTemplate: React.FC<SendInvoiceTemplateProps> = ({
   totalAmount,
   paymentTerms,
   notes,
-  companyDetails
+  companyDetails,
 }) => {
   return (
-    <div style={{
-      fontFamily: 'Arial, sans-serif',
-      lineHeight: '1.6',
-      color: '#333333',
-      maxWidth: '800px',
-      margin: '0 auto',
-      backgroundColor: '#ffffff'
-    }}>
+    <div
+      style={{
+        fontFamily: "Arial, sans-serif",
+        lineHeight: "1.6",
+        color: "#333333",
+        maxWidth: "800px",
+        margin: "0 auto",
+        backgroundColor: "#ffffff",
+      }}
+    >
       {/* Header with Company Logo and Branding */}
-      <div style={{
-        backgroundColor: '#dc2626',
-        color: '#ffffff',
-        padding: '20px',
-        textAlign: 'center'
-      }}>
-        <h1 style={{
-          margin: '0',
-          fontSize: '28px',
-          fontWeight: 'bold'
-        }}>
+      <div
+        style={{
+          backgroundColor: "#dc2626",
+          color: "#ffffff",
+          padding: "20px",
+          textAlign: "center",
+        }}
+      >
+        <h1
+          style={{
+            margin: "0",
+            fontSize: "28px",
+            fontWeight: "bold",
+          }}
+        >
           {companyDetails.name}
         </h1>
-        <p style={{
-          margin: '5px 0 0 0',
-          fontSize: '14px',
-          opacity: '0.9'
-        }}>
+        <p
+          style={{
+            margin: "5px 0 0 0",
+            fontSize: "14px",
+            opacity: "0.9",
+          }}
+        >
           Professional Printing & Digital Services
         </p>
       </div>
 
       {/* Invoice Header */}
-      <div style={{
-        padding: '30px',
-        backgroundColor: '#f8f9fa',
-        borderBottom: '3px solid #dc2626'
-      }}>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          marginBottom: '20px'
-        }}>
+      <div
+        style={{
+          padding: "30px",
+          backgroundColor: "#f8f9fa",
+          borderBottom: "3px solid #dc2626",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            marginBottom: "20px",
+          }}
+        >
           <div>
-            <h2 style={{
-              margin: '0 0 10px 0',
-              fontSize: '24px',
-              color: '#dc2626'
-            }}>
+            <h2
+              style={{
+                margin: "0 0 10px 0",
+                fontSize: "24px",
+                color: "#dc2626",
+              }}
+            >
               INVOICE
             </h2>
-            <p style={{ margin: '5px 0', fontSize: '16px' }}>
+            <p style={{ margin: "5px 0", fontSize: "16px" }}>
               <strong>Invoice #:</strong> {invoiceNumber}
             </p>
-            <p style={{ margin: '5px 0', fontSize: '16px' }}>
+            <p style={{ margin: "5px 0", fontSize: "16px" }}>
               <strong>Date:</strong> {invoiceDate}
             </p>
-            <p style={{ margin: '5px 0', fontSize: '16px' }}>
-              <strong>Due Date:</strong> <span style={{ color: '#dc2626', fontWeight: 'bold' }}>{dueDate}</span>
+            <p style={{ margin: "5px 0", fontSize: "16px" }}>
+              <strong>Due Date:</strong>{" "}
+              <span style={{ color: "#dc2626", fontWeight: "bold" }}>
+                {dueDate}
+              </span>
             </p>
           </div>
-          
-          <div style={{ textAlign: 'right' }}>
-            <h3 style={{ margin: '0 0 10px 0', color: '#dc2626' }}>Bill To:</h3>
-            <p style={{ margin: '5px 0', fontSize: '16px', fontWeight: 'bold' }}>
+
+          <div style={{ textAlign: "right" }}>
+            <h3 style={{ margin: "0 0 10px 0", color: "#dc2626" }}>Bill To:</h3>
+            <p
+              style={{ margin: "5px 0", fontSize: "16px", fontWeight: "bold" }}
+            >
               {customerName}
             </p>
           </div>
@@ -114,14 +133,16 @@ export const SendInvoiceTemplate: React.FC<SendInvoiceTemplateProps> = ({
       </div>
 
       {/* Invoice Items Table */}
-      <div style={{ padding: '30px' }}>
-        <table style={{
-          width: '100%',
-          borderCollapse: 'collapse',
-          marginBottom: '20px'
-        }}>
+      <div style={{ padding: "30px" }}>
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            marginBottom: "20px",
+          }}
+        >
           <thead>
-            <tr style={{ backgroundColor: '#f1f5f9' }}>
+            <tr style={{ backgroundColor: "#f1f5f9" }}>
               <th style={tableHeaderStyle}>Description</th>
               <th style={tableHeaderStyle}>Qty</th>
               <th style={tableHeaderStyle}>Unit Price</th>
@@ -130,13 +151,21 @@ export const SendInvoiceTemplate: React.FC<SendInvoiceTemplateProps> = ({
           </thead>
           <tbody>
             {items.map((item, index) => (
-              <tr key={index} style={{ borderBottom: '1px solid #e2e8f0' }}>
+              <tr key={index} style={{ borderBottom: "1px solid #e2e8f0" }}>
                 <td style={tableCellStyle}>{item.description}</td>
-                <td style={{ ...tableCellStyle, textAlign: 'center' }}>{item.quantity}</td>
-                <td style={{ ...tableCellStyle, textAlign: 'right' }}>
+                <td style={{ ...tableCellStyle, textAlign: "center" }}>
+                  {item.quantity}
+                </td>
+                <td style={{ ...tableCellStyle, textAlign: "right" }}>
                   SLL {item.unitPrice.toLocaleString()}
                 </td>
-                <td style={{ ...tableCellStyle, textAlign: 'right', fontWeight: 'bold' }}>
+                <td
+                  style={{
+                    ...tableCellStyle,
+                    textAlign: "right",
+                    fontWeight: "bold",
+                  }}
+                >
                   SLL {item.total.toLocaleString()}
                 </td>
               </tr>
@@ -145,33 +174,49 @@ export const SendInvoiceTemplate: React.FC<SendInvoiceTemplateProps> = ({
         </table>
 
         {/* Totals Section */}
-        <div style={{
-          marginLeft: 'auto',
-          width: '300px',
-          padding: '20px',
-          backgroundColor: '#f8f9fa',
-          border: '1px solid #e2e8f0',
-          borderRadius: '8px'
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+        <div
+          style={{
+            marginLeft: "auto",
+            width: "300px",
+            padding: "20px",
+            backgroundColor: "#f8f9fa",
+            border: "1px solid #e2e8f0",
+            borderRadius: "8px",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginBottom: "10px",
+            }}
+          >
             <span>Subtotal:</span>
             <span>SLL {subtotal.toLocaleString()}</span>
           </div>
           {tax > 0 && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: "10px",
+              }}
+            >
               <span>Tax:</span>
               <span>SLL {tax.toLocaleString()}</span>
             </div>
           )}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            paddingTop: '10px',
-            borderTop: '2px solid #dc2626',
-            fontSize: '18px',
-            fontWeight: 'bold',
-            color: '#dc2626'
-          }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              paddingTop: "10px",
+              borderTop: "2px solid #dc2626",
+              fontSize: "18px",
+              fontWeight: "bold",
+              color: "#dc2626",
+            }}
+          >
             <span>Total:</span>
             <span>SLL {totalAmount.toLocaleString()}</span>
           </div>
@@ -179,19 +224,25 @@ export const SendInvoiceTemplate: React.FC<SendInvoiceTemplateProps> = ({
       </div>
 
       {/* Payment Terms and Instructions */}
-      <div style={{
-        padding: '30px',
-        backgroundColor: '#f8f9fa',
-        borderTop: '1px solid #e2e8f0'
-      }}>
-        <h3 style={{ margin: '0 0 15px 0', color: '#dc2626' }}>Payment Terms & Instructions</h3>
-        <p style={{ margin: '0 0 15px 0', fontSize: '14px' }}>
+      <div
+        style={{
+          padding: "30px",
+          backgroundColor: "#f8f9fa",
+          borderTop: "1px solid #e2e8f0",
+        }}
+      >
+        <h3 style={{ margin: "0 0 15px 0", color: "#dc2626" }}>
+          Payment Terms & Instructions
+        </h3>
+        <p style={{ margin: "0 0 15px 0", fontSize: "14px" }}>
           <strong>Payment Terms:</strong> {paymentTerms}
         </p>
-        
-        <div style={{ marginBottom: '20px' }}>
-          <h4 style={{ margin: '0 0 10px 0', color: '#374151' }}>Payment Methods:</h4>
-          <ul style={{ margin: '0', paddingLeft: '20px', fontSize: '14px' }}>
+
+        <div style={{ marginBottom: "20px" }}>
+          <h4 style={{ margin: "0 0 10px 0", color: "#374151" }}>
+            Payment Methods:
+          </h4>
+          <ul style={{ margin: "0", paddingLeft: "20px", fontSize: "14px" }}>
             <li>Cash payment at our office</li>
             <li>Mobile Money: Orange Money, Afrimoney</li>
             <li>Bank Transfer (contact us for details)</li>
@@ -200,9 +251,9 @@ export const SendInvoiceTemplate: React.FC<SendInvoiceTemplateProps> = ({
         </div>
 
         {notes && (
-          <div style={{ marginTop: '20px' }}>
-            <h4 style={{ margin: '0 0 10px 0', color: '#374151' }}>Notes:</h4>
-            <p style={{ margin: '0', fontSize: '14px', fontStyle: 'italic' }}>
+          <div style={{ marginTop: "20px" }}>
+            <h4 style={{ margin: "0 0 10px 0", color: "#374151" }}>Notes:</h4>
+            <p style={{ margin: "0", fontSize: "14px", fontStyle: "italic" }}>
               {notes}
             </p>
           </div>
@@ -210,40 +261,44 @@ export const SendInvoiceTemplate: React.FC<SendInvoiceTemplateProps> = ({
       </div>
 
       {/* Footer with Company Information */}
-      <div style={{
-        padding: '20px',
-        backgroundColor: '#dc2626',
-        color: '#ffffff',
-        textAlign: 'center'
-      }}>
-        <div style={{ marginBottom: '15px' }}>
-          <h3 style={{ margin: '0 0 10px 0', fontSize: '18px' }}>
+      <div
+        style={{
+          padding: "20px",
+          backgroundColor: "#dc2626",
+          color: "#ffffff",
+          textAlign: "center",
+        }}
+      >
+        <div style={{ marginBottom: "15px" }}>
+          <h3 style={{ margin: "0 0 10px 0", fontSize: "18px" }}>
             {companyDetails.name}
           </h3>
-          <p style={{ margin: '5px 0', fontSize: '14px' }}>
+          <p style={{ margin: "5px 0", fontSize: "14px" }}>
             {companyDetails.address}
           </p>
         </div>
-        
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          gap: '20px',
-          flexWrap: 'wrap',
-          fontSize: '14px'
-        }}>
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: "20px",
+            flexWrap: "wrap",
+            fontSize: "14px",
+          }}
+        >
           <span>📞 {companyDetails.phone}</span>
           <span>✉️ {companyDetails.email}</span>
-          {companyDetails.website && (
-            <span>🌐 {companyDetails.website}</span>
-          )}
+          {companyDetails.website && <span>🌐 {companyDetails.website}</span>}
         </div>
-        
-        <p style={{
-          margin: '15px 0 0 0',
-          fontSize: '12px',
-          opacity: '0.8'
-        }}>
+
+        <p
+          style={{
+            margin: "15px 0 0 0",
+            fontSize: "12px",
+            opacity: "0.8",
+          }}
+        >
           Thank you for choosing Jay Kay Digital Press for your printing needs!
         </p>
       </div>
@@ -253,22 +308,24 @@ export const SendInvoiceTemplate: React.FC<SendInvoiceTemplateProps> = ({
 
 // Reusable styles
 const tableHeaderStyle: React.CSSProperties = {
-  padding: '12px',
-  textAlign: 'left',
-  fontWeight: 'bold',
-  fontSize: '14px',
-  color: '#374151',
-  borderBottom: '2px solid #dc2626'
+  padding: "12px",
+  textAlign: "left",
+  fontWeight: "bold",
+  fontSize: "14px",
+  color: "#374151",
+  borderBottom: "2px solid #dc2626",
 };
 
 const tableCellStyle: React.CSSProperties = {
-  padding: '12px',
-  fontSize: '14px',
-  color: '#374151'
+  padding: "12px",
+  fontSize: "14px",
+  color: "#374151",
 };
 
 // Generate HTML string for email sending
-export const generateInvoiceEmailHTML = (props: SendInvoiceTemplateProps): string => {
+export const generateInvoiceEmailHTML = (
+  props: SendInvoiceTemplateProps,
+): string => {
   // This would typically use a server-side rendering solution
   // For now, return a static HTML template with interpolated values
   return `
@@ -309,14 +366,18 @@ export const generateInvoiceEmailHTML = (props: SendInvoiceTemplateProps): strin
               </tr>
             </thead>
             <tbody>
-              ${props.items.map(item => `
+              ${props.items
+                .map(
+                  (item) => `
                 <tr style="border-bottom: 1px solid #e2e8f0;">
                   <td style="padding: 12px;">${item.description}</td>
                   <td style="padding: 12px; text-align: center;">${item.quantity}</td>
                   <td style="padding: 12px; text-align: right;">SLL ${item.unitPrice.toLocaleString()}</td>
                   <td style="padding: 12px; text-align: right; font-weight: bold;">SLL ${item.total.toLocaleString()}</td>
                 </tr>
-              `).join('')}
+              `,
+                )
+                .join("")}
             </tbody>
           </table>
           

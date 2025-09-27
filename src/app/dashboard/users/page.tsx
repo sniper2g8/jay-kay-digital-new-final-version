@@ -1,12 +1,24 @@
-'use client';
+"use client";
 
-import { useState, useMemo } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { useState, useMemo } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
@@ -14,7 +26,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,16 +34,16 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { 
-  Users, 
-  Search, 
-  Filter, 
-  UserPlus, 
-  MoreHorizontal, 
-  Edit, 
-  Trash2, 
-  Key, 
+} from "@/components/ui/dropdown-menu";
+import {
+  Users,
+  Search,
+  Filter,
+  UserPlus,
+  MoreHorizontal,
+  Edit,
+  Trash2,
+  Key,
   Mail,
   Phone,
   MapPin,
@@ -41,18 +53,18 @@ import {
   XCircle,
   AlertTriangle,
   RefreshCw,
-  Calendar
-} from 'lucide-react';
-import { useAllUsers } from '@/lib/hooks/useUserManagement';
-import UserForm from '@/components/UserForm';
-import PasswordResetModal from '@/components/PasswordResetModal';
-import DeleteUserModal from '@/components/DeleteUserModal';
-import ProtectedRoute from '@/components/ProtectedRoute';
-import { Database } from '@/lib/database.types';
+  Calendar,
+} from "lucide-react";
+import { useAllUsers } from "@/lib/hooks/useUserManagement";
+import UserForm from "@/components/UserForm";
+import PasswordResetModal from "@/components/PasswordResetModal";
+import DeleteUserModal from "@/components/DeleteUserModal";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import { Database } from "@/lib/database.types";
 
-type User = Database['public']['Tables']['appUsers']['Row'];
-type UserRole = Database['public']['Enums']['user_role'];
-type UserStatus = Database['public']['Enums']['user_status'];
+type User = Database["public"]["Tables"]["appUsers"]["Row"];
+type UserRole = Database["public"]["Enums"]["user_role"];
+type UserStatus = Database["public"]["Enums"]["user_status"];
 
 export default function UsersPage() {
   return (
@@ -63,9 +75,9 @@ export default function UsersPage() {
 }
 
 function UsersContent() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [roleFilter, setRoleFilter] = useState<UserRole | 'all'>('all');
-  const [statusFilter, setStatusFilter] = useState<UserStatus | 'all'>('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState<UserRole | "all">("all");
+  const [statusFilter, setStatusFilter] = useState<UserStatus | "all">("all");
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [passwordResetUser, setPasswordResetUser] = useState<{
@@ -85,70 +97,75 @@ function UsersContent() {
   // Filter users based on search and filters
   const filteredUsers = useMemo(() => {
     if (!users) return [];
-    
-    return users.filter(user => {
-      const matchesSearch = !searchTerm || 
+
+    return users.filter((user) => {
+      const matchesSearch =
+        !searchTerm ||
         user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.human_id?.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesRole = roleFilter === 'all' || user.primary_role === roleFilter;
-      const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
-      
+
+      const matchesRole =
+        roleFilter === "all" || user.primary_role === roleFilter;
+      const matchesStatus =
+        statusFilter === "all" || user.status === statusFilter;
+
       return matchesSearch && matchesRole && matchesStatus;
     });
   }, [users, searchTerm, roleFilter, statusFilter]);
 
   // Calculate statistics
   const stats = useMemo(() => {
-    if (!users) return { total: 0, active: 0, inactive: 0, suspended: 0, pending: 0 };
-    
+    if (!users)
+      return { total: 0, active: 0, inactive: 0, suspended: 0, pending: 0 };
+
     return {
       total: users.length,
-      active: users.filter(u => u.status === 'active').length,
-      inactive: users.filter(u => u.status === 'inactive').length,
-      suspended: users.filter(u => u.status === 'suspended').length,
-      pending: users.filter(u => u.status === 'pending').length,
+      active: users.filter((u) => u.status === "active").length,
+      inactive: users.filter((u) => u.status === "inactive").length,
+      suspended: users.filter((u) => u.status === "suspended").length,
+      pending: users.filter((u) => u.status === "pending").length,
     };
   }, [users]);
 
   const getStatusColor = (status: UserStatus | null) => {
     switch (status) {
-      case 'active':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'inactive':
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-      case 'suspended':
-        return 'bg-red-100 text-red-800 border-red-200';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case "active":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "inactive":
+        return "bg-gray-100 text-gray-800 border-gray-200";
+      case "suspended":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
   const getRoleColor = (role: UserRole | null) => {
     switch (role) {
-      case 'admin':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'staff':
-        return 'bg-cyan-100 text-cyan-800 border-cyan-200';
-      case 'customer':
-        return 'bg-green-100 text-green-800 border-green-200';
+      case "admin":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "staff":
+        return "bg-cyan-100 text-cyan-800 border-cyan-200";
+      case "customer":
+        return "bg-green-100 text-green-800 border-green-200";
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
   const formatRole = (role: UserRole | null) => {
-    if (!role) return 'No Role';
-    return role.split('_').map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1)
-    ).join(' ');
+    if (!role) return "No Role";
+    return role
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
   };
 
   const formatStatus = (status: UserStatus | null) => {
-    if (!status) return 'Unknown';
+    if (!status) return "Unknown";
     return status.charAt(0).toUpperCase() + status.slice(1);
   };
 
@@ -161,17 +178,17 @@ function UsersContent() {
   const handlePasswordReset = (user: User) => {
     setPasswordResetUser({
       id: user.id,
-      name: user.name || 'Unknown User',
-      email: user.email || 'No email'
+      name: user.name || "Unknown User",
+      email: user.email || "No email",
     });
   };
 
   const handleDeleteUserRequest = (user: User) => {
     setDeleteUser({
       id: user.id,
-      name: user.name || 'Unknown User',
-      email: user.email || 'No email',
-      role: (user.primary_role as UserRole) || 'customer'
+      name: user.name || "Unknown User",
+      email: user.email || "No email",
+      role: (user.primary_role as UserRole) || "customer",
     });
   };
 
@@ -216,18 +233,16 @@ function UsersContent() {
               <Users className="h-8 w-8 text-blue-600" />
               User Management
             </h1>
-            <p className="text-gray-600 mt-1">Manage system users, roles, and permissions</p>
+            <p className="text-gray-600 mt-1">
+              Manage system users, roles, and permissions
+            </p>
           </div>
           <div className="flex items-center gap-3">
-            <Button
-              onClick={refetch}
-              variant="outline"
-              size="sm"
-            >
+            <Button onClick={refetch} variant="outline" size="sm">
               <RefreshCw className="h-4 w-4 mr-2" />
               Refresh
             </Button>
-            <Button 
+            <Button
               onClick={() => setIsAddUserOpen(true)}
               className="flex items-center gap-2"
             >
@@ -246,7 +261,9 @@ function UsersContent() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.total}</div>
-              <p className="text-xs text-muted-foreground">All registered users</p>
+              <p className="text-xs text-muted-foreground">
+                All registered users
+              </p>
             </CardContent>
           </Card>
 
@@ -256,7 +273,9 @@ function UsersContent() {
               <CheckCircle className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{stats.active}</div>
+              <div className="text-2xl font-bold text-green-600">
+                {stats.active}
+              </div>
               <p className="text-xs text-muted-foreground">Active users</p>
             </CardContent>
           </Card>
@@ -267,7 +286,9 @@ function UsersContent() {
               <XCircle className="h-4 w-4 text-gray-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-gray-600">{stats.inactive}</div>
+              <div className="text-2xl font-bold text-gray-600">
+                {stats.inactive}
+              </div>
               <p className="text-xs text-muted-foreground">Inactive users</p>
             </CardContent>
           </Card>
@@ -278,7 +299,9 @@ function UsersContent() {
               <AlertTriangle className="h-4 w-4 text-red-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-red-600">{stats.suspended}</div>
+              <div className="text-2xl font-bold text-red-600">
+                {stats.suspended}
+              </div>
               <p className="text-xs text-muted-foreground">Suspended users</p>
             </CardContent>
           </Card>
@@ -289,7 +312,9 @@ function UsersContent() {
               <Clock className="h-4 w-4 text-yellow-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
+              <div className="text-2xl font-bold text-yellow-600">
+                {stats.pending}
+              </div>
               <p className="text-xs text-muted-foreground">Pending approval</p>
             </CardContent>
           </Card>
@@ -306,8 +331,11 @@ function UsersContent() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          
-          <Select value={roleFilter} onValueChange={(value) => setRoleFilter(value as UserRole | 'all')}>
+
+          <Select
+            value={roleFilter}
+            onValueChange={(value) => setRoleFilter(value as UserRole | "all")}
+          >
             <SelectTrigger className="w-full sm:w-48">
               <SelectValue placeholder="Filter by role" />
             </SelectTrigger>
@@ -319,7 +347,12 @@ function UsersContent() {
             </SelectContent>
           </Select>
 
-          <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as UserStatus | 'all')}>
+          <Select
+            value={statusFilter}
+            onValueChange={(value) =>
+              setStatusFilter(value as UserStatus | "all")
+            }
+          >
             <SelectTrigger className="w-full sm:w-48">
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
@@ -361,7 +394,7 @@ function UsersContent() {
                     <TableCell>
                       <div>
                         <div className="font-medium text-gray-900">
-                          {user.name || 'Unnamed User'}
+                          {user.name || "Unnamed User"}
                         </div>
                         <div className="text-sm text-gray-500">
                           ID: {user.human_id || user.id.substring(0, 8)}
@@ -391,23 +424,28 @@ function UsersContent() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge className={getRoleColor(user.primary_role as UserRole)} variant="outline">
+                      <Badge
+                        className={getRoleColor(user.primary_role as UserRole)}
+                        variant="outline"
+                      >
                         <Shield className="h-3 w-3 mr-1" />
                         {formatRole(user.primary_role as UserRole)}
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge className={getStatusColor(user.status)} variant="outline">
+                      <Badge
+                        className={getStatusColor(user.status)}
+                        variant="outline"
+                      >
                         {formatStatus(user.status)}
                       </Badge>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1 text-sm text-gray-500">
                         <Calendar className="h-3 w-3" />
-                        {user.created_at 
+                        {user.created_at
                           ? new Date(user.created_at).toLocaleDateString()
-                          : 'Unknown'
-                        }
+                          : "Unknown"}
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
@@ -420,16 +458,20 @@ function UsersContent() {
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => setEditingUserId(user.id)}>
+                          <DropdownMenuItem
+                            onClick={() => setEditingUserId(user.id)}
+                          >
                             <Edit className="mr-2 h-4 w-4" />
                             Edit User
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handlePasswordReset(user)}>
+                          <DropdownMenuItem
+                            onClick={() => handlePasswordReset(user)}
+                          >
                             <Key className="mr-2 h-4 w-4" />
                             Reset Password
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             onClick={() => handleDeleteUserRequest(user)}
                             className="text-red-600 focus:text-red-600"
                           >
@@ -450,10 +492,9 @@ function UsersContent() {
               <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-500">No users found</p>
               <p className="text-sm text-gray-400">
-                {searchTerm || roleFilter !== 'all' || statusFilter !== 'all'
-                  ? 'Try adjusting your search or filters'
-                  : 'Start by adding your first user'
-                }
+                {searchTerm || roleFilter !== "all" || statusFilter !== "all"
+                  ? "Try adjusting your search or filters"
+                  : "Start by adding your first user"}
               </p>
             </div>
           )}
@@ -471,7 +512,10 @@ function UsersContent() {
       </Dialog>
 
       {/* Edit User Modal */}
-      <Dialog open={!!editingUserId} onOpenChange={(open) => !open && setEditingUserId(null)}>
+      <Dialog
+        open={!!editingUserId}
+        onOpenChange={(open) => !open && setEditingUserId(null)}
+      >
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           {editingUserId && (
             <UserForm

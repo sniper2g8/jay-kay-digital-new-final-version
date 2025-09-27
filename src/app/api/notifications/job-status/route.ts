@@ -1,7 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { Resend } from 'resend';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import { NextRequest, NextResponse } from "next/server";
+import { Resend } from "resend";
 
 export interface JobNotificationData {
   customerEmail: string;
@@ -16,28 +14,28 @@ export interface JobNotificationData {
 
 const getStatusDisplayName = (status: string): string => {
   const statusMap: Record<string, string> = {
-    'pending': 'Pending Review',
-    'in_progress': 'In Production',
-    'review': 'Under Review',
-    'completed': 'Completed',
-    'cancelled': 'Cancelled',
-    'on_hold': 'On Hold',
-    'quote_sent': 'Quote Sent'
+    pending: "Pending Review",
+    in_progress: "In Production",
+    review: "Under Review",
+    completed: "Completed",
+    cancelled: "Cancelled",
+    on_hold: "On Hold",
+    quote_sent: "Quote Sent",
   };
   return statusMap[status] || status;
 };
 
 const getStatusColor = (status: string): string => {
   const colorMap: Record<string, string> = {
-    'pending': '#f59e0b',
-    'in_progress': '#3b82f6',
-    'review': '#8b5cf6',
-    'completed': '#10b981',
-    'cancelled': '#ef4444',
-    'on_hold': '#6b7280',
-    'quote_sent': '#06b6d4'
+    pending: "#f59e0b",
+    in_progress: "#3b82f6",
+    review: "#8b5cf6",
+    completed: "#10b981",
+    cancelled: "#ef4444",
+    on_hold: "#6b7280",
+    quote_sent: "#06b6d4",
   };
-  return colorMap[status] || '#6b7280';
+  return colorMap[status] || "#6b7280";
 };
 
 const generateEmailTemplate = (data: JobNotificationData): string => {
@@ -85,44 +83,66 @@ const generateEmailTemplate = (data: JobNotificationData): string => {
             </div>
 
             <!-- Status-specific messages -->
-            ${data.newStatus === 'completed' ? `
+            ${
+              data.newStatus === "completed"
+                ? `
                 <div style="background: #f0fff4; border: 1px solid #9ae6b4; padding: 20px; border-radius: 8px; margin: 20px 0;">
                     <h4 style="color: #276749; margin: 0 0 10px 0;">🎉 Great News!</h4>
                     <p style="color: #276749; margin: 0;">Your order is ready for pickup or delivery. Please contact us to arrange collection.</p>
                 </div>
-            ` : ''}
+            `
+                : ""
+            }
 
-            ${data.newStatus === 'in_progress' ? `
+            ${
+              data.newStatus === "in_progress"
+                ? `
                 <div style="background: #ebf8ff; border: 1px solid #90cdf4; padding: 20px; border-radius: 8px; margin: 20px 0;">
                     <h4 style="color: #2c5282; margin: 0 0 10px 0;">🔄 In Production</h4>
                     <p style="color: #2c5282; margin: 0;">Your job is now being processed. We'll keep you updated on the progress.</p>
                 </div>
-            ` : ''}
+            `
+                : ""
+            }
 
-            ${data.newStatus === 'on_hold' ? `
+            ${
+              data.newStatus === "on_hold"
+                ? `
                 <div style="background: #fffbeb; border: 1px solid #f6d55c; padding: 20px; border-radius: 8px; margin: 20px 0;">
                     <h4 style="color: #92400e; margin: 0 0 10px 0;">⏸️ On Hold</h4>
                     <p style="color: #92400e; margin: 0;">Your job has been temporarily paused. We'll contact you with more details.</p>
                 </div>
-            ` : ''}
+            `
+                : ""
+            }
 
-            ${data.estimatedDelivery ? `
+            ${
+              data.estimatedDelivery
+                ? `
                 <p style="margin: 20px 0; padding: 15px; background: #f7fafc; border-radius: 6px;">
-                    <strong>Estimated Delivery:</strong> ${new Date(data.estimatedDelivery).toLocaleDateString('en-US', { 
-                        weekday: 'long', 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
+                    <strong>Estimated Delivery:</strong> ${new Date(
+                      data.estimatedDelivery,
+                    ).toLocaleDateString("en-US", {
+                      weekday: "long",
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
                     })}
                 </p>
-            ` : ''}
+            `
+                : ""
+            }
 
-            ${data.notes ? `
+            ${
+              data.notes
+                ? `
                 <div style="margin: 20px 0; padding: 15px; background: #f7fafc; border-radius: 6px;">
                     <strong>Additional Notes:</strong>
                     <p style="margin: 10px 0 0 0;">${data.notes}</p>
                 </div>
-            ` : ''}
+            `
+                : ""
+            }
 
             <!-- Contact Information -->
             <div style="margin: 30px 0; padding: 20px; background: #f8fafc; border-radius: 8px;">
@@ -152,7 +172,7 @@ export async function POST(request: NextRequest) {
   try {
     // Initialize Resend client inside the function to avoid build-time errors
     const resend = new Resend(process.env.RESEND_API_KEY);
-    
+
     const body = await request.json();
     const {
       customerEmail,
@@ -162,14 +182,20 @@ export async function POST(request: NextRequest) {
       oldStatus,
       newStatus,
       estimatedDelivery,
-      notes
+      notes,
     }: JobNotificationData = body;
 
     // Validate required fields
-    if (!customerEmail || !customerName || !jobNumber || !jobTitle || !newStatus) {
+    if (
+      !customerEmail ||
+      !customerName ||
+      !jobNumber ||
+      !jobTitle ||
+      !newStatus
+    ) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
+        { error: "Missing required fields" },
+        { status: 400 },
       );
     }
 
@@ -177,8 +203,8 @@ export async function POST(request: NextRequest) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(customerEmail)) {
       return NextResponse.json(
-        { error: 'Invalid email format' },
-        { status: 400 }
+        { error: "Invalid email format" },
+        { status: 400 },
       );
     }
 
@@ -188,43 +214,42 @@ export async function POST(request: NextRequest) {
       customerName,
       jobNumber,
       jobTitle,
-      oldStatus: oldStatus || 'unknown',
+      oldStatus: oldStatus || "unknown",
       newStatus,
       estimatedDelivery,
-      notes
+      notes,
     });
 
     // Send email using Resend
     const { data, error } = await resend.emails.send({
-      from: 'Jay Kay Digital Press <noreply@jaykaydigitalpress.com>',
+      from: "Jay Kay Digital Press <noreply@jaykaydigitalpress.com>",
       to: [customerEmail],
       subject: `Job Status Update: ${jobNumber} - ${statusDisplay}`,
       html: emailHtml,
-      replyTo: 'jaykaydigitalpress@gmail.com'
+      replyTo: "jaykaydigitalpress@gmail.com",
     });
 
     if (error) {
-      console.error('Resend error:', error);
+      console.error("Resend error:", error);
       return NextResponse.json(
-        { error: 'Failed to send email', details: error },
-        { status: 500 }
+        { error: "Failed to send email", details: error },
+        { status: 500 },
       );
     }
 
     return NextResponse.json({
       success: true,
       messageId: data?.id,
-      message: `Email sent successfully to ${customerEmail}`
+      message: `Email sent successfully to ${customerEmail}`,
     });
-
   } catch (error) {
-    console.error('Email notification error:', error);
+    console.error("Email notification error:", error);
     return NextResponse.json(
-      { 
-        error: 'Internal server error',
-        details: error instanceof Error ? error.message : 'Unknown error'
+      {
+        error: "Internal server error",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

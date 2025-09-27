@@ -4,23 +4,25 @@ import { LogoVariants } from "@/components/Logo";
 import { COMPANY_INFO } from "@/lib/brand";
 
 interface BrandHeaderProps {
-  variant?: 'compact' | 'full';
+  variant?: "compact" | "full";
   showTagline?: boolean;
   className?: string;
   centerAlign?: boolean;
 }
 
-export default function BrandHeader({ 
-  variant = 'compact', 
-  showTagline = true, 
-  className = '',
-  centerAlign = true 
+export default function BrandHeader({
+  variant = "compact",
+  showTagline = true,
+  className = "",
+  centerAlign = true,
 }: BrandHeaderProps) {
-  if (variant === 'full') {
+  if (variant === "full") {
     return (
       <div className={`bg-white border-b border-gray-200 ${className}`}>
         <div className="container mx-auto px-4 py-6">
-          <div className={`flex items-center ${centerAlign ? 'justify-center' : 'justify-start'} space-x-4`}>
+          <div
+            className={`flex items-center ${centerAlign ? "justify-center" : "justify-start"} space-x-4`}
+          >
             <LogoVariants.HeroLogo />
           </div>
         </div>
@@ -31,7 +33,9 @@ export default function BrandHeader({
   return (
     <div className={`bg-white border-b border-gray-200 ${className}`}>
       <div className="container mx-auto px-4 py-4">
-        <div className={`flex items-center ${centerAlign ? 'justify-center' : 'justify-between'} space-x-4`}>
+        <div
+          className={`flex items-center ${centerAlign ? "justify-center" : "justify-between"} space-x-4`}
+        >
           <div className="flex items-center space-x-4">
             <LogoVariants.NavLogo showText={true} />
           </div>

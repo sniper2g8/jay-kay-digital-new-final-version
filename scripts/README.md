@@ -5,30 +5,35 @@ This directory contains several diagnostic and fix scripts to help resolve the R
 ## Scripts Overview
 
 ### 1. check-current-rls.sql
+
 Checks the current RLS status and policies for both `invoice_items` and `invoice_line_items` tables.
 
 **Purpose**: Diagnose current RLS configuration
 **Usage**: Run in Supabase SQL editor
 
 ### 2. simple-data-check.sql
+
 Simple data access check for both tables.
 
 **Purpose**: Verify if data can be accessed in both tables
 **Usage**: Run in Supabase SQL editor
 
 ### 3. role-access-test.sql
+
 Check database roles and test access with different roles.
 
 **Purpose**: Understand role configuration and permissions
 **Usage**: Run in Supabase SQL editor
 
 ### 4. compare-tables-structure.sql
+
 Compare the structure of `invoice_items` and `invoice_line_items` tables.
 
 **Purpose**: Identify structural differences between tables
 **Usage**: Run in Supabase SQL editor
 
 ### 5. fix-invoice-items-rls.sql
+
 Fix RLS policies for the `invoice_items` table.
 
 **Purpose**: Correct RLS policies to allow proper access

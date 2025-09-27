@@ -118,6 +118,6 @@ export const createTrackingUrl = (jobNo: string, baseUrl?: string): string => {
 
 // Utility function to extract job number from tracking URL
 export const extractJobNoFromUrl = (url: string): string | null => {
-  const match = url.match(/\/track\/([^\/\?]+)/);
+  const match = url.match(/\/track\/([^\/?]+)/);
   return match ? match[1] : null;
 };

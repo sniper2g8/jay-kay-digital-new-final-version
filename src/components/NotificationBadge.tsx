@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { Bell, BellDot } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { useState, useEffect, useCallback } from "react";
+import { Bell, BellDot } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,38 +11,47 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
   DropdownMenuLabel,
-} from '@/components/ui/dropdown-menu';
-import { useAuth } from '@/contexts/AuthContext';
-import { useNotifications } from '@/lib/hooks/useNotifications';
-import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+} from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNotifications } from "@/lib/hooks/useNotifications";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 interface Notification {
   id: string;
   title: string;
   message: string;
-  type: 'job_update' | 'payment_due' | 'delivery_ready' | 'system_alert' | 'promotion' | 'reminder';
+  type:
+    | "job_update"
+    | "payment_due"
+    | "delivery_ready"
+    | "system_alert"
+    | "promotion"
+    | "reminder";
   read_at: string | null;
   created_at: string | null;
 }
 
 export default function NotificationBadge() {
   const [unreadCount, setUnreadCount] = useState(0);
-  const [recentNotifications, setRecentNotifications] = useState<Notification[]>([]);
+  const [recentNotifications, setRecentNotifications] = useState<
+    Notification[]
+  >([]);
   const [isNotificationEnabled, setIsNotificationEnabled] = useState(false);
   const { user } = useAuth();
   const { getUnreadCount, getNotifications, markAsRead } = useNotifications();
   const router = useRouter();
 
   // Check if notifications are enabled in environment
-  const notificationsEnabled = process.env.NEXT_PUBLIC_ENABLE_NOTIFICATIONS !== 'false';
+  const notificationsEnabled =
+    process.env.NEXT_PUBLIC_ENABLE_NOTIFICATIONS !== "false";
 
   const fetchUnreadCount = useCallback(async () => {
     if (!user?.id || !isNotificationEnabled || !notificationsEnabled) {
       setUnreadCount(0);
       return;
     }
-    
+
     try {
       const count = await getUnreadCount();
       setUnreadCount(count);
@@ -57,7 +66,7 @@ export default function NotificationBadge() {
       setRecentNotifications([]);
       return;
     }
-    
+
     try {
       const notifications = await getNotifications(undefined, { limit: 5 });
       setRecentNotifications(notifications as Notification[]);
@@ -101,22 +110,22 @@ export default function NotificationBadge() {
       // Only fetch data if notifications are enabled and accessible
       fetchUnreadCount();
       fetchRecentNotifications();
-      
+
       // Set up real-time subscription for notifications
       const channel = supabase
-        .channel('notifications')
+        .channel("notifications")
         .on(
-          'postgres_changes',
+          "postgres_changes",
           {
-            event: '*',
-            schema: 'public',
-            table: 'notifications',
-            filter: `recipient_id=eq.${user.id}`
+            event: "*",
+            schema: "public",
+            table: "notifications",
+            filter: `recipient_id=eq.${user.id}`,
           },
           () => {
             fetchUnreadCount();
             fetchRecentNotifications();
-          }
+          },
         )
         .subscribe();
 
@@ -124,11 +133,16 @@ export default function NotificationBadge() {
         supabase.removeChannel(channel);
       };
     }
-  }, [isNotificationEnabled, user?.id, fetchUnreadCount, fetchRecentNotifications]);
+  }, [
+    isNotificationEnabled,
+    user?.id,
+    fetchUnreadCount,
+    fetchRecentNotifications,
+  ]);
 
   const handleNotificationClick = async (notificationId: string) => {
     if (!isNotificationEnabled) return;
-    
+
     await markAsRead(notificationId);
     await fetchUnreadCount();
     await fetchRecentNotifications();
@@ -136,24 +150,33 @@ export default function NotificationBadge() {
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'job_update': return 'text-blue-600';
-      case 'payment_due': return 'text-red-600';
-      case 'delivery_ready': return 'text-green-600';
-      case 'system_alert': return 'text-orange-600';
-      case 'promotion': return 'text-purple-600';
-      case 'reminder': return 'text-yellow-600';
-      default: return 'text-gray-600';
+      case "job_update":
+        return "text-blue-600";
+      case "payment_due":
+        return "text-red-600";
+      case "delivery_ready":
+        return "text-green-600";
+      case "system_alert":
+        return "text-orange-600";
+      case "promotion":
+        return "text-purple-600";
+      case "reminder":
+        return "text-yellow-600";
+      default:
+        return "text-gray-600";
     }
   };
 
   const formatTimeAgo = (dateString: string | null) => {
-    if (!dateString) return '';
-    
+    if (!dateString) return "";
+
     const date = new Date(dateString);
     const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-    
-    if (diffInMinutes < 1) return 'Just now';
+    const diffInMinutes = Math.floor(
+      (now.getTime() - date.getTime()) / (1000 * 60),
+    );
+
+    if (diffInMinutes < 1) return "Just now";
     if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
     if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
     return `${Math.floor(diffInMinutes / 1440)}d ago`;
@@ -174,11 +197,11 @@ export default function NotificationBadge() {
             <Bell className="h-5 w-5" />
           )}
           {unreadCount > 0 && (
-            <Badge 
-              variant="destructive" 
+            <Badge
+              variant="destructive"
               className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
             >
-              {unreadCount > 99 ? '99+' : unreadCount}
+              {unreadCount > 99 ? "99+" : unreadCount}
             </Badge>
           )}
         </Button>
@@ -193,7 +216,7 @@ export default function NotificationBadge() {
           )}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        
+
         {recentNotifications.length > 0 ? (
           <>
             {recentNotifications.map((notification) => (
@@ -205,7 +228,9 @@ export default function NotificationBadge() {
                 <div className="flex items-start justify-between w-full">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <h4 className={`text-sm font-medium truncate ${getTypeColor(notification.type)}`}>
+                      <h4
+                        className={`text-sm font-medium truncate ${getTypeColor(notification.type)}`}
+                      >
                         {notification.title}
                       </h4>
                       {!notification.read_at && (
@@ -225,7 +250,7 @@ export default function NotificationBadge() {
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="text-center text-blue-600 cursor-pointer"
-              onClick={() => router.push('/dashboard/notifications')}
+              onClick={() => router.push("/dashboard/notifications")}
             >
               View all notifications
             </DropdownMenuItem>

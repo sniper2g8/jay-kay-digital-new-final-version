@@ -41,7 +41,7 @@ const fetchUserRole = async (userId: string): Promise<UserWithRole | null> => {
     if (sessionError) {
       console.error("Session error in fetchUserRole:", {
         message: sessionError.message,
-        code: sessionError.code
+        code: sessionError.code,
       });
       return null;
     }
@@ -57,15 +57,18 @@ const fetchUserRole = async (userId: string): Promise<UserWithRole | null> => {
     }
 
     if (session.user.id !== userId) {
-      console.log("fetchUserRole: Session user ID doesn't match requested user ID", {
-        sessionUserId: session.user.id,
-        requestedUserId: userId
-      });
+      console.log(
+        "fetchUserRole: Session user ID doesn't match requested user ID",
+        {
+          sessionUserId: session.user.id,
+          requestedUserId: userId,
+        },
+      );
       return null;
     }
 
     // Add a small delay to ensure session is fully initialized
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     // Get user data from appUsers table
     const { data, error } = await supabase
@@ -84,7 +87,7 @@ const fetchUserRole = async (userId: string): Promise<UserWithRole | null> => {
         message: error.message,
         code: error.code,
         details: error.details,
-        hint: error.hint
+        hint: error.hint,
       });
       return null;
     }
@@ -93,8 +96,8 @@ const fetchUserRole = async (userId: string): Promise<UserWithRole | null> => {
     return data as UserWithRole;
   } catch (error) {
     console.error("Error in fetchUserRole:", {
-      message: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : 'No stack trace'
+      message: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : "No stack trace",
     });
     return null;
   }
@@ -109,10 +112,10 @@ export const useUserRole = () => {
 
   // Only fetch if user is authenticated and session is valid
   const shouldFetch =
-    !loading && 
-    !isBuildTime && 
-    user && 
-    session && 
+    !loading &&
+    !isBuildTime &&
+    user &&
+    session &&
     session.user?.id === user.id &&
     user.id; // Ensure we have a valid user ID
 
@@ -125,11 +128,11 @@ export const useUserRole = () => {
       errorRetryCount: 2,
       onError: (error) => {
         // Only log errors in development environment
-        if (shouldFetch && process.env.NODE_ENV === 'development') {
+        if (shouldFetch && process.env.NODE_ENV === "development") {
           console.error("Error in useUserRole SWR:", {
             error,
             userId: user?.id,
-            shouldFetch
+            shouldFetch,
           });
         }
       },
@@ -139,13 +142,13 @@ export const useUserRole = () => {
   );
 
   // Add better error logging for development only
-  if (result.error && process.env.NODE_ENV === 'development') {
+  if (result.error && process.env.NODE_ENV === "development") {
     console.error("useUserRole hook error:", {
       error: result.error,
       userId: user?.id,
       shouldFetch,
       loading,
-      isBuildTime
+      isBuildTime,
     });
   }
 
