@@ -33,7 +33,7 @@ export default tseslint.config(
         { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
       ],
       "@typescript-eslint/no-explicit-any": "warn",
-      "@typescript-eslint/prefer-const": "error",
+      "prefer-const": "error", // Use the native ESLint rule
       "no-console": "warn",
     },
     languageOptions: {

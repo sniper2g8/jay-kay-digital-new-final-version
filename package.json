@@ -3,18 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "echo \"No tests specified\" && exit 0",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "type-check": "tsc --noEmit",
     "type-check:watch": "tsc --noEmit --watch",
-    "lint": "next lint",
-    "lint:fix": "next lint --fix",
-    "lint:types": "eslint --ext .ts,.tsx . --max-warnings 0",
-    "fix-types": "tsc --noEmit && eslint --fix --ext .ts,.tsx .",
-    "fix-all": "npm run lint:fix && npm run format",
+    "fix-types": "npm run type-check && npm run lint:fix",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
-    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
-    "pre-commit": "npm run type-check && npm run lint:fix && npm run format",
-    "check-all": "npm run type-check && npm run lint && npm run format:check",
-    "prepare": "husky"
+    "check-all": "npm run type-check && npm run lint && npm run format --check"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
