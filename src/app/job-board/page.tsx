@@ -422,12 +422,12 @@ function JobBoardContent() {
   }, [fetchJobBoardData]);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6">
       {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-        <div className="flex items-center justify-between">
+      <div className="bg-white rounded-xl shadow-sm p-6 mb-6 border border-gray-100">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
               Jay Kay Digital Press
             </h1>
             <p className="text-gray-600 mt-1">Public Job Status Board</p>
@@ -435,11 +435,11 @@ function JobBoardContent() {
               Check your job number for status updates
             </p>
           </div>
-          <div className="text-right">
+          <div className="flex flex-col items-end">
             <Button
               onClick={fetchJobBoardData}
               disabled={isLoading}
-              className="mb-2"
+              className="mb-2 shadow-sm hover:shadow-md transition-shadow"
             >
               <RefreshCw
                 className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`}
@@ -455,7 +455,7 @@ function JobBoardContent() {
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Card>
+        <Card className="shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-blue-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Jobs Created Today
@@ -470,7 +470,7 @@ function JobBoardContent() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-blue-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">In Progress</CardTitle>
             <Printer className="h-4 w-4 text-blue-600" />
@@ -483,7 +483,7 @@ function JobBoardContent() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-yellow-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Waiting</CardTitle>
             <Clock className="h-4 w-4 text-yellow-600" />
@@ -496,7 +496,7 @@ function JobBoardContent() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-green-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Completed Today
@@ -513,34 +513,38 @@ function JobBoardContent() {
       </div>
 
       {/* Daily Statistics Banner */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-        <div className="flex items-center justify-between">
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 mb-6 shadow-sm">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex items-center space-x-4">
-            <Timer className="h-5 w-5 text-blue-600" />
+            <div className="bg-blue-100 p-2 rounded-lg">
+              <Timer className="h-5 w-5 text-blue-600" />
+            </div>
             <div>
               <span className="text-lg font-medium text-blue-900">
                 Daily Statistics - {new Date().toLocaleDateString()}
               </span>
-              <p className="text-sm text-blue-700">
-                Average Wait Time: {stats.average_wait_time} | Created:{" "}
-                {stats.total_jobs_today} | Completed: {stats.completed_today}
+              <p className="text-sm text-blue-700 mt-1">
+                Average Wait Time: <span className="font-medium">{stats.average_wait_time}</span> | Created:{" "}
+                <span className="font-medium">{stats.total_jobs_today}</span> | Completed: <span className="font-medium">{stats.completed_today}</span>
               </p>
             </div>
           </div>
-          <div className="text-right text-sm text-blue-600">
-            <p>Resets at midnight</p>
-            <p className="text-xs">{new Date().toLocaleTimeString()}</p>
+          <div className="text-right">
+            <p className="text-sm text-blue-600 font-medium">Resets at midnight</p>
+            <p className="text-xs text-blue-500">{new Date().toLocaleTimeString()}</p>
           </div>
         </div>
       </div>
 
       {/* Job Status Board */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* In Progress Jobs */}
-        <Card className="border-blue-200">
-          <CardHeader className="bg-blue-50">
+        <Card className="border-blue-200 shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="bg-blue-50 rounded-t-lg">
             <CardTitle className="flex items-center space-x-2">
-              <Printer className="h-5 w-5 text-blue-600" />
+              <div className="bg-blue-100 p-1.5 rounded-md">
+                <Printer className="h-5 w-5 text-blue-600" />
+              </div>
               <span>
                 In Progress (
                 {
@@ -573,6 +577,7 @@ function JobBoardContent() {
                     "processing",
                   ].includes(j.status?.toLowerCase()),
                 )
+                .slice(0, 10)
                 .map((job) => <JobCard key={job.id} job={job} showEstimate />)
             )}
             {!isLoading &&
@@ -584,18 +589,21 @@ function JobBoardContent() {
                   "processing",
                 ].includes(j.status?.toLowerCase()),
               ).length === 0 && (
-                <p className="text-center text-gray-500 py-4">
-                  No jobs in progress
-                </p>
+                <div className="text-center py-8">
+                  <Printer className="h-12 w-12 text-gray-300 mx-auto mb-2" />
+                  <p className="text-gray-500">No jobs in progress</p>
+                </div>
               )}
           </CardContent>
         </Card>
 
         {/* Pending Jobs */}
-        <Card className="border-yellow-200">
-          <CardHeader className="bg-yellow-50">
+        <Card className="border-yellow-200 shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="bg-yellow-50 rounded-t-lg">
             <CardTitle className="flex items-center space-x-2">
-              <Clock className="h-5 w-5 text-yellow-600" />
+              <div className="bg-yellow-100 p-1.5 rounded-md">
+                <Clock className="h-5 w-5 text-yellow-600" />
+              </div>
               <span>
                 Waiting Queue (
                 {
@@ -622,6 +630,7 @@ function JobBoardContent() {
                     j.status?.toLowerCase(),
                   ),
                 )
+                .slice(0, 10)
                 .map((job) => <JobCard key={job.id} job={job} showEstimate />)
             )}
             {!isLoading &&
@@ -630,9 +639,10 @@ function JobBoardContent() {
                   j.status?.toLowerCase(),
                 ),
               ).length === 0 && (
-                <p className="text-center text-gray-500 py-4">
-                  No jobs waiting
-                </p>
+                <div className="text-center py-8">
+                  <Clock className="h-12 w-12 text-gray-300 mx-auto mb-2" />
+                  <p className="text-gray-500">No jobs waiting</p>
+                </div>
               )}
           </CardContent>
         </Card>
@@ -640,17 +650,19 @@ function JobBoardContent() {
 
       {/* Footer */}
       <div className="mt-8 text-center text-gray-500 text-sm">
-        <p>
-          Updates automatically every 30 seconds | Daily statistics reset at
-          midnight
-        </p>
-        <p className="mt-1 text-xs">
-          Only job numbers are displayed for privacy protection
-        </p>
-        <p className="mt-1 text-xs font-medium">
-          Today's Workload: {stats.total_jobs_today} jobs created |{" "}
-          {stats.completed_today} completed
-        </p>
+        <div className="bg-white rounded-lg p-4 border border-gray-100 shadow-sm inline-block">
+          <p>
+            Updates automatically every 30 seconds | Daily statistics reset at
+            midnight
+          </p>
+          <p className="mt-1 text-xs">
+            Only job numbers are displayed for privacy protection
+          </p>
+          <p className="mt-1 text-xs font-medium">
+            Today's Workload: {stats.total_jobs_today} jobs created |{" "}
+            {stats.completed_today} completed
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -668,43 +680,43 @@ function JobCard({
   showPickup = false,
 }: JobCardProps) {
   return (
-    <div className="border rounded-lg p-3 bg-white hover:shadow-sm transition-shadow">
-      <div className="flex items-start justify-between mb-2">
+    <div className="border rounded-lg p-4 bg-white hover:shadow-sm transition-all duration-200 hover:border-gray-300">
+      <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
-          <div className="flex items-center space-x-2 mb-1">
-            <span className="font-medium text-sm">{job.job_number}</span>
+          <div className="flex flex-wrap items-center gap-2 mb-2">
+            <span className="font-bold text-base text-gray-900">{job.job_number}</span>
             <Badge className={getPriorityColor(job.priority)} variant="outline">
               {job.priority}
             </Badge>
           </div>
-          <h4 className="font-medium text-gray-900 text-sm mb-1">
+          <h4 className="font-medium text-gray-900 text-base mb-1">
             {job.title}
           </h4>
           <p className="text-xs text-gray-500">Print Job</p>
         </div>
-        <Badge className={getStatusColor(job.status)}>
+        <Badge className={getStatusColor(job.status)} variant="outline">
           <div className="flex items-center space-x-1">
             {getStatusIcon(job.status)}
-            <span className="text-xs">{job.status.replace("_", " ")}</span>
+            <span className="text-xs font-medium">{job.status.replace("_", " ")}</span>
           </div>
         </Badge>
       </div>
 
       {showEstimate && job.estimated_completion && (
-        <div className="flex items-center space-x-1 text-xs text-blue-600 mt-2">
+        <div className="flex items-center space-x-1 text-xs text-blue-600 mt-2 bg-blue-50 px-2 py-1 rounded">
           <Timer className="h-3 w-3" />
-          <span>{job.estimated_completion}</span>
+          <span className="font-medium">{job.estimated_completion}</span>
         </div>
       )}
 
       {showPickup && (
-        <div className="flex items-center space-x-1 text-xs text-green-600 mt-2">
+        <div className="flex items-center space-x-1 text-xs text-green-600 mt-2 bg-green-50 px-2 py-1 rounded">
           <CheckCircle className="h-3 w-3" />
-          <span>Ready for pickup</span>
+          <span className="font-medium">Ready for pickup</span>
         </div>
       )}
 
-      <div className="text-xs text-gray-400 mt-1">
+      <div className="text-xs text-gray-400 mt-3 pt-2 border-t border-gray-100">
         Created: {new Date(job.created_at).toLocaleDateString()}
       </div>
     </div>
