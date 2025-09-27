@@ -1,6 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import DeleteUserModal from "@/components/DeleteUserModal";
+import PasswordResetModal from "@/components/PasswordResetModal";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,25 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,32 +21,45 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
-  Users,
-  Search,
-  Filter,
-  UserPlus,
-  MoreHorizontal,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import UserForm from "@/components/UserForm";
+import { Database } from "@/lib/database.types";
+import { useAllUsers } from "@/lib/hooks/useUserManagement";
+import {
+  AlertTriangle,
+  Calendar,
+  CheckCircle,
+  Clock,
   Edit,
-  Trash2,
   Key,
   Mail,
-  Phone,
   MapPin,
-  Shield,
-  Clock,
-  CheckCircle,
-  XCircle,
-  AlertTriangle,
+  MoreHorizontal,
+  Phone,
   RefreshCw,
-  Calendar,
+  Search,
+  Shield,
+  Trash2,
+  UserPlus,
+  Users,
+  XCircle
 } from "lucide-react";
-import { useAllUsers } from "@/lib/hooks/useUserManagement";
-import UserForm from "@/components/UserForm";
-import PasswordResetModal from "@/components/PasswordResetModal";
-import DeleteUserModal from "@/components/DeleteUserModal";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import { Database } from "@/lib/database.types";
+import { useMemo, useState } from "react";
 
 type User = Database["public"]["Tables"]["appUsers"]["Row"];
 type UserRole = Database["public"]["Enums"]["user_role"];
@@ -160,7 +159,7 @@ function UsersContent() {
     if (!role) return "No Role";
     return role
       .split("_")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
   };
 

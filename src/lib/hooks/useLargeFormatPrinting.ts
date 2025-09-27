@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 // Define types for our large format printing service
 export interface LargeFormatDimensions {
@@ -192,7 +192,7 @@ export const useLargeFormatPrinting = () => {
       // Use sub-service name directly for lookup (matches database structure)
       return SUB_SERVICE_VARIANTS[subService] || [];
     },
-    [],
+    [SUB_SERVICE_VARIANTS],
   );
 
   // Validation functions

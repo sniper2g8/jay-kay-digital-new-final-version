@@ -3,7 +3,7 @@
  * Uses Resend API for email notifications
  */
 
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "../supabase.ts";
 
@@ -283,7 +283,7 @@ export async function updateJobStatusWithNotification(
     }
 
     // Send notifications if status actually changed and customer has email
-    if (oldStatus !== newStatus && jobWithCustomer.customers?.email) {
+    if (oldStatus !== newStatus && jobWithCustomer.customers && jobWithCustomer.customers.length > 0 && jobWithCustomer.customers[0].email) {
       try {
         const response = await fetch("/api/notifications/job-status", {
           method: "POST",
@@ -291,10 +291,10 @@ export async function updateJobStatusWithNotification(
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            customerEmail: jobWithCustomer.customers.email,
+            customerEmail: jobWithCustomer.customers[0].email,
             customerName:
-              jobWithCustomer.customers.contact_person ||
-              jobWithCustomer.customers.business_name,
+              jobWithCustomer.customers[0].contact_person ||
+              jobWithCustomer.customers[0].business_name,
             jobNumber: jobWithCustomer.jobNo || `JOB-${jobId.slice(-6)}`,
             jobTitle: jobWithCustomer.title || "Untitled Job",
             oldStatus: oldStatus || "unknown",

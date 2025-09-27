@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import DashboardLayout from "@/components/DashboardLayout";
+import PaymentReceiptPDF from "@/components/PaymentReceiptPDF";
+import ProtectedDashboard from "@/components/ProtectedDashboard";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,17 +12,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -28,28 +19,37 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
-  ArrowLeft,
-  Save,
-  Plus,
-  Trash2,
-  Loader2,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  formatCurrency,
+  transformFirebaseTimestamp,
+} from "@/lib/invoice-utils";
+import { supabase } from "@/lib/supabase";
+import {
   AlertCircle,
-  DollarSign,
+  ArrowLeft,
   Calendar,
+  DollarSign,
   Eye,
+  Loader2,
+  Plus,
   QrCode,
+  Save,
+  Trash2,
 } from "lucide-react";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
-import DashboardLayout from "@/components/DashboardLayout";
-import ProtectedDashboard from "@/components/ProtectedDashboard";
-import {
-  transformFirebaseTimestamp,
-  formatCurrency,
-} from "@/lib/invoice-utils";
+import { useParams, useRouter } from "next/navigation";
 import QRCodeLib from "qrcode";
-import PaymentReceiptPDF from "@/components/PaymentReceiptPDF";
+import { useEffect, useState } from "react";
 
 interface InvoiceLineItem {
   id?: string;
@@ -196,7 +196,7 @@ function InvoiceEditContent() {
         return;
       }
 
-      if (!invoiceData.customers?.human_id) {
+      if (!invoiceData.customers || invoiceData.customers.length === 0 || !invoiceData.customers[0].human_id) {
         console.error("Customer has no human_id for foreign key constraint");
         setError("Customer ID is missing - cannot record payment");
         return;
@@ -233,7 +233,7 @@ function InvoiceEditContent() {
         received_by: null, // uuid nullable - we don't have user context here
         // created_at and updated_at will be set by database defaults
         invoice_no: invoiceData.invoiceNo, // varchar(50) NOT NULL - foreign key to invoices.invoiceNo
-        customer_human_id: invoiceData.customers.human_id, // varchar(20) NOT NULL - foreign key to customers.human_id
+        customer_human_id: invoiceData.customers[0].human_id, // varchar(20) NOT NULL - foreign key to customers.human_id
         payment_status: "completed" as const, // varchar(20) with constraint check
         transaction_id: null, // varchar(100) nullable
         payment_gateway: null, // varchar(50) nullable

@@ -1,12 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { ProfessionalInvoicePDF } from "@/components/ProfessionalInvoicePDF";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -14,20 +12,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ProfessionalInvoicePDF } from "@/components/ProfessionalInvoicePDF";
 import { formatCurrency, formatDate } from "@/lib/constants";
+import { supabase } from "@/lib/supabase";
 import {
+  AlertCircle,
   ArrowLeft,
+  Clock,
+  DollarSign,
+  Edit,
+  Eye,
+  FileText,
   Plus,
   Search,
-  FileText,
-  Eye,
-  Edit,
-  DollarSign,
   TrendingUp,
-  Clock,
-  AlertCircle,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface Invoice {
   id: string;
@@ -131,7 +131,7 @@ export default function InvoiceManagementPage() {
           customer_id: invoice.customer_id,
           customerName:
             invoice.customerName ||
-            invoice.customers?.business_name ||
+            (invoice.customers && invoice.customers.length > 0 ? invoice.customers[0].business_name : undefined) ||
             "Unknown Customer",
           due_date:
             invoice.due_date || invoice.created_at || new Date().toISOString(),

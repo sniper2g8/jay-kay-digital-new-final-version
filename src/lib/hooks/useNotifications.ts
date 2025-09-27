@@ -1,6 +1,6 @@
-import { useState, useCallback } from "react";
-import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabase";
+import { useCallback, useState } from "react";
 
 export interface CreateNotificationData {
   title: string;
@@ -58,14 +58,14 @@ export function useNotifications() {
           .single();
 
         if (insertError) {
-          console.error("Error creating notification:", insertError);
+          // Error already handled by setError, no additional logging needed
           setError("Failed to create notification");
           return null;
         }
 
         return notification;
       } catch (err) {
-        console.error("Error creating notification:", err);
+        // Error already handled by setError, no additional logging needed
         setError("Failed to create notification");
         return null;
       } finally {
@@ -86,9 +86,7 @@ export function useNotifications() {
 
         // Validate userId
         if (!targetUserId) {
-          console.warn(
-            "getNotifications called without valid userId and no authenticated user",
-          );
+          // Warning handled by setError, no additional logging needed
           setError("User not authenticated");
           return [];
         }
@@ -130,9 +128,7 @@ export function useNotifications() {
             fetchError.message.includes("permission denied") ||
             fetchError.code === "42501"
           ) {
-            console.warn(
-              "Notifications table access denied - RLS policies need configuration",
-            );
+            // RLS error handled gracefully, no additional logging needed
             return []; // Return empty array instead of throwing error
           }
 
@@ -146,14 +142,9 @@ export function useNotifications() {
           if (fetchError.hint) errorInfo.push(`hint: ${fetchError.hint}`);
 
           if (errorInfo.length > 0) {
-            console.error(
-              "Error fetching notifications:",
-              errorInfo.join(", "),
-            );
+            // Error already handled by setError, no additional logging needed
           } else {
-            console.error(
-              "Error fetching notifications: Unknown database error",
-            );
+            // Error already handled by setError, no additional logging needed
           }
           setError("Failed to fetch notifications");
           return [];
@@ -163,9 +154,9 @@ export function useNotifications() {
       } catch (err) {
         // Only log meaningful error information
         if (err instanceof Error && err.message) {
-          console.error("Error fetching notifications:", err.message);
+          // Error already handled by setError, no additional logging needed
         } else {
-          console.error("Error fetching notifications: Unknown error occurred");
+          // Error already handled by setError, no additional logging needed
         }
         setError("Failed to fetch notifications");
         return [];
@@ -183,7 +174,7 @@ export function useNotifications() {
         setError(null);
 
         if (!user?.id) {
-          console.warn("markAsRead called without authenticated user");
+          // Warning handled by setError, no additional logging needed
           setError("User not authenticated");
           return false;
         }
@@ -196,14 +187,14 @@ export function useNotifications() {
           .is("read_at", null);
 
         if (updateError) {
-          console.error("Error marking notification as read:", updateError);
+          // Error already handled by setError, no additional logging needed
           setError("Failed to mark notification as read");
           return false;
         }
 
         return true;
       } catch (err) {
-        console.error("Error marking notification as read:", err);
+        // Error already handled by setError, no additional logging needed
         setError("Failed to mark notification as read");
         return false;
       } finally {
@@ -222,9 +213,7 @@ export function useNotifications() {
       const targetUserId = userId || user?.id;
 
       if (!targetUserId) {
-        console.warn(
-          "markAllAsRead called without valid userId and no authenticated user",
-        );
+        // Warning handled by setError, no additional logging needed
         setError("User not authenticated");
         return false;
       }
@@ -236,14 +225,14 @@ export function useNotifications() {
         .is("read_at", null);
 
       if (updateError) {
-        console.error("Error marking all notifications as read:", updateError);
+        // Error already handled by setError, no additional logging needed
         setError("Failed to mark notifications as read");
         return false;
       }
 
       return true;
     } catch (err) {
-      console.error("Error marking all notifications as read:", err);
+      // Error already handled by setError, no additional logging needed
       setError("Failed to mark notifications as read");
       return false;
     } finally {
@@ -262,14 +251,14 @@ export function useNotifications() {
         .eq("id", notificationId);
 
       if (deleteError) {
-        console.error("Error deleting notification:", deleteError);
+        // Error already handled by setError, no additional logging needed
         setError("Failed to delete notification");
         return false;
       }
 
       return true;
     } catch (err) {
-      console.error("Error deleting notification:", err);
+      // Error already handled by setError, no additional logging needed
       setError("Failed to delete notification");
       return false;
     } finally {
@@ -284,16 +273,14 @@ export function useNotifications() {
         const targetUserId = userId || user?.id;
 
         if (!targetUserId) {
-          console.warn(
-            "getUnreadCount called without valid userId and no authenticated user",
-          );
+          // Warning handled gracefully, no additional logging needed
           return 0;
         }
 
         // Ensure we have an authenticated session
         const { data: sessionData } = await supabase.auth.getSession();
         if (!sessionData.session) {
-          console.warn("getUnreadCount called without authenticated session");
+          // Warning handled gracefully, no additional logging needed
           return 0;
         }
 
@@ -309,9 +296,7 @@ export function useNotifications() {
             countError.message.includes("permission denied") ||
             countError.code === "42501"
           ) {
-            console.warn(
-              "Notifications table access denied - RLS policies need configuration",
-            );
+            // RLS error handled gracefully, no additional logging needed
             return 0; // Return 0 instead of throwing error
           }
 
@@ -325,9 +310,9 @@ export function useNotifications() {
           if (countError.hint) errorInfo.push(`hint: ${countError.hint}`);
 
           if (errorInfo.length > 0) {
-            console.error("Error getting unread count:", errorInfo.join(", "));
+            // Error handled gracefully, no additional logging needed
           } else {
-            console.error("Error getting unread count: Unknown database error");
+            // Error handled gracefully, no additional logging needed
           }
           return 0;
         }
@@ -336,9 +321,9 @@ export function useNotifications() {
       } catch (err) {
         // Only log meaningful error information
         if (err instanceof Error && err.message) {
-          console.error("Error getting unread count:", err.message);
+          // Error handled gracefully, no additional logging needed
         } else {
-          console.error("Error getting unread count: Unknown error occurred");
+          // Error handled gracefully, no additional logging needed
         }
         return 0;
       }

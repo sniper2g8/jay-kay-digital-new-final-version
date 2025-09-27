@@ -75,42 +75,44 @@ serve(async (req: Request) => {
       throw new Error("RESEND_API_KEY is not configured");
     }
 
-    const emailsToSend: Array<{
+    const emailsToSend: {
       to: string[];
       subject: string;
       html: string;
-    }> = [];
+    }[] = [];
 
     switch (type) {
       case "job_submitted":
-        if (!job)
-          throw new Error(
-            "Job details required for job_submitted notification",
-          );
+        {
+          if (!job)
+            throw new Error(
+              "Job details required for job_submitted notification",
+            );
 
-        // Get all admin emails
-        const { data: admins, error: adminError } = await supabase
-          .from("users")
-          .select("email, name")
-          .eq("role", "admin");
+          // Get all admin emails
+          const { data: admins, error: adminError } = await supabase
+            .from("users")
+            .select("email, name")
+            .eq("role", "admin");
 
-        if (adminError) throw adminError;
+          if (adminError) throw adminError;
 
-        // Send notification to all admins
-        if (admins && admins.length > 0) {
+          // Send notification to all admins
+          if (admins && admins.length > 0) {
+            emailsToSend.push({
+              to: (admins as AdminUser[]).map((admin) => admin.email),
+              subject: `New Job Submitted: ${job.title}`,
+              html: generateJobNotificationTemplate(job, "admin"),
+            });
+          }
+
+          // Send confirmation to customer
           emailsToSend.push({
-            to: (admins as AdminUser[]).map((admin) => admin.email),
-            subject: `New Job Submitted: ${job.title}`,
-            html: generateJobNotificationTemplate(job, "admin"),
+            to: [job.customer_email],
+            subject: `Job Received: ${job.title}`,
+            html: generateJobReceivedTemplate(job),
           });
         }
-
-        // Send confirmation to customer
-        emailsToSend.push({
-          to: [job.customer_email],
-          subject: `Job Received: ${job.title}`,
-          html: generateJobReceivedTemplate(job),
-        });
         break;
 
       case "job_status_update":
@@ -138,27 +140,29 @@ serve(async (req: Request) => {
         break;
 
       case "payment_received":
-        if (!job || !amount) throw new Error("Job details and amount required");
+        {
+          if (!job || !amount) throw new Error("Job details and amount required");
 
-        // Notify customer
-        emailsToSend.push({
-          to: [job.customer_email],
-          subject: `Payment Received: ${job.title}`,
-          html: generatePaymentReceivedTemplate(job, amount),
-        });
-
-        // Notify all admins
-        const { data: adminUsers, error: adminUsersError } = await supabase
-          .from("users")
-          .select("email")
-          .eq("role", "admin");
-
-        if (!adminUsersError && adminUsers && adminUsers.length > 0) {
+          // Notify customer
           emailsToSend.push({
-            to: (adminUsers as AdminEmailOnly[]).map((admin) => admin.email),
+            to: [job.customer_email],
             subject: `Payment Received: ${job.title}`,
-            html: generatePaymentReceivedAdminTemplate(job, amount),
+            html: generatePaymentReceivedTemplate(job, amount),
           });
+
+          // Notify all admins
+          const { data: adminUsers, error: adminUsersError } = await supabase
+            .from("users")
+            .select("email")
+            .eq("role", "admin");
+
+          if (!adminUsersError && adminUsers && adminUsers.length > 0) {
+            emailsToSend.push({
+              to: (adminUsers as AdminEmailOnly[]).map((admin) => admin.email),
+              subject: `Payment Received: ${job.title}`,
+              html: generatePaymentReceivedAdminTemplate(job, amount),
+            });
+          }
         }
         break;
 

@@ -1,29 +1,29 @@
-import React, { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import {
-  Settings,
-  Package,
-  Scissors,
-  Layers,
-  Sparkles,
-  Zap,
-  Grip,
-  LucideIcon,
-  Palette,
-} from "lucide-react";
-import { JobFormData } from "@/lib/hooks/useJobSubmissionForm";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Database } from "@/lib/database.types";
+import { JobFormData } from "@/lib/hooks/useJobSubmissionForm";
+import {
+    Grip,
+    Layers,
+    LucideIcon,
+    Package,
+    Palette,
+    Scissors,
+    Settings,
+    Sparkles,
+    Zap,
+} from "lucide-react";
+import React, { useState } from "react";
 
 type FinishOption = Database["public"]["Tables"]["finish_options"]["Row"];
 
@@ -364,7 +364,7 @@ export default function SpecificationsStep({
                       const info = categoryInfo[category];
                       const Icon = info?.icon || Package;
                       const selectedInCategory =
-                        finishingCategories[category]?.filter((option) =>
+                        finishingCategories[category]?.filter((option: FinishOption) =>
                           formData.finishing_options.includes(option.id),
                         ).length || 0;
 
@@ -424,14 +424,14 @@ export default function SpecificationsStep({
                             {finishingCategories[category]?.length || 0} options
                             available
                           </span>
-                          {finishingCategories[category]?.filter((option) =>
+                          {finishingCategories[category]?.filter((option: FinishOption) =>
                             formData.finishing_options.includes(option.id),
                           ).length > 0 && (
                             <span className="flex items-center gap-1 text-blue-600 font-medium">
                               <div className="h-2 w-2 bg-blue-600 rounded-full animate-pulse"></div>
                               {
                                 finishingCategories[category]?.filter(
-                                  (option) =>
+                                  (option: FinishOption) =>
                                     formData.finishing_options.includes(
                                       option.id,
                                     ),
@@ -446,7 +446,7 @@ export default function SpecificationsStep({
 
                     {/* Options Grid */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      {finishingCategories[category]?.map((option) => {
+                      {finishingCategories[category]?.map((option: FinishOption) => {
                         const isSelected = formData.finishing_options.includes(
                           option.id,
                         );

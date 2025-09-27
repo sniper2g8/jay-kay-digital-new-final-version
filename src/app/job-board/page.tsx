@@ -1,20 +1,20 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Clock,
-  CheckCircle,
-  AlertCircle,
-  Printer,
-  RefreshCw,
-  Users,
-  Timer,
-  TrendingUp,
-} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/lib/supabase";
+import {
+    AlertCircle,
+    CheckCircle,
+    Clock,
+    Printer,
+    RefreshCw,
+    Timer,
+    TrendingUp,
+    Users,
+} from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 
 interface JobBoardData {
   id: string;
@@ -632,53 +632,6 @@ function JobBoardContent() {
               ).length === 0 && (
                 <p className="text-center text-gray-500 py-4">
                   No jobs waiting
-                </p>
-              )}
-          </CardContent>
-        </Card>
-
-        {/* Recently Completed */}
-        <Card className="border-green-200">
-          <CardHeader className="bg-green-50">
-            <CardTitle className="flex items-center space-x-2">
-              <CheckCircle className="h-5 w-5 text-green-600" />
-              <span>
-                Recently Completed (
-                {
-                  jobs.filter((j) =>
-                    ["completed", "finished", "ready"].includes(
-                      j.status?.toLowerCase(),
-                    ),
-                  ).length
-                }
-                )
-              </span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-4 space-y-3">
-            {isLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <RefreshCw className="h-5 w-5 animate-spin mr-2" />
-                <span>Loading completed jobs...</span>
-              </div>
-            ) : (
-              jobs
-                .filter((j) =>
-                  ["completed", "finished", "ready"].includes(
-                    j.status?.toLowerCase(),
-                  ),
-                )
-                .slice(0, 10)
-                .map((job) => <JobCard key={job.id} job={job} showPickup />)
-            )}
-            {!isLoading &&
-              jobs.filter((j) =>
-                ["completed", "finished", "ready"].includes(
-                  j.status?.toLowerCase(),
-                ),
-              ).length === 0 && (
-                <p className="text-center text-gray-500 py-4">
-                  No recent completions
                 </p>
               )}
           </CardContent>

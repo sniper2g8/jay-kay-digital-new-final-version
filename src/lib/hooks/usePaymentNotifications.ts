@@ -4,9 +4,9 @@
  */
 
 import {
-  notificationService,
-  PaymentNotificationData,
-  InvoiceNotificationData,
+    InvoiceNotificationData,
+    notificationService,
+    PaymentNotificationData,
 } from "../notification-service.ts";
 import { supabase } from "../supabase.ts";
 

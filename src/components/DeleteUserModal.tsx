@@ -5,29 +5,29 @@
 
 "use client";
 
-import React, { useState } from "react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Database } from "@/lib/database.types";
+import { deleteUser } from "@/lib/hooks/useUserManagement";
 import {
-  Loader2,
-  Trash2,
   AlertTriangle,
   CheckCircle,
-  User,
+  Loader2,
   Shield,
+  Trash2,
+  User,
 } from "lucide-react";
-import { deleteUser } from "@/lib/hooks/useUserManagement";
-import { Database } from "@/lib/database.types";
+import React, { useState } from "react";
 
 type UserRole = Database["public"]["Enums"]["user_role"];
 
@@ -115,7 +115,7 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
   const getRoleLabel = (role: UserRole) => {
     return role
       .split("_")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
   };
 

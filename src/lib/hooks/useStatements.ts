@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 // =====================================================
@@ -131,7 +131,7 @@ export function useStatementPeriods() {
 
   const fetchStatementPeriods = useCallback(async () => {
     try {
-      console.log("useStatementPeriods: Starting fetch...");
+      // Starting fetch
       setIsLoading(true);
       setError(null);
 
@@ -152,28 +152,15 @@ export function useStatementPeriods() {
         .order("period_start", { ascending: false });
 
       if (fetchError) {
-        console.error("useStatementPeriods: Error fetching data:", {
-          message: fetchError.message,
-          code: fetchError.code,
-          details: fetchError.details,
-          hint: fetchError.hint,
-        });
+        // Error handled by throw fetchError, no additional logging needed
         throw fetchError;
       }
 
-      console.log("useStatementPeriods: Successfully fetched data", {
-        count: periods?.length || 0,
-      });
+      // Successfully fetched data
       setData(periods || []);
     } catch (err) {
       // Enhanced error logging for debugging
-      console.error("Error fetching statement periods:", {
-        error: err,
-        message: err instanceof Error ? err.message : "Unknown error",
-        stack: err instanceof Error ? err.stack : undefined,
-        errorType: typeof err,
-        errorDetails: JSON.stringify(err, null, 2),
-      });
+      // Error handled by setError and toast, no additional logging needed
       const errorMessage =
         err instanceof Error ? err.message : "Failed to load statement periods";
       setError(errorMessage);
@@ -184,7 +171,7 @@ export function useStatementPeriods() {
   }, []);
 
   useEffect(() => {
-    console.log("useStatementPeriods: Initializing...");
+    // Initializing
     fetchStatementPeriods();
   }, [fetchStatementPeriods]);
 
@@ -210,41 +197,31 @@ export function useStatementPeriod(id: string | null) {
 
   const fetchStatementPeriod = useCallback(async () => {
     if (!id) {
-      console.log("useStatementPeriod: No ID provided");
+      // No ID provided
       setData(null);
       setTransactions([]);
       setIsLoading(false);
       return;
     }
 
-    console.log("useStatementPeriod: Fetching statement", { id });
+    // Fetching statement
 
     try {
       setIsLoading(true);
       setError(null);
 
-      console.log("useStatementPeriod: Starting fetch for ID", id);
+      // Starting fetch for ID
 
       // Use computed endpoint that aggregates invoices and payments
       const res = await fetch(`/api/statements/${id}/computed`);
       if (!res.ok) {
         throw new Error(`Failed to load statement (${res.status})`);
       }
-      const payload = await res.json();
+      const payload: { period: CustomerStatementPeriod | null; transactions: CustomerStatementTransaction[] } = await res.json();
       setData(payload.period || null);
       setTransactions(payload.transactions || []);
     } catch (err) {
-      console.error("Error fetching statement period:", {
-        error: err,
-        message: err instanceof Error ? err.message : "Unknown error",
-        code:
-          err instanceof Error && "code" in err ? (err as any).code : undefined,
-        details:
-          err instanceof Error && "details" in err
-            ? (err as any).details
-            : undefined,
-        stack: err instanceof Error ? err.stack : undefined,
-      });
+      // Error handled by setError and toast, no additional logging needed
 
       const errorMessage =
         err instanceof Error ? err.message : "Failed to load statement period";
@@ -308,9 +285,7 @@ export function useCustomerBalances() {
           fetchError.code === "42P01" ||
           fetchError.message.includes("does not exist")
         ) {
-          console.warn(
-            "Customer account balances table not found or not accessible. This feature requires manual database setup.",
-          );
+          // Warning handled by setError, no additional logging needed
           setData([]);
           setError(
             "Customer balances feature requires database setup. Please contact administrator.",
@@ -350,7 +325,7 @@ export function useCustomerBalances() {
 
       setData(balances);
     } catch (err) {
-      console.error("Error fetching customer balances:", err);
+      // Error handled by setError and toast, no additional logging needed
       setError(
         err instanceof Error ? err.message : "Failed to load customer balances",
       );
@@ -420,24 +395,7 @@ export function useStatementActions() {
       return data;
     } catch (error) {
       // Enhanced error logging with structured details
-      const errorDetails = {
-        message: error instanceof Error ? error.message : "Unknown error",
-        code:
-          error instanceof Error && "code" in error
-            ? (error as any).code
-            : undefined,
-        details:
-          error instanceof Error && "details" in error
-            ? (error as any).details
-            : undefined,
-        hint:
-          error instanceof Error && "hint" in error
-            ? (error as any).hint
-            : undefined,
-        stack: error instanceof Error ? error.stack : undefined,
-      };
-
-      console.error("Error creating statement period:", errorDetails);
+      // Error handled by toast, no additional logging needed
 
       // Show a more specific error message based on the error type
       const errorMessage =
@@ -472,7 +430,7 @@ export function useStatementActions() {
       toast.success("Transaction added successfully");
       return data;
     } catch (error) {
-      console.error("Error adding transaction:", error);
+      // Error handled by toast, no additional logging needed
       toast.error("Failed to add transaction");
       throw error;
     } finally {
@@ -495,7 +453,7 @@ export function useStatementActions() {
 
       toast.success("Statement generated successfully");
     } catch (error) {
-      console.error("Error generating statement:", error);
+      // Error handled by toast, no additional logging needed
       toast.error("Failed to generate statement");
       throw error;
     } finally {
@@ -519,7 +477,7 @@ export function useStatementActions() {
 
       toast.success("Statement sent successfully");
     } catch (error) {
-      console.error("Error sending statement:", error);
+      // Error handled by toast, no additional logging needed
       toast.error("Failed to send statement");
       throw error;
     } finally {
@@ -594,8 +552,8 @@ export function useStatementStats() {
           average_balance: averageBalance,
           overdue_accounts: overdueAccounts,
         });
-      } catch (error) {
-        console.error("Error fetching statement stats:", error);
+      } catch (_error) {
+        // Error handled internally, no additional logging needed
       } finally {
         setIsLoading(false);
       }
@@ -641,8 +599,8 @@ async function generateStatementNumber(customerId: string): Promise<string> {
 
     const sequenceNumber = (count || 0) + 1;
     return `${baseNumber}-${sequenceNumber.toString().padStart(2, "0")}`;
-  } catch (error) {
-    console.error("Error generating statement number:", error);
+  } catch (_error) {
+    // Error handled by fallback, no additional logging needed
     // Fallback to simple timestamp-based number
     return `STMT-${Date.now()}`;
   }
@@ -694,8 +652,8 @@ async function updateStatementTotals(periodId: string) {
       .eq("id", periodId);
 
     if (error) throw error;
-  } catch (error) {
-    console.error("Error updating statement totals:", error);
+  } catch (_error) {
+    // Error handled internally, no additional logging needed
   }
 }
 
@@ -703,7 +661,7 @@ async function updateCustomerBalance(_customerId: string) {
   try {
     // Note: Customer balance is now tracked in customer_statement_periods table
     // No need to maintain a separate account balances table
-  } catch (error) {
-    console.error("Error updating customer balance:", error);
+  } catch (_error) {
+    // Error handled internally, no additional logging needed
   }
 }

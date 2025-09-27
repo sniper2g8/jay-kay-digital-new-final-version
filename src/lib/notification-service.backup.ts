@@ -8,7 +8,7 @@
 
 // import { supabase } from './supabase.ts'; // Remove unused import
 import { Database } from "./database.types.ts";
-import { supabase } from "./supabase.ts";
+import { createServiceRoleClient } from "./supabase-admin.ts";
 
 type NotificationType = Database["public"]["Enums"]["notification_type"];
 
@@ -87,21 +87,6 @@ class NotificationService {
     process.env.NEXT_PUBLIC_EMAIL_API_URL || "/api/send-email";
   private readonly SMS_API_URL =
     process.env.NEXT_PUBLIC_SMS_API_URL || "/api/send-sms";
-
-  /**
-   * Get Supabase client based on context
-   * Uses service role client for server-side operations, regular client for client-side
-   */
-  private async getSupabaseClient() {
-    // Check if we're in a server context (Node.js environment)
-    if (typeof window === 'undefined') {
-      // Dynamically import to avoid issues in browser context
-      const { createServiceRoleClient } = await import('./supabase-admin.ts');
-      return createServiceRoleClient();
-    }
-    // Use regular client for client-side operations
-    return supabase;
-  }
 
   /**
    * Send notification when a job is submitted (new job_received notification type)
@@ -539,8 +524,8 @@ class NotificationService {
    */
   private async createNotification(data: NotificationData): Promise<string> {
     try {
-      // Use appropriate Supabase client based on context
-      const supabaseClient = await this.getSupabaseClient();
+      // Use service role client for server-side operations
+      const adminSupabase = createServiceRoleClient();
 
       // Validate recipient_id is a valid UUID or skip if empty
       if (!data.recipient_id || data.recipient_id.trim() === "") {
@@ -548,7 +533,7 @@ class NotificationService {
         return "skipped";
       }
 
-      const { data: notificationData, error } = await supabaseClient
+      const { data: notificationData, error } = await adminSupabase
         .from("notifications")
         .insert({
           recipient_id: data.recipient_id,
@@ -698,10 +683,10 @@ class NotificationService {
     { id: string; email?: string; phone?: string }[]
   > {
     try {
-      // Use appropriate Supabase client based on context
-      const supabaseClient = await this.getSupabaseClient();
+      // Use service role client for server-side operations
+      const adminSupabase = createServiceRoleClient();
 
-      const { data, error } = await supabaseClient
+      const { data, error } = await adminSupabase
         .from("appUsers")
         .select("id, email, phone")
         .eq("primary_role", "admin");
@@ -727,10 +712,10 @@ class NotificationService {
    */
   private async shouldSendEmail(userId: string): Promise<boolean> {
     try {
-      // Use appropriate Supabase client based on context
-      const supabaseClient = await this.getSupabaseClient();
+      // Use service role client for server-side operations
+      const adminSupabase = createServiceRoleClient();
 
-      const { data, error } = await supabaseClient
+      const { data, error } = await adminSupabase
         .from("notification_preferences")
         .select("email_notifications")
         .eq("user_id", userId)
@@ -752,10 +737,10 @@ class NotificationService {
    */
   private async shouldSendSMS(userId: string): Promise<boolean> {
     try {
-      // Use appropriate Supabase client based on context
-      const supabaseClient = await this.getSupabaseClient();
+      // Use service role client for server-side operations
+      const adminSupabase = createServiceRoleClient();
 
-      const { data, error } = await supabaseClient
+      const { data, error } = await adminSupabase
         .from("notification_preferences")
         .select("sms_notifications")
         .eq("user_id", userId)
@@ -1162,9 +1147,9 @@ class NotificationService {
     templateType: string,
   ): Promise<{ subject: string; content: string } | null> {
     try {
-      const supabaseClient = await this.getSupabaseClient();
+      const adminSupabase = createServiceRoleClient();
 
-      const { data, error } = await supabaseClient
+      const { data, error } = await adminSupabase
         .from("email_templates")
         .select("subject, content")
         .eq("type", templateType)
@@ -1233,9 +1218,9 @@ class NotificationService {
     metadata?: Record<string, any>;
   }): Promise<void> {
     try {
-      const supabaseClient = await this.getSupabaseClient();
+      const adminSupabase = createServiceRoleClient();
 
-      const { error: insertError } = await supabaseClient.from("email_notifications").insert({
+      const { error: insertError } = await adminSupabase.from("email_notifications").insert({
         type: logData.type,
         recipient_email: logData.recipient_email,
         recipient_name: logData.recipient_name,
@@ -1262,6 +1247,6 @@ export const notificationService = new NotificationService();
 
 // Export types for use in other files
 export type {
-  InvoiceNotificationData, JobNotificationData, NotificationData, PaymentNotificationData
+    InvoiceNotificationData, JobNotificationData, NotificationData, PaymentNotificationData
 };
 

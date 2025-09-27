@@ -1,61 +1,61 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import PaymentReceiptPDF from "@/components/PaymentReceiptPDF";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
 } from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-} from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  CreditCard,
-  DollarSign,
-  TrendingUp,
-  Plus,
-  Search,
-  Download,
-  Eye,
-  Edit,
-  Trash2,
-  FileText,
-  User,
-  ArrowLeft,
-} from "lucide-react";
-import { supabase } from "@/lib/supabase";
 import { Database } from "@/lib/database.types";
 import { recordPaymentWithNotification } from "@/lib/hooks/usePaymentNotifications";
-import PaymentReceiptPDF from "@/components/PaymentReceiptPDF";
+import { supabase } from "@/lib/supabase";
+import {
+    ArrowLeft,
+    CreditCard,
+    DollarSign,
+    Download,
+    Edit,
+    Eye,
+    FileText,
+    Plus,
+    Search,
+    Trash2,
+    TrendingUp,
+    User,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 type PaymentRow = Database["public"]["Tables"]["payments"]["Row"];
 type PaymentMethod = Database["public"]["Enums"]["payment_method"];
@@ -245,14 +245,29 @@ export default function PaymentsPage() {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-SL", {
-      style: "currency",
-      currency: "SLL",
-    }).format(amount);
+    // Use a consistent formatting approach to avoid hydration mismatches
+    // Format as SLL followed by the amount with 2 decimal places
+    return `SLL ${amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
   };
 
-  const getMethodBadge = (method: PaymentMethod) => {
-    const variants = {
+  const formatDate = (dateString: string, includeTime: boolean = false) => {
+    // Use a consistent date formatting approach to avoid hydration mismatches
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    
+    if (includeTime) {
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${year}-${month}-${day} ${hours}:${minutes}`;
+    }
+    
+    return `${year}-${month}-${day}`;
+  };
+
+  const getMethodBadge = (method: PaymentMethod | string) => {
+    const variants: Record<string, string> = {
       cash: "bg-green-100 text-green-800 border-green-200",
       card: "bg-blue-100 text-blue-800 border-blue-200",
       bank_transfer: "bg-purple-100 text-purple-800 border-purple-200",
@@ -775,7 +790,7 @@ export default function PaymentsPage() {
                         {getMethodBadge(payment.payment_method)}
                       </TableCell>
                       <TableCell>
-                        {new Date(payment.payment_date).toLocaleDateString()}
+                        {formatDate(payment.payment_date)}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
@@ -875,9 +890,9 @@ export default function PaymentsPage() {
                     Payment Date
                   </Label>
                   <p>
-                    {new Date(
+                    {formatDate(
                       selectedPayment.payment_date,
-                    ).toLocaleDateString()}
+                    )}
                   </p>
                 </div>
                 <div>
@@ -920,7 +935,7 @@ export default function PaymentsPage() {
                 </Label>
                 <p>
                   {selectedPayment.created_at
-                    ? new Date(selectedPayment.created_at).toLocaleString()
+                    ? formatDate(selectedPayment.created_at, true)
                     : "N/A"}
                 </p>
               </div>

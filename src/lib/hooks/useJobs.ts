@@ -1,8 +1,8 @@
-import useSWR, { mutate } from "swr";
-import { useEffect } from "react";
-import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { Database } from "@/lib/database.types";
+import { supabase } from "@/lib/supabase";
+import { useEffect } from "react";
+import useSWR, { mutate } from "swr";
 
 // Job interface - updated to match new consolidated schema
 export interface Job {
@@ -142,7 +142,7 @@ const fetchJobById = async (jobId: string): Promise<JobWithCustomer> => {
     .single();
 
   if (customerError) {
-    console.error("Customer fetch error:", customerError);
+    // Customer fetch error handled by returning default customer name
     // Return job without customer name if customer not found
     return {
       ...(job as unknown as Job),
@@ -245,7 +245,7 @@ export const useJobs = () => {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "jobs" },
-        (payload) => {
+        (_payload) => {
           // Revalidate SWR cache when jobs table changes
           mutate("jobs");
           // Also revalidate related caches
@@ -286,7 +286,7 @@ export const useJobsWithCustomers = () => {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "jobs" },
-        (payload) => {
+        (_payload) => {
           mutate("jobs-with-customers");
           mutate("jobs");
           mutate("job-stats");
@@ -295,7 +295,7 @@ export const useJobsWithCustomers = () => {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "customers" },
-        (payload) => {
+        (_payload) => {
           mutate("jobs-with-customers");
         },
       )
@@ -414,7 +414,7 @@ export const useJobStats = () => {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "jobs" },
-        (payload) => {
+        (_payload) => {
           mutate("job-stats");
           mutate("jobs");
           mutate("jobs-with-customers");

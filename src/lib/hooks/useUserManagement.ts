@@ -3,9 +3,9 @@
  * Handles user CRUD operations, password resets, and role management
  */
 
-import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
 import { Database } from "@/lib/database.types";
+import { supabase } from "@/lib/supabase";
+import { useEffect, useState } from "react";
 
 type User = Database["public"]["Tables"]["appUsers"]["Row"];
 type UserRole = Database["public"]["Enums"]["user_role"];

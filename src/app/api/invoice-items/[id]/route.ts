@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import { createServiceRoleClient } from "@/lib/supabase-admin";
+import { NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
