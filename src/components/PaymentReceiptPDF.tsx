@@ -201,72 +201,75 @@ export const PaymentReceiptPDF = forwardRef<PaymentReceiptPDFRef, PaymentReceipt
       {/* Receipt Document */}
       <div 
         ref={receiptRef} 
-        className="bg-white p-8 max-w-2xl mx-auto font-sans border border-gray-200 shadow-lg"
+        className="bg-white p-6 max-w-2xl mx-auto font-sans border border-gray-200"
         data-export-root=""
       >
-        {/* Header */}
-        <div className="border-b-2 border-gray-200 pb-6 mb-6">
-          <div className="flex justify-between items-start">
-            {/* Company Info */}
-            <div className="space-y-2">
-              <div className="flex items-center space-x-3">
-                <div className="bg-blue-600 p-2 rounded-lg">
-                  <Receipt className="h-8 w-8 text-white" />
+ {/* Header */}
+          <div className="border-b border-gray-200 pb-4 mb-4 relative z-10">
+            <div className="flex justify-between items-start">
+              <div className="flex items-start gap-3">
+                {/* Logo */}
+                <div className="flex-shrink-0">
+                  <img 
+                    src="/JK_LogoINV.jpg" 
+                    alt="Jay Kay Digital Press Logo" 
+                    className="w-16 h-16 object-contain"
+                    crossOrigin="anonymous"
+                  />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Jay Kay Digital Press</h1>
-                  <p className="text-sm text-gray-600">Professional Printing Services</p>
+                  <h1 className="text-xl font-bold text-gray-900">Jay Kay Digital Press</h1>
+                  <p className="text-xs text-gray-600">Professional Printing Services</p>
                 </div>
               </div>
               
-              <div className="space-y-1 text-sm text-gray-600">
-                <div className="flex items-center space-x-2">
-                  <Building2 className="h-4 w-4" />
-                  <span>123 Business Street, Freetown, Sierra Leone</span>
+              <div className="space-y-0.5 text-xs text-gray-600">
+                <div className="flex items-center space-x-1">
+                  <Building2 className="h-3 w-3" />
+                  <span>St. Edward School Avenue by Caritas, Freetown, Sierra Leone</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Phone className="h-4 w-4" />
-                  <span>+232 XX XXX XXXX</span>
+                <div className="flex items-center space-x-1">
+                  <Phone className="h-3 w-3" />
+                  <span>+232 34 788 711</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Mail className="h-4 w-4" />
+                <div className="flex items-center space-x-1">
+                  <Mail className="h-3 w-3" />
                   <span>info@jaykaydigitalpress.com</span>
                 </div>
               </div>
             </div>
 
             {/* Receipt Info */}
-            <div className="text-right space-y-1">
-              <h2 className="text-3xl font-bold text-blue-600">RECEIPT</h2>
-              <div className="space-y-1 text-sm">
+            <div className="text-right space-y-0.5">
+              <h2 className="text-2xl font-bold text-red-600">RECEIPT</h2>
+              <div className="space-y-0.5 text-xs">
                 <div><span className="font-medium">Receipt #:</span> {payment.payment_number}</div>
                 <div><span className="font-medium">Date:</span> {formatDate(paymentDate.toISOString())}</div>
                 <div><span className="font-medium">Status:</span> 
-                  <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium">
+                  <span className="ml-1 px-1.5 py-0.5 bg-green-100 text-green-800 rounded text-xs font-medium">
                     {payment.payment_status.toUpperCase()}
                   </span>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
         {/* Customer Information */}
-        <div className="grid md:grid-cols-2 gap-6 mb-6">
+        <div className="grid md:grid-cols-2 gap-4 mb-4">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-              <User className="h-5 w-5 mr-2 text-gray-600" />
+            <h3 className="text-sm font-semibold text-gray-900 mb-2 flex items-center">
+              <User className="h-4 w-4 mr-1.5 text-gray-600" />
               Payment From
             </h3>
-            <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-              <div className="font-medium text-gray-900">{customer?.business_name || payment.customer_human_id}</div>
+            <div className="bg-gray-50 p-3 rounded-lg space-y-1.5">
+              <div className="font-medium text-gray-900 text-sm">{customer?.business_name || payment.customer_human_id}</div>
               {customer?.contact_person && (
-                <div className="text-gray-600">Attn: {customer.contact_person}</div>
+                <div className="text-gray-600 text-xs">Attn: {customer.contact_person}</div>
               )}
               {customer?.address && (
-                <div className="text-gray-600 text-sm">
-                  <div className="flex items-start space-x-2">
-                    <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                <div className="text-gray-600 text-xs">
+                  <div className="flex items-start space-x-1.5">
+                    <MapPin className="h-3 w-3 mt-0.5 flex-shrink-0" />
                     <div>
                       {customer.address}
                       {customer.city && <div>{customer.city}, {customer.state} {customer.zip_code}</div>}
@@ -275,14 +278,14 @@ export const PaymentReceiptPDF = forwardRef<PaymentReceiptPDFRef, PaymentReceipt
                 </div>
               )}
               {customer?.email && (
-                <div className="text-gray-600 text-sm flex items-center space-x-2">
-                  <Mail className="h-4 w-4" />
+                <div className="text-gray-600 text-xs flex items-center space-x-1.5">
+                  <Mail className="h-3 w-3" />
                   <span>{customer.email}</span>
                 </div>
               )}
               {customer?.phone && (
-                <div className="text-gray-600 text-sm flex items-center space-x-2">
-                  <Phone className="h-4 w-4" />
+                <div className="text-gray-600 text-xs flex items-center space-x-1.5">
+                  <Phone className="h-3 w-3" />
                   <span>{customer.phone}</span>
                 </div>
               )}
@@ -292,15 +295,15 @@ export const PaymentReceiptPDF = forwardRef<PaymentReceiptPDFRef, PaymentReceipt
           {/* QR Code */}
           <div className="flex flex-col items-center justify-center">
             {qrCodeDataUrl && (
-              <div className="text-center space-y-2">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <QrCode className="h-4 w-4 text-gray-600" />
-                  <span className="text-sm font-medium text-gray-600">Receipt QR Code</span>
+              <div className="text-center space-y-1.5">
+                <div className="flex items-center justify-center gap-1.5 mb-1">
+                  <QrCode className="h-3 w-3 text-gray-600" />
+                  <span className="text-xs font-medium text-gray-600">Receipt QR Code</span>
                 </div>
                 <img 
                   src={qrCodeDataUrl} 
                   alt="Receipt QR Code" 
-                  className="w-24 h-24 mx-auto border rounded-lg"
+                  className="w-20 h-20 mx-auto border rounded-md"
                 />
                 <p className="text-xs text-gray-500">Scan for receipt verification</p>
               </div>
@@ -309,41 +312,41 @@ export const PaymentReceiptPDF = forwardRef<PaymentReceiptPDFRef, PaymentReceipt
         </div>
 
         {/* Payment Details */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Payment Details</h3>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+          <h3 className="text-sm font-semibold text-gray-900 mb-3">Payment Details</h3>
           
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="space-y-3">
-              <div className="flex justify-between">
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <div className="flex justify-between text-xs">
                 <span className="text-gray-600">Invoice Number:</span>
                 <span className="font-medium">{payment.invoice_no}</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between text-xs">
                 <span className="text-gray-600">Payment Method:</span>
                 <span className="font-medium capitalize">{payment.payment_method.replace('_', ' ')}</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between text-xs">
                 <span className="text-gray-600">Payment Date:</span>
                 <span className="font-medium">{formatDate(paymentDate.toISOString())}</span>
               </div>
               {payment.reference_number && (
-                <div className="flex justify-between">
+                <div className="flex justify-between text-xs">
                   <span className="text-gray-600">Reference Number:</span>
                   <span className="font-medium">{payment.reference_number}</span>
                 </div>
               )}
             </div>
             
-            <div className="space-y-3">
-              <div className="text-center bg-white rounded-lg p-4 border border-blue-200">
-                <div className="text-sm text-gray-600 mb-1">Amount Received</div>
-                <div className="text-3xl font-bold text-green-600">
+            <div className="space-y-2">
+              <div className="text-center bg-white rounded-md p-3 border border-blue-200">
+                <div className="text-xs text-gray-600 mb-1">Amount Received</div>
+                <div className="text-2xl font-bold text-green-600">
                   {formatCurrency(payment.amount)}
                 </div>
               </div>
               
               {invoice && (
-                <div className="text-center bg-gray-50 rounded-lg p-3 text-sm">
+                <div className="text-center bg-gray-50 rounded-md p-2.5 text-xs">
                   <div className="space-y-1">
                     <div className="flex justify-between">
                       <span>Invoice Total:</span>
@@ -364,8 +367,8 @@ export const PaymentReceiptPDF = forwardRef<PaymentReceiptPDFRef, PaymentReceipt
           </div>
           
           {payment.notes && (
-            <div className="mt-4 pt-4 border-t border-blue-200">
-              <div className="text-sm">
+            <div className="mt-3 pt-3 border-t border-blue-200">
+              <div className="text-xs">
                 <span className="font-medium text-gray-700">Notes: </span>
                 <span className="text-gray-600">{payment.notes}</span>
               </div>
@@ -374,15 +377,15 @@ export const PaymentReceiptPDF = forwardRef<PaymentReceiptPDFRef, PaymentReceipt
         </div>
 
         {/* Footer */}
-        <div className="border-t border-gray-200 pt-6 text-center">
-          <div className="text-sm text-gray-600 space-y-2">
+        <div className="border-t border-gray-200 pt-4 text-center">
+          <div className="text-xs text-gray-600 space-y-1.5">
             <p className="font-medium">Thank you for your payment!</p>
             <p>This receipt serves as proof of payment. Please retain for your records.</p>
             <p>For questions about this payment, please contact us at info@jaykaydigitalpress.com</p>
           </div>
           
-          <div className="mt-4 text-xs text-gray-500">
-            Receipt generated on {formatDate(createdDate.toISOString())} | Jay Kay Digital Press © 2024
+          <div className="mt-3 text-xs text-gray-500">
+            Receipt generated on {formatDate(createdDate.toISOString())} | Jay Kay Digital Press © 2025
           </div>
         </div>
       </div>

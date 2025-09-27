@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { Database } from "@/lib/database.types";
+import PaymentReceiptPDF from "@/components/PaymentReceiptPDF";
 
 type PaymentRow = Database['public']['Tables']['payments']['Row'];
 type PaymentMethod = Database['public']['Enums']['payment_method'];
@@ -56,6 +57,7 @@ export default function PaymentsPage() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [isReceiptDialogOpen, setIsReceiptDialogOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -222,6 +224,12 @@ export default function PaymentsPage() {
   const handleViewPayment = (payment: Payment) => {
     setSelectedPayment(payment);
     setIsViewDialogOpen(true);
+  };
+
+  // Handle view payment receipt
+  const handleViewReceipt = (payment: Payment) => {
+    setSelectedPayment(payment);
+    setIsReceiptDialogOpen(true);
   };
 
   // Handle edit payment
@@ -628,6 +636,14 @@ export default function PaymentsPage() {
                           <Button 
                             variant="ghost" 
                             size="sm"
+                            onClick={() => handleViewReceipt(payment)}
+                            title="View Receipt"
+                          >
+                            <FileText className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
                             onClick={() => handleEditPayment(payment)}
                             title="Edit Payment"
                           >
@@ -900,6 +916,59 @@ export default function PaymentsPage() {
             </Button>
             <Button onClick={handleSavePayment}>
               Add Payment
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Receipt Dialog */}
+      <Dialog open={isReceiptDialogOpen} onOpenChange={setIsReceiptDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Payment Receipt</DialogTitle>
+            <DialogDescription>
+              Payment receipt for {selectedPayment?.payment_number}
+            </DialogDescription>
+          </DialogHeader>
+          {selectedPayment && (
+            <PaymentReceiptPDF
+              payment={{
+                id: selectedPayment.id,
+                payment_number: selectedPayment.payment_number,
+                amount: selectedPayment.amount,
+                payment_method: selectedPayment.payment_method,
+                payment_date: selectedPayment.payment_date,
+                reference_number: selectedPayment.reference_number || undefined,
+                notes: selectedPayment.notes || undefined,
+                invoice_no: selectedPayment.invoice_no,
+                customer_human_id: selectedPayment.customer_human_id,
+                payment_status: selectedPayment.payment_status || 'completed',
+                created_at: selectedPayment.created_at || new Date().toISOString()
+              }}
+              customer={
+                selectedPayment.customers 
+                  ? {
+                      business_name: selectedPayment.customers.business_name || selectedPayment.customer_human_id || '',
+                    }
+                  : undefined
+              }
+              invoice={
+                selectedPayment.invoices
+                  ? {
+                      id: selectedPayment.id,
+                      invoiceNo: selectedPayment.invoice_no,
+                      total: selectedPayment.amount,
+                      amountPaid: selectedPayment.amount,
+                      amountDue: 0
+                    }
+                  : undefined
+              }
+              showActions={true}
+            />
+          )}
+          <DialogFooter>
+            <Button onClick={() => setIsReceiptDialogOpen(false)}>
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>
