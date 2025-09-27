@@ -15,6 +15,9 @@ export async function processPayment(paymentData: {
   try {
     const supabase = createServiceRoleClient();
 
+    // Fix precision issues by rounding to 2 decimal places
+    const paymentAmount = Math.round(paymentData.amount * 100) / 100;
+
     // Create payment record with correct column names
     const paymentMethodMapping: Record<string, string> = {
       cash: "cash",
@@ -37,7 +40,7 @@ export async function processPayment(paymentData: {
     const { data, error: paymentError } = await supabase.from("payments").insert({
       customer_human_id: paymentData.customer_human_id,
       invoice_no: paymentData.invoice_no,
-      amount: paymentData.amount,
+      amount: paymentAmount,
       payment_method: (paymentMethodMapping[paymentData.payment_method] ||
         paymentData.payment_method) as
         | "cash"

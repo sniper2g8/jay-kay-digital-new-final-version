@@ -69,7 +69,9 @@ export function SimplifiedInvoiceTemplate({
   const discount = typeof invoice.discount === 'string' ? parseFloat(invoice.discount) || 0 : invoice.discount || 0;
   const total = invoice.total || subtotal + tax - discount;
   const amountPaid = typeof invoice.amountPaid === 'string' ? parseFloat(invoice.amountPaid) || 0 : invoice.amountPaid || 0;
-  const amountDue = total - amountPaid;
+  
+  // Fix precision issues by rounding to 2 decimal places
+  const amountDue = Math.round((total - amountPaid) * 100) / 100;
   const currency = invoice.currency || 'SLL';
 
   // Calculate dates

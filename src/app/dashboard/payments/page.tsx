@@ -153,10 +153,13 @@ export default function PaymentsPage() {
         return;
       }
 
+      // Fix precision issues by rounding to 2 decimal places
+      const paymentAmount = Math.round(parseFloat(newPayment.amount) * 100) / 100;
+
       const { error } = await supabase
         .from('payments')
         .insert([{
-          amount: parseFloat(newPayment.amount),
+          amount: paymentAmount,
           payment_method: newPayment.payment_method as PaymentMethod,
           payment_date: newPayment.payment_date,
           reference_number: newPayment.reference_number || null,
@@ -291,8 +294,11 @@ export default function PaymentsPage() {
         return;
       }
 
+      // Fix precision issues by rounding to 2 decimal places
+      const paymentAmount = Math.round(parseFloat(newPayment.amount) * 100) / 100;
+
       const paymentData = {
-        amount: parseFloat(newPayment.amount),
+        amount: paymentAmount,
         payment_method: newPayment.payment_method,
         payment_date: newPayment.payment_date,
         reference_number: newPayment.reference_number || null,
@@ -970,8 +976,8 @@ export default function PaymentsPage() {
                         : selectedPayment.amount,
                       amountDue: selectedPayment.invoices.total !== undefined && selectedPayment.invoices.total !== null &&
                         selectedPayment.invoices.amountPaid !== undefined && selectedPayment.invoices.amountPaid !== null
-                        ? selectedPayment.invoices.total - selectedPayment.invoices.amountPaid
-                        : selectedPayment.amount - selectedPayment.amount
+                        ? Math.round((selectedPayment.invoices.total - selectedPayment.invoices.amountPaid) * 100) / 100
+                        : Math.round((selectedPayment.amount - selectedPayment.amount) * 100) / 100
                     }
                   : undefined
               }

@@ -141,11 +141,14 @@ function InvoiceEditContent() {
       setError(null); // Clear any previous errors
       
       // Validate payment amount
-      const paymentAmount = parseFloat(paymentForm.amount);
+      let paymentAmount = parseFloat(paymentForm.amount);
       if (isNaN(paymentAmount) || paymentAmount <= 0) {
         setError('Please enter a valid payment amount');
         return;
       }
+      
+      // Fix precision issues by rounding to 2 decimal places
+      paymentAmount = Math.round(paymentAmount * 100) / 100;
       
       // Generate payment number
       const paymentNumber = `PAY-${Date.now()}`;
@@ -359,6 +362,11 @@ function InvoiceEditContent() {
       
       console.log('Payment successfully recorded:', insertedPayment);
       
+      // Fix precision issues in calculations
+      const previousPaymentsTotal = Math.round(payments.reduce((sum, p) => sum + parseFloat(p.amount), 0) * 100) / 100;
+      const newTotalPaid = Math.round((previousPaymentsTotal + paymentAmount) * 100) / 100;
+      const newAmountDue = Math.round((invoice.total - newTotalPaid) * 100) / 100;
+      
       // Store payment data for receipt generation
       const receiptData = {
         ...insertedPayment,
@@ -367,15 +375,15 @@ function InvoiceEditContent() {
           id: invoiceId,
           invoiceNo: invoiceData.invoiceNo,
           total: invoice.total,
-          amountPaid: payments.reduce((sum, p) => sum + parseFloat(p.amount), 0) + paymentAmount,
-          amountDue: invoice.total - (payments.reduce((sum, p) => sum + parseFloat(p.amount), 0) + paymentAmount)
+          amountPaid: newTotalPaid,
+          amountDue: newAmountDue
         }
       };
       setLastPaymentData(receiptData);
       
       // Update invoice amountPaid
-      const totalPaid = payments.reduce((sum, p) => sum + parseFloat(p.amount), 0) + paymentAmount;
-      const amountDue = invoice.total - totalPaid;
+      const totalPaid = newTotalPaid;
+      const amountDue = newAmountDue;
       
       console.log('Updating invoice with payment totals:', {
         invoiceId,
@@ -1069,14 +1077,14 @@ function InvoiceEditContent() {
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Amount Paid:</span>
                     <span className="font-medium text-green-600">
-                      {formatCurrency(payments.reduce((sum, p) => sum + parseFloat(p.amount), 0))}
+                      {formatCurrency(Math.round(payments.reduce((sum, p) => sum + parseFloat(p.amount), 0) * 100) / 100)}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm font-bold border-t pt-2">
                     <span>Amount Due:</span>
                     <span className="text-red-600">
                       {formatCurrency(
-                        (invoice?.total || 0) - payments.reduce((sum, p) => sum + parseFloat(p.amount), 0)
+                        Math.round(((invoice?.total || 0) - payments.reduce((sum, p) => sum + parseFloat(p.amount), 0)) * 100) / 100
                       )}
                     </span>
                   </div>
